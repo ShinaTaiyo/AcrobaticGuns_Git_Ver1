@@ -84,7 +84,7 @@ public:
 
 	//1f前の位置
 	void SetPosOld(D3DXVECTOR3 PosOld) { m_PosOld = PosOld; }                               //1f前の位置の設定
-	D3DXVECTOR3& GetPosOld() { return m_PosOld; }                                            //1f前の位置を設定
+	const D3DXVECTOR3& GetPosOld() const { return m_PosOld; }                                            //1f前の位置を設定
 
 	//初期位置
 	void SetSupportPos(D3DXVECTOR3 SupportPos) { m_SupportPos = SupportPos; }               //設置位置を設定する
@@ -97,6 +97,7 @@ public:
 	//==========================================================
 	//移動量
 	//==========================================================
+	
 	//移動量
 	void SetMove(D3DXVECTOR3 move) { m_Move = move; }                                       //移動量を設定する
 	D3DXVECTOR3& GetMove() { return m_Move; }                                               //移動量を取得する

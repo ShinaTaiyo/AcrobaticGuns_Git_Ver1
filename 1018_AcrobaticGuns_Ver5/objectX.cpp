@@ -28,7 +28,8 @@
 CObjectX::CObjectX(int nPriority) : CObject(nPriority), m_bUseDraw(true),m_ObjectXInfo(), m_bAutoSubLife(false),
 m_bColorChenge(false),m_bHitStop(false), m_bIsJumping(false), m_bIsLanding(false), m_bIsWalling(false),m_bUseAddRot(false), m_bUseAddScaling(false),
 m_bUseAddSpeed(false),m_bUseGravity(false), m_bUseInteria(false), m_bUseMultiSpeed(false),m_bUseRatioLifeAlpha(false),
-m_bUseShadow(false), m_bUseUpdatePos(false), m_fGravityPower(0.0f), m_fInertia(0.0f), m_nChengeColorTime(0), m_nHitStopTime(0), m_nLife(0), m_nMaxLife(0), m_nManagerType(0),m_nObjXType(OBJECTXTYPE_BLOCK), m_nTypeNum(0), m_bUseMultiScale(false), m_MultiScale(NULL_VECTOR3),
+m_bUseShadow(false), m_bUseUpdatePos(false), m_fGravityPower(0.0f), m_fInertia(0.0f), m_nChengeColorTime(0), m_nHitStopTime(0), m_nLife(0), m_nMaxLife(0),
+m_nManagerType(0),m_nObjXType(OBJECTXTYPE_BLOCK), m_nTypeNum(0), m_bUseMultiScale(false), m_MultiScale(NULL_VECTOR3),
 m_bUseCulling(false), m_Pos(NULL_VECTOR3), m_SupportPos(NULL_VECTOR3),m_PosOld(NULL_VECTOR3),m_Rot(NULL_VECTOR3),m_Scale(NULL_VECTOR3),m_FormarScale(NULL_VECTOR3),
 m_Size(NULL_VECTOR3),m_VtxMin(NULL_VECTOR3),m_OriginVtxMin(NULL_VECTOR3),m_VtxMax(NULL_VECTOR3),m_OriginVtxMax(NULL_VECTOR3),m_Move(NULL_VECTOR3),m_mtxWorld(),
 m_AddRot(NULL_VECTOR3),m_SenterPos(NULL_VECTOR3), m_MultiSpeed(NULL_VECTOR3), m_AddSpeed(NULL_VECTOR3), m_AddScale(NULL_VECTOR3)

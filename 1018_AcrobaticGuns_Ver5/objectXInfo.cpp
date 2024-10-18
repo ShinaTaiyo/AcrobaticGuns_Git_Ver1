@@ -29,16 +29,12 @@ CObjectXInfo::CObjectXInfo() : m_Type(CObjectX::OBJECTXTYPE_BLOCK),m_apObjectXLi
 		m_apObjectXList[nCntInfo].pBuffMat = {};              //マテリアルへのポインタ
 		m_apObjectXList[nCntInfo].dwNumMat = {};              //マテリアルの数
 		m_apObjectXList[nCntInfo].pMesh = {};                 //頂点情報へのポインタ
-           for (int nCntMat = 0; nCntMat < m_nMAX_MAT; nCntMat++)
-           {
-               m_apObjectXList[nCntInfo].pTexture[nCntMat] = {}; //テクスチャへのポインタ
-               m_apObjectXList[nCntInfo].Diffuse[nCntMat] = {};  //色合い
-           }
-
-		for (int nCntWord = 0; nCntWord < m_nMAXWORD; nCntWord++)
-		{
-			m_apObjectXList[nCntInfo].aFileName[nCntWord] = {};//文字列の初期化
-		}
+        for (int nCntMat = 0; nCntMat < m_nMAX_MAT; nCntMat++)
+        {
+            m_apObjectXList[nCntInfo].pTexture[nCntMat] = {}; //テクスチャへのポインタ
+            m_apObjectXList[nCntInfo].Diffuse[nCntMat] = {};  //色合い
+        }
+		m_apObjectXList[nCntInfo].aFileName = {};//文字列の初期化
 	}
 }
 //==============================================================================================
@@ -86,21 +82,21 @@ void CObjectXInfo::Unload()
 //===============================================
 //オブジェクトX登録処理
 //===============================================
-int CObjectXInfo::Regist(const char* pTextureName)
+int CObjectXInfo::Regist(string pTextureName)
 {
 	int nIdx = 0;//インデックス
     D3DCOLORVALUE Diffuse[m_nMAX_MAT] = {};
 	for (int nCntObjX = 0; nCntObjX < m_nMAX_INFO; nCntObjX++)
 	{
-		if (m_apObjectXList[nCntObjX].pMesh == nullptr)
-		{
+        if (m_apObjectXList[nCntObjX].pMesh == nullptr)
+        {
             LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice(); //デバイスの取得
             D3DXMATERIAL* pMat;                                               //マテリアルへのポインタ
 
             //============================
             //モデル情報を取得
             //============================
-            D3DXLoadMeshFromX(pTextureName,
+            D3DXLoadMeshFromX(pTextureName.c_str(),
                 D3DXMESH_SYSTEMMEM,
                 pDevice,
                 NULL,
@@ -109,7 +105,7 @@ int CObjectXInfo::Regist(const char* pTextureName)
                 &m_apObjectXList[nCntObjX].dwNumMat,
                 &m_apObjectXList[nCntObjX].pMesh);
 
-            strcpy(&m_apObjectXList[nCntObjX].aFileName[0], pTextureName);//ファイルパスを保存する
+            m_apObjectXList[nCntObjX].aFileName = pTextureName;//ファイルパスを保存する
 
             //================================================================================================================
 
@@ -136,8 +132,8 @@ int CObjectXInfo::Regist(const char* pTextureName)
 
             nIdx = nCntObjX;//インデックスを保存
             break;
-		}
-        else if (strcmp(&m_apObjectXList[nCntObjX].aFileName[0], pTextureName) == 0)
+        }
+        else if (m_apObjectXList[nCntObjX].aFileName == pTextureName)
         {//ファイル名が既にあるものと一致したら
             nIdx = nCntObjX;
             break;

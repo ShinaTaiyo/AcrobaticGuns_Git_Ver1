@@ -30,20 +30,17 @@ CTexture::CTexture() : m_pTextureList(),m_aTextureName()
 	//=====================================================
 	for (int nCntObjType = 0; nCntObjType < m_nMAXTEXTURE; nCntObjType++)
 	{
-		for (int nCntWord = 0; nCntWord < m_nMAX_WORD; nCntWord++)
-		{
-				m_aTextureName[nCntObjType][nCntWord] = {};
-		}
+		m_aTextureName[nCntObjType] = {};
 	}
 	//==============================================================================================
 
 	//=====================================================
 	//テクスチャリストの初期化
 	//=====================================================
-		for (int nCntTexture = 0; nCntTexture < m_nMAXTEXTURE; nCntTexture++)
-		{
-			m_pTextureList[nCntTexture] = {};
-		}
+	for (int nCntTexture = 0; nCntTexture < m_nMAXTEXTURE; nCntTexture++)
+	{
+		m_pTextureList[nCntTexture] = {};
+	}
 	//==================================================================================================
 }
 //==================================================================================================
@@ -76,7 +73,7 @@ void CTexture::Unload()
 //=====================================================
 //テクスチャの登録処理
 //=====================================================
-int CTexture::Regist(const char* pTextureName)
+int CTexture::Regist(string pTextureName)
 {
 	int nIdx = 0;//テクスチャ
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();//デバイスの取得
@@ -85,15 +82,15 @@ int CTexture::Regist(const char* pTextureName)
 		if (m_pTextureList[nCnt] == nullptr)
 		{//まだ登録されていない場合
 			D3DXCreateTextureFromFile(pDevice,
-				pTextureName,
+				pTextureName.c_str(),
 				&m_pTextureList[nCnt]);
 
-			strcpy(&m_aTextureName[nCnt][0],pTextureName);//ファイルパスを保存する
+			m_aTextureName[nCnt] = pTextureName;
 			nIdx = nCnt;//ID設定
 			m_nNumAll++;//テクスチャ総数
 			break;
 		}
-		else if (strcmp(&m_aTextureName[nCnt][0], pTextureName) == 0)
+		else if (m_aTextureName[nCnt] == pTextureName)
 		{//既に生成されているテクスチャのファイルパスと一致した
 			nIdx = nCnt;//ID設定（同じパスを使いまわす)
 			break;

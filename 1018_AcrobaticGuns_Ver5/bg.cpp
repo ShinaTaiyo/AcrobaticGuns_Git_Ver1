@@ -18,9 +18,9 @@
 //=========================================================================
 
 //========================
-//静的メンバt
+//静的メンバ
 //========================
-const char* CBg::m_apBGFILE_NAME[CBg::BG_MAX] =
+const string CBg::m_apBGFILE_NAME[CBg::BG_MAX] =
 {
 	"data\\TEXTURE\\Title\\Title_001.png",
 	"data\\TEXTURE\\Bg\\Wall_000.jpg",

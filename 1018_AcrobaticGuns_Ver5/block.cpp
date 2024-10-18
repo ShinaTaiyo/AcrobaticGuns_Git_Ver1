@@ -410,7 +410,7 @@ void CBlock::ExtrusionCollisionX(CObjectX* pMyObjX, CBlock* pBlock)
 {
 	D3DXVECTOR3 MyPos = pMyObjX->GetPos();
 	D3DXVECTOR3& Pos = pMyObjX->GetPos();              //位置を取得
-	D3DXVECTOR3& PosOld = pMyObjX->GetPosOld();        //1f前の位置を取得
+	const D3DXVECTOR3& PosOld = pMyObjX->GetPosOld();        //1f前の位置を取得
 	D3DXVECTOR3 MyVtxMax = NULL_VECTOR3;             //自分自身の最大頂点
 	D3DXVECTOR3 MyVtxMin = NULL_VECTOR3;             //自分自身の最小頂点
 
