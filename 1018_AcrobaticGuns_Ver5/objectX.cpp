@@ -26,13 +26,12 @@
 //コンストラクタ
 //================================================
 CObjectX::CObjectX(int nPriority) : CObject(nPriority), m_bUseDraw(true),m_ObjectXInfo(), m_bAutoSubLife(false),
-m_bColorChenge(false),m_bHitStop(false), m_bIsJumping(false), m_bIsLanding(false), m_bIsWalling(false),m_bUseAddRot(false), m_bUseAddScaling(false),
-m_bUseAddSpeed(false),m_bUseGravity(false), m_bUseInteria(false), m_bUseMultiSpeed(false),m_bUseRatioLifeAlpha(false),
-m_bUseShadow(false), m_bUseUpdatePos(false), m_fGravityPower(0.0f), m_fInertia(0.0f), m_nChengeColorTime(0), m_nHitStopTime(0), m_nLife(0), m_nMaxLife(0),
+m_bColorChenge(false),m_bHitStop(false), m_bIsJumping(false), m_bIsLanding(false), m_bIsWalling(false),m_bUseAddRot(false), m_bUseAddScaling(false),m_bUseRatioLifeAlpha(false),
+m_bUseShadow(false),m_nChengeColorTime(0), m_nHitStopTime(0), m_nLife(0), m_nMaxLife(0),
 m_nManagerType(0),m_nObjXType(OBJECTXTYPE_BLOCK), m_nTypeNum(0), m_bUseMultiScale(false), m_MultiScale(NULL_VECTOR3),
 m_bUseCulling(false), m_Pos(NULL_VECTOR3), m_SupportPos(NULL_VECTOR3),m_PosOld(NULL_VECTOR3),m_Rot(NULL_VECTOR3),m_Scale(NULL_VECTOR3),m_FormarScale(NULL_VECTOR3),
-m_Size(NULL_VECTOR3),m_VtxMin(NULL_VECTOR3),m_OriginVtxMin(NULL_VECTOR3),m_VtxMax(NULL_VECTOR3),m_OriginVtxMax(NULL_VECTOR3),m_Move(NULL_VECTOR3),m_mtxWorld(),
-m_AddRot(NULL_VECTOR3),m_SenterPos(NULL_VECTOR3), m_MultiSpeed(NULL_VECTOR3), m_AddSpeed(NULL_VECTOR3), m_AddScale(NULL_VECTOR3)
+m_Size(NULL_VECTOR3),m_VtxMin(NULL_VECTOR3),m_OriginVtxMin(NULL_VECTOR3),m_VtxMax(NULL_VECTOR3),m_OriginVtxMax(NULL_VECTOR3),m_mtxWorld(),
+m_AddRot(NULL_VECTOR3),m_SenterPos(NULL_VECTOR3),m_AddScale(NULL_VECTOR3)
 {
 
 }
@@ -56,8 +55,6 @@ HRESULT CObjectX::Init()
 	//変数の初期化
 	//==========================
 	m_mtxWorld = {};                                   //ワールドマトリックス
-	m_fInertia = m_fNORMAL_INERTIA;                    //慣性
-	m_bUseInteria = true;                              //慣性をかけるかどうか
 	//==================================================================================
 
 	//===========================================
@@ -72,20 +69,6 @@ HRESULT CObjectX::Init()
 	//===========================================
 	m_bUseShadow = true;
 	//==================================================================================
-
-	//===========================================
-	//重力関係
-	//===========================================
-	m_bUseGravity = true;         //重力を使用するかどうか
-	//==================================================================================
-
-	//===========================================
-	//位置更新関係
-	//===========================================
-	m_bUseUpdatePos = true;//位置の更新を使用するかどうか
-	//==================================================================================
-	m_bUseGravity = false;                    //重力を使用するかどうか　
-	m_fGravityPower = 0.0f;                   //重力の大きさ
 
 	m_bUseAddScaling = false;                 //拡大率の加算を使用するかどうか
 	m_AddScale = NULL_VECTOR3;                //拡大率の加算量    
@@ -159,26 +142,6 @@ void CObjectX::Update()
 	//===========================================================
 
 	//==================================
-	//乗算加速度がONになっていたら
-	//==================================
-	if (m_bUseMultiSpeed == true)
-	{
-		m_Move.x *= m_MultiSpeed.x;
-		m_Move.y *= m_MultiSpeed.y;
-		m_Move.z *= m_MultiSpeed.z;
-	}
-	//==========================================================
-
-	//==================================
-	//加速がONになっていたら
-	//==================================
-	if (m_bUseAddSpeed == true)
-	{
-		m_Move += m_AddSpeed;
-	}
-	//==========================================================
-
-	//==================================
 	//拡大率の加算がONになっていたら
 	//==================================
 	if (m_bUseAddScaling == true)
@@ -225,11 +188,6 @@ void CObjectX::Update()
 		m_nChengeColorTime = 0;
 		SetFormarColor();//元の色合いに戻す
 		m_bColorChenge = false;
-	}
-
-	if (m_bUseUpdatePos == true)
-	{//位置更新処理
-		UpdatePos();
 	}
 
 	if (m_bUseAddRot == true)
@@ -528,21 +486,6 @@ void CObjectX::SetSize()
 //================================================================================================================================================
 
 //===================================================================================================================
-//位置を更新させる（位置を更新した後にブロックとの当たり判定をしたいので、任意のタイミングで呼べるようにする）
-//===================================================================================================================
-void CObjectX::UpdatePos()
-{
-	m_PosOld = m_Pos;   
-	m_Pos += m_Move;   //位置の更新
-	if (m_bUseInteria == true)
-	{
-		m_Move.x += (0.0f - m_Move.x) * m_fInertia;
-		m_Move.z += (0.0f - m_Move.z) * m_fInertia;
-	}
-}
-//================================================================================================================================================
-
-//===================================================================================================================
 //エディタから拡大率を変更する
 //===================================================================================================================
 void CObjectX::ChengeEditScale()
@@ -679,7 +622,7 @@ void CObjectX::ChengeEditScaleZ()
 //===================================================================================================================
 void CObjectX::ChengeEditPos()
 {
-	D3DXVECTOR3& Pos = GetPos();                                    //モデルの位置の取得
+	const D3DXVECTOR3& Pos = GetPos();                                    //モデルの位置の取得
 	D3DXVECTOR3& SupportPos = GetSupportPos();                      //モデルの支点位置の取得
 	D3DXVECTOR3& Rot = GetRot();                                    //モデルの向きの取得
 	D3DXVECTOR3 Size = GetSize();                                   //サイズを取得
@@ -690,7 +633,7 @@ void CObjectX::ChengeEditPos()
 	SetColor(D3DXCOLOR(1.0f,0.0f,0.0f,0.5f),3,true,true);           //色を半透明にする
 
 	//位置を支点に固定
-	Pos = SupportPos;
+	//Pos = SupportPos;
 	//=====================================================
     //移動処理
     //=====================================================
@@ -725,8 +668,8 @@ void CObjectX::ChengeEditPos()
 	}
 	if (bMove == true)
 	{//移動していたら
-		Pos.x += sinf(atan2f(fMoveX, fMoveZ)) * 5.0f;
-		Pos.y += cosf(atan2f(fMoveX, fMoveZ)) * 5.0f;
+		//Pos.x += sinf(atan2f(fMoveX, fMoveZ)) * 5.0f;
+		//Pos.y += cosf(atan2f(fMoveX, fMoveZ)) * 5.0f;
 	}
 
 	//===========================
@@ -890,23 +833,6 @@ void CObjectX::DrawShadow()
 
 	//保存していたマテリアルを戻す
 	pDevice->SetMaterial(&matDef);
-}
-//================================================================================================================================================
-
-//============================================================================
-//重力の処理
-//============================================================================
-void CObjectX::GravityProcess()
-{
-	if (m_bIsLanding == true)
-	{
-		m_Move.y = 0.0f;
-	}
-	if (m_bUseGravity == true)
-	{
-		m_Move.y += -m_fNORMAL_GRAVITY;
-	}
-
 }
 //================================================================================================================================================
 

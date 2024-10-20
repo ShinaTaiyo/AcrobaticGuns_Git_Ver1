@@ -25,7 +25,7 @@ public:
 	CTexture();                              //コンストラクタ
 	~CTexture();                             //デストラクタ
 	void Unload();//テクスチャ破棄
-	int Regist(string pTextureName);    //テクスチャ登録
+	int Regist(std::string pTextureName);    //テクスチャ登録
 	LPDIRECT3DTEXTURE9 GetAddress(int nIdx); //テクスチャ取得
 private:
 
@@ -34,7 +34,7 @@ private:
 	static int m_nNumAll;                                                 //テクスチャ総数
 
 	LPDIRECT3DTEXTURE9 m_pTextureList[m_nMAXTEXTURE];                     //テクスチャ!
-    string m_aTextureName[m_nMAXTEXTURE];                                 //作成済みテクスチャの名前!
+	std::string m_aTextureName[m_nMAXTEXTURE];                                 //作成済みテクスチャの名前!
 };
 
 #endif

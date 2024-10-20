@@ -59,7 +59,7 @@ protected:
 
 	//==================================================================================
 
-	static const string m_apBGFILE_NAME[BG_MAX];//背景のテクスチャファイル名
+	static const std::string m_apBGFILE_NAME[BG_MAX];//背景のテクスチャファイル名
 private:
 	float m_fPosTexU;          //テクスチャ座標!
 	BG m_Type;                 //背景の種類!

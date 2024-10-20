@@ -56,6 +56,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hInstancePrev, _
 	//*buf = 10;
 	//delete buf;
 	//buf = nullptr;
+
 	WNDCLASSEX wcex =
 	{
 		sizeof(WNDCLASSEX),//WNDCLASSEXÇÃÉÅÉÇÉäÉTÉCÉY

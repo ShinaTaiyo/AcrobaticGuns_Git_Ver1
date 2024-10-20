@@ -126,7 +126,7 @@ void CCalculation::CalculationCollectionRot2D(float& fMyRot, float fRotAim, floa
 //=========================================================
 //ˆÚ“®•ûŒü‚Ö‚ÌŠp“x‚ðŒvŽZ‚·‚é
 //=========================================================
-bool CCalculation::CaluclationMove(D3DXVECTOR3& Pos, float fSpeed, MOVEAIM MoveAim, float& fRot)
+bool CCalculation::CaluclationMove(D3DXVECTOR3& Move, float fSpeed, MOVEAIM MoveAim, float& fRot)
 {
 	float fCameraRot = CManager::GetCamera()->GetRot().y;
 	float fMoveX = 0.0f;                                            //X•ûŒü‚ÌˆÚ“®—Ê
@@ -165,16 +165,16 @@ bool CCalculation::CaluclationMove(D3DXVECTOR3& Pos, float fSpeed, MOVEAIM MoveA
 		switch (MoveAim)
 		{
 		case MOVEAIM_XY:
-			Pos.x += sinf(fRot) * fSpeed;
-			Pos.y += cosf(fRot) * fSpeed;
+			Move.x = sinf(fRot) * fSpeed;
+			Move.y = cosf(fRot) * fSpeed;
 			break;
 		case MOVEAIM_XZ:
-			Pos.x += sinf(fRot) * fSpeed;
-			Pos.z += cosf(fRot) * fSpeed;
+			Move.x = sinf(fRot) * fSpeed;
+			Move.z = cosf(fRot) * fSpeed;
 			break;
 		case MOVEAIM_ZY:
-			Pos.z += sinf(fRot) * fSpeed;
-			Pos.y += cosf(fRot) * fSpeed;
+			Move.z = sinf(fRot) * fSpeed;
+			Move.y = cosf(fRot) * fSpeed;
 			break;
 		default:
 			break;

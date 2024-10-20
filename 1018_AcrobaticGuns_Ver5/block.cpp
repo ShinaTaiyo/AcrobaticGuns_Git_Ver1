@@ -80,8 +80,6 @@ void CBlock::Uninit()
 //=========================
 void CBlock::Update()
 {
-	GravityProcess();
-
 	//========================================
     //Xオブジェクトの更新処理
     //========================================
@@ -123,7 +121,6 @@ CBlock* CBlock::Create(BLOCKTYPE type, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 r
 		if (pBlock != nullptr)
 		{
 			pBlock->Init();                               //初期化処理
-			pBlock->SetUseGravity(false,1.0f);            //重力を設定する
 			pBlock->SetRot(rot);                          //向きを設定
 			pBlock->SetUseDeath(true);                    //死亡フラグを発動するかどうかを設定する
 			pBlock->m_type = type;                        //ブロックの種類
@@ -409,7 +406,7 @@ void CBlock::LandingCorrection(D3DXVECTOR3& Pos, CObject* pSaveObj,D3DXVECTOR3 V
 void CBlock::ExtrusionCollisionX(CObjectX* pMyObjX, CBlock* pBlock)
 {
 	D3DXVECTOR3 MyPos = pMyObjX->GetPos();
-	D3DXVECTOR3& Pos = pMyObjX->GetPos();              //位置を取得
+	const D3DXVECTOR3& Pos = pMyObjX->GetPos();              //位置を取得
 	const D3DXVECTOR3& PosOld = pMyObjX->GetPosOld();        //1f前の位置を取得
 	D3DXVECTOR3 MyVtxMax = NULL_VECTOR3;             //自分自身の最大頂点
 	D3DXVECTOR3 MyVtxMin = NULL_VECTOR3;             //自分自身の最小頂点
@@ -417,7 +414,6 @@ void CBlock::ExtrusionCollisionX(CObjectX* pMyObjX, CBlock* pBlock)
 	D3DXVECTOR3 ComPos = pBlock->GetPos();             //ブロックの位置
 	D3DXVECTOR3 ComVtxMax = pBlock->GetVtxMax();       //ブロックの最大頂点
 	D3DXVECTOR3 ComVtxMin = pBlock->GetVtxMin();       //ブロックの最小頂点
-	D3DXVECTOR3 ComMove = pBlock->GetMove();           //ブロックの最小頂点
 
 	bool& bIsWalling = pMyObjX->GetWalling();          //壁にくっついているかどうか
 	//押し出しに使う値の小数点を切り捨てる（微小な差で失敗しないため）
@@ -448,7 +444,7 @@ void CBlock::ExtrusionCollisionX(CObjectX* pMyObjX, CBlock* pBlock)
 		&& Pos.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
 		&& Pos.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
 	{//対象がブロックの-Xに当たった時の処理
-		Pos.x = ComPos.x + ComVtxMin.x - MyVtxMax.x;
+		//Pos.x = ComPos.x + ComVtxMin.x - MyVtxMax.x;
 		bIsWalling = true;
 	}
 
@@ -460,7 +456,7 @@ void CBlock::ExtrusionCollisionX(CObjectX* pMyObjX, CBlock* pBlock)
 		&& Pos.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
 		&& Pos.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
 	{//対象がブロックの+Xに当たった時の処理
-		Pos.x = ComPos.x + ComVtxMax.x - MyVtxMin.x;
+		//Pos.x = ComPos.x + ComVtxMax.x - MyVtxMin.x;
 		bIsWalling = true;
 	}
 }
@@ -477,10 +473,8 @@ void CBlock::ExtrusionCollisionY(CObjectX* pMyObjX, CBlock* pBlock)
 	D3DXVECTOR3 ComPos = pBlock->GetPos();             //ブロックの位置
 	D3DXVECTOR3 ComVtxMax = pBlock->GetVtxMax();       //ブロックの最大頂点
 	D3DXVECTOR3 ComVtxMin = pBlock->GetVtxMin();       //ブロックの最小頂点[
-	D3DXVECTOR3 ComMove = pBlock->GetMove();           //ブロックの最小頂点[
 
-	D3DXVECTOR3& Pos = pMyObjX->GetPos();              //位置を取得
-	D3DXVECTOR3& Move = pMyObjX->GetMove();             //移動量を取得
+	//D3DXVECTOR3& Pos = pMyObjX->GetPos();              //位置を取得
 	D3DXVECTOR3 PosOld = pMyObjX->GetPosOld();        //1f前の位置を取得
 
 	bool& bIsLanding = pMyObjX->GetLanding();          //地面にいるかどうか
@@ -508,35 +502,35 @@ void CBlock::ExtrusionCollisionY(CObjectX* pMyObjX, CBlock* pBlock)
 	ComVtxMin.y = (float)(floor(ComVtxMin.y));
 	ComVtxMin.z = (float)(floor(ComVtxMin.z));
 
-	//上
-	if (Pos.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
-		&& Pos.x + MyVtxMin.x < ComPos.x + ComVtxMax.x
-		&& Pos.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
-		&& PosOld.y + MyVtxMin.y - Move.y >= ComPos.y + ComVtxMax.y
-		&& Pos.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
-		&& Pos.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
-	{//対象の下端がモデルの+Yに当たった時の処理
-		float fPosY = fabsf(MyVtxMin.y);
-		Pos.y = ComPos.y + ComVtxMax.y + fPosY;
-		Pos += ComMove;
+	////上
+	//if (Pos.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
+	//	&& Pos.x + MyVtxMin.x < ComPos.x + ComVtxMax.x
+	//	&& Pos.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
+	//	&& PosOld.y + MyVtxMin.y - Move.y >= ComPos.y + ComVtxMax.y
+	//	&& Pos.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
+	//	&& Pos.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
+	//{//対象の下端がモデルの+Yに当たった時の処理
+	//	float fPosY = fabsf(MyVtxMin.y);
+	//	Pos.y = ComPos.y + ComVtxMax.y + fPosY;
+	//	Pos += ComMove;
 
-		bIsLanding = true;
-	}
-	//下
-	else if (Pos.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
-		&& Pos.x + MyVtxMin.x < ComPos.x + ComVtxMax.x
-		&& Pos.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
-		&& PosOld.y + MyVtxMax.y <= ComPos.y + ComVtxMin.y
-		&& Pos.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
-		&& Pos.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
-	{//対象の下端がモデルの+Yに当たった時の処理
-		Pos.y = ComPos.y + ComVtxMin.y - MyVtxMax.y;
-		bIsJumping = false;
+	//	bIsLanding = true;
+	//}
+	////下
+	//else if (Pos.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
+	//	&& Pos.x + MyVtxMin.x < ComPos.x + ComVtxMax.x
+	//	&& Pos.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
+	//	&& PosOld.y + MyVtxMax.y <= ComPos.y + ComVtxMin.y
+	//	&& Pos.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
+	//	&& Pos.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
+	//{//対象の下端がモデルの+Yに当たった時の処理
+	//	Pos.y = ComPos.y + ComVtxMin.y - MyVtxMax.y;
+	//	bIsJumping = false;
 
-		if (pMyObjX->GetType() == CObject::TYPE_PLAYER)
-		{
-			Move.y = 0.0f;
-		}
-	}
+	//	if (pMyObjX->GetType() == CObject::TYPE_PLAYER)
+	//	{
+	//		Move.y = 0.0f;
+	//	}
+	//}
 }
 //======================================================================================================================================

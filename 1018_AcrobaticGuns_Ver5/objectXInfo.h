@@ -36,7 +36,7 @@ private:
 		DWORD dwNumMat;                                              //マテリアルの数
 		LPDIRECT3DTEXTURE9 pTexture[m_nMAX_MAT];                     //テクスチャへのポインタ
 		D3DCOLORVALUE Diffuse[m_nMAX_MAT];                           //色合い
-		string aFileName;                                  //ファイル名
+		std::string aFileName;                                  //ファイル名
 	}Modelnfo;
 	//============================================================================================================
 	CObjectX::OBJECTXTYPE m_Type;                                              //オブジェクトXの種類!
@@ -45,7 +45,7 @@ public:
 	CObjectXInfo();                                                  //コンストラクタ
 	~CObjectXInfo();                                                 //デストラクタ
 	void Unload();                                                   //オブジェクトXの情報を破棄
-	int Regist(string pTextureName);          //オブジェクトX登録
+	int Regist(std::string pTextureName);          //オブジェクトX登録
 
 	LPD3DXMESH GetMesh(int nIdx);                   //オブジェクトX取得
 	LPD3DXBUFFER GetBuffMat(int nIdx);             //マテリアルへのポインタを取得

@@ -119,14 +119,14 @@ private:
 	D3DXVECTOR3 m_Rot;                                                          //向き!
 	D3DXMATRIX m_mtxWorld;                                                      //ワールド変換行列!
 	D3DXCOLOR m_Col;                                                            //色合い!
-   
 	float m_fWidth;                                                             //横幅!
 	float m_fFormarWidth;                                                       //元の横幅!
 	float m_fHeight;                                                            //高さ!
 	float m_fFormarHeight;                                                      //元の高さ!
-
 	int m_nLife;                                                                //体力!
 	int m_nMaxLife;                                                             //最大体力!
+
+   
 
 	float m_fAnimationSplit;                                                    //アニメーション１分割当たりの値!
 	int m_nAnimaionPattern;                                                     //アニメーションパターン!

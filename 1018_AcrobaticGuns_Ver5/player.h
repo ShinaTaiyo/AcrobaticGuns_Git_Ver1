@@ -13,7 +13,7 @@
 //======================
 #include "main.h"
 #include "object2d.h"
-#include "objectX.h"
+#include "objectXMove.h"
 //==========================================
 
 //======================
@@ -29,7 +29,7 @@ class CScore;
 //===========================================
 //プレイヤー3Dクラス
 //===========================================
-class CPlayer : public CObjectX
+class CPlayer : public CObjectXMove
 {
 public:
 	CPlayer();                  //コンストラクタ

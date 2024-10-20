@@ -18,7 +18,7 @@
 #include "Xinput.h"//ジョイパッドの処理に必要
 #include "xaudio2.h"//サウンド処理に必要
 #include <iostream>
-using namespace std;
+
 //==============================
 //ライブラリのリンク
 //==============================

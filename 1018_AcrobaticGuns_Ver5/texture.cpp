@@ -73,7 +73,7 @@ void CTexture::Unload()
 //=====================================================
 //テクスチャの登録処理
 //=====================================================
-int CTexture::Regist(string pTextureName)
+int CTexture::Regist(std::string pTextureName)
 {
 	int nIdx = 0;//テクスチャ
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();//デバイスの取得

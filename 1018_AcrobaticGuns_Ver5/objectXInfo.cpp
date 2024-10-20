@@ -82,7 +82,7 @@ void CObjectXInfo::Unload()
 //===============================================
 //オブジェクトX登録処理
 //===============================================
-int CObjectXInfo::Regist(string pTextureName)
+int CObjectXInfo::Regist(std::string pTextureName)
 {
 	int nIdx = 0;//インデックス
     D3DCOLORVALUE Diffuse[m_nMAX_MAT] = {};

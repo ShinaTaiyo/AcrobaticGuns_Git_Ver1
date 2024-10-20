@@ -47,7 +47,7 @@ CPlayer::~CPlayer()
 //====================================================
 HRESULT CPlayer::Init()
 {
-    CObjectX::Init();                 //Xオブジェクト初期化
+    CObjectXMove::Init();                 //Xオブジェクト初期化
 
     return S_OK;
 }
@@ -58,7 +58,7 @@ HRESULT CPlayer::Init()
 //====================================================
 void CPlayer::Uninit()
 {
-    CObjectX::Uninit();//Xオブジェクト終了
+    CObjectXMove::Uninit();//Xオブジェクト終了
 }
 //==========================================================================================================
 
@@ -76,7 +76,7 @@ void CPlayer::ExtraUninit()
 void CPlayer::Update()
 {
     MoveProcess();
-    CObjectX::Update();
+    CObjectXMove::Update();
 }
 //==========================================================================================================
 
@@ -85,7 +85,7 @@ void CPlayer::Update()
 //====================================================
 void CPlayer::Draw()
 {
-    CObjectX::Draw();
+    CObjectXMove::Draw();
 }
 //==========================================================================================================
 
@@ -121,15 +121,15 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
         if (pPlayer != nullptr)
         {
             pPlayer->Init();                                                                 //初期化処理
-            pPlayer->SetMove(move);                                                          //移動量を設定
             pPlayer->CObject::SetType(CObject::TYPE_PLAYER);                                 //オブジェクトの種類を決める
-            pPlayer->CObjectX::SetObjXType(CObjectX::OBJECTXTYPE_PLAYER);                    //オブジェクトXのタイプを設定
-            pPlayer->CObjectX::SetTypeNum(0);                                                //オブジェクトXごとのタイプ番号を設定
+            pPlayer->CObjectXMove::SetObjXType(CObjectXMove::OBJECTXTYPE_PLAYER);                    //オブジェクトXのタイプを設定
+            pPlayer->CObjectXMove::SetTypeNum(0);                                                //オブジェクトXごとのタイプ番号を設定
             pPlayer->SetLife(1);
             pPlayer->SetMaxLife(1);
             pPlayer->SetAutoSubLife(false);//自動的に体力を減らすかどうか
+            //pPlayer->SetUseGravity(true,1.0f);//重力
             nIdx = CManager::GetObjectXInfo()->Regist("data\\MODEL\\Player\\Player_ProtoType.x");
-            pPlayer->CObjectX::BindObjectXInfo(CManager::GetObjectXInfo()->GetMesh(nIdx),
+            pPlayer->CObjectXMove::BindObjectXInfo(CManager::GetObjectXInfo()->GetMesh(nIdx),
                 CManager::GetObjectXInfo()->GetBuffMat(nIdx),
                 CManager::GetObjectXInfo()->GetdwNumMat(nIdx),
                 CManager::GetObjectXInfo()->GetTexture(nIdx),
@@ -160,11 +160,13 @@ void CPlayer::MoveProcess()
 {
     D3DXVECTOR3& Rot = GetRot();
     float fRotDiff = 0.0f;//向きの差分
+    const D3DXVECTOR3 & Move = GetMove();
+    D3DXVECTOR3 AddMove = NULL_VECTOR3;
     bool bMove = false;//移動しているかどうか
-    bMove = CCalculation::CaluclationMove(GetPos(), 5.0f, CCalculation::MOVEAIM_XZ,m_fRotAim);
-    
+    bMove = CCalculation::CaluclationMove(AddMove, 10.0f, CCalculation::MOVEAIM_XZ,m_fRotAim);
     CCalculation::CalculationCollectionRot2D(Rot.y, m_fRotAim, 0.25f);
     
+    SetMove(AddMove + D3DXVECTOR3(0.0f,Move.y,0.0f));
     CManager::GetDebugProc()->PrintDebugProc("向き：%f\n",Rot.y);
     CManager::GetDebugProc()->PrintDebugProc("向きの差分：%f\n", fRotDiff);
     CManager::GetDebugProc()->PrintDebugProc("目的の向き：%f\n", m_fRotAim);
