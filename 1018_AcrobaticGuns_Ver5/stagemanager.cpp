@@ -36,11 +36,6 @@ const char* CStageManager::m_apWORLDMAP_TXT[CStageManager::WORLDTYPE_MAX] =
 //================================
 CStageManager::CStageManager() : m_nWorldIndex(0),m_pBg3D(nullptr)
 {
-	for (int nCnt = 0; nCnt < m_nMAXMANAGEROBJECT; nCnt++)
-	{
-		m_apObjectList[nCnt] = nullptr;
-	}
-
 	for (int nCnt = 0; nCnt < m_nMAX_MAP; nCnt++)
 	{
 		for (int nCntWord = 0; nCntWord < m_nMAX_WORD; nCntWord++)
@@ -177,12 +172,6 @@ void CStageManager::Update()
 			//===============================================
 			SetObjectX();
 			//===========================================================================================
-
-			////===============================================
-			////ブロックを消す処理
-			////===============================================
-			//DeleteObjectX();
-			////===========================================================================================
 
 			//===============================================
 			//マップを変える処理
@@ -476,7 +465,7 @@ void CStageManager::SaveMapTxt(int nMapNum)
 			//==============================================
 			//オブジェクト情報を書き出す
 			//==============================================
-			nLife = ((CObjectX*)pObj)->GetLife();
+			//nLife = ((CObjectX*)pObj)->GetLife();
 			nManagerType = ((CObjectX*)pObj)->GetManagerType(); //Xオブジェクトのタイプを取得
 			nType = ((CObjectX*)pObj)->GetTypeNum();            //Xオブジェクトごとのタイプを取得
 			Pos = ((CObjectX*)pObj)->GetSupportPos();           //位置を書き出す
@@ -570,10 +559,10 @@ void CStageManager::LoadMapBin(int nMapNum)
 				//					break;
 				//}
 
-				if (pObject != nullptr)
-				{
-					m_apObjectList[nCnt] = pObject;
-				}
+				//if (pObject != nullptr)
+				//{
+				//	m_apObjectList[nCnt] = pObject;
+				//}
 			}
 		}
 		//========================================================================
@@ -587,46 +576,46 @@ void CStageManager::LoadMapBin(int nMapNum)
 //==========================================================
 void CStageManager::SaveMapBin()
 {
-	//======================================
-	//変数宣言
-	//======================================
-	D3DXVECTOR3 Pos = NULL_VECTOR3;
-	D3DXVECTOR3 Scale = NULL_VECTOR3;
-	D3DXVECTOR3 Rot = NULL_VECTOR3;
-	int nType = 0;             //オブジェクトXごとのタイプ
-	int nManagerType = 0;             //オブジェクトXのタイプ
-	D3DXVECTOR3 move = NULL_VECTOR3;
-	float fWidth = 0.0f;
-	float fHeight = 0.0f;
-	FILE* pFile = fopen(SAVE_BIN, "wb");
-	//===============================================================================================
-	if (pFile != nullptr)
-	{
+	////======================================
+	////変数宣言
+	////======================================
+	//D3DXVECTOR3 Pos = NULL_VECTOR3;
+	//D3DXVECTOR3 Scale = NULL_VECTOR3;
+	//D3DXVECTOR3 Rot = NULL_VECTOR3;
+	//int nType = 0;             //オブジェクトXごとのタイプ
+	//int nManagerType = 0;             //オブジェクトXのタイプ
+	//D3DXVECTOR3 move = NULL_VECTOR3;
+	//float fWidth = 0.0f;
+	//float fHeight = 0.0f;
+	//FILE* pFile = fopen(SAVE_BIN, "wb");
+	////===============================================================================================
+	//if (pFile != nullptr)
+	//{
 
-		fwrite(&m_nIndexObject, sizeof(int),1, pFile);
-		//==============================================
-        //ブロックのXオブジェクトの情報を書き出す
-        //==============================================
-		for (int nCnt = 0; nCnt < m_nIndexObject; nCnt++)
-		{//ブロックを設定
-			if (m_apObjectList[nCnt] != nullptr)
-			{
-				nManagerType = ((CObjectX*)m_apObjectList[nCnt])->GetManagerType();  //Xオブジェクトのタイプを取得
-				nType = (int)(((CObjectX*)m_apObjectList[nCnt])->GetTypeNum());       //Xオブジェクトごとのタイプを取得
-				Pos = ((CObjectX*)m_apObjectList[nCnt])->GetPos();                    //位置を書き出す
-				Scale = ((CObjectX*)m_apObjectList[nCnt])->GetScale();				//拡大率を書き出す
-				Rot = ((CObjectX*)m_apObjectList[nCnt])->GetRot();					//向きを書き出す
+	//	fwrite(&m_nIndexObject, sizeof(int),1, pFile);
+	//	//==============================================
+ //       //ブロックのXオブジェクトの情報を書き出す
+ //       //==============================================
+	//	for (int nCnt = 0; nCnt < m_nIndexObject; nCnt++)
+	//	{//ブロックを設定
+	//		if (m_apObjectList[nCnt] != nullptr)
+	//		{
+	//			nManagerType = ((CObjectX*)m_apObjectList[nCnt])->GetManagerType();  //Xオブジェクトのタイプを取得
+	//			nType = (int)(((CObjectX*)m_apObjectList[nCnt])->GetTypeNum());       //Xオブジェクトごとのタイプを取得
+	//			Pos = ((CObjectX*)m_apObjectList[nCnt])->GetPos();                    //位置を書き出す
+	//			Scale = ((CObjectX*)m_apObjectList[nCnt])->GetScale();				//拡大率を書き出す
+	//			Rot = ((CObjectX*)m_apObjectList[nCnt])->GetRot();					//向きを書き出す
 
-				fwrite(&nManagerType, sizeof(int), 1, pFile);              //Xオブジェクトのタイプを書き出す
-				fwrite(&nType, sizeof(int), 1, pFile);                  //Xオブジェクトごとのタイプを書き出す
-				fwrite(&Pos, sizeof(D3DXVECTOR3), 1, pFile);            //位置を書き出す
-				fwrite(&Scale, sizeof(D3DXVECTOR3), 1, pFile);          //拡大率を書き出す
-				fwrite(&Rot, sizeof(D3DXVECTOR3), 1, pFile);            //向きを書き出す
-			}
-		}
-		//========================================================================
-		fclose(pFile);
-	}
+	//			fwrite(&nManagerType, sizeof(int), 1, pFile);              //Xオブジェクトのタイプを書き出す
+	//			fwrite(&nType, sizeof(int), 1, pFile);                  //Xオブジェクトごとのタイプを書き出す
+	//			fwrite(&Pos, sizeof(D3DXVECTOR3), 1, pFile);            //位置を書き出す
+	//			fwrite(&Scale, sizeof(D3DXVECTOR3), 1, pFile);          //拡大率を書き出す
+	//			fwrite(&Rot, sizeof(D3DXVECTOR3), 1, pFile);            //向きを書き出す
+	//		}
+	//	}
+	//	//========================================================================
+	//	fclose(pFile);
+	//}
 }
 //======================================================================================================================
 

@@ -25,13 +25,12 @@
 //================================================
 //コンストラクタ
 //================================================
-CObjectX::CObjectX(int nPriority) : CObject(nPriority), m_bUseDraw(true),m_ObjectXInfo(), m_bAutoSubLife(false),
-m_bColorChenge(false),m_bHitStop(false), m_bIsJumping(false), m_bIsLanding(false), m_bIsWalling(false),m_bUseAddRot(false), m_bUseAddScaling(false),m_bUseRatioLifeAlpha(false),
-m_bUseShadow(false),m_nChengeColorTime(0), m_nHitStopTime(0), m_nLife(0), m_nMaxLife(0),
-m_nManagerType(0),m_nObjXType(OBJECTXTYPE_BLOCK), m_nTypeNum(0), m_bUseMultiScale(false), m_MultiScale(NULL_VECTOR3),
-m_bUseCulling(false), m_Pos(NULL_VECTOR3), m_SupportPos(NULL_VECTOR3),m_PosOld(NULL_VECTOR3),m_Rot(NULL_VECTOR3),m_Scale(NULL_VECTOR3),m_FormarScale(NULL_VECTOR3),
-m_Size(NULL_VECTOR3),m_VtxMin(NULL_VECTOR3),m_OriginVtxMin(NULL_VECTOR3),m_VtxMax(NULL_VECTOR3),m_OriginVtxMax(NULL_VECTOR3),m_mtxWorld(),
-m_AddRot(NULL_VECTOR3),m_SenterPos(NULL_VECTOR3),m_AddScale(NULL_VECTOR3)
+CObjectX::CObjectX(int nPriority) : CObject(nPriority), m_bUseDraw(true),m_ObjectXInfo(),m_bColorChenge(false),m_bUseAddRot(false),
+m_bUseAddScaling(false),m_bUseShadow(false),m_nChengeColorTime(0),m_nIndexObjectX(0),m_nManagerType(0),m_nObjXType(OBJECTXTYPE_BLOCK), 
+m_nTypeNum(0), m_bUseMultiScale(false), m_MultiScale(NULL_VECTOR3),m_bUseCulling(false), m_Pos(NULL_VECTOR3), m_SupportPos(NULL_VECTOR3),
+m_PosOld(NULL_VECTOR3),m_Rot(NULL_VECTOR3),m_Scale(NULL_VECTOR3),m_FormarScale(NULL_VECTOR3),m_Size(NULL_VECTOR3),m_VtxMin(NULL_VECTOR3),
+m_OriginVtxMin(NULL_VECTOR3),m_VtxMax(NULL_VECTOR3),m_OriginVtxMax(NULL_VECTOR3),m_mtxWorld(),m_AddRot(NULL_VECTOR3),m_SenterPos(NULL_VECTOR3),
+m_AddScale(NULL_VECTOR3)
 {
 
 }
@@ -58,13 +57,6 @@ HRESULT CObjectX::Init()
 	//==================================================================================
 
 	//===========================================
-	//体力関係
-	//===========================================
-	m_nLife = 1;                                        //体力
-	m_nMaxLife = 1;                                     //最大体力
-	//==================================================================================
-
-	//===========================================
 	//影関係
 	//===========================================
 	m_bUseShadow = true;
@@ -72,6 +64,8 @@ HRESULT CObjectX::Init()
 
 	m_bUseAddScaling = false;                 //拡大率の加算を使用するかどうか
 	m_AddScale = NULL_VECTOR3;                //拡大率の加算量    
+
+	CObject::Init();
 
 	return S_OK;
 }
@@ -109,6 +103,8 @@ void CObjectX::Uninit()
 	{//マテリアルへのポインタをnullptrに
 		m_ObjectXInfo.pBuffMat = nullptr;
 	}
+
+	CObject::Uninit();
 }
 //================================================================================================================================================
 
@@ -121,25 +117,6 @@ void CObjectX::Update()
 	//中心点を求める
 	//==============================================
 	CalculateSenterPos();
-
-	//==============================================
-	//体力を減らす
-	//==============================================
-	if (m_bAutoSubLife == true)
-	{
-		m_nLife--;
-	}
-	//===========================================================
-
-	//==============================================
-	//体力の割合で色合いの透明度を変える
-	//==============================================
-	if (m_bUseRatioLifeAlpha == true)
-	{
-		float fRatio;
-		fRatio = float(m_nLife) / float(m_nMaxLife);
-	}
-	//===========================================================
 
 	//==================================
 	//拡大率の加算がONになっていたら
@@ -160,13 +137,6 @@ void CObjectX::Update()
 		m_Scale.z *= m_MultiScale.z;
 	}
 	//==========================================================
-
-	//==============================================
-    //ヒットストップ処理
-    //==============================================
-	HitStopProcess();
-	//===========================================================
-
 
 	//常に拡大率を参照して最大最小頂点を求める
 	m_VtxMax.x = m_OriginVtxMax.x * m_Scale.x;
@@ -199,6 +169,8 @@ void CObjectX::Update()
 	{//オブジェクトXの情報を表示
 	    DispInfo();
 	}
+
+	CObject::Update();
 }
 //================================================================================================================================================
 
@@ -296,6 +268,8 @@ void CObjectX::Draw()
 	//保存していたマテリアルを戻す
 	pDevice->SetMaterial(&matDef);
 
+	CObject::Draw();
+
 }
 //================================================================================================================================================
 
@@ -384,26 +358,6 @@ void CObjectX::SetFormarColor()
 	for (int nCnt = 0; nCnt < (int)(m_ObjectXInfo.dwNumMat); nCnt++)
 	{
 		m_ObjectXInfo.Diffuse[nCnt] = m_ObjectXInfo.FormarDiffuse[nCnt];
-	}
-}
-//================================================================================================================================================
-
-//================================================
-//ヒットストップの処理
-//================================================
-void CObjectX::HitStopProcess()
-{
-	if (m_bHitStop == true)
-	{
-		if (m_nHitStopTime > 0)
-		{
-			m_nHitStopTime--;
-		}
-		else
-		{//ヒットストップ解除
-			m_bHitStop = false;
-			m_nHitStopTime = 0;
-		}
 	}
 }
 //================================================================================================================================================
@@ -710,35 +664,6 @@ void CObjectX::ChengeEditPos()
 	CManager::GetDebugProc()->PrintDebugProc("向きZ(FGキー) %f\n",Rot.z);
 	//================================================================================================================================================
 
-}
-//================================================================================================================================================
-
-//============================================================================
-//ダメージを与える
-//============================================================================
-void CObjectX::SetDamage(int nDamage, int nHitStopTime)
-{
-	if (m_bHitStop == false && nDamage > 0)
-	{//ヒットストップ状態じゃなければ
-		m_bHitStop = true;              //ヒットストップ状態にする
-		m_nHitStopTime = nHitStopTime;  //ヒットストップ時間
-		for (int nCnt = 0; nCnt < 3; nCnt++)
-		{
-			D3DXVECTOR3 Pos = CObjectX::GetPos();//位置を取得
-			//CParticle::Create(50, 30.0f, 30.0f, Pos, D3DXVECTOR3(sinf(fRandRot) * fRandSpeed, cosf(fRandRot) * fRandSpeed, 0.0f), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-		}
-		m_nLife -= nDamage;
-	}
-}
-//================================================================================================================================================
-
-//============================================================================
-//回復量を割り当てる
-//============================================================================
-void CObjectX::SetHeal(int nHeal, D3DXCOLOR col, float fWidth, float fHeight)
-{
-	m_nLife += nHeal;
-	//CDamage::Create(nHeal, m_Pos, col, fWidth, fHeight);
 }
 //================================================================================================================================================
 

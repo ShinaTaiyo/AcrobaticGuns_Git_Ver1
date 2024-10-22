@@ -173,49 +173,6 @@ public:
 	CObjectX::ObjectXInfo& GetObjectXInfo() { return m_ObjectXInfo; }
 	//================================================================================================================================================
 
-	//==========================================================
-	//判定
-	//==========================================================
-	
-	//地面にいるか
-	void SetLanding(bool bLanding) { m_bIsLanding = bLanding; }                             //地面にいるかどうかを設定
-	bool& GetLanding() { return m_bIsLanding; }                                             //地面にいるかどうかを取得
-
-	//壁にいるか
-	void SetWalling(bool bWalling) { m_bIsWalling = bWalling; }                             //壁にくっついているかどうかを設定
-	bool& GetWalling() { return m_bIsWalling; }                                             //壁にくっついているかどうかを取得
-
-	//ジャンプしているか
-	void SetJumping(bool bJumping) { m_bIsJumping = bJumping; }                             //ジャンプしているかどうかを設定
-	bool& GetJumping() { return m_bIsJumping; }                                             //ジャンプしているかどうかを取得
-
-    //======================================================
-	//体力関係
-	//======================================================
-
-	//体力
-	void SetLife(int nLife) { m_nLife = nLife; }                    //体力を設定する
-	int& GetLife() { return m_nLife; }                              //体力を取得する
-
-	//最大体力
-	void SetMaxLife(int nMaxLife) { m_nMaxLife = nMaxLife; }        //最大体力を設定する
-	int& GetMaxLife() { return m_nMaxLife; }                        //最大体力を取得する
-
-	//ヒットストップ
-	void SetHitStopTime(int nHitStopTime) { m_nHitStopTime = nHitStopTime; }//ヒットストップ時間を設定する
-	bool& GetHitStop() { return m_bHitStop; }                       //ヒットストップ状態かどうかを取得する
-
-	//自動的に体力を減らす
-	void SetAutoSubLife(bool bUse) { m_bAutoSubLife = bUse; }       //体力を自動的に減らすかどうかを設定
-	int& GetHitStopTime() { return m_nHitStopTime; }                //ヒットストップ時間を取得する
-
-	//ダメージを与える
-	virtual void SetDamage(int nDamage, int nHitStopTime);          //ダメージを与える
-
-	//回復する
-	virtual void SetHeal(int nHeal,D3DXCOLOR col,float fWidth,float fHeight);                  //回復量を与える
-	//=================================================================================================================
-
 	//===================================
 	//描画
 	//===================================
@@ -300,31 +257,6 @@ public:
 	//===========================================================================================================================================================
 	
 	//===================================
-	//体力関係
-	//===================================
-	
-	//ヒットストップ
-	bool m_bHitStop;                                //ヒットストップ!
-	int m_nHitStopTime;                             //ヒットストップ時間!
-	void HitStopProcess();            //ヒットストップの処理
-
-	//自動的に体力を減らすかどうか
-	bool m_bAutoSubLife;                            //自動的に体力を減らし続けるかどうか!
-
-	//体力
-	int m_nLife;                                    //体力!
-	int m_nMaxLife;                                 //最大体力!
-	//============================================================================================================
-
-	//===================================
-	//判定関係
-    //===================================
-	bool m_bIsLanding;                              //地面にいるかどうか!
-	bool m_bIsWalling;                              //壁にくっついているかどうか!
-	bool m_bIsJumping;                              //ジャンプしているかどうか!
-	//============================================================================================================
-
-	//===================================
 	//描画関係
 	//===================================
 
@@ -338,7 +270,6 @@ public:
 	bool m_bUseCulling;
 
 	//色
-	bool m_bUseRatioLifeAlpha;                 //体力の割合で透明度を変えるかどうか!
 	int m_nChengeColorTime;                    //色を変える時間!
 	bool m_bColorChenge;                       //色を変えているかどうか!
 	void SetFormarColor();                     //元の色合いに戻す 

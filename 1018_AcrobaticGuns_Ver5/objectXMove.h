@@ -20,7 +20,7 @@
 class CObjectXMove : public CObjectX
 {
 public:
-	CObjectXMove();                                                       //コンストラクタ
+	CObjectXMove(int nPriority = 2);                                                       //コンストラクタ
 	~CObjectXMove() override;                                             //デストラクタ
 	HRESULT Init() override;                                              //初期化処理
 	void Uninit() override;                                               //終了処理
@@ -32,7 +32,7 @@ public:
 	//==========================================================
 	//移動量
 	void SetMove(D3DXVECTOR3 move) { m_Move = move; }                                       //移動量を設定する
-	D3DXVECTOR3& GetMove() { return m_Move; }                                               //移動量を取得する
+	const D3DXVECTOR3& GetMove() const { return m_Move; }                                   //移動量を取得する
 
 	//慣性
 	void SetUseInteria(bool bUseInteria) { m_bUseInteria = bUseInteria; }                   //慣性をかけるかどうか
@@ -58,8 +58,6 @@ public:
 	void SetUseUpdatePos(bool bUse) { m_bUseUpdatePos = bUse; }//位置の更新を使用するかどうか
 	//=================================================================================================================
 protected:
-	static const float GetNormalGravity() { return m_fNORMAL_GRAVITY; }//基本の重力を取得する
-	virtual void GravityProcess();                  //重力の処理
 private:
 	//===============================================
 	//静的メンバ
@@ -68,6 +66,10 @@ private:
 	static constexpr float m_fNORMAL_GRAVITY = 1.0f;//普通の重力
 	//=================================================================================================================
 	
+	//===============================================
+	//静的メンバ関数
+	//===============================================
+	static const float GetNormalGravity() { return m_fNORMAL_GRAVITY; }//基本の重力を取得する
 	//==========================================================
 	//移動量
 	//==========================================================
@@ -80,6 +82,7 @@ private:
 	//重力
 	bool m_bUseGravity;                             //重力を使用するかどうか!
 	float m_fGravityPower;                          //重力の大きさ!
+	virtual void GravityProcess();                  //重力の処理
 	//乗算加速
 	bool m_bUseMultiSpeed;                                  //乗算加速をするかどうか!
 	D3DXVECTOR3 m_MultiSpeed;                               //乗算加速度!

@@ -159,16 +159,17 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
 void CPlayer::MoveProcess()
 {
     D3DXVECTOR3& Rot = GetRot();
+    D3DXVECTOR3 CalRot = Rot;
     float fRotDiff = 0.0f;//向きの差分
     const D3DXVECTOR3 & Move = GetMove();
     D3DXVECTOR3 AddMove = NULL_VECTOR3;
     bool bMove = false;//移動しているかどうか
     bMove = CCalculation::CaluclationMove(AddMove, 10.0f, CCalculation::MOVEAIM_XZ,m_fRotAim);
-    CCalculation::CalculationCollectionRot2D(Rot.y, m_fRotAim, 0.25f);
+    CCalculation::CalculationCollectionRot2D(CalRot.y, m_fRotAim, 0.25f);
     
     SetMove(AddMove + D3DXVECTOR3(0.0f,Move.y,0.0f));
+    SetRot(CalRot);
     CManager::GetDebugProc()->PrintDebugProc("向き：%f\n",Rot.y);
-    CManager::GetDebugProc()->PrintDebugProc("向きの差分：%f\n", fRotDiff);
     CManager::GetDebugProc()->PrintDebugProc("目的の向き：%f\n", m_fRotAim);
 }
 //==========================================================================================================

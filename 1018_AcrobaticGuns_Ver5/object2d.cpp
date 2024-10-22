@@ -112,6 +112,8 @@ HRESULT CObject2D::Init()
 
 	//頂点バッファをアンロックする
 	m_pVtxBuff->Unlock();
+
+	CObject::Init();
 	
 	return S_OK;
 }
@@ -141,6 +143,8 @@ void CObject2D::Uninit()
 	{
 		m_pTexture = nullptr;
 	}
+
+	CObject::Uninit();
 }
 //================================================================================
 
@@ -273,6 +277,7 @@ void CObject2D::Update()
 	//位置の更新
 	m_pos += m_Move;
 
+	CObject::Update();
 }
 //================================================================================
 
@@ -307,6 +312,8 @@ void CObject2D::Draw()
 		//アルファテスト無効に戻す
 		pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	}
+
+	CObject::Draw();
 }
 //================================================================================
 

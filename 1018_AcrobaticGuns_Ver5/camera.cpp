@@ -92,6 +92,15 @@ void CCamera::Update()
 		m_Rot.y -= 0.02f;
 	}
 
+	if (m_Rot.y > D3DX_PI)
+	{
+		m_Rot.y -= D3DX_PI * 2;
+	}
+	else if (m_Rot.y < -D3DX_PI)
+	{
+		m_Rot.y += D3DX_PI * 2;
+	}
+
 	//=========================o==============
 	//ƒJƒƒ‰‚ð—h‚ç‚·
 	//========================================
@@ -195,8 +204,8 @@ void CCamera::NormalCameraMove()
 		case CAMERATYPE_BIRD:
 			if (CGame::GetPlayer() != nullptr)
 			{
-				m_PosR = CGame::GetPlayer()->GetPos();
-				m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -300.0f, 300.0f, cosf(m_Rot.y) * -300.0f);
+				m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f,50.0f,0.0f);
+				m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -200.0f,0.0f, cosf(m_Rot.y) * -200.0f);
 			}
 			break;
 		default:
