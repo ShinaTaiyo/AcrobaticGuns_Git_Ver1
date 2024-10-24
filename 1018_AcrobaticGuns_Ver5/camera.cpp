@@ -92,14 +92,14 @@ void CCamera::Update()
 		m_Rot.y -= 0.02f;
 	}
 
-	if (m_Rot.y > D3DX_PI)
-	{
-		m_Rot.y -= D3DX_PI * 2;
-	}
-	else if (m_Rot.y < -D3DX_PI)
-	{
-		m_Rot.y += D3DX_PI * 2;
-	}
+	//if (m_Rot.y > D3DX_PI)
+	//{
+	//	m_Rot.y -= D3DX_PI * 2;
+	//}
+	//else if (m_Rot.y < -D3DX_PI)
+	//{
+	//	m_Rot.y += D3DX_PI * 2;
+	//}
 
 	//=========================o==============
 	//ƒJƒƒ‰‚ð—h‚ç‚·

@@ -99,24 +99,36 @@ void CCalculation::CalculationCollectionRot2D(float& fMyRot, float fRotAim, floa
 	fRotDiff = fRotAim - fMyRot;
 
 	//向きの差分を求める（3.14と-3.14の境界線をまたぎそうになったら補正する)
-	if (fMyRot > D3DX_PI * 0.5f + fCameraRot && fRotAim < -D3DX_PI * 0.5f + fCameraRot)//1.57以上 -1.57未満
+	//if (fMyRot > D3DX_PI * 0.5f + fCameraRot && fRotAim < -D3DX_PI * 0.5f + fCameraRot)//1.57以上 -1.57未満
+	//{
+	//	fRotDiff += D3DX_PI * 2 + fCameraRot;
+	//}
+	//if (fMyRot < -D3DX_PI * 0.5f + fCameraRot && fRotAim > D3DX_PI * 0.5f + fCameraRot)
+	//{
+	//	fRotDiff -= D3DX_PI * 2 + fCameraRot;
+	//}
+
+	//向きの差分の調整
+	if (fRotDiff > D3DX_PI)
 	{
-		fRotDiff += D3DX_PI * 2 + fCameraRot;
+		fRotDiff -= D3DX_PI * 2;
 	}
-	if (fMyRot < -D3DX_PI * 0.5f + fCameraRot && fRotAim > D3DX_PI * 0.5f + fCameraRot)
+	else if (fRotDiff < -D3DX_PI)
 	{
-		fRotDiff -= D3DX_PI * 2 + fCameraRot;
+		fRotDiff += D3DX_PI * 2;
 	}
+
 
 	//徐々に目的の向きへ合わせていく
 	fMyRot += fRotDiff * fDecayRot;
 
-	//向きの調整（値を3.14～-3.14の中に固定したいので・・・）
+	//向きの調整（カメラを基準に値を3.14～-3.14の中に固定したいので・・・）
 	if (fMyRot >= D3DX_PI + fCameraRot)
 	{//3.14→-3.14にする
 		fMyRot -= D3DX_PI * 2;
 	}
 	else if (fMyRot <= -D3DX_PI + fCameraRot)
+	 
 	{//-3.14→3.14にする
 		fMyRot += D3DX_PI * 2;
 	}
@@ -161,6 +173,7 @@ bool CCalculation::CaluclationMove(D3DXVECTOR3& Move, float fSpeed, MOVEAIM Move
 
 	if (bMove == true)
 	{//移動状態なら
+		//カメラを基準に向きを決める
 		fRot = atan2f(fMoveX, fMoveZ) + fCameraRot;
 		switch (MoveAim)
 		{

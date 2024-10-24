@@ -11,6 +11,7 @@
 #include "player.h"
 #include "objectX.h"
 #include "renderer.h"
+#include "attack.h"
 #include "main.h"
 #include "manager.h"
 #include "camera.h"
@@ -22,6 +23,12 @@
 #include "game.h"
 #include "debugproc.h"
 #include "collision.h"
+//==========================================================================================================
+
+//====================================================
+//静的メンバ宣言
+//====================================================
+
 //==========================================================================================================
 
 //====================================================
@@ -76,6 +83,9 @@ void CPlayer::ExtraUninit()
 void CPlayer::Update()
 {
     MoveProcess();
+
+    NormalAttackProcess();
+
     CObjectXMove::Update();
 }
 //==========================================================================================================
@@ -129,11 +139,12 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
             pPlayer->SetAutoSubLife(false);//自動的に体力を減らすかどうか
             //pPlayer->SetUseGravity(true,1.0f);//重力
             nIdx = CManager::GetObjectXInfo()->Regist("data\\MODEL\\Player\\Player_ProtoType.x");
-            pPlayer->CObjectXMove::BindObjectXInfo(CManager::GetObjectXInfo()->GetMesh(nIdx),
+            pPlayer->BindObjectXInfo(CManager::GetObjectXInfo()->GetMesh(nIdx),
                 CManager::GetObjectXInfo()->GetBuffMat(nIdx),
                 CManager::GetObjectXInfo()->GetdwNumMat(nIdx),
                 CManager::GetObjectXInfo()->GetTexture(nIdx),
-                CManager::GetObjectXInfo()->GetColorValue(nIdx));                       //モデル情報を割り当てる
+                CManager::GetObjectXInfo()->GetColorValue(nIdx));           
+            //モデル情報を割り当てる
             pPlayer->SetSize();
             pPlayer->SetPos(pos);                                                            //位置の設定
             pPlayer->SetPosOld(pos);                                                         //1f前の位置を設定
@@ -158,7 +169,7 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
 //========================================================
 void CPlayer::MoveProcess()
 {
-    D3DXVECTOR3& Rot = GetRot();
+    const D3DXVECTOR3& Rot = GetRot();
     D3DXVECTOR3 CalRot = Rot;
     float fRotDiff = 0.0f;//向きの差分
     const D3DXVECTOR3 & Move = GetMove();
@@ -171,5 +182,33 @@ void CPlayer::MoveProcess()
     SetRot(CalRot);
     CManager::GetDebugProc()->PrintDebugProc("向き：%f\n",Rot.y);
     CManager::GetDebugProc()->PrintDebugProc("目的の向き：%f\n", m_fRotAim);
+}
+//==========================================================================================================
+
+//========================================================
+//攻撃処理
+//========================================================
+void CPlayer::AttackProcress()
+{
+
+}
+//==========================================================================================================
+
+//========================================================
+//通常攻撃処理
+//========================================================
+void CPlayer::NormalAttackProcess()
+{
+    const D3DXVECTOR3 & Rot = GetRot();
+    const D3DXVECTOR3& Pos = GetPos();
+    CAttackPlayer* pAttackPlayer = nullptr;
+    if (CManager::GetInputKeyboard()->GetTrigger(DIK_J) == true)
+    {
+        pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::TYPE00_BULLET, 60, Pos, Rot,
+            D3DXVECTOR3(sinf(Rot.y) * m_fNORMALATTACK_SPEED, 0.0f, cosf(Rot.y) * m_fNORMALATTACK_SPEED),ONE_VECTOR3);
+
+        pAttackPlayer->SetUseInteria(false);
+        pAttackPlayer->SetAutoSubLife(true);
+    }
 }
 //==========================================================================================================

@@ -39,7 +39,7 @@ m_nPriority(0),m_bCreateSuccess(false),m_nCntFrame(0),m_ManagerObjectType(MANAGE
 	m_nPriority = nPriority;                        //描画順の情報を送る
 	m_bCreateSuccess = false;                       //生成に成功したかどうか
 	m_bDeath = false;                               //死亡フラグ
-	m_bUseDeath = false;                            //死亡フラグを発動するかどうか
+	m_bUseDeath = true;                            //死亡フラグを発動するかどうか
 	m_type = (CObject::TYPE)(0);                    //種類
 	m_bStageManagerChooseState = false;             //ステージマネージャーに選択されているかどうか
 	CObject* pObj = nullptr;                        //オブジェクト取得用
