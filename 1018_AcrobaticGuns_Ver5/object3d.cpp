@@ -21,6 +21,8 @@ m_pVtxBuff(nullptr),m_pTexture(nullptr)
 {
 	m_pTexture = nullptr;
 	m_pVtxBuff = nullptr;
+
+	SetObjectType(CObject::OBJECTTYPE::OBJECTTYPE_3D);
 }
 //================================================================================================================================================
 

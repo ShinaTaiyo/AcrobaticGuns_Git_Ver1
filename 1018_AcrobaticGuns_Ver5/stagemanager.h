@@ -11,7 +11,8 @@
 //============================
 //インクルード
 //============================
-#include "player.h"
+#include "main.h"
+#include "object.h"
 //========================================================
 
 //============================
@@ -30,19 +31,6 @@ class CBg3D;
 class CStageManager : public CObject
 {
 public:
-	typedef enum
-	{
-		MANAGEROBJECT_BLOCK = 0,//ブロック
-		MANAGEROBJECT_MODEL,    //モデル
-		MANAGEROBJECT_ENEMY,    //敵
-		MANAGEROBJECT_ITEM,     //アイテム
-		MANAGEROBJECT_MARKER,   //マーカー
-		MANAGEROBJECT_BOSS,     //ボス
-		MANAGEROBJECT_TRAP,     //トラップ
-		MANAGEROBJECT_SIGNBOARD,//立て看板
-		MANAGEROBJECT_MAX
-	}MANAGEROBJECT;
-
 	typedef enum
 	{
 		FOCUSTYPE_NORMAL = 0,//カメラが追う位置が普通
@@ -73,7 +61,11 @@ public:
 	int GetMapIndex() { return m_nMapIndex; }   //現在のマップ番号を取得する
 	D3DXVECTOR3& GetPos() { return m_Pos; }      //位置を取得する
 	FOCUSTYPE GetFocusType() { return m_FocusType; }//集中する位置を取得する
+
+	CObject* GetStageManagerObject() { return m_pManagerObject; }//操作オブジェクトの取得
+
 	static CStageManager* Create();             //生成処理
+
 	static const int m_nMAXMANAGEROBJECT = 1024;//管理するブロックの最大数
 private:
 
@@ -94,15 +86,15 @@ private:
 	static const int m_nMAX_MAP = 20;
 	static const int m_nMAX_WORD = 126;
 	static const char* m_apWORLDMAP_TXT[WORLDTYPE_MAX];
+	static const string m_aSAVE_FILENAME;//保存するファイル名
 
 	void MoveManager();                         //ステージマネージャーを動かす
 	void LifeSet();                             //体力を設定する
 	void TypeChenge();                          //オブジェクトXの種類を変える
 	void SetObjectX();                          //オブジェクトXを設定する
 	void DeleteObjectX();                       //オブジェクトXを消す
-	void ChengeObject();                        //オブジェクトの種類を消す
+	void ChengeObject(CObject::MANAGEROBJECTTYPE ManagerObjectType);                        //オブジェクトの種類を消す
 	void ReleaseObject();                       //オブジェクトをリリースする
-	void ColorChenge();                         //ステージマネージャーの色合いを設定する
 	void MapChenge();                           //マップを変える
 	void DispInfo();                            //現在のマップエディタの情報を表示
 	void ChooseObject();                        //オブジェクト選択処理
@@ -111,11 +103,11 @@ private:
 	//====================
 	D3DXVECTOR3 m_Move;                         //移動量
 	D3DXVECTOR3 m_Rot;                          //向き
+	D3DXVECTOR3 m_Pos;                          //位置
+	D3DXVECTOR3 m_Scale;                        //拡大率
 	D3DXVECTOR3 m_SaveBeforeChoosePos;          //選択処理をする前のする位置
 	CObject* m_pManagerObject;                  //色々な派生クラスにキャストするオブジェクト
 	MANAGERMDOE m_ManagerMode;                  //現在のステージマネーシャーのモード
-	D3DXVECTOR3 m_Pos;                          //位置
-	D3DXVECTOR3 m_Scale;                        //拡大率
 	char m_aMapFilePass[m_nMAX_MAP][m_nMAX_WORD];//マップのファイルパス
 	//========================================================================================
 
@@ -143,7 +135,6 @@ private:
 	FOCUSTYPE m_FocusType;//カメラが追う物の種類
 	bool m_bMakeMapMode;                        //マップを作るモード
 	bool m_bUseSizeMove;//現在のオブジェクトのサイズ分移動するかどうか
-	D3DXVECTOR3 NotSizeMoveProcess(float fMoveX,float fMoveY);//サイズ分動かさないときの処理
 	D3DXVECTOR3 SizeMoveProcess(float fMoveX,float fMoveY,D3DXVECTOR3 Size);//サイズ分動かすときの処理
 	//========================================================================================
 
@@ -156,7 +147,8 @@ private:
 	//===================
 	//オブジェクトリスト
 	//===================
-
+	vector <CObject*> m_VecObjList;//オブジェクトのリスト
+	//========================================================================================
 
 	//===================
 	//3D背景

@@ -63,16 +63,29 @@ public:
 	}TYPE;
 	//===========================================
 
+	//====================================================
+	//ステージマネージャー管理オブジェクトタイプ列挙型
+	//====================================================
+	typedef enum
+	{
+		MANAGEROBJECTTYPE_NONE = 0,//なし
+		MANAGEROBJECTTYPE_BLOCK,   //ブロック
+		MANAGEROBJECTTYPE_MAX
+	}MANAGEROBJECTTYPE;
+	//===========================================
+
 	//===========================
 	//オブジェクト分類列挙型
 	//===========================
-	typedef enum
+	enum class OBJECTTYPE
 	{
 		OBJECTTYPE_2D = 0,
 		OBJECTTYPE_3D,
 		OBJECTTYPE_BILLBOARD,
 		OBJECTTYPE_X,
-	}OBJECTTYPE;
+		OBJECTTYPE_MAX
+	};
+	//===========================================
 
 	CObject(int nPriority = 2);//描画優先設定(５月２８日New!：デフォルト引数（呼び出し時に引数設定しなければ３が代入されて処理される
 	virtual ~CObject();        //デストラクタ
@@ -119,7 +132,11 @@ public:
 	void SetStageManagerObj();                                                        //ステージマネージャーで管理するオブジェクトを設定
 
 	static int GetTotalStageManagerObjNum() { return m_nNumStageManagerObject; }      //ステージマネージャーで管理しているオブジェクトの総数を取得
-	static void StageManagerObjectReleaseAll();                                            //全てのマネージャー管理のオブジェクトを消す    
+	static void StageManagerObjectReleaseAll();                                            //全てのマネージャー管理のオブジェクトを消す
+
+	//分類用
+	void SetManagerObjectType(MANAGEROBJECTTYPE Type) { m_ManagerObjectType = Type; }     //ステージマネージャー管理タイプを設定
+	const MANAGEROBJECTTYPE & GetManagerObjectType() const { return m_ManagerObjectType; }  //ステージマネージャー管理タイプを取得
 	//==============================================================================================
 
 	//==============================
@@ -135,6 +152,15 @@ public:
 	//フレーム関係
 	//=================================================
 	int GetCntFrame() { return m_nCntFrame; }                                         //出現してからのフレーム数をカウントする
+	//================================================================================================
+
+	//=================================================
+	//エディタ関係
+	//=================================================
+	virtual void SaveInfoTxt(fstream& WritingFile);   //テキストファイルに情報を保存するための関数
+	virtual void ManagerChooseControlInfo();          //情報操作
+	virtual CObject * ManagerChengeObject(bool bAim); //ステージマネージャーに変更したオブジェクトを渡す
+	virtual CObject * ManagerSaveObject();            //ステージマネージャーに今のオブジェクトを保存する
 	//================================================================================================
 
 	//=================================================
@@ -174,6 +200,9 @@ private:
 	bool m_bIsStageManagerObj;                               //ステージマネージャーで管理されているオブジェクトかどうか!
 	int m_nStageManagerObjNum;                               //ステージマネージャーで管理されているオブジェクトの番号!
 	bool m_bStageManagerChooseState;                         //ステージマネージャーが選択しているかどうか!
+
+	//分類用
+	MANAGEROBJECTTYPE m_ManagerObjectType;                   //管理番号判別用
 
 	//================================================================================================
 

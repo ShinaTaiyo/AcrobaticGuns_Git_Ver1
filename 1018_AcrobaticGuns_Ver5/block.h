@@ -34,6 +34,7 @@ public:
     typedef enum
 	{
 		BLOCKTYPE00_NORMAL = 0,    //普通ブロック
+		BLOCKTYPE01_WATER,         //水ブロック
 		BLOCKTYPE_MAX
 	}BLOCKTYPE;
 	//======================================================================
@@ -63,6 +64,16 @@ public:
 	static int GetNumFile() { return m_nNumFile; }                                                                 //ファイル数を取得する
 	BLOCKTYPE GetBlockType() { return m_type; }                                                                    //ブロックのタイプを取得する
 	bool GetbCollision() { return m_bCollision; }                                  //判定可能かどうかを取得する     
+
+    //==========================================================
+	//エディタ関係
+	//==========================================================
+	//関数
+	void SaveInfoTxt(fstream& WritingFile) override;  //テキストファイルに情報を保存するための関数
+	static void LoadInfoTxt(fstream& LoadingFile, vector<CObject*>& VecSaveManager,string & Buff);  //テキストファイルから情報を読み込むための関数   
+	CObject* ManagerChengeObject(bool bAim) override; //ステージマネージャーに変更したオブジェクトを渡す
+	virtual CObject* ManagerSaveObject();             //ステージマネージャーに今のオブジェクトを保存する
+	//=================================================================================================================
 private:
 	//======================================
 	//静的メンバ

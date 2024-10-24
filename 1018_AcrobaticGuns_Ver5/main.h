@@ -19,7 +19,9 @@
 #include "xaudio2.h"//サウンド処理に必要
 #include <iostream>
 #include <fstream>
+#include <sstream> //ファイル入出力で使う
 #include <vector>
+#include <iomanip>// setprecisionを使用するのに必要
 using namespace std;
 
 //==============================

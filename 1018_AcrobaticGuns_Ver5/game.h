@@ -13,6 +13,7 @@
 //インクルード
 //========================================
 #include "scene.h"
+#include "stagemanager.h"
 #include "player.h"
 #include "main.h"
 //===============================================================================
@@ -31,5 +32,6 @@ public:
 	static CPlayer* GetPlayer() { return m_pPlayer; }                      //プレイヤーを取得する
 private:
 	static CPlayer* m_pPlayer;                                             //プレイヤー
+	static CStageManager* m_pStageManager;                                 //ステージマネージャー
 };
 #endif

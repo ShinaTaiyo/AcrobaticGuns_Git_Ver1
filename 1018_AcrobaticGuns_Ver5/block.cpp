@@ -28,7 +28,8 @@
 int CBlock::m_nNumFile = CBlock::BLOCKTYPE_MAX;                                              //ファイル数を格納する
 const float CBlock::m_fBLOCKCORRECTIONCOLLISION = 3.0f;      //1,2,3,4,5,6,7,8,9,10,11,12,13 
 const char* CBlock::m_BLOCK_FILENAME[CBlock::BLOCKTYPE_MAX] =
-{ "data\\MODEL\\Block\\Block00_Normal.x", 
+{ "data\\MODEL\\Block\\Block00_Normal.x",
+  "data\\MODEL\\Block\\Block01_Water.x", 
 };                                                  //ブロックのXファイルへのポインタ
 //========================================================
 
@@ -143,7 +144,7 @@ CBlock* CBlock::Create(BLOCKTYPE type, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 r
 			pBlock->CObjectX::SetObjXType(CObjectX::OBJECTXTYPE_BLOCK);               //オブジェクトXのタイプを設定
 			pBlock->CObjectX::SetTypeNum((int)(type));                                //オブジェクトXごとのタイプ番号を設定
 			pBlock->SetSize();                                                        //Xオブジェクトのサイズを設定する
-			pBlock->SetManagerType((int)(CStageManager::MANAGEROBJECT_BLOCK));        //マネージャーで呼び出す時の種類を設定
+			pBlock->SetManagerType((int)(CStageManager::MANAGEROBJECTTYPE_BLOCK));        //マネージャーで呼び出す時の種類を設定
 
 		}
 	}
@@ -388,6 +389,150 @@ void CBlock::LandingCorrection(D3DXVECTOR3& Pos, CObject* pSaveObj,D3DXVECTOR3 V
 		}
 	}
 
+}
+//=========================================================================================================================
+
+//=======================================================================
+//必要な情報をテキストファイルに保存する
+//=======================================================================
+void CBlock::SaveInfoTxt(fstream& WritingFile)
+{
+	WritingFile << "SETBLOCK" << endl;
+	WritingFile << "TYPE = " << m_type;
+	switch (m_type)
+	{
+	case BLOCKTYPE00_NORMAL:
+		WritingFile << " # NORMALBLOCK" << endl;
+		break;
+	case BLOCKTYPE01_WATER:
+		WritingFile << " # WATERBLOCK" << endl;
+		break;
+	default:
+		break;
+	}
+
+	CObjectXAlive::SaveInfoTxt(WritingFile);
+
+	WritingFile << "END_SETBLOCK" << endl;
+}
+//=========================================================================================================================
+
+//=======================================================================
+//ステージマネージャーに変更したオブジェクトを返す
+//=======================================================================
+CObject* CBlock::ManagerChengeObject(bool bAim)
+{
+	int nNewType = int(m_type);
+	BLOCKTYPE NewType = BLOCKTYPE00_NORMAL;
+
+	//=======================================
+	//種類を変える
+    //=======================================
+	if (bAim == true)
+	{
+		nNewType++;
+	}
+	else
+	{
+		nNewType--;
+	}
+	if (nNewType >= BLOCKTYPE_MAX)
+	{
+		nNewType = BLOCKTYPE00_NORMAL;
+	}
+	if (nNewType < 0)
+	{
+		nNewType = BLOCKTYPE_MAX - 1;
+	}
+	//======================================================================================
+
+	//=======================================
+	//設定する
+	//=======================================
+	NewType = BLOCKTYPE(nNewType);
+	//======================================================================================
+
+	//=======================================
+	//死亡フラグを設定する
+	//=======================================
+	SetUseDeath(true);
+	SetDeath();
+	//======================================================================================
+
+	return CBlock::Create(NewType, GetMaxLife(), GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
+}
+//=========================================================================================================================
+
+//=======================================================================
+//テキストファイルから読み込んだ情報を保存する処理
+//=======================================================================
+void CBlock::LoadInfoTxt(fstream& LoadingFile, vector<CObject*>& VecSaveManager, string& Buff)
+{
+	int nType = 0;//種類
+	int nLife = 0;//体力
+	D3DXVECTOR3 Move = NULL_VECTOR3;//移動量
+	D3DXVECTOR3 Pos = NULL_VECTOR3; //位置
+	D3DXVECTOR3 Scale = NULL_VECTOR3;//拡大率
+	D3DXVECTOR3 Rot = NULL_VECTOR3; //向き
+	BLOCKTYPE Type = {};//ブロックの種類
+	while (Buff != "END_SETBLOCK")
+	{
+		LoadingFile >> Buff;//単語を読み込む
+		if (Buff == "#")
+		{
+			getline(LoadingFile, Buff);
+		}
+		else if (Buff == "TYPE")
+		{
+			LoadingFile >> Buff;//イコール
+			LoadingFile >> nType;      //種類
+		}
+		else if (Buff == "LIFE")
+		{
+			LoadingFile >> Buff;//イコール
+			LoadingFile >> nLife;      //体力
+		}
+		else if (Buff == "MOVE")
+		{
+			LoadingFile >> Buff;//イコール
+			LoadingFile >> Move.x;      //移動量X
+			LoadingFile >> Move.y;      //移動量Y
+			LoadingFile >> Move.z;      //移動量Z
+		}
+		else if (Buff == "POS")
+		{
+			LoadingFile >> Buff;//イコール
+			LoadingFile >> Pos.x;      //位置X
+			LoadingFile >> Pos.y;      //位置Y
+			LoadingFile >> Pos.z;      //位置Z
+		}
+		else if (Buff == "ROT")
+		{
+			LoadingFile >> Buff;//イコール
+			LoadingFile >> Rot.x;      //位置X
+			LoadingFile >> Rot.y;      //位置Y
+			LoadingFile >> Rot.z;      //位置Z
+		}
+		else if (Buff == "SCALE")
+		{
+			LoadingFile >> Buff;//イコール
+			LoadingFile >> Scale.x;      //拡大率X
+			LoadingFile >> Scale.y;      //拡大率Y
+			LoadingFile >> Scale.z;      //拡大率Z
+		}
+	}
+	Type = BLOCKTYPE(nType);
+
+	VecSaveManager.push_back(CBlock::Create(Type, nLife, Pos, Rot, Scale));//vectorに情報を保存する
+}
+//=========================================================================================================================
+
+//=======================================================================
+//ステージマネージャーにセーブする
+//=======================================================================
+CObject* CBlock::ManagerSaveObject()
+{
+	return CBlock::Create(m_type, GetMaxLife(), GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
 }
 //=========================================================================================================================
 

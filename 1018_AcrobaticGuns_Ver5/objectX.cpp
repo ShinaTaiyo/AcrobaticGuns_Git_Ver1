@@ -12,6 +12,7 @@
 #include "renderer.h"
 #include "manager.h"
 #include "objectX.h"
+#include "calculation.h"
 #include "manager.h"
 #include "camera.h"
 #include "input.h"
@@ -32,7 +33,7 @@ m_PosOld(NULL_VECTOR3),m_Rot(NULL_VECTOR3),m_Scale(NULL_VECTOR3),m_FormarScale(N
 m_OriginVtxMin(NULL_VECTOR3),m_VtxMax(NULL_VECTOR3),m_OriginVtxMax(NULL_VECTOR3),m_mtxWorld(),m_AddRot(NULL_VECTOR3),m_SenterPos(NULL_VECTOR3),
 m_AddScale(NULL_VECTOR3)
 {
-
+	SetObjectType(CObject::OBJECTTYPE::OBJECTTYPE_X);
 }
 //================================================================================================================================================
 
@@ -167,7 +168,7 @@ void CObjectX::Update()
 
 	if (GetStageManagerChoose() == true)
 	{//オブジェクトXの情報を表示
-	    DispInfo();
+
 	}
 
 	CObject::Update();
@@ -576,55 +577,22 @@ void CObjectX::ChengeEditScaleZ()
 //===================================================================================================================
 void CObjectX::ChengeEditPos()
 {
-	const D3DXVECTOR3& Pos = GetPos();                                    //モデルの位置の取得
-	D3DXVECTOR3& SupportPos = GetSupportPos();                      //モデルの支点位置の取得
-	D3DXVECTOR3& Rot = GetRot();                                    //モデルの向きの取得
-	D3DXVECTOR3 Size = GetSize();                                   //サイズを取得
 	float fMoveX = 0.0f;                                            //X方向の移動量
 	float fMoveZ = 0.0f;                                            //Z方向の移動量
 	bool bMove = false;                                             //移動しているかどうか 
-	 
+	D3DXVECTOR3 Move = NULL_VECTOR3;
 	SetColor(D3DXCOLOR(1.0f,0.0f,0.0f,0.5f),3,true,true);           //色を半透明にする
 
+	//===========================
 	//位置を支点に固定
-	//Pos = SupportPos;
-	//=====================================================
-    //移動処理
-    //=====================================================
-   	if (CManager::GetInputKeyboard()->GetPress(DIK_UP) == true)
-	{
-		fMoveZ = 1.0f;
-	}
-	else if (CManager::GetInputKeyboard()->GetPress(DIK_DOWN) == true)
-	{
-		fMoveZ = -1.0f;
-	}
+	//===========================
+	m_Pos = m_SupportPos;
+	//========================================================================================
 
-	if (CManager::GetInputKeyboard()->GetPress(DIK_RIGHT) == true)
-	{
-		fMoveX = 1.0f;
-	}
-	else if (CManager::GetInputKeyboard()->GetPress(DIK_LEFT) == true)
-	{
-		fMoveX = -1.0f;
-	}
-
-	//============================
-	// 移動ボタンを押していたら
-	//============================
-	if (fMoveX != 0.0f || fMoveZ != 0.0f)
-	{
-		bMove = true;//移動状態
-	}
-	else
-	{
-		bMove = false;//待機状態
-	}
-	if (bMove == true)
-	{//移動していたら
-		//Pos.x += sinf(atan2f(fMoveX, fMoveZ)) * 5.0f;
-		//Pos.y += cosf(atan2f(fMoveX, fMoveZ)) * 5.0f;
-	}
+	//===========================
+	//位置を変更
+	//===========================
+	CCalculation::CaluclationMove(Move, 5.0f, CCalculation::MOVEAIM_XZ, m_Rot.y);
 
 	//===========================
 	//RTボタンを押していたら
@@ -635,12 +603,12 @@ void CObjectX::ChengeEditPos()
 		{//シフトキーを押しながら・・・
 			if (CManager::GetInputKeyboard()->GetPress(DIK_F) == true)
 			{
-				Rot.z -= 0.01f;
+				m_Rot.z -= 0.01f;
 			}
 		}
 		else if (CManager::GetInputKeyboard()->GetPress(DIK_G) == true)
 		{
-			Rot.z += 0.01f;
+			m_Rot.z += 0.01f;
 		}
 	}
 	else
@@ -649,21 +617,50 @@ void CObjectX::ChengeEditPos()
 		{//シフトキーを押しながら・・・
 			if (CManager::GetInputKeyboard()->GetTrigger(DIK_F) == true)
 			{
-				Rot.z -= 0.01f;
+				m_Rot.z -= 0.01f;
 			}
 		}
 		else if (CManager::GetInputKeyboard()->GetTrigger(DIK_G) == true)
 		{
-			Rot.z += 0.01f;
+			m_Rot.z += 0.01f;
 		}
 	}
 
 	//支点も一緒に移動
-	SupportPos = Pos;
-	CManager::GetDebugProc()->PrintDebugProc("支点位置(矢印キー) %f %f %f\n", SupportPos.x, SupportPos.y, SupportPos.z);
-	CManager::GetDebugProc()->PrintDebugProc("向きZ(FGキー) %f\n",Rot.z);
+	m_Pos += Move;
+	m_SupportPos = m_Pos;
+	CManager::GetDebugProc()->PrintDebugProc("支点位置(矢印キー) %f %f %f\n", m_SupportPos.x, m_SupportPos.y, m_SupportPos.z);
+	CManager::GetDebugProc()->PrintDebugProc("向きZ(FGキー) %f\n", m_Rot.z);
 	//================================================================================================================================================
 
+}
+//================================================================================================================================================
+
+//============================================================================
+//ステージマネージャーが情報を操作する
+//============================================================================
+void CObjectX::ManagerChooseControlInfo()
+{
+	ChengeEditPos();//位置を変える
+
+	ChengeEditScale();//拡大率を変える
+}
+//================================================================================================================================================
+
+//============================================================================
+//テキストファイルに情報を保存する
+//============================================================================
+void CObjectX::SaveInfoTxt(fstream & WritingFile)
+{
+	WritingFile << "POS = " << fixed << setprecision(3)<< m_Pos.x << " " << 
+		fixed << setprecision(3) << m_Pos.y << " " << 
+		fixed << setprecision(3) << m_Pos.z << " " << endl;//位置
+	WritingFile << "ROT = " << fixed << setprecision(3) << m_Rot.x << " " <<
+		fixed << setprecision(3) << m_Rot.y << " " <<
+		fixed << setprecision(3) << m_Rot.z << " " << endl;//向き
+	WritingFile << "SCALE = " << fixed << setprecision(3) << m_Scale.x << " " <<
+		fixed << setprecision(3) << m_Scale.y << " " <<
+		fixed << setprecision(3) << m_Scale.z << " " << endl;//拡大率
 }
 //================================================================================================================================================
 
@@ -758,16 +755,5 @@ void CObjectX::DrawShadow()
 
 	//保存していたマテリアルを戻す
 	pDevice->SetMaterial(&matDef);
-}
-//================================================================================================================================================
-
-//============================================================================
-//情報表示処理
-//============================================================================
-void CObjectX::DispInfo()
-{
-	ChengeEditPos();//位置を変える
-
-	ChengeEditScale();//拡大率を変える
 }
 //================================================================================================================================================

@@ -33,6 +33,8 @@ m_pVtxBuff(nullptr),m_pTexture(nullptr),m_Scale(NULL_VECTOR3),m_rot(NULL_VECTOR3
 {
 	m_pTexture = nullptr;
 	m_pVtxBuff = nullptr;
+
+	SetObjectType(CObject::OBJECTTYPE::OBJECTTYPE_2D);
 }
 //================================================================================
 

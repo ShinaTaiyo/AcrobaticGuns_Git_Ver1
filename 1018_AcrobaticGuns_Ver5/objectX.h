@@ -157,7 +157,9 @@ public:
 	int GetTypeNum() { return m_nTypeNum;}                                                  //オブジェクトごとのタイプ番号を設定
 
 	//情報表示処理＆操作
-	virtual void DispInfo();                        //情報表示処理
+	void ManagerChooseControlInfo() override;              //ステージマネージャーが情報を操作する
+
+	void SaveInfoTxt(fstream& WritingFile) override;//テキストファイルに情報を保存するための関数
 
 	//================================================================================================================================================
 
@@ -192,7 +194,7 @@ public:
 	//色合い
 	void SetColor(D3DXCOLOR col, int nColChengeTime,bool bChoose,bool bSetAlpha);
 	//=================================================================================================================
-	private:
+private:
 	void DrawShadow();                                                       //影を描画する
 
 	//==========================================================

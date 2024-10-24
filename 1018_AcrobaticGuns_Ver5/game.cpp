@@ -22,6 +22,7 @@
 //静的メンバ宣言
 //=============================================================
 CPlayer* CGame::m_pPlayer = nullptr;
+CStageManager* CGame::m_pStageManager = nullptr;
 //=========================================================================================================================
 
 //=============================================================
@@ -30,6 +31,7 @@ CPlayer* CGame::m_pPlayer = nullptr;
 CGame::CGame()
 {
 	m_pPlayer = nullptr;
+	m_pStageManager = nullptr;
 }
 //=========================================================================================================================
 
@@ -52,6 +54,8 @@ HRESULT CGame::Init()
 	m_pPlayer = CPlayer::Create(NULL_VECTOR3, NULL_VECTOR3, NULL_VECTOR3, ONE_VECTOR3);
 	m_pPlayer->SetUseDeath(false);
 
+	m_pStageManager = CStageManager::Create();
+
 	CField::Create(NULL_VECTOR3, NULL_VECTOR3, 2000.0f, 2000.0f,CField::FIELDTYPE00_NORMAL);
 	return S_OK;
 }
@@ -72,6 +76,18 @@ void CGame::Uninit()
 		m_pPlayer = nullptr;
 	}
 	//=====================================================================
+
+	//============================================
+	//ステージマネージャーの破棄
+	//============================================
+	if (m_pStageManager != nullptr)
+	{
+		m_pStageManager->SetUseDeath(true);
+		m_pStageManager->SetDeath();
+		m_pStageManager = nullptr;
+	}
+	//=====================================================================
+
 
 	CManager::GetSound()->StopSound();
 

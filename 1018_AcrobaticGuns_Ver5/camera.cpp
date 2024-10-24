@@ -197,21 +197,37 @@ void CCamera::SetShake(int nShakeFrame, float fShakePower)
 //====================================================================
 void CCamera::NormalCameraMove()
 {
-	if (CScene::GetMode() == CScene::MODE_GAME)
-	{
+	CObject* pManagerObject = nullptr;
 		switch (m_CameraType)
 		{
 		case CAMERATYPE_BIRD:
-			if (CGame::GetPlayer() != nullptr)
+			switch (CScene::GetMode())
 			{
-				m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f,50.0f,0.0f);
-				m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -200.0f,0.0f, cosf(m_Rot.y) * -200.0f);
+			case CScene::MODE_GAME:
+				if (CGame::GetPlayer() != nullptr)
+				{
+					m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f);
+					m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -200.0f, 0.0f, cosf(m_Rot.y) * -200.0f);
+				}
+				break;
+			case CScene::MODE_EDIT:
+				pManagerObject = CEdit::GetStageManager()->GetStageManagerObject();
+				if (pManagerObject != nullptr)
+				{
+					if (pManagerObject->GetObjectType() == CObject::OBJECTTYPE::OBJECTTYPE_X)
+					{
+						m_PosR = ((CObjectX*)pManagerObject)->GetPos();
+						m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -200.0f, 400.0f, cosf(m_Rot.y) * -200.0f);
+					}
+				}
+				break;
+			default:
+				break;
 			}
 			break;
 		default:
 			break;
 		}
-	}
 }
 //====================================================================================================
 
