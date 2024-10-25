@@ -144,10 +144,6 @@ public:
 	//エディタ
 	//==========================================================
 
-	//マネージャー番号
-	void SetManagerType(int nManagerType) { m_nManagerType = nManagerType; }//マネージャーで呼び出される際のタイプ番号を設定する
-	int GetManagerType() { return m_nManagerType; }//マネージャーで呼び出される際のタイプ番号
-
 	//オブジェクトXの種類
 	void SetObjXType(OBJECTXTYPE ObjXType) { m_nObjXType = ObjXType; }                      //オブジェクトXの分類を設定
 	OBJECTXTYPE GetObjXType() { return m_nObjXType; }                                       //オブジェクトXのタイプを取得する

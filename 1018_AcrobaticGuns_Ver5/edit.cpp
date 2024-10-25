@@ -21,6 +21,7 @@
 //=============================================================
 CPlayer* CEdit::m_pPlayer = nullptr;
 CStageManager* CEdit::m_pStageManager = nullptr;
+CField* CEdit::m_pField = nullptr;
 //=========================================================================================================================
 
 //=============================================================
@@ -30,6 +31,7 @@ CEdit::CEdit()
 {
 	m_pPlayer = nullptr;
 	m_pStageManager = nullptr;
+	m_pField = nullptr;
 }
 //=========================================================================================================================
 
@@ -50,6 +52,8 @@ HRESULT CEdit::Init()
 	CScene::Init();//シーン初期化処理
 
 	m_pStageManager = CStageManager::Create();
+	m_pField = CField::Create(NULL_VECTOR3, NULL_VECTOR3, 2000.0f, 2000.0f, CField::FIELDTYPE00_NORMAL);
+	m_pField->SetUseDeath(false);
 	CField::Create(NULL_VECTOR3, NULL_VECTOR3, 2000.0f, 2000.0f, CField::FIELDTYPE00_NORMAL);
 
 	return S_OK;
@@ -83,6 +87,18 @@ void CEdit::Uninit()
 		m_pStageManager = nullptr;
 	}
 	//=====================================================================
+
+	//============================================
+	//フィールドの破棄
+	//============================================
+	if (m_pField != nullptr)
+	{
+		m_pField->SetUseDeath(true);
+		m_pField->SetDeath();
+		m_pField = nullptr;
+	}
+	//=====================================================================
+
 	CScene::Uninit();//シーン終了処理
 }
 //=========================================================================================================================

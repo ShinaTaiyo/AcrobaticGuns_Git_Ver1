@@ -16,10 +16,11 @@
 #include "manager.h"
 #include "object.h"
 #include "camera.h"
+#include "calculation.h"
 #include "debugproc.h"
+#include "bgModel.h"
 #include <stdio.h>
 #include <string.h>
-#include "calculation.h"
 //==========================================================
 
 //================================
@@ -37,7 +38,7 @@ const string CStageManager::m_aSAVE_FILENAME = "data\\TEXTFILE\\Ver2\\Practice.t
 //================================
 //コンストラクタ
 //================================
-CStageManager::CStageManager() : m_nWorldIndex(0),m_pBg3D(nullptr),m_VecObjList()
+CStageManager::CStageManager() : m_nWorldIndex(0),m_pBg3D(nullptr),m_VecObjList(),m_SaveScale(ONE_VECTOR3),m_SavePos(NULL_VECTOR3),m_SaveRot(NULL_VECTOR3)
 {
 	for (int nCnt = 0; nCnt < m_nMAX_MAP; nCnt++)
 	{
@@ -68,12 +69,11 @@ HRESULT CStageManager::Init()
 	//===========================
 	m_nMapIndex = 0;                                     //マップのインデックス
 	m_nMapNum = 0;                                       //マップの総数
-	m_Scale = ONE_VECTOR3;                               //拡大率
-	m_Rot = NULL_VECTOR3;                                //向き
-	m_Pos = NULL_VECTOR3;                                //位置
+	m_SaveScale = ONE_VECTOR3;                               //拡大率
+	m_SaveRot = NULL_VECTOR3;                                //向き
+	m_SavePos = NULL_VECTOR3;                                //位置
 	m_SaveBeforeChoosePos = NULL_VECTOR3;                //選択処理をする前の位置を記憶する
  	m_pManagerObject = nullptr;                          //マネージャーに表示するオブジェクト
-	m_nIndexObject = 0;                                  //オブジェクト番号
 	m_ManagerMode = MANAGERMODE_ALREADYSTAGE;            //現在のステージマネーシャーのモード
 
 	//=========================
@@ -105,6 +105,7 @@ HRESULT CStageManager::Init()
 	//オブジェクトX初期化処理
 	//===========================
 	m_pManagerObject = CBlock::Create(CBlock::BLOCKTYPE00_NORMAL, 1, NULL_VECTOR3, NULL_VECTOR3, ONE_VECTOR3);
+	m_pManagerObject->SetUseDeath(false);//死亡フラグをオフにする
 	CObject::Init();
 	//=======================================================================================
 
@@ -147,34 +148,19 @@ void CStageManager::Update()
 			//ステージマネージャーから情報にアクセスして操作する
 			m_pManagerObject->ManagerChooseControlInfo();
 
-			//===============================================
 			//現在のブロックの種類を変更する
-			//===============================================
 			TypeChenge();
-			//===========================================================================================
 
-			//===============================================
 			//ブロックを設定する
-			//===============================================
 			SetObjectX();
-			//===========================================================================================
 
-			//===============================================
 			//マップを変える処理
-			//===============================================
 			MapChenge();
-			//===========================================================================================
 
-			//===============================================
-			//オブジェクト全消去処理
-			//===============================================
-			if (CManager::GetInputKeyboard()->GetTrigger(DIK_RSHIFT) == true)
-			{
-				StageManagerObjectReleaseAll();
-			}
-			//===========================================================================================
+			//末尾のオブジェクトを消去する処理
+			DeleteManagerObject();
 
-			CManager::GetDebugProc()->PrintDebugProc("現在のステージマネージャー管理オブジェクトの数：%d\n", m_VecObjList.size());
+			//===========================================================================================
 		}
 
 		//===============================================
@@ -186,7 +172,7 @@ void CStageManager::Update()
 		//===============================================
 		//情報表示処理
 		//===============================================
-		//DispInfo();
+		DispInfo();
 		//===========================================================================================
 
 		//===============================================
@@ -257,12 +243,13 @@ void CStageManager::LoadMapTxt(int nMapNum)
 		{
 			CBlock::LoadInfoTxt(ReadingFile, m_VecObjList,Reading_Buff);
 		}
+		else if (Reading_Buff == "SETBGMODEL")
+		{
+			CBgModel::LoadInfoTxt(ReadingFile, m_VecObjList, Reading_Buff);
+		}
 	}
 
 	ReadingFile.close();//ファイルを閉じる
-	
-
-
 }
 //============================================================================================================
 
@@ -311,89 +298,6 @@ void CStageManager::LoadMapFilePass(WORLDTYPE type)
 //============================================
 void CStageManager::SaveMapTxt(int nMapNum)
 {
-	//D3DXVECTOR3 Pos = NULL_VECTOR3;
-	//D3DXVECTOR3 WarpPos = NULL_VECTOR3;
-	//D3DXVECTOR3 Scale = NULL_VECTOR3;
-	//D3DXVECTOR3 Rot = NULL_VECTOR3;
-	//int nWarpMap = 0;//ワープ先のマップ番号
-	//int nManagerType;//オブジェクトXのタイプ
-	//int nType = 0;//オブジェクトXごとのタイプ
-	//D3DXVECTOR3 move = NULL_VECTOR3;
-	//float fWidth = 0.0f;
-	//float fHeight = 0.0f;
-	//int nLife = 0;        //体力
-	//m_nMapIndex = nMapNum;
-	//int nSubType = 0;     //サブタイプ
-	//FILE* pFile = nullptr;
-	//CObject* pObj = nullptr;//オブジェクト取得用
-
-	////=================================================
-	////現在のモードによってセーブするファイルを変える
-	////=================================================
-	//if (m_ManagerMode == MANAGERMODE_ALREADYSTAGE)
-	//{
-	//	pFile = fopen(&m_aMapFilePass[m_nMapIndex][0], "w");
-	//}
-	//else
-	//{
-	//	pFile = fopen(SAVE_TXT, "w");
-	//}
-	////=====================================================================================================================
-
-	//if (pFile != nullptr)
-	//{
-	//	pObj = GetTopStageManagerObject();//トップオブジェクトを取得
-
-	//	while (pObj != nullptr)
-	//	{
-	//		//次のオブジェクトを格納
-	//		CObject* pNext = pObj->GetNextStageManagerObject();
-
-	//		//種類の取得（敵なら当たり判定）
-	//		CObject::TYPE type = pObj->GetType();
-
-	//		//==============================================
-	//		//オブジェクト情報を書き出す
-	//		//==============================================
-	//		//nLife = ((CObjectX*)pObj)->GetLife();
-	//		nManagerType = ((CObjectX*)pObj)->GetManagerType(); //Xオブジェクトのタイプを取得
-	//		nType = ((CObjectX*)pObj)->GetTypeNum();            //Xオブジェクトごとのタイプを取得
-	//		Pos = ((CObjectX*)pObj)->GetSupportPos();           //位置を書き出す
-	//		Scale = ((CObjectX*)pObj)->GetScale();				//拡大率を書き出す
-	//		Rot = ((CObjectX*)pObj)->GetRot();					//向きを書き出す
-	//		fprintf(pFile, "SETOBJECT\n");
-	//		fprintf(pFile, "MANAGERTYPE = %d\n", nManagerType);
-	//		fprintf(pFile, "TYPE = %d\n", nType);
-	//		fprintf(pFile, "POS = %.3f %.3f %.3f\n", Pos.x, Pos.y, Pos.z);
-	//		fprintf(pFile, "SCALE = %.3f %.3f %.3f\n", Scale.x, Scale.y, Scale.z);
-	//		fprintf(pFile, "ROT = %.3f %.3f %.3f\n", Rot.x, Rot.y, Rot.z);
-	//		fprintf(pFile, "LIFE = %d\n", nLife);
-	//		fprintf(pFile, "SUBTYPE = %d\n", nSubType);
-	//		fprintf(pFile, "END_SETOBJECT\n\n");
-	//	}
-	//	//========================================================================
-	//	fprintf(pFile, "END_SCRIPT");
-	//	fclose(pFile);
-	//}
-	////================================================================================
-	//while (m_VecObjList.size() != 0)
-	//{
-	//	auto Object = m_VecObjList.begin();
-	//	Type = ((CObject*)&Object)->GetType();
-
-	//	switch (Type)
-	//	{
-	//	case CObject::TYPE::TYPE_BLOCK:
-	//		((CObject*)&Object)->SaveInfoTxt(WritingFile);
-	//		break;
-	//	default:
-	//		break;
-	//	}
-
-	//	WritingFile << endl<<endl;//改行処理
-
-	//	m_VecObjList.erase(m_VecObjList.begin());//先頭のオブジェクトを消す
-	//}
 
 	fstream WritingFile;    //ファイル
 	string Writing_Buff;    //文字列
@@ -425,79 +329,79 @@ void CStageManager::SaveMapTxt(int nMapNum)
 //==========================================================
 void CStageManager::LoadMapBin(int nMapNum)
 {
-	//======================================
-	//変数宣言
-	//======================================
-	D3DXVECTOR3 Pos = NULL_VECTOR3;
-	D3DXVECTOR3 Scale = NULL_VECTOR3;
-	D3DXVECTOR3 Rot = NULL_VECTOR3;
-	int nType = 0;            //オブジェクトXごとのタイプ
-	int nManagerType = 0;        //オブジェクトXのタイプ
-	int nRotType = 0;         //向きのタイプ
-	D3DXVECTOR3 move = NULL_VECTOR3;
-	float fWidth = 0.0f;
-	float fHeight = 0.0f;
-	int nData = 0;
-	char aString[512] = {};
-	char aStringMap[100] = {};
-	CObject* pObject = nullptr;
-	//===============================================================================================
-	StageManagerObjectReleaseAll();
-	FILE* pFile = nullptr;
-	pFile = fopen(&m_aMapFilePass[nMapNum][0], "rb");
-	//pFile = fopen(&m_aMapFilePass[0][0], "rb");
-	if (pFile != nullptr)
-	{
-		//==============================================
-		//オブジェクトの情報を読み込む
-		//==============================================
-		fread(&m_nIndexObject, sizeof(int), 1, pFile);
-		if (m_nIndexObject > 0)
-		{
-			for (int nCnt = 0; nCnt < m_nIndexObject; nCnt++)
-			{//オブジェクトを設定
-				fread(&nManagerType, sizeof(int), 1, pFile);         //Xオブジェクトのタイプを読み込む
-				fread(&nType, sizeof(int), 1, pFile);             //Xオブジェクトごとのタイプを読み込む
-				fread(&nRotType, sizeof(int), 1, pFile);          //向きの種類を読み込む
-				fread(&Pos, sizeof(D3DXVECTOR3), 1, pFile);       //位置を読み込む
-				fread(&Scale, sizeof(D3DXVECTOR3), 1, pFile);     //拡大率を読み込む
-				fread(&Rot, sizeof(D3DXVECTOR3), 1, pFile);       //向きを読み込む
+	////======================================
+	////変数宣言
+	////======================================
+	//D3DXVECTOR3 Pos = NULL_VECTOR3;
+	//D3DXVECTOR3 Scale = NULL_VECTOR3;
+	//D3DXVECTOR3 Rot = NULL_VECTOR3;
+	//int nType = 0;            //オブジェクトXごとのタイプ
+	//int nManagerType = 0;        //オブジェクトXのタイプ
+	//int nRotType = 0;         //向きのタイプ
+	//D3DXVECTOR3 move = NULL_VECTOR3;
+	//float fWidth = 0.0f;
+	//float fHeight = 0.0f;
+	//int nData = 0;
+	//char aString[512] = {};
+	//char aStringMap[100] = {};
+	//CObject* pObject = nullptr;
+	////===============================================================================================
+	//StageManagerObjectReleaseAll();
+	//FILE* pFile = nullptr;
+	//pFile = fopen(&m_aMapFilePass[nMapNum][0], "rb");
+	////pFile = fopen(&m_aMapFilePass[0][0], "rb");
+	//if (pFile != nullptr)
+	//{
+	//	//==============================================
+	//	//オブジェクトの情報を読み込む
+	//	//==============================================
+	//	fread(&m_nIndexObject, sizeof(int), 1, pFile);
+	//	if (m_nIndexObject > 0)
+	//	{
+	//		for (int nCnt = 0; nCnt < m_nIndexObject; nCnt++)
+	//		{//オブジェクトを設定
+	//			fread(&nManagerType, sizeof(int), 1, pFile);         //Xオブジェクトのタイプを読み込む
+	//			fread(&nType, sizeof(int), 1, pFile);             //Xオブジェクトごとのタイプを読み込む
+	//			fread(&nRotType, sizeof(int), 1, pFile);          //向きの種類を読み込む
+	//			fread(&Pos, sizeof(D3DXVECTOR3), 1, pFile);       //位置を読み込む
+	//			fread(&Scale, sizeof(D3DXVECTOR3), 1, pFile);     //拡大率を読み込む
+	//			fread(&Rot, sizeof(D3DXVECTOR3), 1, pFile);       //向きを読み込む
 
-				//switch (nManagerType)
-				//{
-				//	case (int)(MANAGEROBJECT_BLOCK) :
-				//		pObject = CBlock::Create(CBlock::BLOCKTYPE(nType), 10, Pos, Rot, Scale, (CObjectX::ROTTYPE)(nRotType), m_nSetSubType);//生成処理
-				//		break;
-				//		case (int)(MANAGEROBJECT_MODEL) :
-				//			pObject = CModel::Create((CModel::MODELTYPE)(nType), Pos, Rot, NULL_VECTOR3, Scale, (CObjectX::ROTTYPE)(nRotType));//生成処理
-				//			break;
-				//				case (int)(MANAGEROBJECT_ENEMY) :
-				//					pObject = CEnemy::Create((CEnemy::ENEMYTYPE)(nType), 10, Pos, NULL_VECTOR3, Scale,NULL_VECTOR3,NULL_VECTOR3,ONE_VECTOR3);//生成処理
-				//					break;
-				//					case (int)(MANAGEROBJECT_ITEM) :
-				//						pObject = CItem::Create((CItem::ITEMTYPE)(nType), Pos, Rot, Scale, CObjectX::ROTTYPE_NORMAL);//生成処理
-				//						break;
-				//						case (int)(MANAGEROBJECT_MARKER) :
-				//							pObject = CMarker::Create((CMarker::MARKERTYPE)(nType),Pos,Scale, NULL_VECTOR3, 0);
-				//							break;
-				//							case (int)(MANAGEROBJECT_BOSS) :
-				//								pObject = CBoss::SetCreateBoss((CBoss::BOSSTYPE)(nType),10, Pos, Scale);
-				//								break;
+	//			//switch (nManagerType)
+	//			//{
+	//			//	case (int)(MANAGEROBJECT_BLOCK) :
+	//			//		pObject = CBlock::Create(CBlock::BLOCKTYPE(nType), 10, Pos, Rot, Scale, (CObjectX::ROTTYPE)(nRotType), m_nSetSubType);//生成処理
+	//			//		break;
+	//			//		case (int)(MANAGEROBJECT_MODEL) :
+	//			//			pObject = CModel::Create((CModel::MODELTYPE)(nType), Pos, Rot, NULL_VECTOR3, Scale, (CObjectX::ROTTYPE)(nRotType));//生成処理
+	//			//			break;
+	//			//				case (int)(MANAGEROBJECT_ENEMY) :
+	//			//					pObject = CEnemy::Create((CEnemy::ENEMYTYPE)(nType), 10, Pos, NULL_VECTOR3, Scale,NULL_VECTOR3,NULL_VECTOR3,ONE_VECTOR3);//生成処理
+	//			//					break;
+	//			//					case (int)(MANAGEROBJECT_ITEM) :
+	//			//						pObject = CItem::Create((CItem::ITEMTYPE)(nType), Pos, Rot, Scale, CObjectX::ROTTYPE_NORMAL);//生成処理
+	//			//						break;
+	//			//						case (int)(MANAGEROBJECT_MARKER) :
+	//			//							pObject = CMarker::Create((CMarker::MARKERTYPE)(nType),Pos,Scale, NULL_VECTOR3, 0);
+	//			//							break;
+	//			//							case (int)(MANAGEROBJECT_BOSS) :
+	//			//								pObject = CBoss::SetCreateBoss((CBoss::BOSSTYPE)(nType),10, Pos, Scale);
+	//			//								break;
 
 
-				//				default:
-				//					break;
-				//}
+	//			//				default:
+	//			//					break;
+	//			//}
 
-				//if (pObject != nullptr)
-				//{
-				//	m_apObjectList[nCnt] = pObject;
-				//}
-			}
-		}
-		//========================================================================
-		fclose(pFile);
-	}
+	//			//if (pObject != nullptr)
+	//			//{
+	//			//	m_apObjectList[nCnt] = pObject;
+	//			//}
+	//		}
+	//	}
+	//	//========================================================================
+	//	fclose(pFile);
+	//}
 }
 	//======================================================================================================================
 
@@ -576,101 +480,25 @@ CStageManager* CStageManager::Create()
 }
 //================================================================================
 
-//============================================
-//ステージマネージャーを移動させる処理
-//============================================
-void CStageManager::MoveManager()
-{
-	////=========================================
-	////変数宣言
-	////=========================================
-	//D3DXVECTOR3 MoveSize = ((CObjectX*)m_pManagerObject)->GetSize();//移動するサイズを求める
-	//CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();//キーボードクラスの取得
-	//float fMoveX = 0.0f;                                          //X方向の移動量
-	//float fMoveZ = 0.0f;                                          //Z方向の移動量
-	//bool bMove = false;                                           //移動しているかどうか
-	////===========================================================================================================================
-
-	////=================================
-	////移動タイプを切り替える
-	////=================================
-	//if (pInputKeyboard->GetTrigger(DIK_MINUS) == true)
-	//{
-	//	if (m_MoveMode == MOVEMODE00_XY)
-	//	{
-	//		m_MoveMode = MOVEMODE01_XZ;
-	//	}
-	//	else if (m_MoveMode == MOVEMODE01_XZ)
-	//	{
-	//		m_MoveMode = MOVEMODE00_XY;
-	//	}
-	//}
-
-	//if (pInputKeyboard->GetTrigger(DIK_C) == true)
-	//{//サイズ分動かすかどうか
-	//	m_bUseSizeMove = m_bUseSizeMove ? false : true;
-	//}
-
-	////==================================================================================================
-
-	////=================================
-	////位置を戻す
-	////=================================
-	//if (pInputKeyboard->GetTrigger(DIK_PERIOD))
-	//{
-	//	m_Pos.z = 0.0f;
-	//	m_Pos.y = 0.0f;
-	//}
-	////==================================================================================================
-
-	////============================
-	//// 移動ボタンを押していたら
-	////============================
-	//CCalculation::CaluclationMove(m_Pos, 5.0f, CCalculation::MOVEAIM_XZ,m_Rot.y);
-
-	////位置を設定する
-	//((CObjectX*)m_pManagerObject)->SetPos(m_Pos);
-	////==================================================================================================
-
-}
-//===========================================================================================
-
-//=================================================
-//体力を設定する
-//=================================================
-void CStageManager::LifeSet()
-{
-	//if (CManager::GetInputKeyboard()->GetTrigger(DIK_F8) == true)
-	//{
-	//	m_nSetLife += 10;
-	//}
-	//else if (CManager::GetInputKeyboard()->GetTrigger(DIK_F7) == true)
-	//{
-	//	m_nSetLife -= 10;
-	//}
-}
-//===========================================================================================
-
 //=================================================
 //選択オブジェクトの種類を変える
 //=================================================
 void CStageManager::TypeChenge()
 {
 	bool bChengeFlag = false;
-	int nNumType = 0;//オブジェクトタイプ格納用
+	int nNumType = m_pManagerObject->GetManagerObjectType();
+
 	CObject::MANAGEROBJECTTYPE ManagerObjectType = CObject::MANAGEROBJECTTYPE_NONE;
 	//=====================================================================
     //オブジェクトXの種類を変更する
     //=====================================================================
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_2) == true)
 	{
-		nNumType = m_pManagerObject->GetManagerObjectType();
 		nNumType++;
 		bChengeFlag = true;//発動
 	}
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_1) == true)
 	{
-		nNumType = m_pManagerObject->GetManagerObjectType();
 		nNumType--;
 		bChengeFlag = true;//発動
 	}
@@ -725,21 +553,17 @@ void CStageManager::SetObjectX()
 //==================================================
 //Xオブジェクト消去処理
 //==================================================
-void CStageManager::DeleteObjectX()
+void CStageManager::DeleteManagerObject()
 {
-	//if (CManager::GetInputKeyboard()->GetTrigger(DIK_DELETE) == true)
-	//{
-	//	if (m_apObjectList[m_nIndexObject - 1] != nullptr && m_nIndexObject >= 1)
-	//	{
-	//		if (((CObjectX*)m_apObjectList[m_nIndexObject - 1])->GetObjXType() == CObjectX::OBJECTXTYPE_MARKER)
-	//		{
-	//			((CMarker*)m_apObjectList[m_nIndexObject - 1])->DeleteNum();
-	//		}
-	//		m_apObjectList[m_nIndexObject - 1]->SetDeath();    //ブロックリストの動的確保メモリを開放
-	//		m_apObjectList[m_nIndexObject - 1] = nullptr;          //ブロックリストのポインタを初期化
-	//		m_nIndexObject--;                                     //インデックスをデクリメント
-	//	}
-	//}
+	if (CManager::GetInputKeyboard()->GetTrigger(DIK_BACKSPACE) == true)
+	{
+		auto it = m_VecObjList.end() - 1;//配列マックスー１
+
+		((CObject*)*it)->SetUseDeath(true);
+		((CObject*)*it)->SetDeath();
+
+		m_VecObjList.pop_back();//末尾の要素を削除する
+	}
 }
 //=======================================================================================================================
 
@@ -751,11 +575,27 @@ void CStageManager::ChengeObject(CObject::MANAGEROBJECTTYPE ManagerObjectType)
 	//オブジェクトを破棄する
 	ReleaseObject();
 
+	int nObjectType = ManagerObjectType;
+
+	if (nObjectType >= CObject::MANAGEROBJECTTYPE_MAX)
+	{
+		nObjectType = CObject::MANAGEROBJECTTYPE_NONE + 1;
+	}
+	else if (nObjectType < CObject::MANAGEROBJECTTYPE_NONE + 1)
+	{
+		nObjectType = CObject::MANAGEROBJECTTYPE_MAX - 1;
+	}
+
+	ManagerObjectType = MANAGEROBJECTTYPE(nObjectType);
+
 	//オブジェクトの種類を変える
 	switch (ManagerObjectType)
 	{
-		case  MANAGEROBJECTTYPE_BLOCK:
-		m_pManagerObject = CBlock::Create(CBlock::BLOCKTYPE00_NORMAL, 10, m_Pos, NULL_VECTOR3, m_Scale);
+	case  CObject::MANAGEROBJECTTYPE_BLOCK:
+		m_pManagerObject = CBlock::Create(CBlock::BLOCKTYPE00_NORMAL, 10, m_SavePos,m_SaveRot,m_SaveScale);
+		break;
+	case CObject::MANAGEROBJECTTYPE_BGMODEL:
+		m_pManagerObject = CBgModel::Create(CBgModel::BGMODELTYPE::TYPE_BILL_00, m_SavePos, m_SaveRot, m_SaveScale);
 		break;
 		default:
 		break;
@@ -772,6 +612,17 @@ void CStageManager::ChengeObject(CObject::MANAGEROBJECTTYPE ManagerObjectType)
 //==================================================================
 void CStageManager::ReleaseObject()
 {
+	//最低限の情報を保存する
+	switch (m_pManagerObject->GetObjectType())
+	{
+	case CObject::OBJECTTYPE::OBJECTTYPE_X:
+		m_SavePos = ((CObjectX*)m_pManagerObject)->GetPos();
+		m_SaveRot = ((CObjectX*)m_pManagerObject)->GetRot();
+		m_SaveScale = ((CObjectX*)m_pManagerObject)->GetScale();
+		break;
+	default:
+		break;
+	}
 	if (m_pManagerObject != nullptr)
 	{
 		m_pManagerObject->SetUseDeath(true);
@@ -829,28 +680,6 @@ void CStageManager::MapChenge()
 		}
 		LoadMapTxt(m_nMapIndex);//番号のマップを読み込む
 	}
-
-	if (CManager::GetInputKeyboard()->GetTrigger(DIK_P) == true && m_ManagerMode == MANAGERMODE_ALREADYSTAGE)
-	{
-		SaveMapTxt(m_nMapIndex);//現在のマップ情報をセーブする
-
-		m_nMapIndex = 0;//ワールドを変更するのでマップ番号を初期化
-		m_nMapNum = 0;  //マップ総数を初期化
-
-		m_nWorldIndex++;//次のワールドを選択
-
-		if (m_nWorldIndex == WORLDTYPE_MAX)
-		{
-			m_nWorldIndex = 0;
-		}
-
-		//マップ情報をロードする
-		LoadMapFilePass(WORLDTYPE(m_nWorldIndex));
-
-		//マップを読み込む
-		LoadMapTxt(m_nMapIndex);//番号のマップを読み込む
-	}
-
 }
 //=======================================================================================================================
 
@@ -889,20 +718,12 @@ void CStageManager::DispInfo()
 	CManager::GetDebugProc()->PrintDebugProc("//=================================\n");
 	CManager::GetDebugProc()->PrintDebugProc("//マップエディタの情報\n");
 	CManager::GetDebugProc()->PrintDebugProc("//=================================\n");
-	CManager::GetDebugProc()->PrintDebugProc("ステージマネージャー管理オブジェクトの総数：%d\n",GetTotalStageManagerObjNum());
+	CManager::GetDebugProc()->PrintDebugProc("現在のステージマネージャー管理オブジェクトの数：%d\n", m_VecObjList.size());
 	CManager::GetDebugProc()->PrintDebugProc("現在のワールド：%s\n",&m_apWORLDMAP_TXT[m_nWorldIndex][0]);
 	CManager::GetDebugProc()->PrintDebugProc("現在のマップ番号(F2、F3で変更）：%d\n", m_nMapIndex);
 	CManager::GetDebugProc()->PrintDebugProc("現在のマップファイルパス：%s\n",&m_aMapFilePass[m_nMapIndex][0]);
-	CManager::GetDebugProc()->PrintDebugProc("オブジェクトの位置： %f %f %f\n",m_Pos.x,m_Pos.y,m_Pos.z);
-	CManager::GetDebugProc()->PrintDebugProc("オブジェクトの拡大率リセット：V\n");
 	CManager::GetDebugProc()->PrintDebugProc("現在のマップモード（F4）：%s\n",&aMapModeString[0]);
-	CManager::GetDebugProc()->PrintDebugProc("オブジェクトを選択（L）：%s\n",&aChooseString[0]);
-	CManager::GetDebugProc()->PrintDebugProc("選択オブジェクト変更：（N、M）\n");
-	CManager::GetDebugProc()->PrintDebugProc("選択オブジェクト消去：（DEL）\n");
-	CManager::GetDebugProc()->PrintDebugProc("移動方法を変更：ALTキー\n");
-	CManager::GetDebugProc()->PrintDebugProc("移動方向変更：（マイナスキー）\n");
-	CManager::GetDebugProc()->PrintDebugProc("Z座標を原点に戻す：（ピリオドキー）\n");
-	CManager::GetDebugProc()->PrintDebugProc("全管理オブジェクト消去：（LSHIFTキー）\n");
+	CManager::GetDebugProc()->PrintDebugProc("：末尾のオブジェクトを消去：BACKSPACE\n");
 	CManager::GetDebugProc()->PrintDebugProc("//=================================\n");
 
 }
@@ -913,87 +734,86 @@ void CStageManager::DispInfo()
 //===========================================================
 void CStageManager::ChooseObject()
 {
-	bool bChoose = false;                              //オブジェクトを選択しているかどうか
-	int nChooseIdxObject = 0;                          //現在選択しているオブジェクトの番号
+	//if (GetTotalStageManagerObjNum() <= 0)
+	//{//ステージマネージャー管理オブジェクトがなくなった瞬間に選択状態を解除する。
+	//	m_bChooseObject = false;
+	//	m_pChooseObject = nullptr;
+	//}
 
-	if (GetTotalStageManagerObjNum() <= 0)
-	{//ステージマネージャー管理オブジェクトがなくなった瞬間に選択状態を解除する。
-		m_bChooseObject = false;
-		m_pChooseObject = nullptr;
-	}
+	//if (CManager::GetInputKeyboard()->GetTrigger(DIK_L) == true && GetTotalStageManagerObjNum() > 0)
+	//{
+	//	m_bChooseObject = m_bChooseObject ? false : true;
 
-	if (CManager::GetInputKeyboard()->GetTrigger(DIK_L) == true && GetTotalStageManagerObjNum() > 0)
-	{
-		m_bChooseObject = m_bChooseObject ? false : true;
+	//	if (m_bChooseObject == false)
+	//	{
+	//		m_pChooseObject->SetStageManagerChoose(false);     //選択しているオブジェクトの選択状態を解除
+	//		m_Pos = m_SaveBeforeChoosePos;                     //保存していた位置に戻す
+	//	}
+	//	else
+	//	{
+	//		m_SaveBeforeChoosePos = m_Pos;                     //選択状態を発動する前のオブジェクトの位置を記憶する
+	//		m_pChooseObject = GetCurStageManagerObject();      //最新のオブジェクトを選択
+	//		m_pChooseObject->SetStageManagerChoose(false);     //選択しているオブジェクトの選択状態を解除
+	//	}
+	//}
+	//
+	//if (m_pChooseObject != nullptr)
+	//{//選択オブジェクトが存在していたら
+	//	if (m_bChooseObject == true)
+	//	{
+	//		//選択オブジェクト変更
+	//		if (CManager::GetInputKeyboard()->GetTrigger(DIK_N) == true)
+	//		{
+	//			m_pChooseObject->SetStageManagerChoose(false);//現在選んでいるオブジェクトの選択状態を解除
 
-		if (m_bChooseObject == false)
-		{
-			m_pChooseObject->SetStageManagerChoose(false);     //選択しているオブジェクトの選択状態を解除
-			m_Pos = m_SaveBeforeChoosePos;                     //保存していた位置に戻す
-		}
-		else
-		{
-			m_SaveBeforeChoosePos = m_Pos;                     //選択状態を発動する前のオブジェクトの位置を記憶する
-			m_pChooseObject = GetCurStageManagerObject();      //最新のオブジェクトを選択
-			m_pChooseObject->SetStageManagerChoose(false);     //選択しているオブジェクトの選択状態を解除
-		}
-	}
-	
-	if (m_pChooseObject != nullptr)
-	{//選択オブジェクトが存在していたら
-		if (m_bChooseObject == true)
-		{
-			//選択オブジェクト変更
-			if (CManager::GetInputKeyboard()->GetTrigger(DIK_N) == true)
-			{
-				m_pChooseObject->SetStageManagerChoose(false);//現在選んでいるオブジェクトの選択状態を解除
+	//			if (m_pChooseObject->GetPrevStageManagerObject() != nullptr)
+	//			{//前のオブジェクトがあったら
+	//				m_pChooseObject = m_pChooseObject->GetPrevStageManagerObject();//前のオブジェクトを選択
+	//			}
+	//			else
+	//			{//前のオブジェクトがない
+	//				m_pChooseObject = GetCurStageManagerObject();//最新オブジェクトを選択
+	//			}
+	//		}
+	//		else if (CManager::GetInputKeyboard()->GetTrigger(DIK_M) == true)
+	//		{
+	//			m_pChooseObject->SetStageManagerChoose(false);//現在選んでいるオブジェクトの選択状態を解除
 
-				if (m_pChooseObject->GetPrevStageManagerObject() != nullptr)
-				{//前のオブジェクトがあったら
-					m_pChooseObject = m_pChooseObject->GetPrevStageManagerObject();//前のオブジェクトを選択
-				}
-				else
-				{//前のオブジェクトがない
-					m_pChooseObject = GetCurStageManagerObject();//最新オブジェクトを選択
-				}
-			}
-			else if (CManager::GetInputKeyboard()->GetTrigger(DIK_M) == true)
-			{
-				m_pChooseObject->SetStageManagerChoose(false);//現在選んでいるオブジェクトの選択状態を解除
+	//			if (m_pChooseObject->GetNextStageManagerObject() != nullptr)
+	//			{//次のオブジェクトがある
+	//				m_pChooseObject = m_pChooseObject->GetNextStageManagerObject();//次のオブジェクトを選択
+	//			}
+	//			else
+	//			{//次のオブジェクトがない
+	//				m_pChooseObject = GetTopStageManagerObject();//トップオブジェクトを選択
+	//			}
+	//		}
 
-				if (m_pChooseObject->GetNextStageManagerObject() != nullptr)
-				{//次のオブジェクトがある
-					m_pChooseObject = m_pChooseObject->GetNextStageManagerObject();//次のオブジェクトを選択
-				}
-				else
-				{//次のオブジェクトがない
-					m_pChooseObject = GetTopStageManagerObject();//トップオブジェクトを選択
-				}
-			}
+	//		if (m_pChooseObject != nullptr && m_nIndexObject >= 1)
+	//		{//オブジェクトを選択状態にする
+	//			m_Pos = ((CObjectX*)m_pChooseObject)->GetPos();//選択オブジェクトの位置に移動する
+	//			m_pChooseObject->SetStageManagerChoose(true);
+	//		}
 
-			if (m_pChooseObject != nullptr && m_nIndexObject >= 1)
-			{//オブジェクトを選択状態にする
-				m_Pos = ((CObjectX*)m_pChooseObject)->GetPos();//選択オブジェクトの位置に移動する
-				m_pChooseObject->SetStageManagerChoose(true);
-			}
+	//		if (CManager::GetInputKeyboard()->GetTrigger(DIK_DELETE) == true)
+	//		{//選択オブジェクトを破棄する
+	//			m_pChooseObject->SetUseDeath(true);
+	//			m_pChooseObject->SetDeath();
 
-			if (CManager::GetInputKeyboard()->GetTrigger(DIK_DELETE) == true)
-			{//選択オブジェクトを破棄する
-				m_pChooseObject->SetUseDeath(true);
-				m_pChooseObject->SetDeath();
+	//			//選択オブジェクトを変更
+	//			if (m_pChooseObject->GetNextStageManagerObject() != nullptr)
+	//			{//次のオブジェクトがある
+	//				m_pChooseObject = m_pChooseObject->GetNextStageManagerObject();//次のオブジェクトを選択
+	//			}
+	//			else
+	//			{//次のオブジェクトがない
+	//				m_pChooseObject = GetTopStageManagerObject();//トップオブジェクトを選択
+	//			}
+	//		}
+	//	}
+	//}
 
-				//選択オブジェクトを変更
-				if (m_pChooseObject->GetNextStageManagerObject() != nullptr)
-				{//次のオブジェクトがある
-					m_pChooseObject = m_pChooseObject->GetNextStageManagerObject();//次のオブジェクトを選択
-				}
-				else
-				{//次のオブジェクトがない
-					m_pChooseObject = GetTopStageManagerObject();//トップオブジェクトを選択
-				}
-			}
-		}
-	}
+
 }
 //=======================================================================================================================
 
@@ -1039,7 +859,7 @@ void CStageManager::ResetScale()
 {
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_V) == true)
 	{
-		m_Scale = ONE_VECTOR3;
+		m_SaveScale = ONE_VECTOR3;
 	}
 }
 //=======================================================================================================================

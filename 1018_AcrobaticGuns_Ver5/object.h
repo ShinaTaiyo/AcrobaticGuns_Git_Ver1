@@ -30,35 +30,13 @@ public:
 		TYPE_PLAYER,          //プレイヤー3
 		TYPE_ENEMY,           //敵2
 		TYPE_BULLET,          //弾4
-		TYPE_EXPLOSION,       //爆発1
-		TYPE_EFFECT,          //エフェクト1
-		TYPE_PARTICLE,        //パーティクル1
 		TYPE_BLOCK,           //ブロック0
-		TYPE_ITEM,            //アイテム2
-		TYPE_MODEL,           //モデル
 		TYPE_BG,              //背景
 		TYPE_FIELD,           //床
 		TYPE_STAGEMANAGER,    //ステージマネージャー
-		TYPE_GAUGE,           //ゲージ2
-		TYPE_NUMBER,          //数字
 		TYPE_FADE,            //フェード4
-		TYPE_BG3D,            //3D背景
-		TYPE_MARKER,          //マーカー
-		TYPE_NUMBER3D,        //3D数字
-		TYPE_MAGICWINDOW,     //魔法ウインドウ
-		TYPE_MAGICDISP,       //魔法表示
 		TYPE_ATTACK,          //攻撃
-		TYPE_BOSS,            //ボス
-		TYPE_EMITTER,         //エミッター
-		TYPE_TRAP,            //トラップ
-		TYPE_MESHORBIT,       //メッシュ軌跡
-		TYPE_TIMER,           //タイマー
-		TYPE_SCORE,           //スコア      
-		TYPE_AIMODEL,         //AIモデル
-		TYPE_DAMAGE,          //ダメージ
-		TYPE_UI,              //UI
-		TYPE_UI3D,            //UI3D
-		TYPE_PARTICLE2D,      //パーティクル2D
+		TYPE_BGMODEL,         //背景モデル
 		TYPE_MAX
 	}TYPE;
 	//===========================================
@@ -70,6 +48,7 @@ public:
 	{
 		MANAGEROBJECTTYPE_NONE = 0,//なし
 		MANAGEROBJECTTYPE_BLOCK,   //ブロック
+		MANAGEROBJECTTYPE_BGMODEL, //背景モデル
 		MANAGEROBJECTTYPE_MAX
 	}MANAGEROBJECTTYPE;
 	//===========================================

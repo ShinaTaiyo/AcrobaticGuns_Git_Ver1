@@ -59,7 +59,6 @@ public:
 	void LoadMapBin(int nMapNum);               //マップをバイナリファイルからロードする
 	void SaveMapBin();                          //マップをバイナリファイルにセーブする
 	int GetMapIndex() { return m_nMapIndex; }   //現在のマップ番号を取得する
-	D3DXVECTOR3& GetPos() { return m_Pos; }      //位置を取得する
 	FOCUSTYPE GetFocusType() { return m_FocusType; }//集中する位置を取得する
 
 	CObject* GetStageManagerObject() { return m_pManagerObject; }//操作オブジェクトの取得
@@ -88,23 +87,21 @@ private:
 	static const char* m_apWORLDMAP_TXT[WORLDTYPE_MAX];
 	static const string m_aSAVE_FILENAME;//保存するファイル名
 
-	void MoveManager();                         //ステージマネージャーを動かす
-	void LifeSet();                             //体力を設定する
 	void TypeChenge();                          //オブジェクトXの種類を変える
 	void SetObjectX();                          //オブジェクトXを設定する
-	void DeleteObjectX();                       //オブジェクトXを消す
+	void DeleteManagerObject();                       //オブジェクトXを消す
 	void ChengeObject(CObject::MANAGEROBJECTTYPE ManagerObjectType);                        //オブジェクトの種類を消す
 	void ReleaseObject();                       //オブジェクトをリリースする
 	void MapChenge();                           //マップを変える
 	void DispInfo();                            //現在のマップエディタの情報を表示
 	void ChooseObject();                        //オブジェクト選択処理
+
 	//====================
 	//基本系
 	//====================
-	D3DXVECTOR3 m_Move;                         //移動量
-	D3DXVECTOR3 m_Rot;                          //向き
-	D3DXVECTOR3 m_Pos;                          //位置
-	D3DXVECTOR3 m_Scale;                        //拡大率
+	D3DXVECTOR3 m_SaveRot;                          //向き
+	D3DXVECTOR3 m_SavePos;                          //位置
+	D3DXVECTOR3 m_SaveScale;                        //拡大率
 	D3DXVECTOR3 m_SaveBeforeChoosePos;          //選択処理をする前のする位置
 	CObject* m_pManagerObject;                  //色々な派生クラスにキャストするオブジェクト
 	MANAGERMDOE m_ManagerMode;                  //現在のステージマネーシャーのモード
@@ -117,7 +114,6 @@ private:
 	int m_nMapIndex;                            //マップのインデックス
 	int m_nWorldIndex;                          //ワールドのインデックス
 	int m_nMapNum;                              //マップの総数
-	int m_nIndexObject;                         //管理するオブジェクトの番号
 	//========================================================================================
 	
 	//====================

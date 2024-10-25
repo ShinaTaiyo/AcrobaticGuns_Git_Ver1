@@ -1,0 +1,57 @@
+//====================================================
+//
+//１０月２４日：攻撃クラスを実装する[attack.h]
+//Author:ShinaTaiyo
+//
+//====================================================
+
+#ifndef _BGMODEL_H_  
+#define _BGMODEL_H_
+
+//======================
+//インクルード
+//======================
+#include "main.h"
+#include "objectX.h"
+//==========================================
+
+//===========================================
+//背景モデルクラス
+//===========================================
+class CBgModel : public CObjectX
+{
+public:
+	typedef enum
+	{
+		TYPE_BILL_00 = 0,//ビル
+		TYPE_TREE_00,    //木
+		TYPE_MAX
+	}BGMODELTYPE;
+
+	CBgModel();                  //コンストラクタ
+	~CBgModel();                 //デストラクタ
+	HRESULT Init() override;    //初期化処理
+	void Uninit() override;     //終了処理
+	void Update() override;     //更新処理
+	void Draw() override;       //描画処理
+	void SetDeath() override;   //死亡フラグを設定
+	static CBgModel* Create(BGMODELTYPE bgModelType,D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 Scale);//生成処理
+
+	//==========================================================
+	//エディタ関係
+	//==========================================================
+	//関数
+	void SaveInfoTxt(fstream& WritingFile) override;  //テキストファイルに情報を保存するための関数
+	static void LoadInfoTxt(fstream& LoadingFile, vector<CObject*>& VecSaveManager, string& Buff);  //テキストファイルから情報を読み込むための関数   
+	CObject* ManagerChengeObject(bool bAim) override; //ステージマネージャーに変更したオブジェクトを渡す
+	CObject* ManagerSaveObject() override;             //ステージマネージャーに今のオブジェクトを保存する
+	//=================================================================================================================
+protected:
+	void SetBgModelType(BGMODELTYPE AttackType) { m_Type = AttackType; }//背景モデルの種類を設定する
+	const BGMODELTYPE& GetAttackType() const { return m_Type; }         //背景モデルの種類を取得する
+	static const string BGMODEL_FILENAME[BGMODELTYPE::TYPE_MAX];        //背景モデルのファイル名 
+private:
+	BGMODELTYPE m_Type;//タイプ
+};
+//==================================================================================================================================================
+#endif
