@@ -27,20 +27,23 @@ public:
 	void Update() override;                                                //更新処理
 	void Draw() override;                                                  //描画処理	
 	//==========================================================
-	//判定
+	//判定関係
 	//==========================================================
 
-	//地面にいるか
-	void SetLanding(bool bLanding) { m_bIsLanding = bLanding; }                             //地面にいるかどうかを設定
-	bool& GetLanding() { return m_bIsLanding; }                                             //地面にいるかどうかを取得
+	//正方形の押し出し判定
 
-	//壁にいるか
-	void SetWalling(bool bWalling) { m_bIsWalling = bWalling; }                             //壁にくっついているかどうかを設定
-	bool& GetWalling() { return m_bIsWalling; }                                             //壁にくっついているかどうかを取得
+	//X
+	void SetExtrusionCollisionSquareX(bool bSuccess) { m_bExtrusionCollisionSquareX = bSuccess;}
+	const bool & GetExtrusionCollisionSquareX() const { return m_bExtrusionCollisionSquareX; }
 
-	//ジャンプしているか
-	void SetJumping(bool bJumping) { m_bIsJumping = bJumping; }                             //ジャンプしているかどうかを設定
-	bool& GetJumping() { return m_bIsJumping; }                                             //ジャンプしているかどうかを取得
+	//Y
+	void SetExtrusionCollisionSquareY(bool bSuccess) { m_bExtrusionCollisionSquareY = bSuccess;}
+	const bool & GetExtrusionCollisionSquareY() const { return m_bExtrusionCollisionSquareY; }
+
+	//Z
+	void SetExtrusionCollisionSquareZ(bool bSuccess) { m_bExtrusionCollisionSquareZ = bSuccess;}
+	const bool &  GetExtrusionCollisionSquareZ() const { return m_bExtrusionCollisionSquareZ; }
+	//============================================================================================================
 
 	//======================================================
 	//体力関係
@@ -101,9 +104,11 @@ private:
 	//===================================
 	//判定関係
 	//===================================
-	bool m_bIsLanding;                              //地面にいるかどうか!
-	bool m_bIsWalling;                              //壁にくっついているかどうか!
-	bool m_bIsJumping;                              //ジャンプしているかどうか!
+
+	//正方形の押し出し判定
+	bool m_bExtrusionCollisionSquareX;//X
+	bool m_bExtrusionCollisionSquareY;//Y
+	bool m_bExtrusionCollisionSquareZ;//Z
 	//============================================================================================================
 
 	//===================================

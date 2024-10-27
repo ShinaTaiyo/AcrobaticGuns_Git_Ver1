@@ -453,7 +453,7 @@ void CObjectX::ChengeEditScale()
 
 	ChengeEditScaleZ();
 
-	CManager::GetDebugProc()->PrintDebugProc("拡大率(YUIキー) %f %f %f\n", Scale.x,Scale.y,Scale.z);
+	CManager::GetDebugProc()->PrintDebugProc("拡大率(RTYキー) %f %f %f\n", Scale.x,Scale.y,Scale.z);
 }
 //================================================================================================================================================
 
@@ -468,12 +468,12 @@ void CObjectX::ChengeEditScaleX()
 	{//Lコントロールキーを押しながら
 		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
 		{//シフトキーを押しながら・・・
-			if (CManager::GetInputKeyboard()->GetPress(DIK_Y) == true)
+			if (CManager::GetInputKeyboard()->GetPress(DIK_R) == true)
 			{
 				Scale.x -= 0.1f;
 			}
 		}
-		else if (CManager::GetInputKeyboard()->GetPress(DIK_Y) == true)
+		else if (CManager::GetInputKeyboard()->GetPress(DIK_R) == true)
 		{
 			Scale.x += 0.1f;
 		}
@@ -482,12 +482,12 @@ void CObjectX::ChengeEditScaleX()
 	{//Lコントロールキーを押していない
 		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
 		{//シフトキーを押しながら・・・
-			if (CManager::GetInputKeyboard()->GetTrigger(DIK_Y) == true)
+			if (CManager::GetInputKeyboard()->GetTrigger(DIK_R) == true)
 			{
 				Scale.x -= 0.1f;
 			}
 		}
-		else if (CManager::GetInputKeyboard()->GetTrigger(DIK_Y) == true)
+		else if (CManager::GetInputKeyboard()->GetTrigger(DIK_R) == true)
 		{
 			Scale.x += 0.1f;
 		}
@@ -507,12 +507,12 @@ void CObjectX::ChengeEditScaleY()
 	{//Lコントロールキーを押しながら
 		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
 		{//シフトキーを押しながら・・・
-			if (CManager::GetInputKeyboard()->GetPress(DIK_U) == true)
+			if (CManager::GetInputKeyboard()->GetPress(DIK_T) == true)
 			{
 				Scale.y -= 0.1f;
 			}
 		}
-		else if (CManager::GetInputKeyboard()->GetPress(DIK_U) == true)
+		else if (CManager::GetInputKeyboard()->GetPress(DIK_T) == true)
 		{
 			Scale.y += 0.1f;
 		}
@@ -521,12 +521,12 @@ void CObjectX::ChengeEditScaleY()
 	{//Lコントロールキーを押していない
 		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
 		{//シフトキーを押しながら・・・
-			if (CManager::GetInputKeyboard()->GetTrigger(DIK_U) == true)
+			if (CManager::GetInputKeyboard()->GetTrigger(DIK_T) == true)
 			{
 				Scale.y -= 0.1f;
 			}
 		}
-		else if (CManager::GetInputKeyboard()->GetTrigger(DIK_U) == true)
+		else if (CManager::GetInputKeyboard()->GetTrigger(DIK_T) == true)
 		{
 			Scale.y += 0.1f;
 		}
@@ -544,12 +544,12 @@ void CObjectX::ChengeEditScaleZ()
 	{//Lコントロールキーを押しながら
 		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
 		{//シフトキーを押しながら・・・
-			if (CManager::GetInputKeyboard()->GetPress(DIK_I) == true)
+			if (CManager::GetInputKeyboard()->GetPress(DIK_Y) == true)
 			{
 				Scale.z -= 0.1f;
 			}
 		}
-		else if (CManager::GetInputKeyboard()->GetPress(DIK_I) == true)
+		else if (CManager::GetInputKeyboard()->GetPress(DIK_Y) == true)
 		{
 			Scale.z += 0.1f;
 		}
@@ -558,12 +558,12 @@ void CObjectX::ChengeEditScaleZ()
 	{//Lコントロールキーを押していない
 		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
 		{//シフトキーを押しながら・・・
-			if (CManager::GetInputKeyboard()->GetTrigger(DIK_I) == true)
+			if (CManager::GetInputKeyboard()->GetTrigger(DIK_Y) == true)
 			{
 				Scale.z -= 0.1f;
 			}
 		}
-		else if (CManager::GetInputKeyboard()->GetTrigger(DIK_I) == true)
+		else if (CManager::GetInputKeyboard()->GetTrigger(DIK_Y) == true)
 		{
 			Scale.z += 0.1f;
 		}
@@ -594,37 +594,37 @@ void CObjectX::ChengeEditPos()
 	//===========================
 	CCalculation::CaluclationMove(Move, 5.0f, CCalculation::MOVEAIM_XZ, m_Rot.y);
 
-	//===========================
-	//RTボタンを押していたら
-	//===========================
-	if (CManager::GetInputKeyboard()->GetPress(DIK_LCONTROL) == true)
-	{//Lコントロールキーを押しながら
-		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
-		{//シフトキーを押しながら・・・
-			if (CManager::GetInputKeyboard()->GetPress(DIK_F) == true)
-			{
-				m_Rot.z -= 0.01f;
-			}
-		}
-		else if (CManager::GetInputKeyboard()->GetPress(DIK_G) == true)
-		{
-			m_Rot.z += 0.01f;
-		}
-	}
-	else
-	{//Lコントロールキーを押していない
-		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
-		{//シフトキーを押しながら・・・
-			if (CManager::GetInputKeyboard()->GetTrigger(DIK_F) == true)
-			{
-				m_Rot.z -= 0.01f;
-			}
-		}
-		else if (CManager::GetInputKeyboard()->GetTrigger(DIK_G) == true)
-		{
-			m_Rot.z += 0.01f;
-		}
-	}
+	////===========================
+	////RTボタンを押していたら
+	////===========================
+	//if (CManager::GetInputKeyboard()->GetPress(DIK_LCONTROL) == true)
+	//{//Lコントロールキーを押しながら
+	//	if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
+	//	{//シフトキーを押しながら・・・
+	//		if (CManager::GetInputKeyboard()->GetPress(DIK_F) == true)
+	//		{
+	//			m_Rot.z -= 0.01f;
+	//		}
+	//	}
+	//	else if (CManager::GetInputKeyboard()->GetPress(DIK_G) == true)
+	//	{
+	//		m_Rot.z += 0.01f;
+	//	}
+	//}
+	//else
+	//{//Lコントロールキーを押していない
+	//	if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
+	//	{//シフトキーを押しながら・・・
+	//		if (CManager::GetInputKeyboard()->GetTrigger(DIK_F) == true)
+	//		{
+	//			m_Rot.z -= 0.01f;
+	//		}
+	//	}
+	//	else if (CManager::GetInputKeyboard()->GetTrigger(DIK_G) == true)
+	//	{
+	//		m_Rot.z += 0.01f;
+	//	}
+	//}
 
 	//支点も一緒に移動
 	m_Pos += Move;

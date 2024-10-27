@@ -257,83 +257,83 @@ void CBlock::Collision()
 //===============================================================
 void CBlock::CollisionSquare(CObjectXAlive* pObjX)
 {
-	D3DXVECTOR3 ComparisonPos = NULL_VECTOR3;        //比較用位置
-	D3DXVECTOR3 ComparisonPosOld = NULL_VECTOR3;     //比較用1f前の位置
-	D3DXVECTOR3 ComparisonVtxMax = NULL_VECTOR3;     //比較用最高頂点
-	D3DXVECTOR3 ComparisonVtxMin = NULL_VECTOR3;     //比較用最低頂点
-	D3DXVECTOR3 ComparisonSize = NULL_VECTOR3;       //比較サイズ
-	D3DXVECTOR3 ComparisonMove = NULL_VECTOR3;       //比較移動量
-	//==========================================================================================================
-	bool& bIsLanding = pObjX->GetLanding();
-	bool bIsLandingOld = pObjX->GetLanding();//1f前の着地状態
-	bIsLanding = false;
-	bool& bIsWalling = pObjX->GetWalling();          //壁にくっついているかどうか
-	bIsWalling = false;
+	//D3DXVECTOR3 ComparisonPos = NULL_VECTOR3;        //比較用位置
+	//D3DXVECTOR3 ComparisonPosOld = NULL_VECTOR3;     //比較用1f前の位置
+	//D3DXVECTOR3 ComparisonVtxMax = NULL_VECTOR3;     //比較用最高頂点
+	//D3DXVECTOR3 ComparisonVtxMin = NULL_VECTOR3;     //比較用最低頂点
+	//D3DXVECTOR3 ComparisonSize = NULL_VECTOR3;       //比較サイズ
+	//D3DXVECTOR3 ComparisonMove = NULL_VECTOR3;       //比較移動量
+	////==========================================================================================================
+	//bool& bIsLanding = pObjX->GetLanding();
+	//bool bIsLandingOld = pObjX->GetLanding();//1f前の着地状態
+	//bIsLanding = false;
+	//bool& bIsWalling = pObjX->GetWalling();          //壁にくっついているかどうか
+	//bIsWalling = false;
 
-	bool bCollision = true;//当たり判定をするかどうか
+	//bool bCollision = true;//当たり判定をするかどうか
 
-	D3DXVECTOR3 Scale = NULL_VECTOR3;
+	//D3DXVECTOR3 Scale = NULL_VECTOR3;
 
-	//====================================================================
-	//判定開始
-	//====================================================================
-	for (int nCntPriority = 0; nCntPriority < m_nMAXPRIORITY; nCntPriority++)
-	{
-		CObject * pObj = GetTopObject(nCntPriority);//トップオブジェクトを取得
-		while (pObj != nullptr)
-		{
-			//次のオブジェクトを格納
-			CObject* pNext = pObj->GetNextObject();
+	////====================================================================
+	////判定開始
+	////====================================================================
+	//for (int nCntPriority = 0; nCntPriority < m_nMAXPRIORITY; nCntPriority++)
+	//{
+	//	CObject * pObj = GetTopObject(nCntPriority);//トップオブジェクトを取得
+	//	while (pObj != nullptr)
+	//	{
+	//		//次のオブジェクトを格納
+	//		CObject* pNext = pObj->GetNextObject();
 
-			//種類の取得（敵なら当たり判定）
-			CObject::TYPE type = pObj->GetType();
-			if (type == CObject::TYPE_BLOCK)
-			{
-				CBlock* pBlock = (CBlock*)pObj;
+	//		//種類の取得（敵なら当たり判定）
+	//		CObject::TYPE type = pObj->GetType();
+	//		if (type == CObject::TYPE_BLOCK)
+	//		{
+	//			CBlock* pBlock = (CBlock*)pObj;
 
-				float fLength = CCalculation::CalculationLength(pObjX->GetPos(), pBlock->GetPos());
-				Scale = pBlock->GetScale();
-				if (Scale.x >= Scale.y - 0.1f && Scale.x <= Scale.y + 0.1f)
-				{//拡大率がほとんど同じなら
-					if (fLength > pBlock->GetSize().x * 3.0f)
-					{
-						bCollision = false;
-					}
-					else
-					{
-						bCollision = true;
-					}
-				}
-				else
-				{
-					bCollision = true;
-				}
+	//			float fLength = CCalculation::CalculationLength(pObjX->GetPos(), pBlock->GetPos());
+	//			Scale = pBlock->GetScale();
+	//			if (Scale.x >= Scale.y - 0.1f && Scale.x <= Scale.y + 0.1f)
+	//			{//拡大率がほとんど同じなら
+	//				if (fLength > pBlock->GetSize().x * 3.0f)
+	//				{
+	//					bCollision = false;
+	//				}
+	//				else
+	//				{
+	//					bCollision = true;
+	//				}
+	//			}
+	//			else
+	//			{
+	//				bCollision = true;
+	//			}
 
-				if (pBlock->m_bCollision == true && bCollision == true)
-				{
-					if (bIsLandingOld == true)
-					{
-						//上下
-						pBlock->ExtrusionCollisionY(pObjX, pBlock);
+	//			if (pBlock->m_bCollision == true && bCollision == true)
+	//			{
+	//				if (bIsLandingOld == true)
+	//				{
+	//					//上下
+	//					pBlock->ExtrusionCollisionY(pObjX, pBlock);
 
-						//左右
-						pBlock->ExtrusionCollisionX(pObjX, pBlock);
-						
-					}
-					else
-					{
-						//左右
-						pBlock->ExtrusionCollisionX(pObjX, pBlock);
+	//					//左右
+	//					pBlock->ExtrusionCollisionX(pObjX, pBlock);
+	//					
+	//				}
+	//				else
+	//				{
+	//					//左右
+	//					pBlock->ExtrusionCollisionX(pObjX, pBlock);
 
-						//上下
-						pBlock->ExtrusionCollisionY(pObjX, pBlock);
-					}
-				}
-			}
-			//リストを次に進める
-			pObj = pNext;
-		}
-	}
+	//					//上下
+	//					pBlock->ExtrusionCollisionY(pObjX, pBlock);
+	//				}
+	//			}
+	//		}
+	//		//リストを次に進める
+	//		pObj = pNext;
+	//	}
+	//}
 }
 //=========================================================================================================================
 
@@ -541,60 +541,61 @@ CObject* CBlock::ManagerSaveObject()
 //=======================================================================
 void CBlock::ExtrusionCollisionX(CObjectXAlive* pMyObjX, CBlock* pBlock)
 {
-	D3DXVECTOR3 MyPos = pMyObjX->GetPos();
-	const D3DXVECTOR3& Pos = pMyObjX->GetPos();              //位置を取得
-	const D3DXVECTOR3& PosOld = pMyObjX->GetPosOld();        //1f前の位置を取得
-	D3DXVECTOR3 MyVtxMax = NULL_VECTOR3;             //自分自身の最大頂点
-	D3DXVECTOR3 MyVtxMin = NULL_VECTOR3;             //自分自身の最小頂点
+	//D3DXVECTOR3 MyPos = pMyObjX->GetPos();
+	//const D3DXVECTOR3& Pos = pMyObjX->GetPos();              //位置を取得
+	//const D3DXVECTOR3& PosOld = pMyObjX->GetPosOld();        //1f前の位置を取得
+	//D3DXVECTOR3 MyVtxMax = NULL_VECTOR3;             //自分自身の最大頂点
+	//D3DXVECTOR3 MyVtxMin = NULL_VECTOR3;             //自分自身の最小頂点
 
-	D3DXVECTOR3 ComPos = pBlock->GetPos();             //ブロックの位置
-	D3DXVECTOR3 ComVtxMax = pBlock->GetVtxMax();       //ブロックの最大頂点
-	D3DXVECTOR3 ComVtxMin = pBlock->GetVtxMin();       //ブロックの最小頂点
+	//D3DXVECTOR3 ComPos = pBlock->GetPos();             //ブロックの位置
+	//D3DXVECTOR3 ComVtxMax = pBlock->GetVtxMax();       //ブロックの最大頂点
+	//D3DXVECTOR3 ComVtxMin = pBlock->GetVtxMin();       //ブロックの最小頂点
 
-	bool& bIsWalling = pMyObjX->GetWalling();          //壁にくっついているかどうか
-	//押し出しに使う値の小数点を切り捨てる（微小な差で失敗しないため）
-	MyVtxMax.x = (float)(floor(pMyObjX->GetVtxMax().x));
-	MyVtxMax.y = (float)(floor(pMyObjX->GetVtxMax().y));
-	MyVtxMax.z = (float)(floor(pMyObjX->GetVtxMax().z));
+	//bool& bIsWalling = pMyObjX->GetWalling();          //壁にくっついているかどうか
+	////押し出しに使う値の小数点を切り捨てる（微小な差で失敗しないため）
+	//MyVtxMax.x = (float)(floor(pMyObjX->GetVtxMax().x));
+	//MyVtxMax.y = (float)(floor(pMyObjX->GetVtxMax().y));
+	//MyVtxMax.z = (float)(floor(pMyObjX->GetVtxMax().z));
 
-	MyVtxMin.x = (float)(floor(pMyObjX->GetVtxMin().x));
-	MyVtxMin.y = (float)(floor(pMyObjX->GetVtxMin().y));
-	MyVtxMin.z = (float)(floor(pMyObjX->GetVtxMin().z));
+	//MyVtxMin.x = (float)(floor(pMyObjX->GetVtxMin().x));
+	//MyVtxMin.y = (float)(floor(pMyObjX->GetVtxMin().y));
+	//MyVtxMin.z = (float)(floor(pMyObjX->GetVtxMin().z));
 
-	ComPos.x = float(floor(pBlock->GetPos().x));
-	ComPos.y = float(floor(pBlock->GetPos().y));
-	ComPos.z = float(floor(pBlock->GetPos().z));
+	//ComPos.x = float(floor(pBlock->GetPos().x));
+	//ComPos.y = float(floor(pBlock->GetPos().y));
+	//ComPos.z = float(floor(pBlock->GetPos().z));
 
-	ComVtxMax.x = (float)(floor(ComVtxMax.x));
-	ComVtxMax.y = (float)(floor(ComVtxMax.y));
-	ComVtxMax.z = (float)(floor(ComVtxMax.z));
+	//ComVtxMax.x = (float)(floor(ComVtxMax.x));
+	//ComVtxMax.y = (float)(floor(ComVtxMax.y));
+	//ComVtxMax.z = (float)(floor(ComVtxMax.z));
 
-	ComVtxMin.x = (float)(floor(ComVtxMin.x));
-	ComVtxMin.y = (float)(floor(ComVtxMin.y));
-	ComVtxMin.z = (float)(floor(ComVtxMin.z));
-	// 					//左
-	if (Pos.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
-		&& PosOld.x + MyVtxMax.x <= ComPos.x + ComVtxMin.x
-		&& Pos.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
-		&& Pos.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
-		&& Pos.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
-		&& Pos.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
-	{//対象がブロックの-Xに当たった時の処理
-		//Pos.x = ComPos.x + ComVtxMin.x - MyVtxMax.x;
-		bIsWalling = true;
-	}
+	//ComVtxMin.x = (float)(floor(ComVtxMin.x));
+	//ComVtxMin.y = (float)(floor(ComVtxMin.y));
+	//ComVtxMin.z = (float)(floor(ComVtxMin.z));
+	//// 					//左
+	//if (Pos.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
+	//	&& PosOld.x + MyVtxMax.x <= ComPos.x + ComVtxMin.x
+	//	&& Pos.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
+	//	&& Pos.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
+	//	&& Pos.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
+	//	&& Pos.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
+	//{//対象がブロックの-Xに当たった時の処理
+	//	//Pos.x = ComPos.x + ComVtxMin.x - MyVtxMax.x;
+	//	bIsWalling = true;
+	// 
+	//}
 
-	//右
-	else if (Pos.x + MyVtxMin.x < ComPos.x + ComVtxMax.x
-		&& PosOld.x + MyVtxMin.x >= ComPos.x + ComVtxMax.x
-		&& Pos.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
-		&& Pos.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
-		&& Pos.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
-		&& Pos.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
-	{//対象がブロックの+Xに当たった時の処理
-		//Pos.x = ComPos.x + ComVtxMax.x - MyVtxMin.x;
-		bIsWalling = true;
-	}
+	////右
+	//else if (Pos.x + MyVtxMin.x < ComPos.x + ComVtxMax.x
+	//	&& PosOld.x + MyVtxMin.x >= ComPos.x + ComVtxMax.x
+	//	&& Pos.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
+	//	&& Pos.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
+	//	&& Pos.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
+	//	&& Pos.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
+	//{//対象がブロックの+Xに当たった時の処理
+	//	//Pos.x = ComPos.x + ComVtxMax.x - MyVtxMin.x;
+	//	bIsWalling = true;
+	//}
 }
 //======================================================================================================================================
 
@@ -603,75 +604,75 @@ void CBlock::ExtrusionCollisionX(CObjectXAlive* pMyObjX, CBlock* pBlock)
 //=======================================================================
 void CBlock::ExtrusionCollisionY(CObjectXAlive* pMyObjX, CBlock* pBlock)
 {
-	D3DXVECTOR3 MyVtxMax = NULL_VECTOR3;             //自分自身の最大頂点
-	D3DXVECTOR3 MyVtxMin = NULL_VECTOR3;             //自分自身の最小頂点
+	//D3DXVECTOR3 MyVtxMax = NULL_VECTOR3;             //自分自身の最大頂点
+	//D3DXVECTOR3 MyVtxMin = NULL_VECTOR3;             //自分自身の最小頂点
 
-	D3DXVECTOR3 ComPos = pBlock->GetPos();             //ブロックの位置
-	D3DXVECTOR3 ComVtxMax = pBlock->GetVtxMax();       //ブロックの最大頂点
-	D3DXVECTOR3 ComVtxMin = pBlock->GetVtxMin();       //ブロックの最小頂点[
-	const D3DXVECTOR3& ComMove = pBlock->GetMove();           //ブロックの移動量
-	const D3DXVECTOR3& Pos = pMyObjX->GetPos();              //位置を取得
-	const D3DXVECTOR3& Move = pMyObjX->GetMove();
-	D3DXVECTOR3 PosOld = pMyObjX->GetPosOld();        //1f前の位置を取得
+	//D3DXVECTOR3 ComPos = pBlock->GetPos();             //ブロックの位置
+	//D3DXVECTOR3 ComVtxMax = pBlock->GetVtxMax();       //ブロックの最大頂点
+	//D3DXVECTOR3 ComVtxMin = pBlock->GetVtxMin();       //ブロックの最小頂点[
+	//const D3DXVECTOR3& ComMove = pBlock->GetMove();           //ブロックの移動量
+	//const D3DXVECTOR3& Pos = pMyObjX->GetPos();              //位置を取得
+	//const D3DXVECTOR3& Move = pMyObjX->GetMove();
+	//D3DXVECTOR3 PosOld = pMyObjX->GetPosOld();        //1f前の位置を取得
 
-	bool& bIsLanding = pMyObjX->GetLanding();          //地面にいるかどうか
+	//bool& bIsLanding = pMyObjX->GetLanding();          //地面にいるかどうか
 
-	bool& bIsJumping = pMyObjX->GetJumping();          //ジャンプしているかどうか
+	//bool& bIsJumping = pMyObjX->GetJumping();          //ジャンプしているかどうか
 
-	//押し出し失敗対策
-	MyVtxMax.x = (float)(floor(pMyObjX->GetVtxMax().x));
-	MyVtxMax.y = (float)(floor(pMyObjX->GetVtxMax().y));
-	MyVtxMax.z = (float)(floor(pMyObjX->GetVtxMax().z));
+	////押し出し失敗対策
+	//MyVtxMax.x = (float)(floor(pMyObjX->GetVtxMax().x));
+	//MyVtxMax.y = (float)(floor(pMyObjX->GetVtxMax().y));
+	//MyVtxMax.z = (float)(floor(pMyObjX->GetVtxMax().z));
 
-	MyVtxMin.x = (float)(floor(pMyObjX->GetVtxMin().x));
-	MyVtxMin.y = (float)(floor(pMyObjX->GetVtxMin().y));
-	MyVtxMin.z = (float)(floor(pMyObjX->GetVtxMin().z));
+	//MyVtxMin.x = (float)(floor(pMyObjX->GetVtxMin().x));
+	//MyVtxMin.y = (float)(floor(pMyObjX->GetVtxMin().y));
+	//MyVtxMin.z = (float)(floor(pMyObjX->GetVtxMin().z));
 
-	ComPos.x = float(floor(pBlock->GetPos().x));
-	ComPos.y = float(floor(pBlock->GetPos().y));
-	ComPos.z = float(floor(pBlock->GetPos().z));
+	//ComPos.x = float(floor(pBlock->GetPos().x));
+	//ComPos.y = float(floor(pBlock->GetPos().y));
+	//ComPos.z = float(floor(pBlock->GetPos().z));
 
-	
+	//
 
-	ComVtxMax.x = (float)(floor(ComVtxMax.x));
-	ComVtxMax.y = (float)(floor(ComVtxMax.y));
-	ComVtxMax.z = (float)(floor(ComVtxMax.z));
+	//ComVtxMax.x = (float)(floor(ComVtxMax.x));
+	//ComVtxMax.y = (float)(floor(ComVtxMax.y));
+	//ComVtxMax.z = (float)(floor(ComVtxMax.z));
 
-	ComVtxMin.x = (float)(floor(ComVtxMin.x));
-	ComVtxMin.y = (float)(floor(ComVtxMin.y));
-	ComVtxMin.z = (float)(floor(ComVtxMin.z));
+	//ComVtxMin.x = (float)(floor(ComVtxMin.x));
+	//ComVtxMin.y = (float)(floor(ComVtxMin.y));
+	//ComVtxMin.z = (float)(floor(ComVtxMin.z));
 
-	//上
-	if (Pos.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
-		&& Pos.x + MyVtxMin.x < ComPos.x + ComVtxMax.x
-		&& Pos.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
-		&& PosOld.y + MyVtxMin.y - Move.y >= ComPos.y + ComVtxMax.y
-		&& Pos.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
-		&& Pos.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
-	{//対象の下端がモデルの+Yに当たった時の処理
-		float fPosY = fabsf(MyVtxMin.y);
-		//Pos.y = ComPos.y + ComVtxMax.y + fPosY;
-		pMyObjX->SetPos(D3DXVECTOR3(Pos.x, Pos.y + ComVtxMax.y + fPosY, Pos.z));
-		pMyObjX->SetPos(Pos + ComMove);
-		bIsLanding = true;
-	}
-	//下
-	else if (Pos.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
-		&& Pos.x + MyVtxMin.x < ComPos.x + ComVtxMax.x
-		&& Pos.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
-		&& PosOld.y + MyVtxMax.y <= ComPos.y + ComVtxMin.y
-		&& Pos.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
-		&& Pos.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
-	{//対象の下端がモデルの+Yに当たった時の処理
-		//Pos.y = ComPos.y + ComVtxMin.y - MyVtxMax.y;
-		pMyObjX->SetPos(D3DXVECTOR3(Pos.x,ComPos.y + ComVtxMin.y - MyVtxMax.y, Pos.z));
-		bIsJumping = false;
+	////上
+	//if (Pos.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
+	//	&& Pos.x + MyVtxMin.x < ComPos.x + ComVtxMax.x
+	//	&& Pos.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
+	//	&& PosOld.y + MyVtxMin.y - Move.y >= ComPos.y + ComVtxMax.y
+	//	&& Pos.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
+	//	&& Pos.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
+	//{//対象の下端がモデルの+Yに当たった時の処理
+	//	float fPosY = fabsf(MyVtxMin.y);
+	//	//Pos.y = ComPos.y + ComVtxMax.y + fPosY;
+	//	pMyObjX->SetPos(D3DXVECTOR3(Pos.x, Pos.y + ComVtxMax.y + fPosY, Pos.z));
+	//	pMyObjX->SetPos(Pos + ComMove);
+	//	bIsLanding = true;
+	//}
+	////下
+	//else if (Pos.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
+	//	&& Pos.x + MyVtxMin.x < ComPos.x + ComVtxMax.x
+	//	&& Pos.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
+	//	&& PosOld.y + MyVtxMax.y <= ComPos.y + ComVtxMin.y
+	//	&& Pos.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
+	//	&& Pos.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
+	//{//対象の下端がモデルの+Yに当たった時の処理
+	//	//Pos.y = ComPos.y + ComVtxMin.y - MyVtxMax.y;
+	//	pMyObjX->SetPos(D3DXVECTOR3(Pos.x,ComPos.y + ComVtxMin.y - MyVtxMax.y, Pos.z));
+	//	bIsJumping = false;
 
-		if (pMyObjX->GetType() == CObject::TYPE_PLAYER)
-		{
-			//Move.y = 0.0f;
-			pMyObjX->SetMove(D3DXVECTOR3(Move.x, 0.0f, Move.z));
-		}
-	}
+	//	if (pMyObjX->GetType() == CObject::TYPE_PLAYER)
+	//	{
+	//		//Move.y = 0.0f;
+	//		pMyObjX->SetMove(D3DXVECTOR3(Move.x, 0.0f, Move.z));
+	//	}
+	//}
 }
 //======================================================================================================================================

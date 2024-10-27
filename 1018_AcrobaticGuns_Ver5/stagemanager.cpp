@@ -55,7 +55,7 @@ CStageManager::CStageManager() : m_nWorldIndex(0),m_pBg3D(nullptr),m_VecObjList(
 //================================
 CStageManager::~CStageManager()
 {
-
+	m_VecObjList.clear();//vectorの中身をクリア（忘れたとき対策）
 }
 //==========================================================
 
@@ -104,10 +104,13 @@ HRESULT CStageManager::Init()
 	//===========================
 	//オブジェクトX初期化処理
 	//===========================
-	m_pManagerObject = CBlock::Create(CBlock::BLOCKTYPE00_NORMAL, 1, NULL_VECTOR3, NULL_VECTOR3, ONE_VECTOR3);
-	m_pManagerObject->SetUseDeath(false);//死亡フラグをオフにする
-	CObject::Init();
+	if (CScene::GetMode() == CScene::MODE_EDIT)
+	{
+		m_pManagerObject = CBlock::Create(CBlock::BLOCKTYPE00_NORMAL, 1, NULL_VECTOR3, NULL_VECTOR3, ONE_VECTOR3);
+		m_pManagerObject->SetUseDeath(false);//死亡フラグをオフにする
+	}
 	//=======================================================================================
+	CObject::Init();
 
 	LoadMapTxt(0);
 	return S_OK;
@@ -118,15 +121,6 @@ HRESULT CStageManager::Init()
 //終了処理
 //================================
 void CStageManager::Uninit()
-{
-
-}
-//==========================================================
-
-//================================
-//別枠の終了処理
-//================================
-void CStageManager::ExtraUninit()
 {
 
 }
@@ -557,12 +551,15 @@ void CStageManager::DeleteManagerObject()
 {
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_BACKSPACE) == true)
 	{
-		auto it = m_VecObjList.end() - 1;//配列マックスー１
+		if (m_VecObjList.size() > 0)
+		{
+			auto it = m_VecObjList.end() - 1;//配列マックスー１
 
-		((CObject*)*it)->SetUseDeath(true);
-		((CObject*)*it)->SetDeath();
+			((CObject*)*it)->SetUseDeath(true);
+			((CObject*)*it)->SetDeath();
 
-		m_VecObjList.pop_back();//末尾の要素を削除する
+			m_VecObjList.pop_back();//末尾の要素を削除する
+		}
 	}
 }
 //=======================================================================================================================

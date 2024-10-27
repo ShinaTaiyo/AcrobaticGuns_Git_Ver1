@@ -620,11 +620,6 @@ void CBillboard::HormingProcess()
 
 		//==========================================================================================================================================================
 
-		//if (g_aEnemy[nNumEnemy].nTime == 1)
-		//{//敵が出現時に最初の軌道を決める（プレイヤーと敵のベクトルで計算)
-		//	g_aEnemy[nNumEnemy].fRotMove = atan2f(g_aEnemy[nNumEnemy].fVXaim, g_aEnemy[nNumEnemy].fVZaim);
-		//}
-
 		//目的の位置への角度
 		fRotDest = atan2f(TargetPos.x - m_Pos.x, TargetPos.y - m_Pos.y);
 
@@ -634,20 +629,16 @@ void CBillboard::HormingProcess()
 		//===============================
 		//角度差分の修正
 		//===============================
-		if (m_fRotMove < 0.0f)
-		{//現在の角度がマイナスなら
-			if ((m_fRotMove + D3DX_PI) <= fRotDest)
-			{//現在の角度 + D3DX_PIより目的の角度が大きかったら
-				fRotDiff -= D3DX_PI * 2.0f;
-			}
+		//向きの差分の調整(3.14を超えたら近い向きに補正）
+		if (fRotDiff > D3DX_PI)
+		{
+			fRotDiff -= D3DX_PI * 2;
 		}
-		if (m_fRotMove > 0.0f)
-		{//現在の角度がプラスなら
-			if ((m_fRotMove - D3DX_PI) >= fRotDest)
-			{//現在の角度 - D3DX_PIより目的の角度が小さかったら
-				fRotDiff += D3DX_PI * 2.0f;
-			}
+		else if (fRotDiff < -D3DX_PI)
+		{
+			fRotDiff += D3DX_PI * 2;
 		}
+
 		//==============================================================================================
 		m_fRotMove += fRotDiff * 0.05f;//移動方向（角度補正）
 

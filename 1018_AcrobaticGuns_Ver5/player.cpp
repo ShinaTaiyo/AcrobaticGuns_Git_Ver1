@@ -11,6 +11,7 @@
 #include "player.h"
 #include "objectX.h"
 #include "renderer.h"
+#include "block.h"
 #include "attack.h"
 #include "main.h"
 #include "manager.h"
@@ -70,14 +71,6 @@ void CPlayer::Uninit()
 //==========================================================================================================
 
 //====================================================
-//別枠の終了処理
-//====================================================
-void CPlayer::ExtraUninit()
-{
-}
-//==========================================================================================================
-
-//====================================================
 //更新処理
 //====================================================
 void CPlayer::Update()
@@ -87,6 +80,8 @@ void CPlayer::Update()
     NormalAttackProcess();
 
     CObjectXMove::Update();
+
+    CollisionBlock();
 }
 //==========================================================================================================
 
@@ -107,15 +102,6 @@ void CPlayer::SetDeath()
     CObject::SetDeath();
 }
 //===========================================================================================================
-
-//====================================================
-//モデル情報の破棄
-//====================================================
-void CPlayer::Unload()
-{
-
-}
-//==========================================================================================================
 
 //====================================================
 //プレイヤーの生成
@@ -210,5 +196,67 @@ void CPlayer::NormalAttackProcess()
         pAttackPlayer->SetUseInteria(false);
         pAttackPlayer->SetAutoSubLife(true);
     }
+}
+//==========================================================================================================
+
+//========================================================
+//ブロックとの当たり判定
+//========================================================
+void CPlayer::CollisionBlock()
+{
+    D3DXVECTOR3 MyPos = GetPos();
+    D3DXVECTOR3 MyPosOld = GetPosOld();
+    D3DXVECTOR3 MyVtxMax = GetVtxMax();
+    D3DXVECTOR3 MyVtxMin = GetVtxMin();
+    const D3DXVECTOR3 Move = GetMove();
+    bool bCollisionXOld = GetExtrusionCollisionSquareX();
+    bool bCollisionYOld = GetExtrusionCollisionSquareY();
+    bool bCollisionZOld = GetExtrusionCollisionSquareZ();
+
+    bool bCollisionX = false;
+    bool bCollisionY = false;
+    bool bCollisionZ = false;
+
+    bool bSuccessCollision = false;//当たり判定が成功したかどうか
+    for (int nCntPri = 0; nCntPri < CObject::m_nMAXPRIORITY; nCntPri++)
+    {
+        CObject* pObj = CObject::GetTopObject(nCntPri);
+
+        while (pObj != nullptr)
+        {
+            //次のオブジェクトを格納
+            CObject* pNext = pObj->GetNextObject();
+
+            //種類の取得（敵なら当たり判定）
+            CObject::TYPE type = pObj->GetType();
+
+            if (type == CObject::TYPE_BLOCK)
+            {
+                D3DXVECTOR3 ComPos = ((CBlock*)pObj)->GetPos();
+                D3DXVECTOR3 ComVtxMax = ((CBlock*)pObj)->GetVtxMax();
+                D3DXVECTOR3 ComVtxMin = ((CBlock*)pObj)->GetVtxMin();
+
+                bSuccessCollision = CCollision::ExtrusionCollisionSquare(MyPos, bCollisionX, bCollisionY, bCollisionZ, Move, MyPosOld, MyVtxMax, MyVtxMin,
+                    ComPos, ComVtxMax, ComVtxMin,bCollisionXOld,bCollisionYOld,bCollisionZOld);
+
+                if (bSuccessCollision == true)
+
+                {
+                    SetPos(MyPos);
+                    SetExtrusionCollisionSquareX(bCollisionX);
+                    SetExtrusionCollisionSquareY(bCollisionY);
+                    SetExtrusionCollisionSquareZ(bCollisionZ);
+                }
+            }
+
+            //オブジェクトを次に進める
+            pObj = pNext;
+        }
+
+    }
+
+    CManager::GetDebugProc()->PrintDebugProc("X方向の当たり判定が発動しているかどうか（０：いいえ、１：はい）：%d\n", bCollisionX);
+    CManager::GetDebugProc()->PrintDebugProc("Y方向の当たり判定が発動しているかどうか（０：いいえ、１：はい）：%d\n", bCollisionY);
+    CManager::GetDebugProc()->PrintDebugProc("Z方向の当たり判定が発動しているかどうか（０：いいえ、１：はい）：%d\n", bCollisionZ);
 }
 //==========================================================================================================

@@ -12,6 +12,7 @@
 //インクルード
 //======================
 #include "main.h"
+#include "objectXMove.h"
 //==========================================
 
 //==========================================
@@ -36,6 +37,29 @@ public:
 	//斜めの当たり判定XY
 	static bool RectAngleCollisionXY(D3DXVECTOR3 MyPos, D3DXVECTOR3 MyVtxMax, D3DXVECTOR3 MyVtxMin, D3DXVECTOR3 Rot,
 		D3DXVECTOR3 ComparisonPos, D3DXVECTOR3 ComparisonVtxMax, D3DXVECTOR3 ComparisonVtxMin);
+
+	//==============================================
+	//正方形の押し出し判定
+	//==============================================
+	//基本
+	static bool ExtrusionCollisionSquare(D3DXVECTOR3 & MyPos,bool& bCollisionX,bool & bCollisionY,bool & bCollisionZ,
+		const D3DXVECTOR3 MyMove,const D3DXVECTOR3 MyPosOld,const D3DXVECTOR3 MyVtxMax,const D3DXVECTOR3 MyVtxMin,
+		const D3DXVECTOR3 ComPos,const D3DXVECTOR3 ComVtxMax,const D3DXVECTOR3 ComVtxMin,
+		const bool bCollisionXOld,const bool bCollisionYOld,const bool bCollisionZOld);
+
+	//X押し出し
+	static bool ExtrusionCollisionSquareX(D3DXVECTOR3& MyPos,const D3DXVECTOR3 MyMove,const D3DXVECTOR3 MyPosOld,const D3DXVECTOR3 MyVtxMax, const D3DXVECTOR3 MyVtxMin, 
+		const D3DXVECTOR3 ComPos, const D3DXVECTOR3 ComVtxMax, const D3DXVECTOR3 ComVtxMin,const bool bCollisionX);
+
+	//Y押し出し
+	static bool ExtrusionCollisionSquareY(D3DXVECTOR3& MyPos, const D3DXVECTOR3 MyMove, const D3DXVECTOR3 MyPosOld, const D3DXVECTOR3 MyVtxMax, const D3DXVECTOR3 MyVtxMin,
+		const D3DXVECTOR3 ComPos, const D3DXVECTOR3 ComVtxMax, const D3DXVECTOR3 ComVtxMin,const bool bCollisionY);
+
+	//Z押し出し
+	static bool ExtrusionCollisionSquareZ(D3DXVECTOR3& MyPos, const D3DXVECTOR3 MyMove, const D3DXVECTOR3 MyPosOld, const D3DXVECTOR3 MyVtxMax, const D3DXVECTOR3 MyVtxMin,
+		const D3DXVECTOR3 ComPos, const D3DXVECTOR3 ComVtxMax, const D3DXVECTOR3 ComVtxMin,const bool bCollisionZ);
+
+	//=============================================================================================================================================================================
 private:
 };
 #endif

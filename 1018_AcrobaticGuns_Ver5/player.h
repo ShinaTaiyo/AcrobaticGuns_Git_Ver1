@@ -36,11 +36,9 @@ public:
 	~CPlayer();                 //デストラクタ
 	HRESULT Init() override;    //初期化処理
 	void Uninit() override;     //終了処理
-	void ExtraUninit() override;//別枠の終了処理
 	void Update() override;     //更新処理
 	void Draw() override;       //描画処理
 	void SetDeath() override;   //死亡フラグを設定
-	static void Unload();       //モデルの情報の破棄
 	static CPlayer * Create(D3DXVECTOR3 pos,D3DXVECTOR3 rot,D3DXVECTOR3 move,D3DXVECTOR3 Scale);
 private:
 	//================================================
@@ -58,9 +56,15 @@ private:
 	//================================================
 	//プロトタイプ宣言
 	//================================================
+
+	//基本形
 	void MoveProcess();//プレイヤーの移動処理
 	void AttackProcress();//攻撃処理
 	void NormalAttackProcess();//通常攻撃処理
+
+	//判定
+	void CollisionBlock();//ブロックとの当たり判定処理
+
 	//===============================================================================================
 };
 
