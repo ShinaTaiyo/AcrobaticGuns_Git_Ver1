@@ -143,7 +143,7 @@ bool CCalculation::CaluclationMove(D3DXVECTOR3& Move, float fSpeed, MOVEAIM Move
 	float fCameraRot = CManager::GetCamera()->GetRot().y;
 	float fMoveX = 0.0f;                                            //X方向の移動量
 	float fMoveZ = 0.0f;                                            //Z方向の移動量
-	bool bMove = false;                                             //移動しているかどうか 
+	bool bMove = true;                                             //移動しているかどうか 
 	if (CManager::GetInputKeyboard()->GetPress(DIK_W) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY_UP) == true)
 	{
 		fMoveZ = 1.0f;
@@ -170,11 +170,11 @@ bool CCalculation::CaluclationMove(D3DXVECTOR3& Move, float fSpeed, MOVEAIM Move
 		bMove = false;//待機状態
 	}
 
-
+	bMove = CManager::GetInputJoypad()->GetLStickPress(8);
 	if (bMove == true)
 	{//移動状態なら
 		//カメラを基準に向きを決める
-		fRot = atan2f(fMoveX, fMoveZ) + fCameraRot;
+		fRot = fCameraRot + CManager::GetInputJoypad()->GetLStickAimRot();
 		switch (MoveAim)
 		{
 		case MOVEAIM_XY:
@@ -195,6 +195,38 @@ bool CCalculation::CaluclationMove(D3DXVECTOR3& Move, float fSpeed, MOVEAIM Move
 	}
 
 	return bMove;
+}
+//===========================================================================================================
+
+
+//=========================================================
+//目的の位置への移動量を計算する
+//=========================================================
+D3DXVECTOR3 CCalculation::Calculation3DVec(D3DXVECTOR3 MyPos, D3DXVECTOR3 AimPos, float fSpeed)
+
+{
+	D3DXVECTOR3 VecAim = NULL_VECTOR3;       //それぞれの方向のベクトル
+	D3DXVECTOR3 ResultMove = NULL_VECTOR3;   //結果の移動量
+	float fVLaim = 0.0f;                     //総合ベクトル
+
+	//==========================
+	//３次元ベクトルを取る
+	//==========================
+
+	//それぞれの方向のベクトルを求める
+	VecAim.x = MyPos.x - AimPos.x;
+	VecAim.y = MyPos.y - AimPos.y;
+	VecAim.z = MyPos.z - AimPos.z;
+
+	//総合ベクトルを求める
+	fVLaim = sqrtf(powf(VecAim.x,2) + powf(VecAim.y,2) + powf(VecAim.z,2));
+
+	//目的の位置への移動量を求める
+	ResultMove.x = VecAim.x / fVLaim * fSpeed;
+	ResultMove.y = VecAim.y / fVLaim * fSpeed;
+	ResultMove.z = VecAim.z / fVLaim * fSpeed;
+
+	return ResultMove;
 }
 //===========================================================================================================
 

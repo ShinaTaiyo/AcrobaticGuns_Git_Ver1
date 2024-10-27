@@ -164,6 +164,8 @@ void CPlayer::MoveProcess()
     bMove = CCalculation::CaluclationMove(AddMove, 10.0f, CCalculation::MOVEAIM_XZ,m_fRotAim);
     CCalculation::CalculationCollectionRot2D(CalRot.y, m_fRotAim, 0.25f);
     
+    //CManager::GetInputJoypad()->GetLStickPress();
+
     SetMove(AddMove + D3DXVECTOR3(0.0f,Move.y,0.0f));
     SetRot(CalRot);
     CManager::GetDebugProc()->PrintDebugProc("Œü‚«F%f\n",Rot.y);

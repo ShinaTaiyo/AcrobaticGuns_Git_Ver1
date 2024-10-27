@@ -10,6 +10,8 @@
 //=========================
 #include "input.h"
 #include "main.h"
+#include "debugproc.h"
+#include "manager.h"
 //=========================================================
 
 //=========================
@@ -234,7 +236,7 @@ bool CInputKeyboard::GetRepeat(int nKey)
 //=====================================
 //コンストラクタ（ジョイパッドクラス）
 //=====================================
-CInputJoypad::CInputJoypad() : m_joykeyStatePress(),m_joykeyStateTrigger()
+CInputJoypad::CInputJoypad() : m_joykeyStatePress(),m_joykeyStateTrigger(),m_fLSitckAimRot(0.0f)
 {
 	//=======================
 	//メモリのクリア
@@ -326,6 +328,91 @@ bool CInputJoypad::GetTrigger(JOYKEY key)
 bool CInputJoypad::GetRT_Press()
 {
 	return m_joykeyStatePress.Gamepad.bRightTrigger != 0;//0x0004（JOYKEY_LEFT)なら0x01<<2 = 00000111 = 0x0004;
+}
+
+//==================================================================================
+//Lスティックのプレス情報の取得（ジョイパッドクラス）
+//==================================================================================
+bool CInputJoypad::GetLStickPress(const int nDivisionRot)
+{
+	float LX = m_joykeyStatePress.Gamepad.sThumbLX;
+	float LY = m_joykeyStatePress.Gamepad.sThumbLY;
+
+	bool bActive = false;//スティックを押しているかどうか
+	bool bSuccessDivision = false;//nDivisionRotで割った値の取得に成功したかどうか
+
+	//determine how far the controller is pushed
+	float magnitude = sqrt(LX * LX + LY * LY);
+
+	//上で求めた角度を正規化する
+	float normalizedLX = LX / magnitude;
+	float normalizedLY = LY / magnitude;
+
+	//正規化した角度で目的の角度を求める
+	float fAimRot = atan2f(normalizedLX, normalizedLY);
+
+	//======================================
+	//大まかな方向を決める
+	//======================================
+	float fLapRot = D3DX_PI * 2;//一周分の値
+	float fDivRot = fLapRot / nDivisionRot;       //分割した向きの値
+
+	float fRangeRotA = 0.0f;
+	float fRangeRotB = 0.0f;
+	for (int nCnt = 0; nCnt < nDivisionRot; nCnt++)
+	{
+		fRangeRotA = fDivRot * nCnt - D3DX_PI - fDivRot * 0.5f;
+		fRangeRotB = fDivRot * (nCnt + 1) - D3DX_PI - fDivRot * 0.5f;
+
+		if (fAimRot >= fRangeRotA && fAimRot <= fRangeRotB)
+		{
+			fAimRot = fDivRot * nCnt - D3DX_PI;
+			bSuccessDivision = true;
+			break;
+		}
+	}
+
+	if (bSuccessDivision == false)
+	{
+		fAimRot = fDivRot * nDivisionRot - D3DX_PI;
+	}
+
+	//============================================================================================================
+
+
+
+	float normalizedMagnitude = 0.0f;
+
+	//check if the controller is outside a circular dead zone
+	if (magnitude > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+	{//スティックを押している
+
+		//clip the magnitude at its expected maximum value
+		if (magnitude > 32767) magnitude = 32767;
+
+		//adjust magnitude relative to the end of the dead zone
+		magnitude -= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+
+		//optionally normalize the magnitude with respect to its expected range
+		//giving a magnitude value of 0.0 to 1.0
+		normalizedMagnitude = magnitude / (32767 - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
+
+		m_fLSitckAimRot = fAimRot;//求めた目的の角度を代入
+		bActive = true;
+	}
+	else //if the controller is in the deadzone zero out the magnitude
+	{//スティックを押していない
+		magnitude = 0.0;
+		normalizedMagnitude = 0.0;
+		bActive = false;
+	}
+
+	//CManager::GetDebugProc()->PrintDebugProc("LX：%f\n", normalizedLX);
+	//CManager::GetDebugProc()->PrintDebugProc("LY：%f\n", normalizedLY);
+	//CManager::GetDebugProc()->PrintDebugProc("if文判定：%d\n", bIfUnderstand);
+	//CManager::GetDebugProc()->PrintDebugProc("スティックの角度：%f\n", fRot);
+
+	return bActive;
 }
 //===============================================================
 

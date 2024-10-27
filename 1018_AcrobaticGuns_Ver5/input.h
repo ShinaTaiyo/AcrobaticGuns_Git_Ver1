@@ -100,11 +100,16 @@ public:
 	void Update() override;                                               //更新処理
  	bool GetPress(JOYKEY key);                                            //プレス状態獲得
 	bool GetTrigger(JOYKEY key);                                          //トリガー状態獲得
-	bool GetRT_Trigger();                                       //Lトリガーボタンのトリガー情報
-	bool GetRT_Press();
+	bool GetRT_Trigger();                                                 //Rトリガーボタンのトリガー情報
+ 	bool GetRT_Press();                                                   //Rトリガーボタンのプレス情報
+	bool GetLStickPress(const int nDivisionRot);                          //Lスティックのプレス情報
+
+	const float & GetLStickAimRot() const { return m_fLSitckAimRot; }     //Lスティックの目的の角度を取得する
 private:
 	XINPUT_STATE m_joykeyStatePress;      //ジョイパッドのプレス情報!
 	XINPUT_STATE m_joykeyStateTrigger;    //ジョイパッドのトリガー情報!
+
+	float m_fLSitckAimRot;                //Lスティックの目的の角度代入する
 
 };
 #endif

@@ -616,12 +616,13 @@ void CBillboard::HormingProcess()
 		fVXaim = TargetPos.x - m_Pos.x;
 		fVYaim = TargetPos.y - m_Pos.y;
 
-		fVLaim = atan2f(fVXaim, fVYaim);
+		fRotDest = atan2f(fVXaim, fVYaim);
 
 		//==========================================================================================================================================================
 
-		//目的の位置への角度
-		fRotDest = atan2f(TargetPos.x - m_Pos.x, TargetPos.y - m_Pos.y);
+		////目的の位置への角度
+		//fRotDest = atan2f(TargetPos.x - m_Pos.x, TargetPos.y - m_Pos.y);
+
 
 		//現在の移動方向の角度と、目的の移動方向の角度の差分を求める
 		fRotDiff = fRotDest - m_fRotMove;
