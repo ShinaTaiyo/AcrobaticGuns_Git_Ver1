@@ -161,7 +161,7 @@ void CPlayer::MoveProcess()
     const D3DXVECTOR3 & Move = GetMove();
     D3DXVECTOR3 AddMove = NULL_VECTOR3;
     bool bMove = false;//ˆÚ“®‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚©
-    bMove = CCalculation::CaluclationMove(AddMove, 10.0f, CCalculation::MOVEAIM_XZ,m_fRotAim);
+    bMove = CCalculation::CaluclationMove(true,AddMove, 10.0f, CCalculation::MOVEAIM_XZ,m_fRotAim);
     CCalculation::CalculationCollectionRot2D(CalRot.y, m_fRotAim, 0.25f);
     
     //CManager::GetInputJoypad()->GetLStickPress();

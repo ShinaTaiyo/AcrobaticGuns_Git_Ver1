@@ -138,43 +138,57 @@ void CCalculation::CalculationCollectionRot2D(float& fMyRot, float fRotAim, floa
 //=========================================================
 //移動方向への角度を計算する
 //=========================================================
-bool CCalculation::CaluclationMove(D3DXVECTOR3& Move, float fSpeed, MOVEAIM MoveAim, float& fRot)
+bool CCalculation::CaluclationMove(bool bUseStick, D3DXVECTOR3& Move, float fSpeed, MOVEAIM MoveAim, float& fRot)
 {
 	float fCameraRot = CManager::GetCamera()->GetRot().y;
 	float fMoveX = 0.0f;                                            //X方向の移動量
 	float fMoveZ = 0.0f;                                            //Z方向の移動量
 	bool bMove = true;                                             //移動しているかどうか 
-	if (CManager::GetInputKeyboard()->GetPress(DIK_W) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY_UP) == true)
-	{
-		fMoveZ = 1.0f;
-	}
-	else if (CManager::GetInputKeyboard()->GetPress(DIK_S) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY_DOWN) == true)
-	{
-		fMoveZ = -1.0f;
-	}
-	if (CManager::GetInputKeyboard()->GetPress(DIK_D) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY_RIGHT) == true)
-	{
-		fMoveX = 1.0f;
-	}
-	else if (CManager::GetInputKeyboard()->GetPress(DIK_A) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY_LEFT) == true)
-	{
-		fMoveX = -1.0f;
-	}
 
-	if (fMoveX != 0.0f || fMoveZ != 0.0f)
+	if (bUseStick == false)
 	{
-		bMove = true;//移動状態
+		if (CManager::GetInputKeyboard()->GetPress(DIK_W) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY_UP) == true)
+		{
+			fMoveZ = 1.0f;
+		}
+		else if (CManager::GetInputKeyboard()->GetPress(DIK_S) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY_DOWN) == true)
+		{
+			fMoveZ = -1.0f;
+		}
+		if (CManager::GetInputKeyboard()->GetPress(DIK_D) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY_RIGHT) == true)
+		{
+			fMoveX = 1.0f;
+		}
+		else if (CManager::GetInputKeyboard()->GetPress(DIK_A) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY_LEFT) == true)
+		{
+			fMoveX = -1.0f;
+		}
+
+		if (fMoveX != 0.0f || fMoveZ != 0.0f)
+		{
+			bMove = true;//移動状態
+		}
+		else
+		{
+			bMove = false;//待機状態
+		}
 	}
 	else
 	{
-		bMove = false;//待機状態
+		bMove = CManager::GetInputJoypad()->GetLStickPress(8);
 	}
-
-	bMove = CManager::GetInputJoypad()->GetLStickPress(8);
 	if (bMove == true)
 	{//移動状態なら
-		//カメラを基準に向きを決める
-		fRot = fCameraRot + CManager::GetInputJoypad()->GetLStickAimRot();
+
+		if (bUseStick == false)
+		{//WASDのボタン入力を基準に向きを決める
+			fRot = atan2f(fMoveX, fMoveZ);
+		}
+		else
+		{
+			//カメラを基準に向きを決める
+			fRot = fCameraRot + CManager::GetInputJoypad()->GetLStickAimRot();
+		}
 		switch (MoveAim)
 		{
 		case MOVEAIM_XY:

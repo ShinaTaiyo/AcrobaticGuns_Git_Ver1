@@ -592,7 +592,7 @@ void CObjectX::ChengeEditPos()
 	//===========================
 	//位置を変更
 	//===========================
-	CCalculation::CaluclationMove(Move, 5.0f, CCalculation::MOVEAIM_XZ, m_Rot.y);
+	CCalculation::CaluclationMove(false,Move, 5.0f, CCalculation::MOVEAIM_XZ, m_Rot.y);
 
 	////===========================
 	////RTボタンを押していたら

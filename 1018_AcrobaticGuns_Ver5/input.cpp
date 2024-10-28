@@ -236,7 +236,7 @@ bool CInputKeyboard::GetRepeat(int nKey)
 //=====================================
 //コンストラクタ（ジョイパッドクラス）
 //=====================================
-CInputJoypad::CInputJoypad() : m_joykeyStatePress(),m_joykeyStateTrigger(),m_fLSitckAimRot(0.0f)
+CInputJoypad::CInputJoypad() : m_joykeyStatePress(),m_joykeyStateTrigger(),m_fLSitckAimRot(0.0f), m_fRStickAimRot(0.0f)
 {
 	//=======================
 	//メモリのクリア
@@ -411,6 +411,90 @@ bool CInputJoypad::GetLStickPress(const int nDivisionRot)
 	//CManager::GetDebugProc()->PrintDebugProc("LY：%f\n", normalizedLY);
 	//CManager::GetDebugProc()->PrintDebugProc("if文判定：%d\n", bIfUnderstand);
 	//CManager::GetDebugProc()->PrintDebugProc("スティックの角度：%f\n", fRot);
+
+	return bActive;
+}
+//===============================================================
+
+//=====================================================================================
+//Rスティックのプレス情報を取得（ジョイパッドクラス）
+//=====================================================================================
+bool CInputJoypad::GetRStickPress(const int nDivisionRot)
+{
+	float RX = m_joykeyStatePress.Gamepad.sThumbRX;
+	float RY = m_joykeyStatePress.Gamepad.sThumbRY;
+
+	bool bActive = false;//スティックを押しているかどうか
+	bool bSuccessDivision = false;//nDivisionRotで割った値の取得に成功したかどうか
+
+	//determine how far the controller is pushed
+	float magnitude = sqrt(RX * RX + RY * RY);
+
+	//上で求めた角度を正規化する
+	float normalizedRX = RX / magnitude;
+	float normalizedRY = RY / magnitude;
+
+	//正規化した角度で目的の角度を求める
+	float fAimRot = atan2f(normalizedRX, normalizedRY);
+
+	//======================================
+	//大まかな方向を決める
+	//======================================
+	float fLapRot = D3DX_PI * 2;//一周分の値
+	float fDivRot = fLapRot / nDivisionRot;       //分割した向きの値
+
+	float fRangeRotA = 0.0f;
+	float fRangeRotB = 0.0f;
+	for (int nCnt = 0; nCnt < nDivisionRot; nCnt++)
+	{
+		fRangeRotA = fDivRot * nCnt - D3DX_PI - fDivRot * 0.5f;
+		fRangeRotB = fDivRot * (nCnt + 1) - D3DX_PI - fDivRot * 0.5f;
+
+		if (fAimRot >= fRangeRotA && fAimRot <= fRangeRotB)
+		{
+			fAimRot = fDivRot * nCnt - D3DX_PI;
+			bSuccessDivision = true;
+			break;
+		}
+	}
+
+	if (bSuccessDivision == false)
+	{
+		fAimRot = fDivRot * nDivisionRot - D3DX_PI;
+	}
+
+	//============================================================================================================
+
+	float normalizedMagnitude = 0.0f;
+
+	//check if the controller is outside a circular dead zone
+	if (magnitude > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
+	{//スティックを押している
+
+		//clip the magnitude at its expected maximum value
+		if (magnitude > 32767) magnitude = 32767;
+
+		//adjust magnitude relative to the end of the dead zone
+		magnitude -= XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
+
+		//optionalRY normalize the magnitude with respect to its expected range
+		//giving a magnitude value of 0.0 to 1.0
+		normalizedMagnitude = magnitude / (32767 - XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE);
+
+		m_fRStickAimRot = fAimRot;//求めた目的の角度を代入
+		bActive = true;
+	}
+	else //if the controller is in the deadzone zero out the magnitude
+	{//スティックを押していない
+		magnitude = 0.0;
+		normalizedMagnitude = 0.0;
+		bActive = false;
+	}
+
+	CManager::GetDebugProc()->PrintDebugProc("RX：%f\n", normalizedRX);
+	CManager::GetDebugProc()->PrintDebugProc("RY：%f\n", normalizedRY);
+	CManager::GetDebugProc()->PrintDebugProc("if文判定：%d\n", bActive);
+	CManager::GetDebugProc()->PrintDebugProc("スティックの角度：%f\n", fAimRot);
 
 	return bActive;
 }
