@@ -236,7 +236,7 @@ bool CInputKeyboard::GetRepeat(int nKey)
 //=====================================
 //コンストラクタ（ジョイパッドクラス）
 //=====================================
-CInputJoypad::CInputJoypad() : m_joykeyStatePress(),m_joykeyStateTrigger(),m_fLSitckAimRot(0.0f), m_fRStickAimRot(0.0f)
+CInputJoypad::CInputJoypad() : m_joykeyStatePress(),m_joykeyStateTrigger(),m_fLSitckAimRot(0.0f), m_fRStickAimRot(0.0f), m_nRTTrigger_RepeatCnt(0)
 {
 	//=======================
 	//メモリのクリア
@@ -329,6 +329,32 @@ bool CInputJoypad::GetRT_Press()
 {
 	return m_joykeyStatePress.Gamepad.bRightTrigger != 0;//0x0004（JOYKEY_LEFT)なら0x01<<2 = 00000111 = 0x0004;
 }
+//========================================================================================================================================================
+
+//==================================================================================
+//Lスティックのプレス情報の取得（ジョイパッドクラス）
+//==================================================================================
+bool CInputJoypad::GetRT_Repeat(const int nRepeatLoop)
+{
+	if (GetRT_Press() == true)
+	{
+		if (GetRT_Trigger() == true)
+		{
+			m_nRTTrigger_RepeatCnt = 0;
+			return true;
+		}
+
+		m_nRTTrigger_RepeatCnt++;
+
+		if (m_nRTTrigger_RepeatCnt >= nRepeatLoop)
+		{
+			m_nRTTrigger_RepeatCnt = 0;
+			return true;
+		}
+	}
+	return false;
+}
+//========================================================================================================================================================
 
 //==================================================================================
 //Lスティックのプレス情報の取得（ジョイパッドクラス）
@@ -409,8 +435,8 @@ bool CInputJoypad::GetLStickPress(const int nDivisionRot)
 
 	//CManager::GetDebugProc()->PrintDebugProc("LX：%f\n", normalizedLX);
 	//CManager::GetDebugProc()->PrintDebugProc("LY：%f\n", normalizedLY);
-	//CManager::GetDebugProc()->PrintDebugProc("if文判定：%d\n", bIfUnderstand);
-	//CManager::GetDebugProc()->PrintDebugProc("スティックの角度：%f\n", fRot);
+	//CManager::GetDebugProc()->PrintDebugProc("if文判定：%d\n", bActive);
+	//CManager::GetDebugProc()->PrintDebugProc("スティックの角度：%f\n", m_fLSitckAimRot);
 
 	return bActive;
 }
@@ -491,10 +517,10 @@ bool CInputJoypad::GetRStickPress(const int nDivisionRot)
 		bActive = false;
 	}
 
-	CManager::GetDebugProc()->PrintDebugProc("RX：%f\n", normalizedRX);
-	CManager::GetDebugProc()->PrintDebugProc("RY：%f\n", normalizedRY);
-	CManager::GetDebugProc()->PrintDebugProc("if文判定：%d\n", bActive);
-	CManager::GetDebugProc()->PrintDebugProc("スティックの角度：%f\n", fAimRot);
+	//CManager::GetDebugProc()->PrintDebugProc("RX：%f\n", normalizedRX);
+	//CManager::GetDebugProc()->PrintDebugProc("RY：%f\n", normalizedRY);
+	//CManager::GetDebugProc()->PrintDebugProc("if文判定：%d\n", bActive);
+	//CManager::GetDebugProc()->PrintDebugProc("スティックの角度：%f\n", fAimRot);
 
 	return bActive;
 }

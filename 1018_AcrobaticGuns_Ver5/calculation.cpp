@@ -12,6 +12,9 @@
 #include "manager.h"
 #include "camera.h"
 #include "renderer.h"
+#include "debugproc.h"
+#include "particle.h"
+#include "attack.h"
 #include "input.h"
 //===========================================================================================================
 
@@ -179,15 +182,14 @@ bool CCalculation::CaluclationMove(bool bUseStick, D3DXVECTOR3& Move, float fSpe
 	}
 	if (bMove == true)
 	{//移動状態なら
-
-		if (bUseStick == false)
-		{//WASDのボタン入力を基準に向きを決める
-			fRot = atan2f(fMoveX, fMoveZ);
+		//カメラを基準に向きを決める
+		if (bUseStick == true)
+		{
+			fRot = fCameraRot + CManager::GetInputJoypad()->GetLStickAimRot();
 		}
 		else
 		{
-			//カメラを基準に向きを決める
-			fRot = fCameraRot + CManager::GetInputJoypad()->GetLStickAimRot();
+			fRot = atan2f(fMoveX, fMoveZ) + fCameraRot;
 		}
 		switch (MoveAim)
 		{
@@ -228,9 +230,9 @@ D3DXVECTOR3 CCalculation::Calculation3DVec(D3DXVECTOR3 MyPos, D3DXVECTOR3 AimPos
 	//==========================
 
 	//それぞれの方向のベクトルを求める
-	VecAim.x = MyPos.x - AimPos.x;
-	VecAim.y = MyPos.y - AimPos.y;
-	VecAim.z = MyPos.z - AimPos.z;
+	VecAim.x = AimPos.x - MyPos.x;
+	VecAim.y = AimPos.y - MyPos.y;
+	VecAim.z = AimPos.z - MyPos.z;
 
 	//総合ベクトルを求める
 	fVLaim = sqrtf(powf(VecAim.x,2) + powf(VecAim.y,2) + powf(VecAim.z,2));
@@ -241,6 +243,150 @@ D3DXVECTOR3 CCalculation::Calculation3DVec(D3DXVECTOR3 MyPos, D3DXVECTOR3 AimPos
 	ResultMove.z = VecAim.z / fVLaim * fSpeed;
 
 	return ResultMove;
+}
+//===========================================================================================================
+
+//=========================================================
+// スクリーン座標をワールド座標に変換
+//=========================================================
+D3DXVECTOR3* CCalculation::CalcScreenToWorld(D3DXVECTOR3* pout, int Sx, int Sy, float fZ, int Screen_w, int Screen_h, D3DXMATRIX* View, D3DXMATRIX* Prj)
+{
+	// 各行列の逆行列を算出
+	D3DXMATRIX InvView, InvPrj, VP, InvViewport;
+	D3DXMatrixInverse(&InvView, NULL, View);//ビューマトリックスとの逆光列
+	D3DXMatrixInverse(&InvPrj, NULL, Prj);  //プロジェクションマトリックスとの逆光列
+	D3DXMatrixIdentity(&VP);
+	VP._11 = Screen_w / 2.0f; VP._22 = -Screen_h / 2.0f;
+	VP._41 = Screen_w / 2.0f; VP._42 = Screen_h / 2.0f;
+	D3DXMatrixInverse(&InvViewport, NULL, &VP);
+
+	//自分
+	D3DXVECTOR3 MyPos = D3DXVECTOR3(float(Sx), float(Sy),fZ);
+
+	// 逆変換
+	D3DXMATRIX tmp = InvViewport * InvPrj * InvView;//ワールド座標を求める
+	D3DXVec3TransformCoord(pout, &MyPos, &tmp);     //位置を求める
+	CManager::GetDebugProc()->PrintDebugProc("カーソルのワールド座標：%f %f %f\n", pout->x, pout->y, pout->z);
+	return pout;
+}
+//===========================================================================================================
+
+//=========================================================
+// XZ平面とスクリーン座標の交点算出関数
+//=========================================================
+D3DXVECTOR3* CCalculation::CalcScreenToXZ(D3DXVECTOR3* pout, int Sx, int Sy, int Screen_w, int Screen_h, D3DXMATRIX* View, D3DXMATRIX* Prj)
+{
+	D3DXVECTOR3 nearpos;
+	D3DXVECTOR3 farpos;
+	D3DXVECTOR3 ray;
+	bool bCross = false;
+
+	D3DXVECTOR3 Pos1 = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	CalcScreenToWorld(&nearpos, Sx, Sy, 0.0f, Screen_w, Screen_h, View, Prj);//（椎名）多分カメラの位置
+	CalcScreenToWorld(&farpos, Sx, Sy, 1.0f, Screen_w, Screen_h, View, Prj); //（椎名）多分描画範囲の一番奥の位置
+	ray = farpos - nearpos;
+
+	D3DXVec3Normalize(&ray, &ray);
+
+	nearpos *= -1;
+	// 床との交差が起きている場合は交点を
+	// 起きていない場合は遠くの壁との交点を出力
+	//if (ray.y <= 0) {
+	//	// 床交点
+	//	float Lray = D3DXVec3Dot(&ray, &Pos1);
+	//	float LP0 = D3DXVec3Dot(&nearpos, &Pos1);
+	//	*pout = nearpos + (LP0 / Lray) * ray;
+	//	bCross = true;
+	//	//CManager::GetDebugProc()->PrintDebugProc("Lray:%f\n", Lray);
+	//	//CManager::GetDebugProc()->PrintDebugProc("LP0:%f\n",LP0);
+	//}
+	//else {
+	* pout = farpos;
+	bCross = false;
+	//}
+	CManager::GetDebugProc()->PrintDebugProc("レイの向き：%f %f %f\n", ray.x, ray.y, ray.z);
+	CManager::GetDebugProc()->PrintDebugProc("レイが床と交差しているかどうか：%d\n", bCross);
+
+	return pout;
+}
+//===========================================================================================================
+
+//=========================================================
+// レイと球の衝突判定
+//=========================================================
+bool CCalculation::CalcRaySphere(D3DXVECTOR3 LayPos, D3DXVECTOR3 LayVec, D3DXVECTOR3 SphereSenterPos, float r, D3DXVECTOR3& CollisionStartPos, D3DXVECTOR3& CollisoinEndPos)
+{
+	SphereSenterPos.x = SphereSenterPos.x - LayPos.x;
+	SphereSenterPos.y = SphereSenterPos.y - LayPos.y;
+	SphereSenterPos.z = SphereSenterPos.z - LayPos.z;
+
+	float A = LayVec.x * LayVec.x + LayVec.y * LayVec.y + LayVec.z * LayVec.z;
+	float B = LayVec.x * SphereSenterPos.x + LayVec.y * SphereSenterPos.y + LayVec.z * SphereSenterPos.z;
+	float C = SphereSenterPos.x * SphereSenterPos.x + SphereSenterPos.y * SphereSenterPos.y + SphereSenterPos.z * SphereSenterPos.z - r * r;
+
+	if (A == 0.0f)
+		return false; // レイの長さが0
+
+	float s = B * B - A * C;
+	if (s < 0.0f)
+		return false; // 衝突していない
+
+	s = sqrtf(s);
+	float a1 = (B - s) / A;
+	float a2 = (B + s) / A;
+
+	if (a1 < 0.0f || a2 < 0.0f)
+		return false; // レイの反対で衝突
+
+	//衝突開始位置を求める
+	CollisionStartPos.x = LayPos.x + a1 * LayVec.x;
+	CollisionStartPos.y = LayPos.y + a1 * LayVec.y;
+	CollisionStartPos.z = LayPos.z + a1 * LayVec.z;
+
+	//衝突終了位置を求める
+	CollisoinEndPos.x = LayPos.x + a2 * LayVec.x;
+	CollisoinEndPos.y = LayPos.y + a2 * LayVec.y;
+	CollisoinEndPos.z = LayPos.z + a2 * LayVec.z;
+
+	return true;
+}
+//===========================================================================================================
+
+//=========================================================
+//目的の位置と狙っている位置とのレイが一致しているかどうかを判定
+//=========================================================
+bool CCalculation::CalcMatchRay(D3DXVECTOR3 AimPos, float fSx, float fSy, int nScreen_w, int nScreen_h, D3DXMATRIX* View, D3DXMATRIX* Prj)
+{
+	D3DXVECTOR3 nearpos1;
+	D3DXVECTOR3 farpos1;
+	D3DXVECTOR3 ray1;
+	bool bCross = false;
+
+	D3DXVECTOR3 Pos1 = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	CalcScreenToWorld(&nearpos1, int(fSx), int(fSy), 0.0f, nScreen_w, nScreen_h, View, Prj);//（椎名）多分カメラの位置
+	CalcScreenToWorld(&farpos1, int(fSx), int(fSy), 1.0f, nScreen_w, nScreen_h, View, Prj); //（椎名）多分描画範囲の一番奥の位置
+	ray1 = farpos1 - nearpos1;
+
+	D3DXVec3Normalize(&ray1, &ray1);
+
+	D3DXVECTOR3 farpos2;
+	D3DXVECTOR3 ray2;
+
+	ray2 = AimPos - nearpos1;//目的の位置とカメラの位置のレイを求める
+
+	D3DXVec3Normalize(&ray2, &ray2);
+
+	CManager::GetDebugProc()->PrintDebugProc("ray1:%f %f %f\n", ray1.x, ray1.y, ray1.z);
+	CManager::GetDebugProc()->PrintDebugProc("ray2:%f %f %f\n", ray2.x, ray2.y, ray2.z);
+
+	if (ray1.x >= ray2.x - 0.05f && ray1.x <= ray2.x + 0.05f &&
+		ray1.y >= ray2.y - 0.05f && ray1.y <= ray2.y + 0.05f &&
+		ray1.z >= ray2.z - 0.05f && ray1.z <= ray2.z + 0.05f)
+	{
+		CManager::GetDebugProc()->PrintDebugProc("レイの方向が一致\n");
+		return true;
+	}
+	return false;
 }
 //===========================================================================================================
 

@@ -37,6 +37,9 @@ public:
 		TYPE_FADE,            //フェード4
 		TYPE_ATTACK,          //攻撃
 		TYPE_BGMODEL,         //背景モデル
+		TYPE_UI3D,            //UI3D
+		TYPE_LOCKON,          //ロックオン
+		TYPE_PARTICLE,        //パーティクル
 		TYPE_MAX
 	}TYPE;
 	//===========================================

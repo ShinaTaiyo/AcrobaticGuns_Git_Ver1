@@ -67,10 +67,18 @@ public:
 
 	void SetAddLength(float fAddLength) { m_fAddLength = fAddLength; }
 	float& GetAddLength() { return m_fAddLength; }
+
+	//======================================
+	//マトリックス系
+	//======================================
+	D3DXMATRIX* GetMtxView() { return &m_mtxView; }//ビューマトリックスを取得
+	D3DXMATRIX* GetMtxProjection() { return &m_mtxProjection; }//プロジェクションマトリックスを取得
+	//==========================================================================================================================================
 private:
 	static const float m_BESIDECAMERALENGTH;      //ビサイドモードのカメラの距離
 	D3DXVECTOR3 m_PosV;                           //視点!
 	D3DXVECTOR3 m_PosR;                           //注視点!
+	D3DXVECTOR3 m_AddPosR;                        //加算注視点
 	D3DXVECTOR3 m_VecU;                           //上方向ベクトル!
 	D3DXVECTOR3 m_Rot;                            //向き!
 	D3DXMATRIX m_mtxProjection;                   //プロジェクション行列!

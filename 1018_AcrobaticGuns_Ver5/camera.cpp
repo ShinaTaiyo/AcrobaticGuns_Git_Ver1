@@ -29,7 +29,7 @@ const float CCamera::m_BESIDECAMERALENGTH = 570.0f;//ƒrƒTƒCƒhƒrƒ…[‚ÌƒJƒƒ‰‚Ì‹——
 //====================================================================
 CCamera::CCamera() : m_SupportPos(NULL_VECTOR3),m_fLength(0.0f), m_fTurningRotSpeed(0.0f),m_fTurningSpeedY(0.0f),m_PosV(NULL_VECTOR3),
 m_PosR(NULL_VECTOR3),m_VecU(NULL_VECTOR3),m_Rot(NULL_VECTOR3),m_mtxProjection(),m_mtxView(),m_CameraType(CAMERATYPE_BIRD),m_DifferenceLength(NULL_VECTOR3),
-m_ZoomSpeed(NULL_VECTOR3),m_nShakeFrame(0),m_ModeTime(0),m_fShakePower(0.0f),m_fAddLength(0.0f)
+m_ZoomSpeed(NULL_VECTOR3),m_nShakeFrame(0),m_ModeTime(0),m_fShakePower(0.0f),m_fAddLength(0.0f),m_AddPosR(NULL_VECTOR3)
 {
 
 }
@@ -81,15 +81,30 @@ void CCamera::Uninit()
 void CCamera::Update()
 {
 	//========================================
-	//ƒJƒƒ‰‚ÌˆÊ’u‚ð•Ï‚¦‚é
+	//ƒJƒƒ‰‚ÌŒü‚«‚ð•Ï‚¦‚é
 	//========================================
-	if (CManager::GetInputKeyboard()->GetPress(DIK_E) == true)
+	if (CManager::GetInputKeyboard()->GetPress(DIK_E) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY_RB) == true)
 	{
 		m_Rot.y += 0.02f;
 	}
-	else if (CManager::GetInputKeyboard()->GetPress(DIK_Q) == true)
+	else if (CManager::GetInputKeyboard()->GetPress(DIK_Q) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY_LB) == true)
 	{
 		m_Rot.y -= 0.02f;
+	}
+
+	//===========================
+	//RTƒ{ƒ^ƒ“‚ð‰Ÿ‚µ‚Ä‚¢‚½‚ç
+	//===========================
+	if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
+	{//ƒVƒtƒgƒL[‚ð‰Ÿ‚µ‚È‚ª‚çEEE
+		if (CManager::GetInputKeyboard()->GetPress(DIK_X) == true)
+		{
+			m_AddPosR.y -= 5.0f;
+		}
+	}
+	else if (CManager::GetInputKeyboard()->GetPress(DIK_X) == true)
+	{
+		m_AddPosR.y += 5.0f;
 	}
 
 	//=========================o==============
@@ -161,11 +176,11 @@ void CCamera::SetCamera()
 		ResultPosR += adjust;
 	}
 	//========================================================================================
-		//ƒrƒ…[ƒ}ƒgƒŠƒbƒNƒX‚Ìì¬
-		D3DXMatrixLookAtLH(&m_mtxView,
-			&ResultPosV,
-			&ResultPosR,
-			&m_VecU);
+	//ƒrƒ…[ƒ}ƒgƒŠƒbƒNƒX‚Ìì¬
+	D3DXMatrixLookAtLH(&m_mtxView,
+		&ResultPosV,
+		&ResultPosR,
+		&m_VecU);
 
 	//ƒrƒ…[ƒ}ƒgƒŠƒbƒNƒX‚ÌÝ’è
 	pDevice->SetTransform(D3DTS_VIEW,&m_mtxView);
@@ -197,7 +212,7 @@ void CCamera::NormalCameraMove()
 			case CScene::MODE_GAME:
 				if (CGame::GetPlayer() != nullptr)
 				{
-					m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f);
+					m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f) + m_AddPosR;
 					m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -200.0f, 0.0f, cosf(m_Rot.y) * -200.0f);
 				}
 				break;
@@ -207,7 +222,7 @@ void CCamera::NormalCameraMove()
 				{
 					if (pManagerObject->GetObjectType() == CObject::OBJECTTYPE::OBJECTTYPE_X)
 					{
-						m_PosR = ((CObjectX*)pManagerObject)->GetPos();
+						m_PosR = ((CObjectX*)pManagerObject)->GetPos() + m_AddPosR;
 						m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -200.0f, 400.0f, cosf(m_Rot.y) * -200.0f);
 					}
 				}

@@ -11,17 +11,18 @@
 #include "player.h"
 #include "objectX.h"
 #include "renderer.h"
-#include "block.h"
 #include "attack.h"
 #include "main.h"
 #include "manager.h"
 #include "camera.h"
 #include "input.h"
-#include "sound.h"
 #include "objectXInfo.h"
 #include "calculation.h"
 #include "fade.h"
 #include "game.h"
+#include "block.h"
+#include "lockon.h"
+#include "particle.h"
 #include "debugproc.h"
 #include "collision.h"
 //==========================================================================================================
@@ -35,7 +36,7 @@
 //====================================================
 //コンストラクタ
 //====================================================
-CPlayer::CPlayer() : m_fRotAim(0.0f)
+CPlayer::CPlayer() : m_fRotAim(0.0f),m_pLockOn(nullptr)
 {
 
 }
@@ -55,7 +56,10 @@ CPlayer::~CPlayer()
 //====================================================
 HRESULT CPlayer::Init()
 {
-    CObjectXMove::Init();                 //Xオブジェクト初期化
+    CObjectXAlive::Init();                 //Xオブジェクト初期化
+
+    m_pLockOn = CLockon::Create(SENTER_VECTOR3, CObject2D::POLYGONTYPE01_SENTERROLLING, 100.0f, 100.0f, NORMAL_COL);
+    m_pLockOn->SetUseDeath(true);
 
     return S_OK;
 }
@@ -66,7 +70,7 @@ HRESULT CPlayer::Init()
 //====================================================
 void CPlayer::Uninit()
 {
-    CObjectXMove::Uninit();//Xオブジェクト終了
+    CObjectXAlive::Uninit();//Xオブジェクト終了
 }
 //==========================================================================================================
 
@@ -75,12 +79,19 @@ void CPlayer::Uninit()
 //====================================================
 void CPlayer::Update()
 {
+    //移動処理
     MoveProcess();
 
+    //更新処理
+    CObjectXAlive::Update();
+
+    //通常攻撃処理
     NormalAttackProcess();
 
-    CObjectXMove::Update();
+    //ロックオンの処理
+    LockOnProcess();
 
+    //ブロックとの当たり判定
     CollisionBlock();
 }
 //==========================================================================================================
@@ -90,7 +101,7 @@ void CPlayer::Update()
 //====================================================
 void CPlayer::Draw()
 {
-    CObjectXMove::Draw();
+    CObjectXAlive::Draw();
 }
 //==========================================================================================================
 
@@ -99,6 +110,13 @@ void CPlayer::Draw()
 //====================================================
 void CPlayer::SetDeath()
 {
+    if (m_pLockOn != nullptr)
+    {
+        m_pLockOn->SetUseDeath(true);
+        m_pLockOn->SetDeath();
+        m_pLockOn = nullptr;
+    }
+
     CObject::SetDeath();
 }
 //===========================================================================================================
@@ -155,6 +173,7 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
 //========================================================
 void CPlayer::MoveProcess()
 {
+    const D3DXVECTOR3& Pos = GetPos();
     const D3DXVECTOR3& Rot = GetRot();
     D3DXVECTOR3 CalRot = Rot;
     float fRotDiff = 0.0f;//向きの差分
@@ -168,6 +187,7 @@ void CPlayer::MoveProcess()
 
     SetMove(AddMove + D3DXVECTOR3(0.0f,Move.y,0.0f));
     SetRot(CalRot);
+    CManager::GetDebugProc()->PrintDebugProc("プレイヤーの位置：%f %f %f\n",Pos.x,Pos.y,Pos.z);
     CManager::GetDebugProc()->PrintDebugProc("向き：%f\n",Rot.y);
     CManager::GetDebugProc()->PrintDebugProc("目的の向き：%f\n", m_fRotAim);
 }
@@ -189,12 +209,51 @@ void CPlayer::NormalAttackProcess()
 {
     const D3DXVECTOR3 & Rot = GetRot();
     const D3DXVECTOR3& Pos = GetPos();
-    CAttackPlayer* pAttackPlayer = nullptr;
-    if (CManager::GetInputKeyboard()->GetTrigger(DIK_J) == true)
-    {
-        pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::TYPE00_BULLET, 60, Pos, Rot,
-            D3DXVECTOR3(sinf(Rot.y) * m_fNORMALATTACK_SPEED, 0.0f, cosf(Rot.y) * m_fNORMALATTACK_SPEED),ONE_VECTOR3);
+    bool bCollision = false;//当たり判定
+    D3DXVECTOR3 Move = NULL_VECTOR3;
+    D3DXVECTOR3 ShotPos = GetPos() + D3DXVECTOR3(0.0f, GetSize().y, 0.0f);
+    D3DXVECTOR3 NearPos = NULL_VECTOR3;//手前
+    D3DXVECTOR3 FarPos = NULL_VECTOR3; //奥
+    D3DXVECTOR3 Ray = NULL_VECTOR3;    //レイの方向
+    D3DXVECTOR3 CollisionStartPos = NULL_VECTOR3;//衝突判定開始位置
+    D3DXVECTOR3 CollisionEndPos = NULL_VECTOR3;  //衝突判定終了位置
 
+    //カメラの手前側のワールド座標を求める
+    CCalculation::CalcScreenToWorld(&NearPos, int(m_pLockOn->GetPos().x), int(m_pLockOn->GetPos().y), 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT,
+        CManager::GetCamera()->GetMtxView(), CManager::GetCamera()->GetMtxProjection());
+
+    //カメラの奥側のワールド座標を求める
+    CCalculation::CalcScreenToWorld(&FarPos, int(m_pLockOn->GetPos().x), int(m_pLockOn->GetPos().y), 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT,
+        CManager::GetCamera()->GetMtxView(), CManager::GetCamera()->GetMtxProjection());
+
+    //レイを求める
+    Ray = FarPos - NearPos;
+
+    //レイを正規化する
+    D3DXVec3Normalize(&Ray, &Ray);
+
+    //指定したモデルの位置
+    bCollision = CCalculation::CalcRaySphere(NearPos, Ray, NULL_VECTOR3, 100.0f, CollisionStartPos, CollisionEndPos);
+
+    if (bCollision == true)
+    {//狙っている方向の奥側の壁に向かって撃つ
+        Move = CCalculation::Calculation3DVec(ShotPos,NULL_VECTOR3, 40.0f);
+        CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 12, 60, 30.0f, 30.0f, 100, 10, false, NULL_VECTOR3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
+        CManager::GetDebugProc()->PrintDebugProc("レイと球の当たり判定成功！\n");
+    }
+    else
+    {//レイの方向が一致したオブジェクトの中心点に向かって撃つ
+        Move = CCalculation::Calculation3DVec(ShotPos, m_pLockOn->GetLockOnPos(), 10.0f);
+        //判定対象の位置にパーティクルを召喚
+        CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 2, 60, 30.0f, 30.0f, 100, 10, false, NULL_VECTOR3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f), true);
+        CManager::GetDebugProc()->PrintDebugProc("レイと球の当たり判定失敗！\n");
+    }
+
+    CAttackPlayer* pAttackPlayer = nullptr;//プレイヤー攻撃へのポインタ
+
+    if (CManager::GetInputKeyboard()->GetTrigger(DIK_J) == true || CManager::GetInputJoypad()->GetRT_Repeat(6) == true)
+    {
+        pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::TYPE00_BULLET, 60, ShotPos, Rot, Move,ONE_VECTOR3);
         pAttackPlayer->SetUseInteria(false);
         pAttackPlayer->SetAutoSubLife(true);
     }
@@ -260,5 +319,24 @@ void CPlayer::CollisionBlock()
     CManager::GetDebugProc()->PrintDebugProc("X方向の当たり判定が発動しているかどうか（０：いいえ、１：はい）：%d\n", bCollisionX);
     CManager::GetDebugProc()->PrintDebugProc("Y方向の当たり判定が発動しているかどうか（０：いいえ、１：はい）：%d\n", bCollisionY);
     CManager::GetDebugProc()->PrintDebugProc("Z方向の当たり判定が発動しているかどうか（０：いいえ、１：はい）：%d\n", bCollisionZ);
+}
+//==========================================================================================================
+
+//========================================================
+//ロックオンの処理
+//========================================================
+void CPlayer::LockOnProcess()
+{
+    //移動処理
+    LockOnMove();
+}
+//==========================================================================================================
+
+//========================================================
+//ロックオンを動かす
+//========================================================
+void CPlayer::LockOnMove()
+{
+
 }
 //==========================================================================================================

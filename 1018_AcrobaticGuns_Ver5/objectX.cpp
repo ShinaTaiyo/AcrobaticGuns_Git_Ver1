@@ -592,40 +592,21 @@ void CObjectX::ChengeEditPos()
 	//===========================
 	//位置を変更
 	//===========================
-	CCalculation::CaluclationMove(false,Move, 5.0f, CCalculation::MOVEAIM_XZ, m_Rot.y);
-
-	////===========================
-	////RTボタンを押していたら
-	////===========================
-	//if (CManager::GetInputKeyboard()->GetPress(DIK_LCONTROL) == true)
-	//{//Lコントロールキーを押しながら
-	//	if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
-	//	{//シフトキーを押しながら・・・
-	//		if (CManager::GetInputKeyboard()->GetPress(DIK_F) == true)
-	//		{
-	//			m_Rot.z -= 0.01f;
-	//		}
-	//	}
-	//	else if (CManager::GetInputKeyboard()->GetPress(DIK_G) == true)
-	//	{
-	//		m_Rot.z += 0.01f;
-	//	}
-	//}
-	//else
-	//{//Lコントロールキーを押していない
-	//	if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
-	//	{//シフトキーを押しながら・・・
-	//		if (CManager::GetInputKeyboard()->GetTrigger(DIK_F) == true)
-	//		{
-	//			m_Rot.z -= 0.01f;
-	//		}
-	//	}
-	//	else if (CManager::GetInputKeyboard()->GetTrigger(DIK_G) == true)
-	//	{
-	//		m_Rot.z += 0.01f;
-	//	}
-	//}
-
+	if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
+	{
+		if (CManager::GetInputKeyboard()->GetPress(DIK_W) == true)
+		{
+			m_Pos.y += 5.0f;
+		}
+		else if (CManager::GetInputKeyboard()->GetPress(DIK_S) == true)
+		{
+			m_Pos.y -= 5.0f;
+		}
+	}
+	else
+	{
+		CCalculation::CaluclationMove(false, Move, 5.0f, CCalculation::MOVEAIM_XZ, m_Rot.y);
+	}
 	//支点も一緒に移動
 	m_Pos += Move;
 	m_SupportPos = m_Pos;

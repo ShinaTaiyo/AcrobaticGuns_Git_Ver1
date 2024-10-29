@@ -62,7 +62,7 @@ public:
 
 	void SetScaling(float fAddScale);//拡大をするかどうか
 	void SetUseEffect(int nSetEffectLife, D3DXVECTOR2 Size, D3DXCOLOR Col);//エフェクトを使用するかどうか
-	void SetUseMtxChild(D3DXMATRIX* pMtxParent,bool bUse);//子マトリックスを設定
+	void SetParent(D3DXMATRIX* pMtxParent,bool bUse);//子マトリックスを設定
 	void SetUseGravity(float fGravity); //重力を設定
 	void SetAddGravity(float fAddGravity) { m_fAddGravity = fAddGravity; };//加算する重力を設定
 	void SetUseHorming(float fSpeed);   //ホーミングを設定
@@ -140,8 +140,6 @@ private:
 	bool m_bScaling;        //拡縮をするかどうか  !
 	float m_fAddScale;      //拡大量を設定!
 	float m_fScale;         //拡大率!
-
-	bool m_bUse;            //使用状態!
 
 	float m_fSpeed;          //早さ!
 

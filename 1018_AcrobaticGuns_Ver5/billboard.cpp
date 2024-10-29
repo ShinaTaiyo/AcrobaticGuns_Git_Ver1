@@ -23,7 +23,7 @@
 //=============================================================================================
 
 CBillboard::CBillboard(int nPriority) : CObject(nPriority),m_bAnimFlag(false),m_bDraw(false),m_bMtxChild(false),m_bMultiplication(false),m_bScaling(false),
-m_bSetEffect(false),m_bUse(true),m_bUseAddSpeed(false),m_bUseCurve(false),m_bUseGravity(false),m_bUseHorming(false),m_bUseLengthCurve(false),m_bUsePolygonRot(false),
+m_bSetEffect(false),m_bUseAddSpeed(false),m_bUseCurve(false),m_bUseGravity(false),m_bUseHorming(false),m_bUseLengthCurve(false),m_bUsePolygonRot(false),
 m_fAddCurveLength(0.0f),m_fAddGravity(0.0f),m_fAddRot(0.0f),m_fAddScale(0.0f),m_fAddSpeed(0.0f),m_fAnimationSplit(0.0f),m_fCurveSpeed(0.0f),m_fFormarHeight(0.0f),
 m_fFormarWidth(0.0f),m_fGravity(0.0f),m_fGravityPower(0.0f),m_fHeight(0.0f),m_fPolygonRotPower(0.0f),m_fRotMove(0.0f),m_fScale(0.0f),m_fSpeed(0.0f),m_fStartRot(0.0f),
 m_fSupportCurveLength(0.0f),m_fWidth(0.0f),m_nMaxAnimationPattern(0),m_nAnimationChange(0),m_nAnimationCnt(0),m_nCntTime(0),m_nLife(0),m_nMaxLife(0),m_nSetEffectLife(0),
@@ -335,7 +335,6 @@ void CBillboard::Draw(void)
 	m_mtxWorld._42 = 0.0f;
 	m_mtxWorld._43 = 0.0f;
 
-
 	if (m_pMtxParent == nullptr && m_bMtxChild == false)
 	{//親となるモデルがいなかったら
 		//位置を反映
@@ -557,7 +556,7 @@ void CBillboard::SetUseEffect(int nSetEffectLife, D3DXVECTOR2 Size, D3DXCOLOR Co
 //===============================================================
 //子マトリックスを設定
 //===============================================================
-void CBillboard::SetUseMtxChild(D3DXMATRIX* pMtxParent, bool bUse)
+void CBillboard::SetParent(D3DXMATRIX* pMtxParent, bool bUse)
 {
 	m_pMtxParent = pMtxParent;
 	m_bMtxChild = bUse;
