@@ -21,6 +21,7 @@
 #include "fade.h"
 #include "game.h"
 #include "block.h"
+#include "enemy.h"
 #include "lockon.h"
 #include "particle.h"
 #include "debugproc.h"
@@ -207,6 +208,9 @@ void CPlayer::AttackProcress()
 //========================================================
 void CPlayer::NormalAttackProcess()
 {
+    //======================
+    //変数宣言
+    //======================
     const D3DXVECTOR3 & Rot = GetRot();
     const D3DXVECTOR3& Pos = GetPos();
     bool bCollision = false;//当たり判定
@@ -218,45 +222,101 @@ void CPlayer::NormalAttackProcess()
     D3DXVECTOR3 CollisionStartPos = NULL_VECTOR3;//衝突判定開始位置
     D3DXVECTOR3 CollisionEndPos = NULL_VECTOR3;  //衝突判定終了位置
 
-    //カメラの手前側のワールド座標を求める
+    D3DXVECTOR3 NearCollisionPos = NULL_VECTOR3; //当たり判定が成功した位置の中で一番近い位置
+
+    vector<D3DXVECTOR3> VecCollisionSuccess;     //当たり判定が成功した位置のvector
+    //============================================================================================================================
+
+    //============================================
+    //カメラ手前と奥のワールド座標を求める
+    //============================================
     CCalculation::CalcScreenToWorld(&NearPos, int(m_pLockOn->GetPos().x), int(m_pLockOn->GetPos().y), 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT,
-        CManager::GetCamera()->GetMtxView(), CManager::GetCamera()->GetMtxProjection());
+        CManager::GetCamera()->GetMtxView(), CManager::GetCamera()->GetMtxProjection());//手前
 
-    //カメラの奥側のワールド座標を求める
     CCalculation::CalcScreenToWorld(&FarPos, int(m_pLockOn->GetPos().x), int(m_pLockOn->GetPos().y), 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT,
-        CManager::GetCamera()->GetMtxView(), CManager::GetCamera()->GetMtxProjection());
+        CManager::GetCamera()->GetMtxView(), CManager::GetCamera()->GetMtxProjection());//奥
+    //============================================================================================================================
+    
+    //============================================
+    //レイ
+    //============================================
+    Ray = FarPos - NearPos;//求める
+    D3DXVec3Normalize(&Ray, &Ray);//正規化
+    //レイと一致した全てのオブジェクトを求め、中心点をVectorに保存
+    for (int nCntPri = 0; nCntPri < CObject::m_nMAXPRIORITY; nCntPri++)
+    {
+        CObject* pObj = CObject::GetTopObject(nCntPri);//先頭オブジェクトを取得
+        while (pObj != nullptr)
+        {
+            CObject* pNext = pObj->GetNextObject();//次のオブジェクトのポインタを取得
 
-    //レイを求める
-    Ray = FarPos - NearPos;
+            if (pObj->GetType() == CObject::TYPE_ENEMY)
+            {
+                CEnemy* pEnemy = (CEnemy*)pObj;
+                //指定したモデルの位置
+                bCollision = CCalculation::CalcRaySphere(NearPos, Ray, pEnemy->GetSenterPos(),pEnemy->GetSize().y, CollisionStartPos, CollisionEndPos);
+                CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 2, 20, 30.0f, 30.0f, 100, 10, false,pEnemy->GetSenterPos() + D3DXVECTOR3(0.0f,pEnemy->GetSize().y,0.0f), D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f), true);
+                if (bCollision == true)
+                {//レイとサイズ/２分の球の当たり判定成功
+                    VecCollisionSuccess.push_back(pEnemy->GetSenterPos());//当たり判定が成功したオブジェクトの中心点を保存する 
+                }
+            }
 
-    //レイを正規化する
-    D3DXVec3Normalize(&Ray, &Ray);
+            pObj = pNext;//オブジェクトを次に進める
+        }
+    }
 
-    //指定したモデルの位置
-    bCollision = CCalculation::CalcRaySphere(NearPos, Ray, NULL_VECTOR3, 100.0f, CollisionStartPos, CollisionEndPos);
+    //レイの方向が一致したオブジェクトが存在したら、その中で一番距離が近いオブジェクトの中心点を求め、そこを目掛けた移動量を求める
+    if (VecCollisionSuccess.size() != 0)
+    {//狙っているオブジェクトの中心点に向かって撃つ
+        float fLength = 0.0f;//距離
+        float fMinLength = 0.0f;//一番近い距離格納用
+        for (auto it = VecCollisionSuccess.begin(); it != VecCollisionSuccess.end(); it++)
+        {
+            fLength = CCalculation::CalculationLength(ShotPos, *it);//レイの判定が成功したオブジェクトの位置とプレイヤーの中心点の距離を測る
 
-    if (bCollision == true)
-    {//狙っている方向の奥側の壁に向かって撃つ
-        Move = CCalculation::Calculation3DVec(ShotPos,NULL_VECTOR3, 40.0f);
-        CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 12, 60, 30.0f, 30.0f, 100, 10, false, NULL_VECTOR3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
+            if (it == VecCollisionSuccess.begin())
+            {
+                fMinLength = fLength;
+                NearCollisionPos = *it;
+            }
+            else
+            {
+                if (fLength < fMinLength)
+                {//一番近い距離より近かったら
+                    NearCollisionPos = *it;//一番近いオブジェクトを格納
+                }
+            }
+        }
+
+        //一番近いレイ判定成功オブジェクトへの移動量を求める
+        Move = CCalculation::Calculation3DVec(ShotPos, NearCollisionPos, 40.0f);
+        CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 2, 60, 30.0f, 30.0f, 100, 10, false, NearCollisionPos, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
         CManager::GetDebugProc()->PrintDebugProc("レイと球の当たり判定成功！\n");
     }
     else
-    {//レイの方向が一致したオブジェクトの中心点に向かって撃つ
+    {//狙っている方向の奥の壁に向かって撃つ
         Move = CCalculation::Calculation3DVec(ShotPos, m_pLockOn->GetLockOnPos(), 10.0f);
         //判定対象の位置にパーティクルを召喚
-        CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 2, 60, 30.0f, 30.0f, 100, 10, false, NULL_VECTOR3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f), true);
         CManager::GetDebugProc()->PrintDebugProc("レイと球の当たり判定失敗！\n");
     }
+    //====================================================================================================================================================================
 
+
+    //==========================================================
+    //攻撃を開始
+    //==========================================================
     CAttackPlayer* pAttackPlayer = nullptr;//プレイヤー攻撃へのポインタ
-
     if (CManager::GetInputKeyboard()->GetTrigger(DIK_J) == true || CManager::GetInputJoypad()->GetRT_Repeat(6) == true)
     {
         pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::TYPE00_BULLET, 60, ShotPos, Rot, Move,ONE_VECTOR3);
         pAttackPlayer->SetUseInteria(false);
         pAttackPlayer->SetAutoSubLife(true);
     }
+    //====================================================================================================================================================================
+
+    //Vectorをクリア
+    VecCollisionSuccess.clear();
 }
 //==========================================================================================================
 
