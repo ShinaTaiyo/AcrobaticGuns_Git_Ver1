@@ -213,20 +213,31 @@ void CPlayer::NormalAttackProcess()
     //======================
     const D3DXVECTOR3 & Rot = GetRot();
     const D3DXVECTOR3& Pos = GetPos();
-    bool bCollision = false;//当たり判定
     D3DXVECTOR3 Move = NULL_VECTOR3;
+    D3DXVECTOR3 NearPos = NULL_VECTOR3;
     D3DXVECTOR3 ShotPos = GetPos() + D3DXVECTOR3(0.0f, GetSize().y, 0.0f);
-    D3DXVECTOR3 NearPos = NULL_VECTOR3;//手前
-    D3DXVECTOR3 FarPos = NULL_VECTOR3; //奥
     D3DXVECTOR3 Ray = NULL_VECTOR3;    //レイの方向
-    D3DXVECTOR3 CollisionStartPos = NULL_VECTOR3;//衝突判定開始位置
-    D3DXVECTOR3 CollisionEndPos = NULL_VECTOR3;  //衝突判定終了位置
-
-    D3DXVECTOR3 NearCollisionPos = NULL_VECTOR3; //当たり判定が成功した位置の中で一番近い位置
-
-    vector<D3DXVECTOR3> VecCollisionSuccess;     //当たり判定が成功した位置のvector
+    D3DXVECTOR3 RightRay = NULL_VECTOR3;//右端のレイの方向
     //============================================================================================================================
+   
+    ////射影空間の奥と手前のレイを求める
+    //Ray = CalcRay(NearPos);
 
+    //攻撃の移動量を求める
+    CalcAttackMove(ShotPos,m_pLockOn->GetFrontPos(),m_pLockOn->GetNowRay(),Move);
+
+    //攻撃を開始
+    AttackStart(ShotPos, Move, Rot);
+}
+//==========================================================================================================
+
+//========================================================
+//レイを測る
+//========================================================
+D3DXVECTOR3 CPlayer::CalcRay(D3DXVECTOR3& NearPos)
+{
+    D3DXVECTOR3 FarPos = NULL_VECTOR3; //奥
+    D3DXVECTOR3 Ray = NULL_VECTOR3;    //レイ
     //============================================
     //カメラ手前と奥のワールド座標を求める
     //============================================
@@ -236,16 +247,28 @@ void CPlayer::NormalAttackProcess()
     CCalculation::CalcScreenToWorld(&FarPos, int(m_pLockOn->GetPos().x), int(m_pLockOn->GetPos().y), 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT,
         CManager::GetCamera()->GetMtxView(), CManager::GetCamera()->GetMtxProjection());//奥
     //============================================================================================================================
-    
-    //============================================
-    //レイ
-    //============================================
-    Ray = FarPos - NearPos;//求める
+
+    Ray = FarPos - NearPos;//ベクトルを求める
     D3DXVec3Normalize(&Ray, &Ray);//正規化
+    return Ray;
+}
+//==========================================================================================================
+
+//========================================================
+//攻撃の移動方向を計算する
+//========================================================
+D3DXVECTOR3& CPlayer::CalcAttackMove(const D3DXVECTOR3& ShotPos, const D3DXVECTOR3& NearPos, const D3DXVECTOR3& Ray, D3DXVECTOR3 & Move)
+{
+    bool bCollision = false;//当たり判定
+    vector<D3DXVECTOR3> VecCollisionSuccess;     //当たり判定が成功した位置のvector
+    D3DXVECTOR3 NearCollisionPos = NULL_VECTOR3; //当たり判定が成功した位置の中で一番近い位置
+
     //レイと一致した全てのオブジェクトを求め、中心点をVectorに保存
     for (int nCntPri = 0; nCntPri < CObject::m_nMAXPRIORITY; nCntPri++)
     {
         CObject* pObj = CObject::GetTopObject(nCntPri);//先頭オブジェクトを取得
+        D3DXVECTOR3 CollisionStartPos = NULL_VECTOR3;//衝突判定開始位置
+        D3DXVECTOR3 CollisionEndPos = NULL_VECTOR3;  //衝突判定終了位置
         while (pObj != nullptr)
         {
             CObject* pNext = pObj->GetNextObject();//次のオブジェクトのポインタを取得
@@ -254,11 +277,16 @@ void CPlayer::NormalAttackProcess()
             {
                 CEnemy* pEnemy = (CEnemy*)pObj;
                 //指定したモデルの位置
-                bCollision = CCalculation::CalcRaySphere(NearPos, Ray, pEnemy->GetSenterPos(),pEnemy->GetSize().y, CollisionStartPos, CollisionEndPos);
-                CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 2, 20, 30.0f, 30.0f, 100, 10, false,pEnemy->GetSenterPos() + D3DXVECTOR3(0.0f,pEnemy->GetSize().y,0.0f), D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f), true);
+                bCollision = CCalculation::CalcRaySphere(NearPos, Ray, pEnemy->GetSenterPos(), pEnemy->GetSize().y, CollisionStartPos, CollisionEndPos);
+
                 if (bCollision == true)
                 {//レイとサイズ/２分の球の当たり判定成功
+                    CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 20, 30.0f, 30.0f, 100, 10, false, CollisionStartPos, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f), true);
+
+                    CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 20, 30.0f, 30.0f, 100, 10, false, CollisionEndPos, D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f), true);
+
                     VecCollisionSuccess.push_back(pEnemy->GetSenterPos());//当たり判定が成功したオブジェクトの中心点を保存する 
+                    CManager::GetDebugProc()->PrintDebugProc("判定成功したかどうか:%d\n",bCollision);
                 }
             }
 
@@ -291,7 +319,6 @@ void CPlayer::NormalAttackProcess()
 
         //一番近いレイ判定成功オブジェクトへの移動量を求める
         Move = CCalculation::Calculation3DVec(ShotPos, NearCollisionPos, 40.0f);
-        CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 2, 60, 30.0f, 30.0f, 100, 10, false, NearCollisionPos, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
         CManager::GetDebugProc()->PrintDebugProc("レイと球の当たり判定成功！\n");
     }
     else
@@ -302,21 +329,25 @@ void CPlayer::NormalAttackProcess()
     }
     //====================================================================================================================================================================
 
+    //Vectorをクリア
+    VecCollisionSuccess.clear();
 
-    //==========================================================
-    //攻撃を開始
-    //==========================================================
+    return Move;
+}
+//==========================================================================================================
+
+//========================================================
+//攻撃開始
+//========================================================
+void CPlayer::AttackStart(const D3DXVECTOR3& ShotPos, const D3DXVECTOR3& Move, const D3DXVECTOR3& Rot)
+{
     CAttackPlayer* pAttackPlayer = nullptr;//プレイヤー攻撃へのポインタ
     if (CManager::GetInputKeyboard()->GetTrigger(DIK_J) == true || CManager::GetInputJoypad()->GetRT_Repeat(6) == true)
     {
-        pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::TYPE00_BULLET, 60, ShotPos, Rot, Move,ONE_VECTOR3);
+        pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::TYPE00_BULLET, 60, ShotPos, Rot, Move, ONE_VECTOR3);
         pAttackPlayer->SetUseInteria(false);
         pAttackPlayer->SetAutoSubLife(true);
     }
-    //====================================================================================================================================================================
-
-    //Vectorをクリア
-    VecCollisionSuccess.clear();
 }
 //==========================================================================================================
 

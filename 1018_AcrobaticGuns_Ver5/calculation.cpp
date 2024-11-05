@@ -121,7 +121,6 @@ void CCalculation::CalculationCollectionRot2D(float& fMyRot, float fRotAim, floa
 		fRotDiff += D3DX_PI * 2;
 	}
 
-
 	//徐々に目的の向きへ合わせていく
 	fMyRot += fRotDiff * fDecayRot;
 
@@ -131,7 +130,6 @@ void CCalculation::CalculationCollectionRot2D(float& fMyRot, float fRotAim, floa
 		fMyRot -= D3DX_PI * 2;
 	}
 	else if (fMyRot <= -D3DX_PI + fCameraRot)
-	 
 	{//-3.14→3.14にする
 		fMyRot += D3DX_PI * 2;
 	}
@@ -185,11 +183,11 @@ bool CCalculation::CaluclationMove(bool bUseStick, D3DXVECTOR3& Move, float fSpe
 		//カメラを基準に向きを決める
 		if (bUseStick == true)
 		{
-			fRot = fCameraRot + CManager::GetInputJoypad()->GetLStickAimRot();
+			fRot = fCameraRot + CManager::GetInputJoypad()->GetLStickAimRot() + D3DX_PI;
 		}
 		else
 		{
-			fRot = atan2f(fMoveX, fMoveZ) + fCameraRot;
+			fRot = atan2f(fMoveX, fMoveZ) + fCameraRot + D3DX_PI;
 		}
 		switch (MoveAim)
 		{
@@ -198,8 +196,8 @@ bool CCalculation::CaluclationMove(bool bUseStick, D3DXVECTOR3& Move, float fSpe
 			Move.y = cosf(fRot) * fSpeed;
 			break;
 		case MOVEAIM_XZ:
-			Move.x = sinf(fRot) * fSpeed;
-			Move.z = cosf(fRot) * fSpeed;
+			Move.x = sinf(fRot - D3DX_PI) * fSpeed;
+			Move.z = cosf(fRot - D3DX_PI) * fSpeed;
 			break;
 		case MOVEAIM_ZY:
 			Move.z = sinf(fRot) * fSpeed;
@@ -323,6 +321,11 @@ bool CCalculation::CalcRaySphere(D3DXVECTOR3 LayPos, D3DXVECTOR3 LayVec, D3DXVEC
 	float A = LayVec.x * LayVec.x + LayVec.y * LayVec.y + LayVec.z * LayVec.z;
 	float B = LayVec.x * SphereSenterPos.x + LayVec.y * SphereSenterPos.y + LayVec.z * SphereSenterPos.z;
 	float C = SphereSenterPos.x * SphereSenterPos.x + SphereSenterPos.y * SphereSenterPos.y + SphereSenterPos.z * SphereSenterPos.z - r * r;
+	
+	CManager::GetDebugProc()->PrintDebugProc("A = %f\n", A);
+	CManager::GetDebugProc()->PrintDebugProc("B = %f\n", B);
+	CManager::GetDebugProc()->PrintDebugProc("C = %f\n", C);
+
 
 	if (A == 0.0f)
 		return false; // レイの長さが0
@@ -331,9 +334,14 @@ bool CCalculation::CalcRaySphere(D3DXVECTOR3 LayPos, D3DXVECTOR3 LayVec, D3DXVEC
 	if (s < 0.0f)
 		return false; // 衝突していない
 
+	CManager::GetDebugProc()->PrintDebugProc("s = %f\n", s);
+
 	s = sqrtf(s);
 	float a1 = (B - s) / A;
 	float a2 = (B + s) / A;
+
+	CManager::GetDebugProc()->PrintDebugProc("a1 = %f\n", a1);
+	CManager::GetDebugProc()->PrintDebugProc("a2 = %f\n", a2);
 
 	if (a1 < 0.0f || a2 < 0.0f)
 		return false; // レイの反対で衝突
@@ -342,11 +350,13 @@ bool CCalculation::CalcRaySphere(D3DXVECTOR3 LayPos, D3DXVECTOR3 LayVec, D3DXVEC
 	CollisionStartPos.x = LayPos.x + a1 * LayVec.x;
 	CollisionStartPos.y = LayPos.y + a1 * LayVec.y;
 	CollisionStartPos.z = LayPos.z + a1 * LayVec.z;
+	CManager::GetDebugProc()->PrintDebugProc("レイ貫通開始位置： %f %f %f\n",CollisionStartPos.x,CollisionStartPos.y,CollisionStartPos.z);
 
 	//衝突終了位置を求める
 	CollisoinEndPos.x = LayPos.x + a2 * LayVec.x;
 	CollisoinEndPos.y = LayPos.y + a2 * LayVec.y;
 	CollisoinEndPos.z = LayPos.z + a2 * LayVec.z;
+	CManager::GetDebugProc()->PrintDebugProc("レイ貫通終了位置： %f %f %f\n", CollisoinEndPos.x, CollisoinEndPos.y, CollisoinEndPos.z);
 
 	return true;
 }

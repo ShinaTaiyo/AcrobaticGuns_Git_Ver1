@@ -20,7 +20,7 @@
 //===============================================================
 //コンストラクタ
 //===============================================================
-CLockon::CLockon() : m_LockOnPos(NULL_VECTOR3)
+CLockon::CLockon() : m_LockOnPos(NULL_VECTOR3),m_NowRay(NULL_VECTOR3),m_FrontPos(NULL_VECTOR3)
 {
 
 }
@@ -59,11 +59,18 @@ void CLockon::Uninit()
 //===============================================================
 void CLockon::Update()
 {
+	D3DXVECTOR3 Rot = GetRot();
+	Rot.z += 0.01f;
+	SetRot(Rot);
+
 	//移動処理
 	MoveProcess();
 
 	//レイの処理
 	SearchProcess();
+
+	//レイを計算する
+	CalcRay();
 
 	//オブジェクト2D更新処理
 	CObject2D::Update();
@@ -146,5 +153,29 @@ void CLockon::SearchProcess()
 
 	CManager::GetDebugProc()->PrintDebugProc("床または壁との交点：%f %f %f\n", m_LockOnPos.x, m_LockOnPos.y, m_LockOnPos.z);
 
+}
+//==============================================================================================================
+
+//===============================================================
+//レイを計算する
+//===============================================================
+void CLockon::CalcRay()
+{
+	D3DXVECTOR3 FarPos = NULL_VECTOR3; //奥
+	D3DXVECTOR3 Ray = NULL_VECTOR3;    //レイ
+	//============================================
+	//カメラ手前と奥のワールド座標を求める
+	//============================================
+	CCalculation::CalcScreenToWorld(&m_FrontPos, int(GetPos().x), int(GetPos().y), 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT,
+		CManager::GetCamera()->GetMtxView(), CManager::GetCamera()->GetMtxProjection());//手前
+
+	CCalculation::CalcScreenToWorld(&FarPos, int(GetPos().x), int(GetPos().y), 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT,
+		CManager::GetCamera()->GetMtxView(), CManager::GetCamera()->GetMtxProjection());//奥
+	//============================================================================================================================
+
+	m_NowRay = FarPos - m_FrontPos;//ベクトルを求める
+	D3DXVec3Normalize(&m_NowRay, &m_NowRay);//正規化
+
+	CManager::GetDebugProc()->PrintDebugProc("レイの向き：%f %f %f\n", m_NowRay.x, m_NowRay.y, m_NowRay.z);
 }
 //==============================================================================================================

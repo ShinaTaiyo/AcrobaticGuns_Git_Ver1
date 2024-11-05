@@ -32,6 +32,8 @@ public:
 	static CLockon* Create(D3DXVECTOR3 Pos,CObject2D::POLYGONTYPE PolygonType,float fWidth,float fHeight,D3DXCOLOR col);//生成処理
 
 	const D3DXVECTOR3& GetLockOnPos() const { return m_LockOnPos; }//狙っている位置を取得する
+	const D3DXVECTOR3& GetNowRay() const { return m_NowRay; }      //現在のレイを取得する
+	const D3DXVECTOR3& GetFrontPos() const { return m_FrontPos; }  //手前の位置を取得する
 private:
 	//=======================================
 	//静的メンバ
@@ -43,6 +45,8 @@ private:
 	//変数
 	//=======================================
 	D3DXVECTOR3 m_LockOnPos;//狙っている位置
+	D3DXVECTOR3 m_NowRay;   //現在のレイ
+	D3DXVECTOR3 m_FrontPos; //手前の位置
 	//==========================================================================================================
 
 	//=======================================
@@ -50,6 +54,7 @@ private:
 	//=======================================
 	void MoveProcess();//移動処理
 	void SearchProcess();//カーソルの先にあるオブジェクトをサーチする
+	void CalcRay();//レイを計算する
 	//==========================================================================================================
 
 
