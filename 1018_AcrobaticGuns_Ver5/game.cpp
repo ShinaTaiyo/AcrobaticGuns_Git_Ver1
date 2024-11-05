@@ -56,7 +56,7 @@ HRESULT CGame::Init()
 	m_pPlayer->SetUseDeath(false);
 
 	CEnemy::Create(CEnemy::ENEMYTYPE::NORMAL, 100, D3DXVECTOR3(0.0f, 200.0f, 200.0f), NULL_VECTOR3, ONE_VECTOR3 * 4);
-	//CEnemy::Create(CEnemy::ENEMYTYPE::NORMAL, 100, D3DXVECTOR3(200.0f, 0.0f, 200.0f), NULL_VECTOR3, ONE_VECTOR3 * 2);
+	CEnemy::Create(CEnemy::ENEMYTYPE::NORMAL, 100, D3DXVECTOR3(200.0f, 0.0f, 200.0f), NULL_VECTOR3, ONE_VECTOR3 * 2);
 	//CEnemy::Create(CEnemy::ENEMYTYPE::NORMAL, 100, D3DXVECTOR3(-200.0f, 0.0f, 200.0f), NULL_VECTOR3, ONE_VECTOR3 * 2);
 
 	m_pStageManager = CStageManager::Create();

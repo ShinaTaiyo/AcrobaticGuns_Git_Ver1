@@ -20,6 +20,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream> //ファイル入出力で使う
+#include <algorithm>
 #include <vector>
 #include <iomanip>// setprecisionを使用するのに必要
 using namespace std;

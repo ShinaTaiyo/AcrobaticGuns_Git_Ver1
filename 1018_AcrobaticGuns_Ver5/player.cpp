@@ -216,8 +216,6 @@ void CPlayer::NormalAttackProcess()
     D3DXVECTOR3 Move = NULL_VECTOR3;
     D3DXVECTOR3 NearPos = NULL_VECTOR3;
     D3DXVECTOR3 ShotPos = GetPos() + D3DXVECTOR3(0.0f, GetSize().y, 0.0f);
-    D3DXVECTOR3 Ray = NULL_VECTOR3;    //レイの方向
-    D3DXVECTOR3 RightRay = NULL_VECTOR3;//右端のレイの方向
     //============================================================================================================================
    
     ////射影空間の奥と手前のレイを求める
@@ -277,15 +275,20 @@ D3DXVECTOR3& CPlayer::CalcAttackMove(const D3DXVECTOR3& ShotPos, const D3DXVECTO
             {
                 CEnemy* pEnemy = (CEnemy*)pObj;
                 //指定したモデルの位置
-                bCollision = CCalculation::CalcRaySphere(NearPos, Ray, pEnemy->GetSenterPos(), pEnemy->GetSize().y, CollisionStartPos, CollisionEndPos);
+                //bCollision = CCollision::RayIntersectsAABB(NearPos, Ray, pEnemy->GetVtxMax() + pEnemy->GetPos(),pEnemy->GetVtxMin() + pEnemy->GetPos());
+                bCollision = CCollision::RayIntersectsAABBCollisionPos(NearPos, Ray, pEnemy->GetVtxMin() + pEnemy->GetPos(),pEnemy->GetVtxMax() + pEnemy->GetPos(),
+                    CollisionStartPos);
+                //bCollision = CCalculation::CalcRaySphere(NearPos, Ray, pEnemy->GetSenterPos(), pEnemy->GetSize().y, CollisionStartPos, CollisionEndPos);
 
                 if (bCollision == true)
                 {//レイとサイズ/２分の球の当たり判定成功
                     CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 20, 30.0f, 30.0f, 100, 10, false, CollisionStartPos, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f), true);
 
-                    CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 20, 30.0f, 30.0f, 100, 10, false, CollisionEndPos, D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f), true);
+                    CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 20, 30.0f, 30.0f, 100, 10, false, CollisionStartPos, D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f), true);
 
-                    VecCollisionSuccess.push_back(pEnemy->GetSenterPos());//当たり判定が成功したオブジェクトの中心点を保存する 
+                    CManager::GetDebugProc()->PrintDebugProc("衝突した位置：%f %f %f\n", CollisionStartPos.x, CollisionStartPos.y, CollisionStartPos.z);
+
+                    VecCollisionSuccess.push_back(CollisionStartPos);//当たり判定が成功したオブジェクトの中心点を保存する 
                     CManager::GetDebugProc()->PrintDebugProc("判定成功したかどうか:%d\n",bCollision);
                 }
             }

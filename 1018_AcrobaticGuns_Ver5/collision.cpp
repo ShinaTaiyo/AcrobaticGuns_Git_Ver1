@@ -9,7 +9,9 @@
 //インクルード
 //================================================================
 #include "collision.h"
+#include "manager.h"
 #include "calculation.h"
+#include "debugproc.h"
 //====================================================================================================================
 
 //================================================================
@@ -394,5 +396,78 @@ bool CCollision::ExtrusionCollisionSquareZ(D3DXVECTOR3& MyPos, const D3DXVECTOR3
 		return true;
 	}
 	return bCollisionZ;
+}
+//====================================================================================================================
+
+//================================================================
+//レイとAABBの当たり判定
+//================================================================
+bool CCollision::RayIntersectsAABB(const D3DXVECTOR3& rayOrigin, const D3DXVECTOR3& rayDir, const D3DXVECTOR3& boxMin, const D3DXVECTOR3& boxMax)
+{
+	float tMin = 0.0f;
+	float tMax = std::numeric_limits<float>::infinity();
+
+	for (int i = 0; i < 3; i++) {
+		if (rayDir[i] != 0) {
+			float t1 = (boxMin[i] - rayOrigin[i]) / rayDir[i];
+			float t2 = (boxMax[i] - rayOrigin[i]) / rayDir[i];
+			if (t1 > t2) std::swap(t1, t2);
+
+			tMin = (std::max)(tMin, t1);
+			tMax = (std::min)(tMax, t2);
+
+			if (tMin > tMax) {
+				return false; // No intersection
+			}
+		}
+		else if (rayOrigin[i] < boxMin[i] || rayOrigin[i] > boxMax[i]) {
+			return false; // No intersection if the ray is parallel and outside the box
+		}
+	}
+
+	return true; // The ray intersects the AABB}
+}
+//====================================================================================================================
+
+//================================================================
+//レイとAABBの当たり判定、判定箇所も求める
+//================================================================
+bool CCollision::RayIntersectsAABBCollisionPos(const D3DXVECTOR3& origin, const D3DXVECTOR3& direction, const D3DXVECTOR3& min, const D3DXVECTOR3& max,
+	D3DXVECTOR3& CollisionPos)
+{
+	float tmin = (min.x - origin.x) / direction.x;
+	float tmax = (max.x - origin.x) / direction.x;
+
+	float t = 0.0f;
+
+	if (tmin > tmax) std::swap(tmin, tmax);
+
+	float tymin = (min.y - origin.y) / direction.y;
+	float tymax = (max.y - origin.y) / direction.y;
+
+	if (tymin > tymax) std::swap(tymin, tymax);
+
+	if ((tmin > tymax) || (tymin > tmax)) return false;
+
+	if (tymin > tmin) tmin = tymin;
+	if (tymax < tmax) tmax = tymax;
+
+	float tzmin = (min.z - origin.z) / direction.z;
+	float tzmax = (max.z - origin.z) / direction.z;
+
+	if (tzmin > tzmax) std::swap(tzmin, tzmax);
+
+	if ((tmin > tzmax) || (tzmin > tmax)) return false;
+
+	if (tzmin > tmin) tmin = tzmin;
+	if (tzmax < tmax) tmax = tzmax;
+
+	t = tmin;
+
+	//衝突したことが確定したので、衝突位置を求める（tには、レイがAABBとの衝突点の最小距離が入っている）
+	CollisionPos = D3DXVECTOR3(origin.x + direction.x * t,
+		origin.y + direction.y * t,
+		origin.z + direction.z * t);
+	return true;
 }
 //====================================================================================================================
