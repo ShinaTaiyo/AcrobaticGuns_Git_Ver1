@@ -22,6 +22,15 @@
 class CLockon : public CObject2D
 {
 public:
+	enum class ENDSTATE
+	{
+		NONE = 0,
+		RIGHTEND,
+		LEFTEND,
+		UPEND,
+		DOWNEND,
+		MAX
+	};
 	CLockon();     //描画順設定用コンストラクタ
 	~CLockon() override;       //デストラクタ
 	HRESULT Init() override;     //初期化処理
@@ -47,6 +56,7 @@ private:
 	D3DXVECTOR3 m_LockOnPos;//狙っている位置
 	D3DXVECTOR3 m_NowRay;   //現在のレイ
 	D3DXVECTOR3 m_FrontPos; //手前の位置
+	ENDSTATE m_EndState;    //どの端にいるか
 	//==========================================================================================================
 
 	//=======================================

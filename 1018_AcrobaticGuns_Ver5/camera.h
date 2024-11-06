@@ -41,7 +41,8 @@ public:
 	void SetCamera();     //カメラの設定
 
 	void SetPosR(D3DXVECTOR3 PosR) { m_PosR = PosR; }  //注視点を設定する
-	D3DXVECTOR3& GetRot() { return m_Rot; }             //向きを取得する
+	void SetRot(const D3DXVECTOR3 Rot) { m_Rot = Rot; }//向きを設定
+	const D3DXVECTOR3& GetRot() const{ return m_Rot; } //向きを取得する
 	void SetShake(int nShakeFrame, float fShakePower); //カメラの揺れを設定する
 	CAMERATYPE GetCameraType() { return m_CameraType; }//カメラタイプを取得する
 	void SetCameraType(CAMERATYPE type) { m_CameraType = type; m_ModeTime = 0; }//カメラタイプを設定する

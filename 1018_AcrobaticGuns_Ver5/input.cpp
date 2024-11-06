@@ -359,7 +359,7 @@ bool CInputJoypad::GetRT_Repeat(const int nRepeatLoop)
 //==================================================================================
 //Lスティックのプレス情報の取得（ジョイパッドクラス）
 //==================================================================================
-bool CInputJoypad::GetLStickPress(const int nDivisionRot)
+bool CInputJoypad::GetLStickPress(const int nDivisionRot,float fDirectionRot)
 {
 	float LX = m_joykeyStatePress.Gamepad.sThumbLX;
 	float LY = m_joykeyStatePress.Gamepad.sThumbLY;
@@ -387,12 +387,12 @@ bool CInputJoypad::GetLStickPress(const int nDivisionRot)
 	float fRangeRotB = 0.0f;
 	for (int nCnt = 0; nCnt < nDivisionRot; nCnt++)
 	{
-		fRangeRotA = fDivRot * nCnt - D3DX_PI - fDivRot * 0.5f;
-		fRangeRotB = fDivRot * (nCnt + 1) - D3DX_PI - fDivRot * 0.5f;
+		fRangeRotA = fDivRot * nCnt - D3DX_PI - fDivRot * 0.5f + fDirectionRot;
+		fRangeRotB = fDivRot * (nCnt + 1) - D3DX_PI - fDivRot * 0.5f + fDirectionRot;
 
 		if (fAimRot >= fRangeRotA && fAimRot <= fRangeRotB)
 		{
-			fAimRot = fDivRot * nCnt - D3DX_PI;
+			fAimRot = fDivRot * nCnt - D3DX_PI + fDirectionRot;
 			bSuccessDivision = true;
 			break;
 		}
@@ -400,7 +400,7 @@ bool CInputJoypad::GetLStickPress(const int nDivisionRot)
 
 	if (bSuccessDivision == false)
 	{
-		fAimRot = fDivRot * nDivisionRot - D3DX_PI;
+		fAimRot = fDivRot * nDivisionRot - D3DX_PI + fDirectionRot;
 	}
 
 	//============================================================================================================

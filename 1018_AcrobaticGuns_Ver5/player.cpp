@@ -83,6 +83,9 @@ void CPlayer::Update()
     //移動処理
     MoveProcess();
 
+    //向き調整処理
+    AdjustRot();
+
     //更新処理
     CObjectXAlive::Update();
 
@@ -175,21 +178,17 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
 void CPlayer::MoveProcess()
 {
     const D3DXVECTOR3& Pos = GetPos();
-    const D3DXVECTOR3& Rot = GetRot();
-    D3DXVECTOR3 CalRot = Rot;
     float fRotDiff = 0.0f;//向きの差分
     const D3DXVECTOR3 & Move = GetMove();
     D3DXVECTOR3 AddMove = NULL_VECTOR3;
     bool bMove = false;//移動しているかどうか
     bMove = CCalculation::CaluclationMove(true,AddMove, 10.0f, CCalculation::MOVEAIM_XZ,m_fRotAim);
-    CCalculation::CalculationCollectionRot2D(CalRot.y, m_fRotAim, 0.25f);
+    //CCalculation::CalculationCollectionRot2D(CalRot.y, m_fRotAim, 0.25f);
     
     //CManager::GetInputJoypad()->GetLStickPress();
 
     SetMove(AddMove + D3DXVECTOR3(0.0f,Move.y,0.0f));
-    SetRot(CalRot);
     CManager::GetDebugProc()->PrintDebugProc("プレイヤーの位置：%f %f %f\n",Pos.x,Pos.y,Pos.z);
-    CManager::GetDebugProc()->PrintDebugProc("向き：%f\n",Rot.y);
     CManager::GetDebugProc()->PrintDebugProc("目的の向き：%f\n", m_fRotAim);
 }
 //==========================================================================================================
@@ -271,7 +270,7 @@ D3DXVECTOR3& CPlayer::CalcAttackMove(const D3DXVECTOR3& ShotPos, const D3DXVECTO
         {
             CObject* pNext = pObj->GetNextObject();//次のオブジェクトのポインタを取得
 
-            if (pObj->GetType() == CObject::TYPE_ENEMY)
+            if (pObj->GetType() == CObject::TYPE_ENEMY || pObj->GetType() == CObject::TYPE_BLOCK)
             {
                 CEnemy* pEnemy = (CEnemy*)pObj;
                 //指定したモデルの位置
@@ -432,5 +431,16 @@ void CPlayer::LockOnProcess()
 void CPlayer::LockOnMove()
 {
 
+}
+//==========================================================================================================
+
+//========================================================
+//向き調整処理
+//========================================================
+void CPlayer::AdjustRot()
+{
+    D3DXVECTOR3& Rot = GetRot();
+    const D3DXVECTOR3& CameraRot = CManager::GetCamera()->GetRot();
+    SetRot(D3DXVECTOR3(0.0f,D3DX_PI + CameraRot.y,0.0f));
 }
 //==========================================================================================================

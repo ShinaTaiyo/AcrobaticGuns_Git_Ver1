@@ -20,7 +20,7 @@
 //===============================================================
 //コンストラクタ
 //===============================================================
-CLockon::CLockon() : m_LockOnPos(NULL_VECTOR3),m_NowRay(NULL_VECTOR3),m_FrontPos(NULL_VECTOR3)
+CLockon::CLockon() : m_LockOnPos(NULL_VECTOR3),m_NowRay(NULL_VECTOR3),m_FrontPos(NULL_VECTOR3),m_EndState(ENDSTATE::NONE)
 {
 
 }
@@ -129,15 +129,44 @@ CLockon* CLockon::Create(D3DXVECTOR3 Pos, CObject2D::POLYGONTYPE PolygonType, fl
 void CLockon::MoveProcess()
 {
 	D3DXVECTOR3 Pos = GetPos();
+	const D3DXVECTOR3& CameraRot = CManager::GetCamera()->GetRot();
+
+	m_EndState = ENDSTATE::NONE;
+
 	if (CManager::GetInputJoypad()->GetRStickPress(16) == true)
 	{
 		Pos.x += sinf(CManager::GetInputJoypad()->GetRStickAimRot()) * m_fNORMAL_LOCKONMOVE;
 		Pos.y += cosf(CManager::GetInputJoypad()->GetRStickAimRot()) * -m_fNORMAL_LOCKONMOVE;
+	}
 
-		SetPos(Pos);
+	if (Pos.x + GetWidth() * 0.5f > SCREEN_WIDTH)
+	{//右
+		Pos.x = SCREEN_WIDTH - GetWidth() * 0.5f;
+		m_EndState = ENDSTATE::RIGHTEND;
+		CManager::GetCamera()->SetRot(CameraRot + D3DXVECTOR3(0.0f, 0.01f, 0.0f));
+	}
+	if (Pos.x - GetWidth() * 0.5f < 0.0f)
+	{//左
+		Pos.x = 0.0f + GetWidth() * 0.5f;
+		m_EndState = ENDSTATE::LEFTEND;
+		CManager::GetCamera()->SetRot(CameraRot + D3DXVECTOR3(0.0f, -0.01f, 0.0f));
+
+	}
+
+	if (Pos.y + GetHeight() * 0.5f > SCREEN_HEIGHT)
+	{//上
+		Pos.y = SCREEN_HEIGHT - GetHeight() * 0.5f;
+		m_EndState = ENDSTATE::UPEND;
+	}
+	if (Pos.y - GetHeight() * 0.5f < 0.0f)
+	{//下
+		Pos.y = 0.0f + GetHeight() * 0.5f;
+		m_EndState = ENDSTATE::DOWNEND;
 	}
 
 
+
+	SetPos(Pos);
 }
 //==============================================================================================================
 

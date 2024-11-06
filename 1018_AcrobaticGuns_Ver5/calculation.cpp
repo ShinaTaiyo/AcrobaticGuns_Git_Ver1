@@ -176,7 +176,7 @@ bool CCalculation::CaluclationMove(bool bUseStick, D3DXVECTOR3& Move, float fSpe
 	}
 	else
 	{
-		bMove = CManager::GetInputJoypad()->GetLStickPress(8);
+		bMove = CManager::GetInputJoypad()->GetLStickPress(2,D3DX_PI * 0.5f);
 	}
 	if (bMove == true)
 	{//ˆÚ“®ó‘Ô‚È‚ç

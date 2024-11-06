@@ -103,7 +103,7 @@ public:
 	bool GetRT_Trigger();                                                 //Rトリガーボタンのトリガー情報
  	bool GetRT_Press();                                                   //Rトリガーボタンのプレス情報
 	bool GetRT_Repeat(const int nRepeatLoop);                                   //Rトリガーボタンのリピート情報
-	bool GetLStickPress(const int nDivisionRot);                          //Lスティックのプレス情報
+	bool GetLStickPress(const int nDivisionRot,float fDirectionRot);                          //Lスティックのプレス情報
 	bool GetRStickPress(const int nDivisionRot);                          //Rスティックのプレス情報
 
 	const float & GetLStickAimRot() const { return m_fLSitckAimRot; }     //Lスティックの目的の角度を取得する
