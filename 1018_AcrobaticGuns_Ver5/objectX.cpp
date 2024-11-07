@@ -31,7 +31,7 @@ m_bUseAddScaling(false),m_bUseShadow(false),m_nChengeColorTime(0),m_nIndexObject
 m_nTypeNum(0), m_bUseMultiScale(false), m_MultiScale(NULL_VECTOR3),m_bUseCulling(false), m_Pos(NULL_VECTOR3), m_SupportPos(NULL_VECTOR3),
 m_PosOld(NULL_VECTOR3),m_Rot(NULL_VECTOR3),m_Scale(NULL_VECTOR3),m_FormarScale(NULL_VECTOR3),m_Size(NULL_VECTOR3),m_VtxMin(NULL_VECTOR3),
 m_OriginVtxMin(NULL_VECTOR3),m_VtxMax(NULL_VECTOR3),m_OriginVtxMax(NULL_VECTOR3),m_mtxWorld(),m_AddRot(NULL_VECTOR3),m_SenterPos(NULL_VECTOR3),
-m_AddScale(NULL_VECTOR3)
+m_AddScale(NULL_VECTOR3),m_fAxis(0.0f),m_VecAxis(D3DXVECTOR3(0.0f,1.0f,0.0f))
 {
 	SetObjectType(CObject::OBJECTTYPE::OBJECTTYPE_X);
 }
@@ -114,6 +114,9 @@ void CObjectX::Uninit()
 //================================================
 void CObjectX::Update()
 {
+
+	//m_fAxis += 0.01f;
+
 	//==============================================
 	//中心点を求める
 	//==============================================
@@ -181,7 +184,9 @@ void CObjectX::Update()
 void CObjectX::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice(); //デバイスへのポインタと取得
-	D3DXMATRIX mtxRot, mtxTrans, mtxScale;                  //計算用マトリックス
+	D3DXMATRIX mtxRot, mtxTrans, mtxScale;                            //計算用マトリックス
+	D3DXQUATERNION quat;                                              //クォータニオン
+	D3DXVECTOR3 vecAxis = D3DXVECTOR3(0.0f, 0.0, 1.0f);               //回転軸
 	D3DMATERIAL9 matDef;                                              //現在のマテリアル保存用
 	D3DXMATERIAL* pMat;                                               //マテリアルデータへのポインタ
 
@@ -198,6 +203,12 @@ void CObjectX::Draw()
 	//向きを反映
 	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_Rot.y, m_Rot.x, m_Rot.z);
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
+
+	////クォータニオン生成
+	//D3DXQuaternionRotationAxis(&quat, &m_VecAxis,m_fAxis);
+	//D3DXMatrixRotationQuaternion(&mtxRot, &quat);
+	//D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
+
 
 	//位置を反映
 	D3DXMatrixTranslation(&mtxTrans, m_Pos.x, m_Pos.y, m_Pos.z);

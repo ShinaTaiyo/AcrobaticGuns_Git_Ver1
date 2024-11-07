@@ -102,6 +102,13 @@ public:
 	void SetUseAddRot(bool bUse, D3DXVECTOR3 Rot) { m_bUseAddRot = bUse; m_AddRot = Rot;}
 	bool& GetUseAddRot() { return m_bUseAddRot; }//向きの加算を使用しているかどうか
 	D3DXVECTOR3& GetAddRot() { return m_AddRot; }//向きの加算量を取得
+
+	//クォータニオン
+	void SetAxis(float fAxis) { m_fAxis = fAxis; }//回転角を設定
+	const float& GetAxis() const { return m_fAxis; }//回転角を取得 
+	void SetVecAxis(D3DXVECTOR3 VecAxis) { m_VecAxis = VecAxis; }//回転軸を設定
+	const D3DXVECTOR3& GetVecAxis() const { return m_VecAxis; }  //回転軸を取得
+
 	//============================================================================================================
 
 	//==========================================================
@@ -192,6 +199,12 @@ public:
 	//=================================================================================================================
 private:
 	void DrawShadow();                                                       //影を描画する
+
+	//==========================================================
+	//クォータニオン
+	//==========================================================
+    float m_fAxis;//クォータニオンの回転角
+	D3DXVECTOR3 m_VecAxis;//クォータニオンの回転軸
 
 	//==========================================================
 	//位置

@@ -248,7 +248,7 @@ void CLockon::RayCollisionToObject()
 					CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 20, 30.0f, 30.0f, 100, 10, false, CollisionStartPos, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f), true);
 					CManager::GetDebugProc()->PrintDebugProc("衝突した位置：%f %f %f\n", CollisionStartPos.x, CollisionStartPos.y, CollisionStartPos.z);
 
-					//敵の中心点のスクリーン座標を求める
+					//敵の最大頂点のスクリーン座標を求める
 					D3DXVECTOR3 ScreenPos = CCalculation::CalcWorldToScreenNoViewport(pObjX->GetSenterPos(), *CManager::GetCamera()->GetMtxView(), *CManager::GetCamera()->GetMtxProjection(),
 						float(SCREEN_WIDTH), float(SCREEN_HEIGHT));
 
@@ -256,7 +256,7 @@ void CLockon::RayCollisionToObject()
 					CParticle2D::Create(ScreenPos, D3DXVECTOR3(sinf(fRot) * 10.0f, cosf(fRot) * 10.0f, 0.0f), NULL_VECTOR3, CObject2D::POLYGONTYPE01_SENTERROLLING,
 						15, 55.0f, 55.0f, CCalculation::CalRaibowColor());
 
-					VecCollisionSuccess.push_back(CollisionStartPos);//当たり判定が成功したオブジェクトの中心点を保存する 
+					VecCollisionSuccess.push_back(CollisionStartPos);//当たり判定が成功したオブジェクトの判定開始位置を保存する
 					CManager::GetDebugProc()->PrintDebugProc("判定成功したかどうか:%d\n", bCollision);
 				}
 			}

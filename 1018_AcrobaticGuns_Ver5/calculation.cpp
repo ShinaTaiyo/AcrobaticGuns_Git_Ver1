@@ -444,6 +444,46 @@ bool CCalculation::CalcMatchRay(D3DXVECTOR3 AimPos, float fSx, float fSy, int nS
 //===========================================================================================================
 
 //=========================================================
+//点と辺の距離を求める
+//=========================================================
+float CCalculation::pointLineDistance(float cx, float cy, float x1, float y1, float x2, float y2)
+{
+	float dx = x2 - x1;
+	float dy = y2 - y1;
+
+	// 円の中心から辺の端点までのベクトルを計算
+	float t = ((cx - x1) * dx + (cy - y1) * dy) / (dx * dx + dy * dy);
+
+	// tの範囲を[0, 1]に制限し、円の中心に最も近い点を見つける
+	t = (std::max)(0.0f, (std::min)(1.0f, t));
+
+	// 最短距離を計算
+	float closestX = x1 + t * dx;
+	float closestY = y1 + t * dy;
+	float distanceX = cx - closestX;
+	float distanceY = cy - closestY;
+
+	return std::sqrt(distanceX * distanceX + distanceY * distanceY);
+}
+//===========================================================================================================
+
+//=========================================================
+//正方形と円の当たり判定（2D)
+//=========================================================
+bool CCalculation::checkCollisionCircleRectangle(float cx, float cy, float r, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)
+{
+	// 四角形の各辺に対して円との距離を計算
+	if (pointLineDistance(cx, cy, x1, y1, x2, y2) <= r) return true;
+	if (pointLineDistance(cx, cy, x2, y2, x3, y3) <= r) return true;
+	if (pointLineDistance(cx, cy, x3, y3, x4, y4) <= r) return true;
+	if (pointLineDistance(cx, cy, x4, y4, x1, y1) <= r) return true;
+
+	// どの辺とも当たっていない場合はfalse
+	return false;
+}
+//===========================================================================================================
+
+//=========================================================
 //桁数を計算する
 //=========================================================
 int CCalculation::CalculationDigit(int nNum)

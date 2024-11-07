@@ -85,6 +85,14 @@ public:
 	//目的の物体とレイの向きが一致しているかどうかを判定
 	static bool CalcMatchRay(D3DXVECTOR3 AimPos, float fSx, float fSy, int nScreen_w, int nScreen_h, D3DXMATRIX* View, D3DXMATRIX * Prj);
 
+	//点と四角形の各辺との距離を求める
+	static float pointLineDistance(float cx, float cy, float x1, float y1, float x2, float y2);
+
+	//四角形と円の当たり判定
+	static bool checkCollisionCircleRectangle(float cx, float cy, float r,
+		float x1, float y1, float x2, float y2,
+		float x3, float y3, float x4, float y4);
+
 	static int CalculationDigit(int nNum);//桁数を計算する
 	//=============================================================================================================
 private:
