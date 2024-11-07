@@ -461,7 +461,7 @@ CStageManager* CStageManager::Create()
 		{
 			pStageManager->Init();                                                                                           //初期化処理
 			pStageManager->SetUseDeath(false);                                                                        //死亡フラグを発動するかどうかを設定する
-			pStageManager->CObject::SetType(CObject::TYPE_STAGEMANAGER);                                                     //オブジェクトの種類を決める   
+			pStageManager->CObject::SetType(CObject::TYPE::STAGEMANAGER);                                                     //オブジェクトの種類を決める   
 		}
 	}
 	else

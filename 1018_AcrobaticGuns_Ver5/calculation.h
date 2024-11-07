@@ -47,6 +47,8 @@ public:
 	static bool CaluclationMove(bool bUseStick,D3DXVECTOR3& Move, float fSpeed, MOVEAIM MoveAim,float & fRot);//移動に使う処理の角度を求める
 	static D3DXVECTOR3 Calculation3DVec(D3DXVECTOR3 MyPos, D3DXVECTOR3 AimPos, float fSpeed);  //目的への移動量を求める
 
+	static D3DXCOLOR CalRaibowColor();
+
 	// スクリーン座標をワールド座標に変換
 	static D3DXVECTOR3* CalcScreenToWorld(D3DXVECTOR3* pout,
 		int Sx,  // スクリーンX座標
@@ -58,6 +60,8 @@ public:
 		D3DXMATRIX* Prj
 	);
 
+	//ワールド座標をスクリーン座標に変換
+	static D3DXVECTOR3 CalcWorldToScreenNoViewport(D3DXVECTOR3 worldPos, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, float screenWidth, float screenHeight);
 	// XZ平面とスクリーン座標の交点算出関数
 	static D3DXVECTOR3* CalcScreenToXZ(
 		D3DXVECTOR3* pout,

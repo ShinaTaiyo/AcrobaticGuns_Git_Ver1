@@ -136,7 +136,7 @@ void CBg::Create(BG type)
 			pBg->CObject2D::BindTexture(pTextureClass->GetAddress(pBg->GetTextureIndex()));
 			pBg->CObject2D::SetPos(SENTER_VECTOR3);//ポリゴンとテクスチャ情報を設定
 			pBg->m_Type = type;  //弾の種類
-			pBg->CObject::SetType(CObject::TYPE_BG);//オブジェクの種類を決める
+			pBg->CObject::SetType(CObject::TYPE::BG);//オブジェクの種類を決める
 		}
 	}
 	else
@@ -235,7 +235,7 @@ CBgTitle* CBgTitle::Create(BG type)
 			pBgTitle->CObject2D::BindTexture(pTextureClass->GetAddress(pBgTitle->GetTextureIndex()));
 			pBgTitle->CObject2D::SetPos(SENTER_VECTOR3);//ポリゴンとテクスチャ情報を設定
 			pBgTitle->SetBgType(type);                  //背景の種類を設定
-			pBgTitle->CObject::SetType(CObject::TYPE_BG);//オブジェクの種類を決める
+			pBgTitle->CObject::SetType(CObject::TYPE::BG);//オブジェクの種類を決める
 
 		}
 	}
@@ -336,7 +336,7 @@ CBgDifficulty* CBgDifficulty::Create(BG type)
 			pBgDifficulty->CObject2D::BindTexture(pTextureClass->GetAddress(pBgDifficulty->GetTextureIndex()));
 			pBgDifficulty->CObject2D::SetPos(SENTER_VECTOR3);//ポリゴンとテクスチャ情報を設定
 			pBgDifficulty->SetBgType(type);                  //背景の種類を設定
-			pBgDifficulty->CObject::SetType(CObject::TYPE_BG);//オブジェクの種類を決める
+			pBgDifficulty->CObject::SetType(CObject::TYPE::BG);//オブジェクの種類を決める
 		}
 	}
 	else

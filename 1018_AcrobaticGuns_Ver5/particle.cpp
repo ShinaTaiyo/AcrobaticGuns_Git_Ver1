@@ -261,7 +261,7 @@ CParticle* CParticle::Create(TYPE Type, int nLife, float fWidth, float fHeight, 
 			pParticle->SetSupportPos(pos);                                                                 //召喚位置を設定
 			pParticle->SetSize(fWidth, fHeight);                                         //サイズを設定する
 			pParticle->SetColor(col);                                                    //色合いを設定
-			pParticle->CObject::SetType(CObject::TYPE_PARTICLE);                         //オブジェクトの種類を決める
+			pParticle->CObject::SetType(CObject::TYPE::PARTICLE);                         //オブジェクトの種類を決める
 			pParticle->SetAnimInfo(1, 1, col, false);                                    //アニメーション情報を設定
 		}
 	}

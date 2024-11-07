@@ -17,12 +17,13 @@
 #include "dinput.h"//入力処理に必要
 #include "Xinput.h"//ジョイパッドの処理に必要
 #include "xaudio2.h"//サウンド処理に必要
-#include <iostream>
-#include <fstream>
+#include <iostream> //標準入出力
+#include <fstream> //ファイル入出力で使う
 #include <sstream> //ファイル入出力で使う
 #include <algorithm>
-#include <vector>
+#include <vector> //ベクター管理で使う
 #include <iomanip>// setprecisionを使用するのに必要
+
 using namespace std;
 
 //==============================

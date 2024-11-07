@@ -155,7 +155,7 @@ CFade* CFade::Create()
 			pFade->SetInfo(1, 1, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, D3DXCOLOR(0.0f,0.0f, 0.0f,1.0f),POLYGONTYPE00_NORMAL,false);//ポリゴン情報を設定
 			pFade->SetPos(SENTER_VECTOR3);                                                                                        //中心に位置を設定
 			pFade->m_nMaxFadeCnt = 45;                                                                                           //フェードカウント最大値
-			pFade->CObject::SetType(CObject::TYPE_FADE);                                                                          //オブジェクトの種類を決める
+			pFade->CObject::SetType(CObject::TYPE::FADE);                                                                          //オブジェクトの種類を決める
 		}
 	}
 	else
@@ -264,7 +264,7 @@ CSceneFade* CSceneFade::Create()
 			pSceneFade->SetInfo(1, 1, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f), POLYGONTYPE00_NORMAL, false);//ポリゴン情報を設定
 			pSceneFade->SetPos(SENTER_VECTOR3);                                                                                        //中心に位置を設定
 			pSceneFade->SetMaxFadeCnt(45);                                                                                           //フェードカウント最大値
-			pSceneFade->CObject::SetType(CObject::TYPE_FADE);                                                                          //オブジェクトの種類を決める
+			pSceneFade->CObject::SetType(CObject::TYPE::FADE);                                                                          //オブジェクトの種類を決める
 		}
 	}
 	else
@@ -381,7 +381,7 @@ CDirectionFade* CDirectionFade::Create()
 			pDirectionFade->SetInfo(1, 1, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f), POLYGONTYPE00_NORMAL, false);//ポリゴン情報を設定
 			pDirectionFade->SetPos(SENTER_VECTOR3);                                                                                        //中心に位置を設定
 			pDirectionFade->SetMaxFadeCnt(45);                                                                                           //フェードカウント最大値
-			pDirectionFade->CObject::SetType(CObject::TYPE_FADE);                                                                          //オブジェクトの種類を決める
+			pDirectionFade->CObject::SetType(CObject::TYPE::FADE);                                                                          //オブジェクトの種類を決める
 		}
 	}
 	else

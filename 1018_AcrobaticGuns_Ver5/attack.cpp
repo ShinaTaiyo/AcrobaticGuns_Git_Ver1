@@ -94,7 +94,7 @@ CAttack* CAttack::Create(ATTACKTYPE AttackType, int nLife, D3DXVECTOR3 pos, D3DX
 	CAttack* pAttack = DBG_NEW CAttack;     //生成
 
 	pAttack->Init();                        //初期化処理
-	pAttack->SetType(CObject::TYPE_ATTACK); //オブジェクトごとのタイプを設定する
+	pAttack->SetType(CObject::TYPE::ATTACK); //オブジェクトごとのタイプを設定する
 	pAttack->SetAttackType(AttackType);     //攻撃の種類を設定する
 	pAttack->SetLife(nLife);                //体力を設定
 	pAttack->SetMaxLife(nLife);             //最大体力を設定
@@ -192,7 +192,7 @@ CAttackPlayer* CAttackPlayer::Create(ATTACKTYPE AttackType, int nLife, D3DXVECTO
 	CAttackPlayer* pAttackPlayer = DBG_NEW CAttackPlayer;     //生成
 
 	pAttackPlayer->Init();                        //初期化処理
-	pAttackPlayer->SetType(CObject::TYPE_ATTACK); //オブジェクトごとのタイプを設定する
+	pAttackPlayer->SetType(CObject::TYPE::ATTACK); //オブジェクトごとのタイプを設定する
 	pAttackPlayer->SetAttackType(AttackType);     //攻撃の種類を設定する
 	pAttackPlayer->SetLife(nLife);                //体力を設定
 	pAttackPlayer->SetMaxLife(nLife);             //最大体力を設定
@@ -289,7 +289,7 @@ CAttackEnemy* CAttackEnemy::Create(ATTACKTYPE AttackType, int nLife, D3DXVECTOR3
 	CAttackEnemy* pAttackEnemy = DBG_NEW CAttackEnemy;     //生成
 
 	pAttackEnemy->Init();                        //初期化処理
-	pAttackEnemy->SetType(CObject::TYPE_ATTACK); //オブジェクトごとのタイプを設定する
+	pAttackEnemy->SetType(CObject::TYPE::ATTACK); //オブジェクトごとのタイプを設定する
 	pAttackEnemy->SetAttackType(AttackType);     //攻撃の種類を設定する
 	pAttackEnemy->SetLife(nLife);                //体力を設定
 	pAttackEnemy->SetMaxLife(nLife);             //最大体力を設定

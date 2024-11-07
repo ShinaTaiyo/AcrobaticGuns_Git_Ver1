@@ -245,6 +245,19 @@ D3DXVECTOR3 CCalculation::Calculation3DVec(D3DXVECTOR3 MyPos, D3DXVECTOR3 AimPos
 //===========================================================================================================
 
 //=========================================================
+//虹色を計算する
+//=========================================================
+D3DXCOLOR CCalculation::CalRaibowColor()
+{
+	D3DXCOLOR RaibowColor = NORMAL_COL;
+	RaibowColor.r = float(rand() % 100 + 1) / 100;
+	RaibowColor.g = float(rand() % 100 + 1) / 100;
+	RaibowColor.b = float(rand() % 100 + 1) / 100;
+	return RaibowColor;
+}
+//===========================================================================================================
+
+//=========================================================
 // スクリーン座標をワールド座標に変換
 //=========================================================
 D3DXVECTOR3* CCalculation::CalcScreenToWorld(D3DXVECTOR3* pout, int Sx, int Sy, float fZ, int Screen_w, int Screen_h, D3DXMATRIX* View, D3DXMATRIX* Prj)
@@ -266,6 +279,36 @@ D3DXVECTOR3* CCalculation::CalcScreenToWorld(D3DXVECTOR3* pout, int Sx, int Sy, 
 	D3DXVec3TransformCoord(pout, &MyPos, &tmp);     //位置を求める
 	CManager::GetDebugProc()->PrintDebugProc("カーソルのワールド座標：%f %f %f\n", pout->x, pout->y, pout->z);
 	return pout;
+}
+//===========================================================================================================
+
+//=========================================================
+// ワールド座標をスクリーン座標に変換する
+//=========================================================
+D3DXVECTOR3 CCalculation::CalcWorldToScreenNoViewport(D3DXVECTOR3 worldPos, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, float screenWidth, float screenHeight)
+{
+	//ワールド座標をクリップ座標に変換
+	D3DXVECTOR4 ClipSpacePos;
+	D3DXMATRIX mtxTrans;
+
+	mtxTrans = viewMatrix * projectionMatrix;
+	D3DXVec3Transform(&ClipSpacePos, &worldPos, &mtxTrans);
+
+	//透視除算（クリップ座標からNDC空間へ）
+	if (ClipSpacePos.w != 0.0f)
+	{
+		ClipSpacePos.x /= ClipSpacePos.w;
+		ClipSpacePos.y /= ClipSpacePos.w;
+		ClipSpacePos.z /= ClipSpacePos.w;
+	}
+
+	//スクリーン座標へ変換
+	D3DXVECTOR3 ScreenPos;
+	ScreenPos.x = (ClipSpacePos.x * 0.5f + 0.5f) * screenWidth;
+	ScreenPos.y = (1.0f - (ClipSpacePos.y * 0.5f + 0.5f)) * screenHeight;
+	ScreenPos.z = ClipSpacePos.z;//深度値（０～１）の範囲
+
+	return ScreenPos;
 }
 //===========================================================================================================
 

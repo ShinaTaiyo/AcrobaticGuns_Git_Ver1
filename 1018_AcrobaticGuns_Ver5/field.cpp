@@ -114,7 +114,7 @@ CField* CField::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHe
 			pField->SetUseDeath(true);                                                                  //死亡フラグを発動するかどうかを設定する
 			pField->SetTextureIndex(CManager::GetTexture()->Regist(m_apFIELD_FILENAME[FieldType]));     //テクスチャインデックスを設定
 			pField->bindTexture(CManager::GetTexture()->GetAddress(pField->GetTextureIndex()));         //テクスチャをセットする　
-			pField->CObject::SetType(CObject::TYPE_FIELD);                                              //オブジェクトの種類を決める
+			pField->CObject::SetType(CObject::TYPE::FIELD);                                              //オブジェクトの種類を決める
 			pField->CObject3D::SetWidth(fWidth);                                                        //横幅
 			pField->CObject3D::SetHeight(fHeight);                                                      //高さ
 		}

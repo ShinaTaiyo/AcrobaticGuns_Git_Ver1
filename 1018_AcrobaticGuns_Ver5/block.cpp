@@ -131,7 +131,7 @@ CBlock* CBlock::Create(BLOCKTYPE type, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 r
 			pBlock->SetSupportPos(pos);                   //設置位置
 			pBlock->CObjectX::SetPos(pos);                //オブジェクトXの位置を設定
 			pBlock->SetPosOld(pos);                       //1f前の位置を設定
-			pBlock->CObject::SetType(CObject::TYPE_BLOCK);//オブジェクトの種類を決める
+			pBlock->CObject::SetType(CObject::TYPE::BLOCK);//オブジェクトの種類を決める
 			pBlock->SetScale(scale);                      //オブジェクトの拡大率
 			pBlock->SetFormarScale(scale);                //元の拡大率を設定する
 			nIdx = CManager::GetObjectXInfo()->Regist(m_BLOCK_FILENAME[(int)(type)]);
@@ -202,7 +202,7 @@ void CBlock::Collision()
 			CObject::TYPE type = pObj->GetType();
 
 			//オブジェクトの種類が敵だったら
-			if (type == CObject::TYPE_PLAYER || type == CObject::TYPE_ENEMY)
+			if (type == CObject::TYPE::PLAYER || type == CObject::TYPE::ENEMY)
 			{
 				ComparisonPos.x = (float)(floor(((CObjectX*)pObj)->GetPos().x));                   //位置を取得
 				ComparisonPos.y = (float)(floor(((CObjectX*)pObj)->GetPos().y));                   //位置を取得
@@ -359,7 +359,7 @@ void CBlock::LandingCorrection(D3DXVECTOR3& Pos, CObject* pSaveObj,D3DXVECTOR3 V
 	{
 		//種類の取得
 		type = pSaveObj->GetType();
-		if (type == CObject::TYPE_BLOCK)
+		if (type == CObject::TYPE::BLOCK)
 		{
 			CBlock* pBlock = (CBlock*)pSaveObj;
 

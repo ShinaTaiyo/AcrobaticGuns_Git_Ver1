@@ -100,7 +100,7 @@ CEnemy* CEnemy::Create(ENEMYTYPE Type, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 r
 		CManager::GetObjectXInfo()->GetTexture(nIdx),
 		CManager::GetObjectXInfo()->GetColorValue(nIdx));
 
-	pEnemy->SetType(CObject::TYPE_ENEMY);//オブジェクトタイプを設定
+	pEnemy->SetType(CObject::TYPE::ENEMY);//オブジェクトタイプを設定
 	pEnemy->SetEnemyType(Type);//敵の種類を設定
 	pEnemy->SetLife(nLife);    //体力
 	pEnemy->SetMaxLife(nLife); //最大体力

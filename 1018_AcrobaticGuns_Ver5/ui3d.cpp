@@ -85,7 +85,7 @@ CUi3D* CUi3D::Create(UI3DTYPE type, D3DXVECTOR3 Pos, D3DXVECTOR3 Move, int nLife
 	CTexture* pTexture = CManager::GetTexture();
 
 	pUi3D->Init();
-	pUi3D->SetType(CObject::TYPE_UI3D);
+	pUi3D->SetType(CObject::TYPE::UI3D);
 
 	pUi3D->SetTextureIndex(pTexture->Regist(m_UI3D_FILENAME[type]));
 	pUi3D->bindTexture(pTexture->GetAddress(pUi3D->GetTextureIndex()));

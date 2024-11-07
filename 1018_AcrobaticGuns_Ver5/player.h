@@ -60,9 +60,7 @@ private:
 	//=============================
 	//通常攻撃処理
 	//=============================
-	D3DXVECTOR3 CalcRay(D3DXVECTOR3 & NearPos);//レイを測る
-	D3DXVECTOR3 & CalcAttackMove(const D3DXVECTOR3& ShotPos,const D3DXVECTOR3 & NearPos,const D3DXVECTOR3& Ray,D3DXVECTOR3 & Move);
-	void AttackStart(const D3DXVECTOR3& ShotPos, const D3DXVECTOR3& Move, const D3DXVECTOR3& Rot);
+	void AttackStart();
 
 	//判定
 	void CollisionBlock();//ブロックとの当たり判定処理
@@ -70,6 +68,9 @@ private:
 	//ロックオンコントローラー
 	void LockOnProcess();//ロックオンの処理
 	void LockOnMove();   //ロックオンを動かす
+
+	//攻撃処理
+	//void CalcWorldToScreenEnemyLength();//
 
 	//向き調整
 	void AdjustRot();//向き調整処理

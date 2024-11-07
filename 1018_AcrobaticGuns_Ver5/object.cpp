@@ -33,7 +33,7 @@ bool CObject::m_bActivationReleaseAll = false;            //ReleaseAllを発動する
 //コンストラクタ（描画順設定用）
 //=====================================================
 CObject::CObject(int nPriority) : m_bUseInitialSound(true) ,m_ObjectType(OBJECTTYPE::OBJECTTYPE_2D),m_bIsStageManagerObj(false),m_nID(0),m_nStageManagerObjNum(0),m_pStageManagerObj_Next(nullptr),
-m_pStageManagerObj_Prev(nullptr), m_bStageManagerChooseState(false),m_type(TYPE_NONE),m_bDeath(false), m_bUseDeath(false),m_pPrev(nullptr),m_pNext(nullptr),
+m_pStageManagerObj_Prev(nullptr), m_bStageManagerChooseState(false),m_type(TYPE::NONE),m_bDeath(false), m_bUseDeath(false),m_pPrev(nullptr),m_pNext(nullptr),
 m_nPriority(0),m_bCreateSuccess(false),m_nCntFrame(0),m_ManagerObjectType(MANAGEROBJECTTYPE_NONE)
 {
 	m_nPriority = nPriority;                        //描画順の情報を送る

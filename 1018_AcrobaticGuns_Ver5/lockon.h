@@ -43,6 +43,7 @@ public:
 	const D3DXVECTOR3& GetLockOnPos() const { return m_LockOnPos; }//狙っている位置を取得する
 	const D3DXVECTOR3& GetNowRay() const { return m_NowRay; }      //現在のレイを取得する
 	const D3DXVECTOR3& GetFrontPos() const { return m_FrontPos; }  //手前の位置を取得する
+	const D3DXVECTOR3& GetNearRayColObjPos() const { return m_NearRayColObjPos; }//レイが当たった一番近いオブジェクトの衝突位置を求める
 private:
 	//=======================================
 	//静的メンバ
@@ -57,14 +58,16 @@ private:
 	D3DXVECTOR3 m_NowRay;   //現在のレイ
 	D3DXVECTOR3 m_FrontPos; //手前の位置
 	ENDSTATE m_EndState;    //どの端にいるか
+	D3DXVECTOR3 m_NearRayColObjPos;//一番近いオブジェクトのレイが当たっている位置を求める
 	//==========================================================================================================
 
 	//=======================================
 	//プロトタイプ宣言
 	//=======================================
 	void MoveProcess();//移動処理
-	void SearchProcess();//カーソルの先にあるオブジェクトをサーチする
+	void BackWallRayCollisionPosSearch();//レイが当たっている奥の壁の位置をサーチ
 	void CalcRay();//レイを計算する
+	void RayCollisionToObject();//どのオブジェクトにレイが当たっているかを求める	
 	//==========================================================================================================
 
 

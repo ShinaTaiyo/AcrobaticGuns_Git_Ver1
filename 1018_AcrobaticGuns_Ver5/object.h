@@ -24,24 +24,25 @@ public:
 	//===========================
 	//オブジェクト種類列挙型
 	//===========================
-	typedef enum
+	enum class TYPE
 	{
-		TYPE_NONE,            //タイプなし
-		TYPE_PLAYER,          //プレイヤー3
-		TYPE_ENEMY,           //敵2
-		TYPE_BULLET,          //弾4
-		TYPE_BLOCK,           //ブロック0
-		TYPE_BG,              //背景
-		TYPE_FIELD,           //床
-		TYPE_STAGEMANAGER,    //ステージマネージャー
-		TYPE_FADE,            //フェード4
-		TYPE_ATTACK,          //攻撃
-		TYPE_BGMODEL,         //背景モデル
-		TYPE_UI3D,            //UI3D
-		TYPE_LOCKON,          //ロックオン
-		TYPE_PARTICLE,        //パーティクル
-		TYPE_MAX
-	}TYPE;
+		NONE,            //タイプなし
+		PLAYER,          //プレイヤー3
+		ENEMY,           //敵2
+		BULLET,          //弾4
+		BLOCK,           //ブロック0
+		BG,              //背景
+		FIELD,           //床
+		STAGEMANAGER,    //ステージマネージャー
+		FADE,            //フェード4
+		ATTACK,          //攻撃
+		BGMODEL,         //背景モデル
+		UI3D,            //UI3D
+		LOCKON,          //ロックオン
+		PARTICLE,        //パーティクル
+	    PARTICLE2D,      //パーティクル２D
+		MAX
+	};
 	//===========================================
 
 	//====================================================
