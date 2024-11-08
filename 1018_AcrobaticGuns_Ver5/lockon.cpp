@@ -19,6 +19,7 @@
 #include "calculation.h"
 #include "objectX.h"
 #include "debugproc.h"
+#include "ui.h"
 //==============================================================================================================
 
 //===============================================================
@@ -184,8 +185,8 @@ void CLockon::BackWallRayCollisionPosSearch()
 {
 	D3DXVECTOR3 Pos = GetPos();//位置
 
-	CCalculation::CalcScreenToXZ(&m_LockOnPos, int(Pos.x), int(Pos.y), SCREEN_WIDTH, SCREEN_HEIGHT,
-		CManager::GetCamera()->GetMtxView(), CManager::GetCamera()->GetMtxProjection());
+	CCalculation::CalcScreenToWorld(&m_LockOnPos,int(GetPos().x),int(GetPos().y), 1.0f,SCREEN_WIDTH,SCREEN_HEIGHT,CManager::GetCamera()->GetMtxView(),
+		CManager::GetCamera()->GetMtxProjection()); //（椎名）多分描画範囲の一番奥の位置
 	CManager::GetDebugProc()->PrintDebugProc("床または壁との交点：%f %f %f\n", m_LockOnPos.x, m_LockOnPos.y, m_LockOnPos.z);
 
 }
@@ -238,10 +239,8 @@ void CLockon::RayCollisionToObject()
 			{
 				CObjectX* pObjX = (CObjectX*)pObj;
 				//指定したモデルの位置
-				//bCollision = CCollision::RayIntersectsAABB(NearPos, Ray, pEnemy->GetVtxMax() + pEnemy->GetPos(),pEnemy->GetVtxMin() + pEnemy->GetPos());
 				bCollision = CCollision::RayIntersectsAABBCollisionPos(m_FrontPos, m_NowRay, pObjX->GetVtxMin() + pObjX->GetPos(), pObjX->GetVtxMax() + pObjX->GetPos(),
 					CollisionStartPos);
-				//bCollision = CCalculation::CalcRaySphere(NearPos, Ray, pEnemy->GetSenterPos(), pEnemy->GetSize().y, CollisionStartPos, CollisionEndPos);
 
 				if (bCollision == true)
 				{//レイとサイズ/２分の球の当たり判定成功

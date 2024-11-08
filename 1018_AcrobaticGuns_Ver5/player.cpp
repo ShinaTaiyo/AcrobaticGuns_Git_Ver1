@@ -24,6 +24,7 @@
 #include "enemy.h"
 #include "lockon.h"
 #include "particle.h"
+#include "ui.h"
 #include "particle2d.h"
 #include "debugproc.h"
 #include "collision.h"

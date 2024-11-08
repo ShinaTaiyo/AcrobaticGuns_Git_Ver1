@@ -277,7 +277,6 @@ D3DXVECTOR3* CCalculation::CalcScreenToWorld(D3DXVECTOR3* pout, int Sx, int Sy, 
 	// 逆変換
 	D3DXMATRIX tmp = InvViewport * InvPrj * InvView;//ワールド座標を求める
 	D3DXVec3TransformCoord(pout, &MyPos, &tmp);     //位置を求める
-	CManager::GetDebugProc()->PrintDebugProc("カーソルのワールド座標：%f %f %f\n", pout->x, pout->y, pout->z);
 	return pout;
 }
 //===========================================================================================================
@@ -345,8 +344,8 @@ D3DXVECTOR3* CCalculation::CalcScreenToXZ(D3DXVECTOR3* pout, int Sx, int Sy, int
 	* pout = farpos;
 	bCross = false;
 	//}
-	CManager::GetDebugProc()->PrintDebugProc("レイの向き：%f %f %f\n", ray.x, ray.y, ray.z);
-	CManager::GetDebugProc()->PrintDebugProc("レイが床と交差しているかどうか：%d\n", bCross);
+	//CManager::GetDebugProc()->PrintDebugProc("レイの向き：%f %f %f\n", ray.x, ray.y, ray.z);
+	//CManager::GetDebugProc()->PrintDebugProc("レイが床と交差しているかどうか：%d\n", bCross);
 
 	return pout;
 }
