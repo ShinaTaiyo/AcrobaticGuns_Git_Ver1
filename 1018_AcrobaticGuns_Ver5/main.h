@@ -45,10 +45,7 @@ using namespace std;
 //3Dで追加するマクロ定義
 #define FVF_VERTEX_3D (D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1)
 
-#define NULL_VECTOR3 (D3DXVECTOR3(0.0f,0.0f,0.0f))                            //初期化用
 #define NORMAL_COL (D3DXCOLOR(1.0f,1.0f,1.0f,1.0f))                           //普通の色
-#define ONE_VECTOR3 (D3DXVECTOR3(1.0f,1.0f,1.0f) )                            //全部1.0f
-#define SENTER_VECTOR3 (D3DXVECTOR3(SCREEN_WIDTH / 2,SCREEN_HEIGHT / 2,0.0f)) //Windowの中心
 
 //==================================================
 //メモリリーク検出用

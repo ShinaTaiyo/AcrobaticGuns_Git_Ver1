@@ -154,10 +154,10 @@ void CBgModel::LoadInfoTxt(fstream& LoadingFile, vector<CObject*>& VecSaveManage
 {
 	int nType = 0;//Ží—Þ
 	int nLife = 0;//‘Ì—Í
-	D3DXVECTOR3 Move = NULL_VECTOR3;  //ˆÚ“®—Ê
-	D3DXVECTOR3 Pos = NULL_VECTOR3;   //ˆÊ’u
-	D3DXVECTOR3 Scale = NULL_VECTOR3; //Šg‘å—¦
-	D3DXVECTOR3 Rot = NULL_VECTOR3;   //Œü‚«
+	D3DXVECTOR3 Move = D3DXVECTOR3(0.0f,0.0f,0.0f);  //ˆÚ“®—Ê
+	D3DXVECTOR3 Pos = D3DXVECTOR3(0.0f,0.0f,0.0f);   //ˆÊ’u
+	D3DXVECTOR3 Scale = D3DXVECTOR3(0.0f,0.0f,0.0f); //Šg‘å—¦
+	D3DXVECTOR3 Rot = D3DXVECTOR3(0.0f,0.0f,0.0f);   //Œü‚«
 	BGMODELTYPE Type = {};            //”wŒiƒ‚ƒfƒ‹‚ÌŽí—Þ
 	while (Buff != "END_SETBGMODEL")
 	{

@@ -28,8 +28,8 @@ m_fAddCurveLength(0.0f),m_fAddGravity(0.0f),m_fAddRot(0.0f),m_fAddScale(0.0f),m_
 m_fFormarWidth(0.0f),m_fGravity(0.0f),m_fGravityPower(0.0f),m_fHeight(0.0f),m_fPolygonRotPower(0.0f),m_fRotMove(0.0f),m_fScale(0.0f),m_fSpeed(0.0f),m_fStartRot(0.0f),
 m_fSupportCurveLength(0.0f),m_fWidth(0.0f),m_nMaxAnimationPattern(0),m_nAnimationChange(0),m_nAnimationCnt(0),m_nCntTime(0),m_nLife(0),m_nMaxLife(0),m_nSetEffectLife(0),
 m_nTextureIndex(0),m_pMtxParent(nullptr),m_nAnimaionPattern(0), m_nCntBlinkingFrame(0), m_nMaxBlinkingFrame(0), m_bBlinkingAim(false), m_bUseBlinking(false), 
-m_fLimitBlinkingRatio(0.0f),m_Pos(NULL_VECTOR3),m_PosOld(NULL_VECTOR3),m_SupportPos(NULL_VECTOR3),m_Move(NULL_VECTOR3),m_Rot(NULL_VECTOR3), m_mtxWorld(),
-m_Col(NORMAL_COL),m_SetEffectCol(NORMAL_COL),m_SetEffectSize(D3DXVECTOR2(0.0f,0.0f)),m_TransPos(NULL_VECTOR3)
+m_fLimitBlinkingRatio(0.0f),m_Pos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_PosOld(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_SupportPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Move(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Rot(D3DXVECTOR3(0.0f,0.0f,0.0f)), m_mtxWorld(),
+m_Col(D3DXCOLOR(1.0f,1.0f,1.0f,1.0f)),m_SetEffectCol(D3DXCOLOR(1.0f,1.0f,1.0f,1.0f)),m_SetEffectSize(D3DXVECTOR2(0.0f,0.0f)),m_TransPos(D3DXVECTOR3(0.0f,0.0f,0.0f))
 {
 	m_pTexture = nullptr;
 	m_pVtxBuff = nullptr;
@@ -54,14 +54,14 @@ HRESULT CBillboard::Init(void)
 
 	m_Col = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);//色合い
 
-	m_Pos = NULL_VECTOR3;                     //位置
-	m_PosOld = NULL_VECTOR3;                  //1f前の位置
-	m_SupportPos = NULL_VECTOR3;              //召喚位置
-	m_Rot = NULL_VECTOR3;                     //向き
-	m_Move = NULL_VECTOR3;                    //移動量
+	m_Pos = D3DXVECTOR3(0.0f,0.0f,0.0f);                     //位置
+	m_PosOld = D3DXVECTOR3(0.0f,0.0f,0.0f);                  //1f前の位置
+	m_SupportPos = D3DXVECTOR3(0.0f,0.0f,0.0f);              //召喚位置
+	m_Rot = D3DXVECTOR3(0.0f,0.0f,0.0f);                     //向き
+	m_Move = D3DXVECTOR3(0.0f,0.0f,0.0f);                    //移動量
 	m_mtxWorld = {};                          //マトリックスワールド
-	m_TransPos = NULL_VECTOR3;                //子マトリックスを使用している場合のワールド座標
-	m_SetEffectCol = NORMAL_COL;              //設定するエフェクトの色合い
+	m_TransPos = D3DXVECTOR3(0.0f,0.0f,0.0f);                //子マトリックスを使用している場合のワールド座標
+	m_SetEffectCol = D3DXCOLOR(1.0f,1.0f,1.0f,1.0f);              //設定するエフェクトの色合い
 	m_SetEffectSize = D3DXVECTOR2(0.0f, 0.0f);//設定するエフェクトのサイズ
 
 	m_bDraw = true;                           //基本的には描画する
@@ -83,10 +83,10 @@ HRESULT CBillboard::Init(void)
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 	//頂点座標の設定（初期位置）
-	pVtx[0].pos = NULL_VECTOR3;
-	pVtx[1].pos = NULL_VECTOR3;
-	pVtx[2].pos = NULL_VECTOR3;
-	pVtx[3].pos = NULL_VECTOR3;
+	pVtx[0].pos = D3DXVECTOR3(0.0f,0.0f,0.0f);
+	pVtx[1].pos = D3DXVECTOR3(0.0f,0.0f,0.0f);
+	pVtx[2].pos = D3DXVECTOR3(0.0f,0.0f,0.0f);
+	pVtx[3].pos = D3DXVECTOR3(0.0f,0.0f,0.0f);
 
 	//norの設定（初期設定）
 	pVtx[0].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
@@ -424,9 +424,9 @@ void CBillboard::bindTexture(LPDIRECT3DTEXTURE9 pTexture)
 //==================================================
 bool CBillboard::CollisionSquare(D3DXVECTOR3 pos, D3DXVECTOR3 VtxMax, D3DXVECTOR3 VtxMin)
 {
-	D3DXVECTOR3 ComparisonPos = NULL_VECTOR3;
-	D3DXVECTOR3 ComparisonVtxMin = NULL_VECTOR3;
-	D3DXVECTOR3 ComparisonVtxMax = NULL_VECTOR3;
+	D3DXVECTOR3 ComparisonPos = D3DXVECTOR3(0.0f,0.0f,0.0f);
+	D3DXVECTOR3 ComparisonVtxMin = D3DXVECTOR3(0.0f,0.0f,0.0f);
+	D3DXVECTOR3 ComparisonVtxMax = D3DXVECTOR3(0.0f,0.0f,0.0f);
 
 	ComparisonPos.x = (float)(floor(pos.x));
 	ComparisonPos.y = (float)(floor(pos.y));
@@ -605,7 +605,7 @@ void CBillboard::HormingProcess()
 	float fVXaim = 0.0f;  //Xベクトル
 	float fVYaim = 0.0f;  //Yベクトル
 	float fVLaim = 0.0f;  //総合ベクトル
-	D3DXVECTOR3 TargetPos = NULL_VECTOR3;//ターゲットの位置
+	D3DXVECTOR3 TargetPos = D3DXVECTOR3(0.0f,0.0f,0.0f);//ターゲットの位置
 	//===================================
 	//XZベクトルを出す
 	//===================================

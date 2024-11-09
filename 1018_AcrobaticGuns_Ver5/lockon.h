@@ -44,6 +44,7 @@ public:
 	const D3DXVECTOR3& GetNowRay() const { return m_NowRay; }      //現在のレイを取得する
 	const D3DXVECTOR3& GetFrontPos() const { return m_FrontPos; }  //手前の位置を取得する
 	const D3DXVECTOR3& GetNearRayColObjPos() const { return m_NearRayColObjPos; }//レイが当たった一番近いオブジェクトの衝突位置を求める
+	const ENDSTATE& GetEndState() const { return m_EndState; }     //ロックオンが画面内のどの端に当たっているかを取得する
 private:
 	//=======================================
 	//静的メンバ

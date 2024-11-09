@@ -219,8 +219,8 @@ bool CCalculation::CaluclationMove(bool bUseStick, D3DXVECTOR3& Move, float fSpe
 D3DXVECTOR3 CCalculation::Calculation3DVec(D3DXVECTOR3 MyPos, D3DXVECTOR3 AimPos, float fSpeed)
 
 {
-	D3DXVECTOR3 VecAim = NULL_VECTOR3;       //それぞれの方向のベクトル
-	D3DXVECTOR3 ResultMove = NULL_VECTOR3;   //結果の移動量
+	D3DXVECTOR3 VecAim = D3DXVECTOR3(0.0f,0.0f,0.0f);       //それぞれの方向のベクトル
+	D3DXVECTOR3 ResultMove = D3DXVECTOR3(0.0f,0.0f,0.0f);   //結果の移動量
 	float fVLaim = 0.0f;                     //総合ベクトル
 
 	//==========================
@@ -249,7 +249,7 @@ D3DXVECTOR3 CCalculation::Calculation3DVec(D3DXVECTOR3 MyPos, D3DXVECTOR3 AimPos
 //=========================================================
 D3DXCOLOR CCalculation::CalRaibowColor()
 {
-	D3DXCOLOR RaibowColor = NORMAL_COL;
+	D3DXCOLOR RaibowColor = D3DXCOLOR(1.0f,1.0f,1.0f,1.0f);
 	RaibowColor.r = float(rand() % 100 + 1) / 100;
 	RaibowColor.g = float(rand() % 100 + 1) / 100;
 	RaibowColor.b = float(rand() % 100 + 1) / 100;

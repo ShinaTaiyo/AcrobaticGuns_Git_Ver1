@@ -61,7 +61,7 @@ HRESULT CPlayer::Init()
 {
     CObjectXAlive::Init();                 //Xオブジェクト初期化
 
-    m_pLockOn = CLockon::Create(SENTER_VECTOR3, CObject2D::POLYGONTYPE01_SENTERROLLING, 100.0f, 100.0f, NORMAL_COL);
+    m_pLockOn = CLockon::Create(D3DXVECTOR3(SCREEN_WIDTH / 2,SCREEN_HEIGHT / 2,0.0f), CObject2D::POLYGONTYPE01_SENTERROLLING, 100.0f, 100.0f, D3DXCOLOR(1.0f,1.0f,1.0f,1.0f));
     m_pLockOn->SetUseDeath(true);
 
     return S_OK;
@@ -99,6 +99,9 @@ void CPlayer::Update()
 
     //ブロックとの当たり判定
     CollisionBlock();
+
+    //m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f) + m_AddPosR;
+    //m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -200.0f, 0.0f, cosf(m_Rot.y) * -200.0f);
 }
 //==========================================================================================================
 
@@ -162,6 +165,12 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
             pPlayer->SetRot(rot);                                                            //向きの設定
             pPlayer->SetScale(Scale);                                                        //拡大率の設定
             pPlayer->SetFormarScale(Scale);                                                               //元の拡大率を設定する
+
+            //カメラ初期設定（プレイヤー基準なのでプレイヤーから設定）
+            CCamera* pCamera = CManager::GetCamera();
+            pCamera->SetPosR(pPlayer->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f));
+            pCamera->SetPosV(pCamera->GetPosR() + D3DXVECTOR3(sinf(pPlayer->GetRot().y) * 200.0f, 0.0f, cosf(pPlayer->GetRot().y) * 200.0f));
+
         }
     }
     else
@@ -182,7 +191,7 @@ void CPlayer::MoveProcess()
     const D3DXVECTOR3& Pos = GetPos();
     float fRotDiff = 0.0f;//向きの差分
     const D3DXVECTOR3 & Move = GetMove();
-    D3DXVECTOR3 AddMove = NULL_VECTOR3;
+    D3DXVECTOR3 AddMove = D3DXVECTOR3(0.0f,0.0f,0.0f);
     bool bMove = false;//移動しているかどうか
     bMove = CCalculation::CaluclationMove(true,AddMove, 10.0f, CCalculation::MOVEAIM_XZ,m_fRotAim);
     //CCalculation::CalculationCollectionRot2D(CalRot.y, m_fRotAim, 0.25f);
@@ -225,7 +234,7 @@ void CPlayer::AttackStart()
     CAttackPlayer* pAttackPlayer = nullptr;//プレイヤー攻撃へのポインタ
     if (CManager::GetInputKeyboard()->GetTrigger(DIK_J) == true || CManager::GetInputJoypad()->GetRT_Repeat(6) == true)
     {
-        pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::TYPE00_BULLET, 60, ShotPos,GetRot(), Move, ONE_VECTOR3);
+        pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::TYPE00_BULLET, 60, ShotPos,GetRot(), Move, D3DXVECTOR3(1.0f,1.0f,1.0f));
         pAttackPlayer->SetUseInteria(false);
         pAttackPlayer->SetAutoSubLife(true);
     }
@@ -321,6 +330,25 @@ void CPlayer::AdjustRot()
     D3DXVECTOR3& Rot = GetRot();
     const D3DXVECTOR3& CameraRot = CManager::GetCamera()->GetRot();
     SetRot(D3DXVECTOR3(0.0f,D3DX_PI + CameraRot.y,0.0f));
+
+    //CCamera* pCaemra = CManager::GetCamera();
+    //if (m_pLockOn->GetEndState() == CLockon::ENDSTATE::RIGHTEND)
+    //{
+
+    //}
+    //SetRot(D3DXVECTOR3(0.0f, D3DX_PI + CameraRot.y, 0.0f));
+
     //SetAxis(CameraRot.y + D3DX_PI);
+}
+//==========================================================================================================
+
+//========================================================
+//位置調整処理
+//========================================================
+void CPlayer::AdjustPos()
+{
+    const D3DXVECTOR3& Pos = GetPos();
+    D3DXVECTOR3 ScreenPos = CCalculation::CalcWorldToScreenNoViewport(Pos, *CManager::GetCamera()->GetMtxView(), *CManager::GetCamera()->GetMtxView(),
+        static_cast<float>(SCREEN_WIDTH), static_cast<float>(SCREEN_HEIGHT));
 }
 //==========================================================================================================

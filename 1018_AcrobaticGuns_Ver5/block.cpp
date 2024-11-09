@@ -175,11 +175,11 @@ void CBlock::Collision()
 	//==================================
 	//オブジェクトXから情報を取得
 	//==================================
-	D3DXVECTOR3 ComparisonPos = NULL_VECTOR3;                  //判定対象の位置を取得
-	D3DXVECTOR3 ComparisonPosOld = NULL_VECTOR3;               //判定対象の1f前の位置を取得
-	D3DXVECTOR3 ComparisonVtxMax = NULL_VECTOR3;               //判定対象の最大頂点を取得
-	D3DXVECTOR3 ComparisonVtxMin = NULL_VECTOR3;               //判定対象の最小頂点を取得
-	D3DXVECTOR3 MySize = NULL_VECTOR3;
+	D3DXVECTOR3 ComparisonPos = D3DXVECTOR3(0.0f,0.0f,0.0f);                  //判定対象の位置を取得
+	D3DXVECTOR3 ComparisonPosOld = D3DXVECTOR3(0.0f,0.0f,0.0f);               //判定対象の1f前の位置を取得
+	D3DXVECTOR3 ComparisonVtxMax = D3DXVECTOR3(0.0f,0.0f,0.0f);               //判定対象の最大頂点を取得
+	D3DXVECTOR3 ComparisonVtxMin = D3DXVECTOR3(0.0f,0.0f,0.0f);               //判定対象の最小頂点を取得
+	D3DXVECTOR3 MySize = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	D3DXVECTOR3 BlockPos = GetPos();                          //ブロックの位置を取得
 	D3DXVECTOR3 BlockVtxMax = GetVtxMax();                    //ブロックの最大頂点を取得
 	D3DXVECTOR3 BlockVtxMin = GetVtxMin();                    //ブロックの最小頂点を取得
@@ -257,12 +257,12 @@ void CBlock::Collision()
 //===============================================================
 void CBlock::CollisionSquare(CObjectXAlive* pObjX)
 {
-	//D3DXVECTOR3 ComparisonPos = NULL_VECTOR3;        //比較用位置
-	//D3DXVECTOR3 ComparisonPosOld = NULL_VECTOR3;     //比較用1f前の位置
-	//D3DXVECTOR3 ComparisonVtxMax = NULL_VECTOR3;     //比較用最高頂点
-	//D3DXVECTOR3 ComparisonVtxMin = NULL_VECTOR3;     //比較用最低頂点
-	//D3DXVECTOR3 ComparisonSize = NULL_VECTOR3;       //比較サイズ
-	//D3DXVECTOR3 ComparisonMove = NULL_VECTOR3;       //比較移動量
+	//D3DXVECTOR3 ComparisonPos = D3DXVECTOR3(0.0f,0.0f,0.0f);        //比較用位置
+	//D3DXVECTOR3 ComparisonPosOld = D3DXVECTOR3(0.0f,0.0f,0.0f);     //比較用1f前の位置
+	//D3DXVECTOR3 ComparisonVtxMax = D3DXVECTOR3(0.0f,0.0f,0.0f);     //比較用最高頂点
+	//D3DXVECTOR3 ComparisonVtxMin = D3DXVECTOR3(0.0f,0.0f,0.0f);     //比較用最低頂点
+	//D3DXVECTOR3 ComparisonSize = D3DXVECTOR3(0.0f,0.0f,0.0f);       //比較サイズ
+	//D3DXVECTOR3 ComparisonMove = D3DXVECTOR3(0.0f,0.0f,0.0f);       //比較移動量
 	////==========================================================================================================
 	//bool& bIsLanding = pObjX->GetLanding();
 	//bool bIsLandingOld = pObjX->GetLanding();//1f前の着地状態
@@ -272,7 +272,7 @@ void CBlock::CollisionSquare(CObjectXAlive* pObjX)
 
 	//bool bCollision = true;//当たり判定をするかどうか
 
-	//D3DXVECTOR3 Scale = NULL_VECTOR3;
+	//D3DXVECTOR3 Scale = D3DXVECTOR3(0.0f,0.0f,0.0f);
 
 	////====================================================================
 	////判定開始
@@ -343,14 +343,14 @@ void CBlock::CollisionSquare(CObjectXAlive* pObjX)
 void CBlock::LandingCorrection(D3DXVECTOR3& Pos, CObject* pSaveObj,D3DXVECTOR3 VtxMin)
 {
 	CObject::TYPE type = (CObject::TYPE)(0);
-	D3DXVECTOR3 ComparisonPos = NULL_VECTOR3;        //比較用位置
-	D3DXVECTOR3 ComparisonPosOld = NULL_VECTOR3;     //比較用1f前の位置
-	D3DXVECTOR3 ComparisonVtxMax = NULL_VECTOR3;     //比較用最高頂点
-	D3DXVECTOR3 ComparisonVtxMin = NULL_VECTOR3;     //比較用最低頂点
-	D3DXVECTOR3 ComparisonSize = NULL_VECTOR3;       //サイズ
-	D3DXVECTOR3 ComparisonMove = NULL_VECTOR3;
+	D3DXVECTOR3 ComparisonPos = D3DXVECTOR3(0.0f,0.0f,0.0f);        //比較用位置
+	D3DXVECTOR3 ComparisonPosOld = D3DXVECTOR3(0.0f,0.0f,0.0f);     //比較用1f前の位置
+	D3DXVECTOR3 ComparisonVtxMax = D3DXVECTOR3(0.0f,0.0f,0.0f);     //比較用最高頂点
+	D3DXVECTOR3 ComparisonVtxMin = D3DXVECTOR3(0.0f,0.0f,0.0f);     //比較用最低頂点
+	D3DXVECTOR3 ComparisonSize = D3DXVECTOR3(0.0f,0.0f,0.0f);       //サイズ
+	D3DXVECTOR3 ComparisonMove = D3DXVECTOR3(0.0f,0.0f,0.0f);
 
-	D3DXVECTOR3 MyVtxMin = NULL_VECTOR3;
+	D3DXVECTOR3 MyVtxMin = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	MyVtxMin.x = (float)(floor(VtxMin.x));
 	MyVtxMin.y = (float)(floor(VtxMin.y));
 	MyVtxMin.z = (float)(floor(VtxMin.z));
@@ -470,10 +470,10 @@ void CBlock::LoadInfoTxt(fstream& LoadingFile, vector<CObject*>& VecSaveManager,
 {
 	int nType = 0;//種類
 	int nLife = 0;//体力
-	D3DXVECTOR3 Move = NULL_VECTOR3;//移動量
-	D3DXVECTOR3 Pos = NULL_VECTOR3; //位置
-	D3DXVECTOR3 Scale = NULL_VECTOR3;//拡大率
-	D3DXVECTOR3 Rot = NULL_VECTOR3; //向き
+	D3DXVECTOR3 Move = D3DXVECTOR3(0.0f,0.0f,0.0f);//移動量
+	D3DXVECTOR3 Pos = D3DXVECTOR3(0.0f,0.0f,0.0f); //位置
+	D3DXVECTOR3 Scale = D3DXVECTOR3(0.0f,0.0f,0.0f);//拡大率
+	D3DXVECTOR3 Rot = D3DXVECTOR3(0.0f,0.0f,0.0f); //向き
 	BLOCKTYPE Type = {};//ブロックの種類
 	while (Buff != "END_SETBLOCK")
 	{
@@ -544,8 +544,8 @@ void CBlock::ExtrusionCollisionX(CObjectXAlive* pMyObjX, CBlock* pBlock)
 	//D3DXVECTOR3 MyPos = pMyObjX->GetPos();
 	//const D3DXVECTOR3& Pos = pMyObjX->GetPos();              //位置を取得
 	//const D3DXVECTOR3& PosOld = pMyObjX->GetPosOld();        //1f前の位置を取得
-	//D3DXVECTOR3 MyVtxMax = NULL_VECTOR3;             //自分自身の最大頂点
-	//D3DXVECTOR3 MyVtxMin = NULL_VECTOR3;             //自分自身の最小頂点
+	//D3DXVECTOR3 MyVtxMax = D3DXVECTOR3(0.0f,0.0f,0.0f);             //自分自身の最大頂点
+	//D3DXVECTOR3 MyVtxMin = D3DXVECTOR3(0.0f,0.0f,0.0f);             //自分自身の最小頂点
 
 	//D3DXVECTOR3 ComPos = pBlock->GetPos();             //ブロックの位置
 	//D3DXVECTOR3 ComVtxMax = pBlock->GetVtxMax();       //ブロックの最大頂点
@@ -604,8 +604,8 @@ void CBlock::ExtrusionCollisionX(CObjectXAlive* pMyObjX, CBlock* pBlock)
 //=======================================================================
 void CBlock::ExtrusionCollisionY(CObjectXAlive* pMyObjX, CBlock* pBlock)
 {
-	//D3DXVECTOR3 MyVtxMax = NULL_VECTOR3;             //自分自身の最大頂点
-	//D3DXVECTOR3 MyVtxMin = NULL_VECTOR3;             //自分自身の最小頂点
+	//D3DXVECTOR3 MyVtxMax = D3DXVECTOR3(0.0f,0.0f,0.0f);             //自分自身の最大頂点
+	//D3DXVECTOR3 MyVtxMin = D3DXVECTOR3(0.0f,0.0f,0.0f);             //自分自身の最小頂点
 
 	//D3DXVECTOR3 ComPos = pBlock->GetPos();             //ブロックの位置
 	//D3DXVECTOR3 ComVtxMax = pBlock->GetVtxMax();       //ブロックの最大頂点

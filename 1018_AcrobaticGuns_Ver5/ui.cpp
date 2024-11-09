@@ -26,7 +26,7 @@ const char* CUi::m_apUI_FILENAME[int(CUi::UITYPE::MAX)] =
 //====================================================
 //コンストラクタ
 //====================================================
-CUi::CUi(int nPriority) : CObject2D(nPriority),m_MoveType(UIMOVETYPE_NORMAL),m_Type(UITYPE::LOCKON),m_bUseUiEffect(false),m_nSetUiEffectLife(0),m_SetUiEffectColor(NORMAL_COL)
+CUi::CUi(int nPriority) : CObject2D(nPriority),m_MoveType(UIMOVETYPE_NORMAL),m_Type(UITYPE::LOCKON),m_bUseUiEffect(false),m_nSetUiEffectLife(0),m_SetUiEffectColor(D3DXCOLOR(1.0f,1.0f,1.0f,1.0f))
 {
 
 }
@@ -69,7 +69,7 @@ void CUi::Update()
 
 	if (m_bUseUiEffect == true)
 	{
-		CUiEffect::Create(m_Type, GetPolygonType(), GetWidth(), GetHeight(), m_nSetUiEffectLife, GetPos(), NULL_VECTOR3, GetRot(), m_SetUiEffectColor);
+		CUiEffect::Create(m_Type, GetPolygonType(), GetWidth(), GetHeight(), m_nSetUiEffectLife, GetPos(), D3DXVECTOR3(0.0f,0.0f,0.0f), GetRot(), m_SetUiEffectColor);
 	}
 }
 //===================================================================================================

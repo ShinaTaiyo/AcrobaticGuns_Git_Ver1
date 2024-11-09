@@ -98,7 +98,7 @@ CUi3D* CUi3D::Create(UI3DTYPE type, D3DXVECTOR3 Pos, D3DXVECTOR3 Move, int nLife
 	pUi3D->SetSize(fWidth,fHeight);
 	pUi3D->SetFormarSize(fWidth, fHeight);
 
-	pUi3D->SetAnimInfo(1, 1, NORMAL_COL, false);//アニメーション情報を設定
+	pUi3D->SetAnimInfo(1, 1, D3DXCOLOR(1.0f,1.0f,1.0f,1.0f), false);//アニメーション情報を設定
 
 
 	return pUi3D;

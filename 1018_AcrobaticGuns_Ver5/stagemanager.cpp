@@ -38,7 +38,7 @@ const string CStageManager::m_aSAVE_FILENAME = "data\\TEXTFILE\\Ver2\\Practice.t
 //================================
 //コンストラクタ
 //================================
-CStageManager::CStageManager() : m_nWorldIndex(0),m_pBg3D(nullptr),m_VecObjList(),m_SaveScale(ONE_VECTOR3),m_SavePos(NULL_VECTOR3),m_SaveRot(NULL_VECTOR3)
+CStageManager::CStageManager() : m_nWorldIndex(0),m_pBg3D(nullptr),m_VecObjList(),m_SaveScale(D3DXVECTOR3(1.0f,1.0f,1.0f)),m_SavePos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_SaveRot(D3DXVECTOR3(0.0f,0.0f,0.0f))
 {
 	for (int nCnt = 0; nCnt < m_nMAX_MAP; nCnt++)
 	{
@@ -69,10 +69,10 @@ HRESULT CStageManager::Init()
 	//===========================
 	m_nMapIndex = 0;                                     //マップのインデックス
 	m_nMapNum = 0;                                       //マップの総数
-	m_SaveScale = ONE_VECTOR3;                               //拡大率
-	m_SaveRot = NULL_VECTOR3;                                //向き
-	m_SavePos = NULL_VECTOR3;                                //位置
-	m_SaveBeforeChoosePos = NULL_VECTOR3;                //選択処理をする前の位置を記憶する
+	m_SaveScale = D3DXVECTOR3(1.0f,1.0f,1.0f);                               //拡大率
+	m_SaveRot = D3DXVECTOR3(0.0f,0.0f,0.0f);                                //向き
+	m_SavePos = D3DXVECTOR3(0.0f,0.0f,0.0f);                                //位置
+	m_SaveBeforeChoosePos = D3DXVECTOR3(0.0f,0.0f,0.0f);                //選択処理をする前の位置を記憶する
  	m_pManagerObject = nullptr;                          //マネージャーに表示するオブジェクト
 	m_ManagerMode = MANAGERMODE_ALREADYSTAGE;            //現在のステージマネーシャーのモード
 
@@ -106,7 +106,7 @@ HRESULT CStageManager::Init()
 	//===========================
 	if (CScene::GetMode() == CScene::MODE_EDIT)
 	{
-		m_pManagerObject = CBlock::Create(CBlock::BLOCKTYPE00_NORMAL, 1, NULL_VECTOR3, NULL_VECTOR3, ONE_VECTOR3);
+		m_pManagerObject = CBlock::Create(CBlock::BLOCKTYPE00_NORMAL, 1, D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(1.0f,1.0f,1.0f));
 		m_pManagerObject->SetUseDeath(false);//死亡フラグをオフにする
 	}
 	//=======================================================================================
@@ -326,13 +326,13 @@ void CStageManager::LoadMapBin(int nMapNum)
 	////======================================
 	////変数宣言
 	////======================================
-	//D3DXVECTOR3 Pos = NULL_VECTOR3;
-	//D3DXVECTOR3 Scale = NULL_VECTOR3;
-	//D3DXVECTOR3 Rot = NULL_VECTOR3;
+	//D3DXVECTOR3 Pos = D3DXVECTOR3(0.0f,0.0f,0.0f);
+	//D3DXVECTOR3 Scale = D3DXVECTOR3(0.0f,0.0f,0.0f);
+	//D3DXVECTOR3 Rot = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	//int nType = 0;            //オブジェクトXごとのタイプ
 	//int nManagerType = 0;        //オブジェクトXのタイプ
 	//int nRotType = 0;         //向きのタイプ
-	//D3DXVECTOR3 move = NULL_VECTOR3;
+	//D3DXVECTOR3 move = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	//float fWidth = 0.0f;
 	//float fHeight = 0.0f;
 	//int nData = 0;
@@ -367,16 +367,16 @@ void CStageManager::LoadMapBin(int nMapNum)
 	//			//		pObject = CBlock::Create(CBlock::BLOCKTYPE(nType), 10, Pos, Rot, Scale, (CObjectX::ROTTYPE)(nRotType), m_nSetSubType);//生成処理
 	//			//		break;
 	//			//		case (int)(MANAGEROBJECT_MODEL) :
-	//			//			pObject = CModel::Create((CModel::MODELTYPE)(nType), Pos, Rot, NULL_VECTOR3, Scale, (CObjectX::ROTTYPE)(nRotType));//生成処理
+	//			//			pObject = CModel::Create((CModel::MODELTYPE)(nType), Pos, Rot, D3DXVECTOR3(0.0f,0.0f,0.0f), Scale, (CObjectX::ROTTYPE)(nRotType));//生成処理
 	//			//			break;
 	//			//				case (int)(MANAGEROBJECT_ENEMY) :
-	//			//					pObject = CEnemy::Create((CEnemy::ENEMYTYPE)(nType), 10, Pos, NULL_VECTOR3, Scale,NULL_VECTOR3,NULL_VECTOR3,ONE_VECTOR3);//生成処理
+	//			//					pObject = CEnemy::Create((CEnemy::ENEMYTYPE)(nType), 10, Pos, D3DXVECTOR3(0.0f,0.0f,0.0f), Scale,D3DXVECTOR3(0.0f,0.0f,0.0f),D3DXVECTOR3(0.0f,0.0f,0.0f),D3DXVECTOR3(1.0f,1.0f,1.0f));//生成処理
 	//			//					break;
 	//			//					case (int)(MANAGEROBJECT_ITEM) :
 	//			//						pObject = CItem::Create((CItem::ITEMTYPE)(nType), Pos, Rot, Scale, CObjectX::ROTTYPE_NORMAL);//生成処理
 	//			//						break;
 	//			//						case (int)(MANAGEROBJECT_MARKER) :
-	//			//							pObject = CMarker::Create((CMarker::MARKERTYPE)(nType),Pos,Scale, NULL_VECTOR3, 0);
+	//			//							pObject = CMarker::Create((CMarker::MARKERTYPE)(nType),Pos,Scale, D3DXVECTOR3(0.0f,0.0f,0.0f), 0);
 	//			//							break;
 	//			//							case (int)(MANAGEROBJECT_BOSS) :
 	//			//								pObject = CBoss::SetCreateBoss((CBoss::BOSSTYPE)(nType),10, Pos, Scale);
@@ -407,12 +407,12 @@ void CStageManager::SaveMapBin()
 	////======================================
 	////変数宣言
 	////======================================
-	//D3DXVECTOR3 Pos = NULL_VECTOR3;
-	//D3DXVECTOR3 Scale = NULL_VECTOR3;
-	//D3DXVECTOR3 Rot = NULL_VECTOR3;
+	//D3DXVECTOR3 Pos = D3DXVECTOR3(0.0f,0.0f,0.0f);
+	//D3DXVECTOR3 Scale = D3DXVECTOR3(0.0f,0.0f,0.0f);
+	//D3DXVECTOR3 Rot = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	//int nType = 0;             //オブジェクトXごとのタイプ
 	//int nManagerType = 0;             //オブジェクトXのタイプ
-	//D3DXVECTOR3 move = NULL_VECTOR3;
+	//D3DXVECTOR3 move = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	//float fWidth = 0.0f;
 	//float fHeight = 0.0f;
 	//FILE* pFile = fopen(SAVE_BIN, "wb");
@@ -819,13 +819,13 @@ void CStageManager::ChooseObject()
 //===========================================================
 D3DXVECTOR3 CStageManager::SizeMoveProcess(float fMoveX, float fMoveY,D3DXVECTOR3 Size)
 {
-	D3DXVECTOR3 ResultSize = NULL_VECTOR3;
+	D3DXVECTOR3 ResultSize = D3DXVECTOR3(0.0f,0.0f,0.0f);
 
 	ResultSize.x = float(floor(Size.x));
 	ResultSize.y = float(floor(Size.y));
 	ResultSize.z = float(floor(Size.z));
 
-	D3DXVECTOR3 Move = NULL_VECTOR3;
+	D3DXVECTOR3 Move = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_DOWN) == true ||
 		CManager::GetInputKeyboard()->GetTrigger(DIK_UP) == true ||
 		CManager::GetInputKeyboard()->GetTrigger(DIK_RIGHT) == true ||
@@ -856,7 +856,7 @@ void CStageManager::ResetScale()
 {
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_V) == true)
 	{
-		m_SaveScale = ONE_VECTOR3;
+		m_SaveScale = D3DXVECTOR3(1.0f,1.0f,1.0f);
 	}
 }
 //=======================================================================================================================

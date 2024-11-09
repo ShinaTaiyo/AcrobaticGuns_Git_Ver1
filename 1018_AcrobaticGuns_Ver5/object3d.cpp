@@ -16,7 +16,7 @@
 //================================================
 //コンストラクタ
 //================================================
-CObject3D::CObject3D(int nPriority) : CObject(nPriority),m_fWidth(0.0f),m_fHeight(0.0f),m_nTextureIndex(0),m_Pos(NULL_VECTOR3),m_Rot(NULL_VECTOR3),m_mtxWorld(),
+CObject3D::CObject3D(int nPriority) : CObject(nPriority),m_fWidth(0.0f),m_fHeight(0.0f),m_nTextureIndex(0),m_Pos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Rot(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_mtxWorld(),
 m_pVtxBuff(nullptr),m_pTexture(nullptr)
 {
 	m_pTexture = nullptr;
@@ -47,8 +47,8 @@ HRESULT CObject3D::Init(void)
     //=================================
 	//変数の初期化
 	//=================================
-	m_Pos = NULL_VECTOR3;                        //位置
-	m_Rot = NULL_VECTOR3;                        //向き
+	m_Pos = D3DXVECTOR3(0.0f,0.0f,0.0f);                        //位置
+	m_Rot = D3DXVECTOR3(0.0f,0.0f,0.0f);                        //向き
 	m_mtxWorld = {};                             //マトリックスワールド
 	//=======================================================================
 
@@ -72,10 +72,10 @@ HRESULT CObject3D::Init(void)
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 	//頂点座標の設定（初期位置）
-	pVtx[0].pos = NULL_VECTOR3;
-	pVtx[1].pos = NULL_VECTOR3;
-	pVtx[2].pos = NULL_VECTOR3;
-	pVtx[3].pos = NULL_VECTOR3;
+	pVtx[0].pos = D3DXVECTOR3(0.0f,0.0f,0.0f);
+	pVtx[1].pos = D3DXVECTOR3(0.0f,0.0f,0.0f);
+	pVtx[2].pos = D3DXVECTOR3(0.0f,0.0f,0.0f);
+	pVtx[3].pos = D3DXVECTOR3(0.0f,0.0f,0.0f);
 
 	//norの設定（初期設定）
 	pVtx[0].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);

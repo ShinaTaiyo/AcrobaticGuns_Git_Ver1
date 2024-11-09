@@ -27,9 +27,9 @@ const float CCamera::m_BESIDECAMERALENGTH = 570.0f;//ƒrƒTƒCƒhƒrƒ…[‚ÌƒJƒƒ‰‚Ì‹——
 //====================================================================
 //ƒRƒ“ƒXƒgƒ‰ƒNƒ^
 //====================================================================
-CCamera::CCamera() : m_SupportPos(NULL_VECTOR3),m_fLength(0.0f), m_fTurningRotSpeed(0.0f),m_fTurningSpeedY(0.0f),m_PosV(NULL_VECTOR3),
-m_PosR(NULL_VECTOR3),m_VecU(NULL_VECTOR3),m_Rot(NULL_VECTOR3),m_mtxProjection(),m_mtxView(),m_CameraType(CAMERATYPE_BIRD),m_DifferenceLength(NULL_VECTOR3),
-m_ZoomSpeed(NULL_VECTOR3),m_nShakeFrame(0),m_ModeTime(0),m_fShakePower(0.0f),m_fAddLength(0.0f),m_AddPosR(NULL_VECTOR3)
+CCamera::CCamera() : m_SupportPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_fLength(0.0f), m_fTurningRotSpeed(0.0f),m_fTurningSpeedY(0.0f),m_PosV(D3DXVECTOR3(0.0f,0.0f,0.0f)),
+m_PosR(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_VecU(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Rot(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_mtxProjection(),m_mtxView(),m_CameraType(CAMERATYPE_BIRD),m_DifferenceLength(D3DXVECTOR3(0.0f,0.0f,0.0f)),
+m_ZoomSpeed(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_nShakeFrame(0),m_ModeTime(0),m_fShakePower(0.0f),m_fAddLength(0.0f),m_AddPosR(D3DXVECTOR3(0.0f,0.0f,0.0f))
 {
 
 }
@@ -50,17 +50,17 @@ CCamera::~CCamera()
 HRESULT CCamera::Init()
 {
 	m_PosV = D3DXVECTOR3(0.0f, 200.0f,-400.0f);     //x“_
-	m_PosR = NULL_VECTOR3;                          //’‹“_
+	m_PosR = D3DXVECTOR3(0.0f,0.0f,0.0f);                          //’‹“_
 	m_VecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);         //ã•ûŒüƒxƒNƒgƒ‹i–@üj
-	m_Rot = NULL_VECTOR3;                           //Œü‚«
+	m_Rot = D3DXVECTOR3(0.0f,0.0f,0.0f);                           //Œü‚«
 	m_mtxProjection = {};                           //ƒvƒƒWƒFƒNƒVƒ‡ƒ“ƒ}ƒgƒŠƒbƒNƒX
 	m_mtxView = {};                                 //ƒrƒ…[ƒ}ƒgƒŠƒbƒNƒX
 	m_CameraType = CAMERATYPE_BIRD;                 //ƒJƒƒ‰ƒ‚[ƒh‚Ìí—Ş
 	m_nShakeFrame = 0;                              //ƒJƒƒ‰‚ğ—h‚ç‚·ƒtƒŒ[ƒ€”
 	m_fShakePower = 0.0f;                           //ƒJƒƒ‰‚ğ—h‚ç‚·—Í
-	m_DifferenceLength = NULL_VECTOR3;              //‘ÎÛ‚Æ‚Ì‹——£
+	m_DifferenceLength = D3DXVECTOR3(0.0f,0.0f,0.0f);              //‘ÎÛ‚Æ‚Ì‹——£
 	m_ModeTime = 0;                                 //ƒ‚[ƒh‚ÌŠÔ
-	m_ZoomSpeed = NULL_VECTOR3;                     //ƒY[ƒ€‚·‚é‘¬‚³
+	m_ZoomSpeed = D3DXVECTOR3(0.0f,0.0f,0.0f);                     //ƒY[ƒ€‚·‚é‘¬‚³
 	return S_OK;
 }
 //====================================================================================================
@@ -163,7 +163,7 @@ void CCamera::SetCamera()
 	//==========================
 	//ƒJƒƒ‰‚ğ—h‚ç‚·ˆ—
 	//==========================
-	D3DXVECTOR3 adjust = NULL_VECTOR3;//—h‚ê‚Ì•â³
+	D3DXVECTOR3 adjust = D3DXVECTOR3(0.0f,0.0f,0.0f);//—h‚ê‚Ì•â³
 	D3DXVECTOR3 ResultPosV = m_PosV;//Œ‹‰Ê“I‚Èx“_
 	D3DXVECTOR3 ResultPosR = m_PosR;//Œ‹‰Ê“I‚È’‹“_
 	if (m_nShakeFrame > 0)
@@ -212,8 +212,8 @@ void CCamera::NormalCameraMove()
 			case CScene::MODE_GAME:
 				if (CGame::GetPlayer() != nullptr)
 				{
-					m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f) + m_AddPosR;
-					m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -200.0f, 0.0f, cosf(m_Rot.y) * -200.0f);
+					//m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f) + m_AddPosR;
+					//m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -200.0f, 0.0f, cosf(m_Rot.y) * -200.0f);
 				}
 				break;
 			case CScene::MODE_EDIT:
@@ -248,7 +248,7 @@ void CCamera::BossDefeatCameraProcess()
 	float fVLaim = 0.0f;//‘‡ƒxƒNƒgƒ‹
 	float fLength = 0.0f;
 	CObject* pObj = nullptr;
-	D3DXVECTOR3 ComparisonPos = NULL_VECTOR3;
+	D3DXVECTOR3 ComparisonPos = D3DXVECTOR3(0.0f,0.0f,0.0f);
 
 	m_ModeTime++;
 }
@@ -259,17 +259,17 @@ void CCamera::BossDefeatCameraProcess()
 //====================================================================
 void CCamera::TurningCameraProcess()
 {
-	//ù‰ñŒü‚«
-	m_Rot.y += m_fTurningRotSpeed;
+	////ù‰ñŒü‚«
+	//m_Rot.y += m_fTurningRotSpeed;
 
-	//x“_Y‚ÌˆÊ’u
-	m_PosV.y += m_fTurningSpeedY;
+	////x“_Y‚ÌˆÊ’u
+	//m_PosV.y += m_fTurningSpeedY;
 
-	//‹——£‚ğXV‚·‚é
-	m_fLength += m_fAddLength;
+	////‹——£‚ğXV‚·‚é
+	//m_fLength += m_fAddLength;
 
-	//ƒJƒƒ‰‚Ìù‰ñˆ—
-	m_PosV.x = sinf(m_Rot.y) * m_fLength + m_PosR.x;
-	m_PosV.z = cosf(m_Rot.y) * m_fLength + m_PosR.z;
+	////ƒJƒƒ‰‚Ìù‰ñˆ—
+	//m_PosV.x = sinf(m_Rot.y) * m_fLength + m_PosR.x;
+	//m_PosV.z = cosf(m_Rot.y) * m_fLength + m_PosR.z;
 }
 //====================================================================================================

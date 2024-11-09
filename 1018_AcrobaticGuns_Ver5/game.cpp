@@ -52,17 +52,17 @@ HRESULT CGame::Init()
 {
 	CScene::Init();//ƒV[ƒ“‰Šú‰»ˆ—
 
-	m_pPlayer = CPlayer::Create(D3DXVECTOR3(0.0f,0.0f,-300.0f),D3DXVECTOR3(0.0f,D3DX_PI,0.0f), NULL_VECTOR3, ONE_VECTOR3);
+	m_pPlayer = CPlayer::Create(D3DXVECTOR3(0.0f,0.0f,-300.0f),D3DXVECTOR3(0.0f,D3DX_PI,0.0f), D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(1.0f,1.0f,1.0f));
 	m_pPlayer->SetUseDeath(false);
 	m_pPlayer->SetVecAxis(D3DXVECTOR3(0.0f, 1.0f, 0.0f));
 
-	CEnemy::Create(CEnemy::ENEMYTYPE::NORMAL, 100, D3DXVECTOR3(0.0f, 200.0f, 200.0f), NULL_VECTOR3, ONE_VECTOR3 * 4);
-	CEnemy::Create(CEnemy::ENEMYTYPE::NORMAL, 100, D3DXVECTOR3(200.0f, 0.0f, 200.0f), NULL_VECTOR3, ONE_VECTOR3 * 2);
-	//CEnemy::Create(CEnemy::ENEMYTYPE::NORMAL, 100, D3DXVECTOR3(-200.0f, 0.0f, 200.0f), NULL_VECTOR3, ONE_VECTOR3 * 2);
+	CEnemy::Create(CEnemy::ENEMYTYPE::NORMAL, 100, D3DXVECTOR3(0.0f, 200.0f, 200.0f), D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(1.0f,1.0f,1.0f) * 4);
+	CEnemy::Create(CEnemy::ENEMYTYPE::NORMAL, 100, D3DXVECTOR3(200.0f, 0.0f, 200.0f), D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(1.0f,1.0f,1.0f) * 2);
+	//CEnemy::Create(CEnemy::ENEMYTYPE::NORMAL, 100, D3DXVECTOR3(-200.0f, 0.0f, 200.0f), D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(1.0f,1.0f,1.0f) * 2);
 
 	m_pStageManager = CStageManager::Create();
 
-	CField::Create(NULL_VECTOR3, NULL_VECTOR3, 2000.0f, 2000.0f,CField::FIELDTYPE00_NORMAL);
+	CField::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(0.0f,0.0f,0.0f), 2000.0f, 2000.0f,CField::FIELDTYPE00_NORMAL);
 	return S_OK;
 }
 //=========================================================================================================================

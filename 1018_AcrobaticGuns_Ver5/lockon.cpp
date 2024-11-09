@@ -25,7 +25,7 @@
 //===============================================================
 //コンストラクタ
 //===============================================================
-CLockon::CLockon() : m_LockOnPos(NULL_VECTOR3),m_NowRay(NULL_VECTOR3),m_FrontPos(NULL_VECTOR3),m_EndState(ENDSTATE::NONE),m_NearRayColObjPos(NULL_VECTOR3)
+CLockon::CLockon() : m_LockOnPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_NowRay(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_FrontPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_EndState(ENDSTATE::NONE),m_NearRayColObjPos(D3DXVECTOR3(0.0f,0.0f,0.0f))
 {
 
 }
@@ -197,8 +197,8 @@ void CLockon::BackWallRayCollisionPosSearch()
 //===============================================================
 void CLockon::CalcRay()
 {
-	D3DXVECTOR3 FarPos = NULL_VECTOR3; //奥
-	D3DXVECTOR3 Ray = NULL_VECTOR3;    //レイ
+	D3DXVECTOR3 FarPos = D3DXVECTOR3(0.0f,0.0f,0.0f); //奥
+	D3DXVECTOR3 Ray = D3DXVECTOR3(0.0f,0.0f,0.0f);    //レイ
 	//============================================
 	//カメラ手前と奥のワールド座標を求める
 	//============================================
@@ -223,21 +223,21 @@ void CLockon::RayCollisionToObject()
 {
 	bool bCollision = false;//当たり判定
 	vector<D3DXVECTOR3> VecCollisionSuccess;     //当たり判定が成功した位置のvector
-	D3DXVECTOR3 NearCollisionPos = NULL_VECTOR3; //当たり判定が成功した位置の中で一番近い位置
+	D3DXVECTOR3 NearCollisionPos = D3DXVECTOR3(0.0f,0.0f,0.0f); //当たり判定が成功した位置の中で一番近い位置
 
 	//レイと一致した全てのオブジェクトを求め、中心点をVectorに保存
 	for (int nCntPri = 0; nCntPri < CObject::m_nMAXPRIORITY; nCntPri++)
 	{
 		CObject* pObj = CObject::GetTopObject(nCntPri);//先頭オブジェクトを取得
-		D3DXVECTOR3 CollisionStartPos = NULL_VECTOR3;//衝突判定開始位置
-		D3DXVECTOR3 CollisionEndPos = NULL_VECTOR3;  //衝突判定終了位置
+		D3DXVECTOR3 CollisionStartPos = D3DXVECTOR3(0.0f,0.0f,0.0f);//衝突判定開始位置
+		D3DXVECTOR3 CollisionEndPos = D3DXVECTOR3(0.0f,0.0f,0.0f);  //衝突判定終了位置
 		while (pObj != nullptr)
 		{
 			CObject* pNext = pObj->GetNextObject();//次のオブジェクトのポインタを取得
 
 			if (pObj->GetType() == CObject::TYPE::ENEMY || pObj->GetType() == CObject::TYPE::BLOCK)
 			{
-				CObjectX* pObjX = (CObjectX*)pObj;
+				CObjectX* pObjX = static_cast<CObjectX*>(pObj);
 				//指定したモデルの位置
 				bCollision = CCollision::RayIntersectsAABBCollisionPos(m_FrontPos, m_NowRay, pObjX->GetVtxMin() + pObjX->GetPos(), pObjX->GetVtxMax() + pObjX->GetPos(),
 					CollisionStartPos);
@@ -252,7 +252,7 @@ void CLockon::RayCollisionToObject()
 						float(SCREEN_WIDTH), float(SCREEN_HEIGHT));
 
 					float fRot = CCalculation::CalculationRandVecXY();
-					CParticle2D::Create(ScreenPos, D3DXVECTOR3(sinf(fRot) * 10.0f, cosf(fRot) * 10.0f, 0.0f), NULL_VECTOR3, CObject2D::POLYGONTYPE01_SENTERROLLING,
+					CParticle2D::Create(ScreenPos, D3DXVECTOR3(sinf(fRot) * 10.0f, cosf(fRot) * 10.0f, 0.0f), D3DXVECTOR3(0.0f,0.0f,0.0f), CObject2D::POLYGONTYPE01_SENTERROLLING,
 						15, 55.0f, 55.0f, CCalculation::CalRaibowColor());
 
 					VecCollisionSuccess.push_back(CollisionStartPos);//当たり判定が成功したオブジェクトの判定開始位置を保存する

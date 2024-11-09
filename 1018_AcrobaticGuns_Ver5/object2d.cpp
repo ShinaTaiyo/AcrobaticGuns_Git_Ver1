@@ -28,8 +28,8 @@ CObject2D::CObject2D(int nPriority) : CObject(nPriority),m_nCntBlinkingFrame(0),
 m_nLife(0),m_nMaxLife(0),m_fRatioLife(0.0f),m_bUseLifeRatioColor(false),m_bUseDraw(true),m_PolygonType(POLYGONTYPE00_NORMAL),m_bAnimFlag(false),m_bUse(false),m_bUseBlinking(false),
 m_bUseFloating(false),m_bUseLife(false),m_bUseScale(false),m_fAngle(0.0f),m_fAnimationSplit(0.0f),m_fFloatingAddSpeed(0.0f),m_fFloatingLimitSpeed(0.0f),m_fFloatingRot(0.0f),
 m_fFloatingSpeed(0.0f),m_fHeight(0.0f),m_fLength(0.0f),m_fMaxHeight(0.0f),m_fMaxWidth(0.0f),m_fPolygonRotSpeed(0.0f),m_fWidth(0.0f),m_nAnimaionPattern(0),m_nAnimationChange(0),
-m_nAnimationCnt(0),m_nMaxAnimationPattern(0),m_nTextureIndex(0),m_pos(NULL_VECTOR3), m_Move(NULL_VECTOR3), m_SupportPos(NULL_VECTOR3),m_col(NULL_VECTOR3),
-m_pVtxBuff(nullptr),m_pTexture(nullptr),m_Scale(NULL_VECTOR3),m_rot(NULL_VECTOR3)
+m_nAnimationCnt(0),m_nMaxAnimationPattern(0),m_nTextureIndex(0),m_pos(D3DXVECTOR3(0.0f,0.0f,0.0f)), m_Move(D3DXVECTOR3(0.0f,0.0f,0.0f)), m_SupportPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_col(D3DXVECTOR3(0.0f,0.0f,0.0f)),
+m_pVtxBuff(nullptr),m_pTexture(nullptr),m_Scale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_rot(D3DXVECTOR3(0.0f,0.0f,0.0f))
 {
 	m_pTexture = nullptr;
 	m_pVtxBuff = nullptr;
@@ -54,15 +54,15 @@ HRESULT CObject2D::Init()
 {
 	m_bUse = true;          //使用状態
 
-	m_pos = SENTER_VECTOR3;//位置（中心）
-	m_Move = NULL_VECTOR3;//移動量
+	m_pos = D3DXVECTOR3(SCREEN_WIDTH / 2,SCREEN_HEIGHT / 2,0.0f);//位置（中心）
+	m_Move = D3DXVECTOR3(0.0f,0.0f,0.0f);//移動量
 	m_col = D3DXCOLOR(1.0f,1.0f,1.0f,1.0f);//色合い
-	m_SupportPos = NULL_VECTOR3;
+	m_SupportPos = D3DXVECTOR3(0.0f,0.0f,0.0f);
 
 	//=======================================
 	//回転系
 	//=======================================
-	m_rot = NULL_VECTOR3;
+	m_rot = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	//===============================================================================================
 
 	//=======================================
@@ -89,10 +89,10 @@ HRESULT CObject2D::Init()
 	//頂点バッファをロックし、頂点データへのポインタを取得
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
-	pVtx[0].pos = NULL_VECTOR3;
-	pVtx[1].pos = NULL_VECTOR3;
-	pVtx[2].pos = NULL_VECTOR3;
-	pVtx[3].pos = NULL_VECTOR3;
+	pVtx[0].pos = D3DXVECTOR3(0.0f,0.0f,0.0f);
+	pVtx[1].pos = D3DXVECTOR3(0.0f,0.0f,0.0f);
+	pVtx[2].pos = D3DXVECTOR3(0.0f,0.0f,0.0f);
+	pVtx[3].pos = D3DXVECTOR3(0.0f,0.0f,0.0f);
 
 	//rhwの設定
 	pVtx[0].rhw = 1.0f;
@@ -457,6 +457,6 @@ void CObject2D::SubLifeProcess()
 //======================================================
 void CObject2D::LifeRatioColorProcess()
 {
-	SetColor(NORMAL_COL, true, m_fRatioLife);
+	SetColor(D3DXCOLOR(1.0f,1.0f,1.0f,1.0f), true, m_fRatioLife);
 }
 //====================================================================================================

@@ -327,6 +327,7 @@ bool CInputJoypad::GetTrigger(JOYKEY key)
 //=====================================
 bool CInputJoypad::GetRT_Press()
 {
+	CManager::GetDebugProc()->PrintDebugProc("トリガーの値：%d\n", m_joykeyStatePress.Gamepad.bRightTrigger);
 	return m_joykeyStatePress.Gamepad.bRightTrigger != 0;//0x0004（JOYKEY_LEFT)なら0x01<<2 = 00000111 = 0x0004;
 }
 //========================================================================================================================================================

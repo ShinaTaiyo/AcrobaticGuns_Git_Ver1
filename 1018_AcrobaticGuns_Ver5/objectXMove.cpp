@@ -24,7 +24,7 @@
 //コンストラクタ
 //===========================================================================================
 CObjectXMove::CObjectXMove(int nPriority) : CObjectX(nPriority),m_bUseAddSpeed(false), m_bUseGravity(false), m_bUseInteria(false), m_bUseMultiSpeed(false), m_fGravityPower(0.0f), m_fInertia(0.0f),
-m_MultiSpeed(NULL_VECTOR3), m_AddSpeed(NULL_VECTOR3),m_Move(NULL_VECTOR3),m_bUseUpdatePos(false)
+m_MultiSpeed(D3DXVECTOR3(0.0f,0.0f,0.0f)), m_AddSpeed(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Move(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_bUseUpdatePos(false)
 {
 
 }

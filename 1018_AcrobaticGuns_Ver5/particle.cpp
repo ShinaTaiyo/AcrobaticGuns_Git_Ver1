@@ -32,7 +32,7 @@ const char* CParticle::m_apPARTICLE_FILENAME[CParticle::TYPE_MAX] =
 //コンストラクタ
 //==========================================
 CParticle::CParticle() : CBillboard(4), m_bBranding(true), m_Type(TYPE00_NORMAL), m_fReductionWidth(0.0f),m_fReductionHeight(0.0f), m_bAddSpeed(false),m_fAddSpeed(0.0f),
-m_bUseChargePartilce(false), m_bGravity(false), m_fGravity(0.0f),m_SupportPos(NULL_VECTOR3)
+m_bUseChargePartilce(false), m_bGravity(false), m_fGravity(0.0f),m_SupportPos(D3DXVECTOR3(0.0f,0.0f,0.0f))
 {
 
 }
@@ -281,7 +281,7 @@ CParticle* CParticle::Create(TYPE Type, int nLife, float fWidth, float fHeight, 
 //==================================================================
 void CParticle::SummonParticle(TYPE type, int nNum, int nLife, float fWidth, float fHeight, int nRandSpeed, int nDivision, bool bRandumCol, D3DXVECTOR3 Pos, D3DXCOLOR col, bool bBreanding)
 {
-	D3DXVECTOR3 Speed = NULL_VECTOR3;//速さ
+	D3DXVECTOR3 Speed = D3DXVECTOR3(0.0f,0.0f,0.0f);//速さ
 	D3DXCOLOR RandCol = {};          //色合い
 	for (int nCnt = 0; nCnt < nNum; nCnt++)
 	{
@@ -316,8 +316,8 @@ void CParticle::SummonChargeParticle(TYPE type, int nNum, int nLife, float fInit
 	float fVLaim = 0.0f;//総合ベクトル
 	float fSpeed = 0.0f;//速さ
 	float fLength = float(rand() % nSummonLength - (nSummonLength / 2));
-	D3DXVECTOR3 Speed = NULL_VECTOR3;//速さ
-	D3DXVECTOR3 SummonPos = NULL_VECTOR3;
+	D3DXVECTOR3 Speed = D3DXVECTOR3(0.0f,0.0f,0.0f);//速さ
+	D3DXVECTOR3 SummonPos = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	CParticle* pParticle = nullptr;
 	for (int nCnt = 0; nCnt < nNum; nCnt++)
 	{

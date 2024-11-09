@@ -46,6 +46,7 @@ public:
 	void SetShake(int nShakeFrame, float fShakePower); //カメラの揺れを設定する
 	CAMERATYPE GetCameraType() { return m_CameraType; }//カメラタイプを取得する
 	void SetCameraType(CAMERATYPE type) { m_CameraType = type; m_ModeTime = 0; }//カメラタイプを設定する
+	void SetPosV(D3DXVECTOR3 PosV) { m_PosV = PosV; }//視点を設定
 	D3DXVECTOR3& GetPosV() { return m_PosV; }      //視点を取得
 	D3DXVECTOR3& GetPosR() { return m_PosR; }      //注視点を取得
 	void SetTurningInfo(float fLength, float fRotSpeed, D3DXVECTOR3 PosR,float fPosVY,float fTurningSpeedY,float fAddLength)

@@ -28,10 +28,10 @@
 //================================================
 CObjectX::CObjectX(int nPriority) : CObject(nPriority), m_bUseDraw(true),m_ObjectXInfo(),m_bColorChenge(false),m_bUseAddRot(false),
 m_bUseAddScaling(false),m_bUseShadow(false),m_nChengeColorTime(0),m_nIndexObjectX(0),m_nManagerType(0),m_nObjXType(OBJECTXTYPE_BLOCK), 
-m_nTypeNum(0), m_bUseMultiScale(false), m_MultiScale(NULL_VECTOR3),m_bUseCulling(false), m_Pos(NULL_VECTOR3), m_SupportPos(NULL_VECTOR3),
-m_PosOld(NULL_VECTOR3),m_Rot(NULL_VECTOR3),m_Scale(NULL_VECTOR3),m_FormarScale(NULL_VECTOR3),m_Size(NULL_VECTOR3),m_VtxMin(NULL_VECTOR3),
-m_OriginVtxMin(NULL_VECTOR3),m_VtxMax(NULL_VECTOR3),m_OriginVtxMax(NULL_VECTOR3),m_mtxWorld(),m_AddRot(NULL_VECTOR3),m_SenterPos(NULL_VECTOR3),
-m_AddScale(NULL_VECTOR3),m_fAxis(0.0f),m_VecAxis(D3DXVECTOR3(0.0f,1.0f,0.0f))
+m_nTypeNum(0), m_bUseMultiScale(false), m_MultiScale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_bUseCulling(false), m_Pos(D3DXVECTOR3(0.0f,0.0f,0.0f)), m_SupportPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),
+m_PosOld(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Rot(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Scale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_FormarScale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Size(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_VtxMin(D3DXVECTOR3(0.0f,0.0f,0.0f)),
+m_OriginVtxMin(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_VtxMax(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_OriginVtxMax(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_mtxWorld(),m_AddRot(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_SenterPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),
+m_AddScale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_fAxis(0.0f),m_VecAxis(D3DXVECTOR3(0.0f,1.0f,0.0f))
 {
 	SetObjectType(CObject::OBJECTTYPE::OBJECTTYPE_X);
 }
@@ -64,7 +64,7 @@ HRESULT CObjectX::Init()
 	//==================================================================================
 
 	m_bUseAddScaling = false;                 //拡大率の加算を使用するかどうか
-	m_AddScale = NULL_VECTOR3;                //拡大率の加算量    
+	m_AddScale = D3DXVECTOR3(0.0f,0.0f,0.0f);                //拡大率の加算量    
 
 	CObject::Init();
 
@@ -591,7 +591,7 @@ void CObjectX::ChengeEditPos()
 	float fMoveX = 0.0f;                                            //X方向の移動量
 	float fMoveZ = 0.0f;                                            //Z方向の移動量
 	bool bMove = false;                                             //移動しているかどうか 
-	D3DXVECTOR3 Move = NULL_VECTOR3;
+	D3DXVECTOR3 Move = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	SetColor(D3DXCOLOR(1.0f,0.0f,0.0f,0.5f),3,true,true);           //色を半透明にする
 
 	//===========================
@@ -683,7 +683,7 @@ void CObjectX::DrawShadow()
 
 	//ライトの逆方向ベクトルを設定
 	vecLight = D3DXVECTOR4(-100.0f, 300.0f,300.0f, 0.0f);
-	ShadowPos = NULL_VECTOR3;
+	ShadowPos = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	ShadowNor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 
 	//法線と平面上の一点から平面情報を作成
