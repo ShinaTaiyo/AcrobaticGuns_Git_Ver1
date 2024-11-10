@@ -24,7 +24,7 @@ const std::string CBg::m_apBGFILE_NAME[CBg::BG_MAX] =
 {
 	"data\\TEXTURE\\Title\\Title_001.png",
 	"data\\TEXTURE\\Bg\\Wall_000.jpg",
-	"data\\TEXTURE\\Result_BG.png"
+	"data\\TEXTURE\\Bg\\Result_BG.png"
 };//背景のファイル名
 
 //========================
@@ -130,7 +130,7 @@ void CBg::Create(BG type)
 		if (pBg != nullptr)
 		{
 			pBg->Init();                                                     //初期化処理
-			pBg->CObject2D::SetInfo(1, 1, SCREEN_WIDTH,SCREEN_HEIGHT,D3DXCOLOR(1.0f,1.0f,1.0f,1.0f),POLYGONTYPE01_SENTERROLLING,true);//ポリゴンとテクスチャ情報を設定
+			pBg->CObject2D::SetInfo(1, 1, SCREEN_WIDTH,SCREEN_HEIGHT,D3DXCOLOR(1.0f,1.0f,1.0f,1.0f),CObject2D::POLYGONTYPE::SENTERROLLING,true);//ポリゴンとテクスチャ情報を設定
 			pBg->SetTextureIndex(pTextureClass->Regist(m_apBGFILE_NAME[type]));
 			pBg->SetUseDeath(true);                 //死亡フラグを発動するかどうかを設定する
 			pBg->CObject2D::BindTexture(pTextureClass->GetAddress(pBg->GetTextureIndex()));
@@ -229,7 +229,7 @@ CBgTitle* CBgTitle::Create(BG type)
 		{
 			pBgTitle->Init();                                                     //初期化処理
 			pBgTitle->SetUseScale(true);//拡大率を使用する
-			pBgTitle->CObject2D::SetInfo(1, 1, SCREEN_WIDTH, SCREEN_HEIGHT, D3DXCOLOR(1.0f,1.0f,1.0f,1.0f), POLYGONTYPE01_SENTERROLLING, true);//ポリゴンとテクスチャ情報を設定
+			pBgTitle->CObject2D::SetInfo(1, 1, SCREEN_WIDTH, SCREEN_HEIGHT, D3DXCOLOR(1.0f,1.0f,1.0f,1.0f), CObject2D::POLYGONTYPE::SENTERROLLING, true);//ポリゴンとテクスチャ情報を設定
 			pBgTitle->SetTextureIndex(pTextureClass->Regist(m_apBGFILE_NAME[type]));
 			pBgTitle->SetUseDeath(true);                 //死亡フラグを発動するかどうかを設定する
 			pBgTitle->CObject2D::BindTexture(pTextureClass->GetAddress(pBgTitle->GetTextureIndex()));
@@ -330,7 +330,7 @@ CBgDifficulty* CBgDifficulty::Create(BG type)
 		{
 			pBgDifficulty->Init();                                                     //初期化処理
 			pBgDifficulty->SetUseScale(true);//拡大率を使用する
-			pBgDifficulty->CObject2D::SetInfo(1, 1, SCREEN_WIDTH, SCREEN_HEIGHT, D3DXCOLOR(1.0f,1.0f,1.0f,1.0f), POLYGONTYPE01_SENTERROLLING, true);//ポリゴンとテクスチャ情報を設定
+			pBgDifficulty->CObject2D::SetInfo(1, 1, SCREEN_WIDTH, SCREEN_HEIGHT, D3DXCOLOR(1.0f,1.0f,1.0f,1.0f), CObject2D::POLYGONTYPE::SENTERROLLING, true);//ポリゴンとテクスチャ情報を設定
 			pBgDifficulty->SetTextureIndex(pTextureClass->Regist(m_apBGFILE_NAME[type]));
 			pBgDifficulty->SetUseDeath(true);                 //死亡フラグを発動するかどうかを設定する
 			pBgDifficulty->CObject2D::BindTexture(pTextureClass->GetAddress(pBgDifficulty->GetTextureIndex()));

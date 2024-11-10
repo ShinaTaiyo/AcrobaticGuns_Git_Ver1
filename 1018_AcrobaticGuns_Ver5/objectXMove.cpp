@@ -104,23 +104,9 @@ void CObjectXMove::Update()
 	}
 	//==========================================================
 
-	//==================================
-	//重力の更新
-	//==================================
-	if (m_bUseGravity == true)
-	{
-		GravityProcess();
-	}
-	//==========================================================
+	GravityProcess();
 
-    //==================================
-	//位置の更新
-	//==================================
-	if (m_bUseUpdatePos == true)
-	{
-		UpdatePos();
-	}
-	//==========================================================
+	UpdatePos();
 
 	//更新処理
 	CObjectX::Update();
@@ -142,9 +128,11 @@ void CObjectXMove::Draw()
 //===========================================================================================
 void CObjectXMove::GravityProcess()
 {
-	const D3DXVECTOR3& Move = GetMove();
-
-	SetMove(Move + D3DXVECTOR3(0.0f, -m_fGravityPower, 0.0f));
+	if (m_bUseGravity == true)
+	{
+		const D3DXVECTOR3& Move = GetMove();
+		SetMove(Move + D3DXVECTOR3(0.0f, -m_fGravityPower, 0.0f));
+	}
 }
 //===============================================================================================================================================================
 
@@ -153,20 +141,31 @@ void CObjectXMove::GravityProcess()
 //===========================================================================================
 void CObjectXMove::UpdatePos()
 {
-	const D3DXVECTOR3& Pos = GetPos();
-	
-	//1f前の位置を設定
-	SetPosOld(Pos);
-
-	//慣性の処理
-	if (m_bUseInteria == true)
+	if (m_bUseUpdatePos == true)
 	{
-		m_Move.x += (0.0f - m_Move.x) * m_fInertia;
-		m_Move.z += (0.0f - m_Move.z) * m_fInertia;
-	}
 
-	//位置の設定
-	SetPos(Pos + m_Move);
+		const D3DXVECTOR3& Pos = GetPos();
+
+		//1f前の位置を設定
+		SetPosOld(Pos);
+
+		//慣性の処理
+		if (m_bUseInteria == true)
+		{
+			m_Move.x += (0.0f - m_Move.x) * m_fInertia;
+			m_Move.z += (0.0f - m_Move.z) * m_fInertia;
+		}
+
+		//位置の設定
+		SetPos(Pos + m_Move);
+
+		if (Pos.y <= fabs(GetVtxMin().y))
+		{
+			SetPos(D3DXVECTOR3(Pos.x, 0.0f + fabs(GetVtxMin().y), Pos.z));
+			m_Move.y = 0.0f;
+		}
+
+	}
 }
 //===============================================================================================================================================================
 

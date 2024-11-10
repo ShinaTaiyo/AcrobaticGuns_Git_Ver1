@@ -29,6 +29,7 @@ public:
 	enum class UITYPE
 	{
 		LOCKON = 0,//ロックオン
+		ACTIONMODEWINDOW,//アクションモードウインドウ
 		MAX
 	};
 
@@ -51,7 +52,7 @@ public:
 	void SetUseUiEffect(bool bUse, int nSetEffectLife, D3DXCOLOR col) { m_bUseUiEffect = bUse; m_nSetUiEffectLife = nSetEffectLife; m_SetUiEffectColor = col; }
 	UITYPE GetUiType() { return m_Type; }//UIの種類を取得
 protected:
-	static const char* m_apUI_FILENAME[int(UITYPE::MAX)];//UIのテクスチャファイル名
+	static const string UI_FILENAME[int(UITYPE::MAX)];//UIのテクスチャファイル名
 private:
 	UITYPE m_Type;                 //背景の種類
 	UIMOVETYPE m_MoveType;         //UIの動き方の種類

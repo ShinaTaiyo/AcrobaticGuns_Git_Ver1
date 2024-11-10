@@ -21,12 +21,13 @@
 class CBgModel : public CObjectX
 {
 public:
-	typedef enum
+	enum class BGMODELTYPE
 	{
-		TYPE_BILL_00 = 0,//ビル
-		TYPE_TREE_00,    //木
-		TYPE_MAX
-	}BGMODELTYPE;
+		BILL_00 = 0,//ビル０
+		TREE_00,    //木	
+		BILL_01,    //ビル１
+		MAX
+	};
 
 	CBgModel();                  //コンストラクタ
 	~CBgModel();                 //デストラクタ
@@ -49,7 +50,7 @@ public:
 protected:
 	void SetBgModelType(BGMODELTYPE AttackType) { m_Type = AttackType; }//背景モデルの種類を設定する
 	const BGMODELTYPE& GetAttackType() const { return m_Type; }         //背景モデルの種類を取得する
-	static const string BGMODEL_FILENAME[BGMODELTYPE::TYPE_MAX];        //背景モデルのファイル名 
+	static const string BGMODEL_FILENAME[static_cast<int>(BGMODELTYPE::MAX)];        //背景モデルのファイル名 
 private:
 	BGMODELTYPE m_Type;//タイプ
 };

@@ -253,20 +253,20 @@ bool CCollision::ExtrusionCollisionSquare(D3DXVECTOR3& MyPos, bool& bCollisionX,
 				MyVtxMax, MyVtxMin, ComPos,
 				ComVtxMax, ComVtxMin,bCollisionY);
 	}
-	//else if (bCollisionYOld == true)
-	//{
-	//	bCollisionY = ExtrusionCollisionSquareY(MyPos, MyMove, MyPosOld,
-	//		MyVtxMax, MyVtxMin, ComPos,
-	//		ComVtxMax, ComVtxMin);
+	else if (bCollisionYOld == true)
+	{
+		bCollisionY = ExtrusionCollisionSquareY(MyPos, MyMove, MyPosOld,
+			MyVtxMax, MyVtxMin, ComPos,
+			ComVtxMax, ComVtxMin,bCollisionY);
 
-	//	bCollisionX = ExtrusionCollisionSquareX(MyPos, MyMove, MyPosOld,
-	//		MyVtxMax, MyVtxMin, ComPos,
-	//		ComVtxMax, ComVtxMin);
+		bCollisionX = ExtrusionCollisionSquareX(MyPos, MyMove, MyPosOld,
+			MyVtxMax, MyVtxMin, ComPos,
+			ComVtxMax, ComVtxMin,bCollisionX);
 
-	//	bCollisionZ = ExtrusionCollisionSquareZ(MyPos, MyMove, MyPosOld,
-	//		MyVtxMax, MyVtxMin, ComPos,
-	//		ComVtxMax, ComVtxMin);
-	//}
+		bCollisionZ = ExtrusionCollisionSquareZ(MyPos, MyMove, MyPosOld,
+			MyVtxMax, MyVtxMin, ComPos,
+			ComVtxMax, ComVtxMin,bCollisionZ);
+	}
 	else/* if (bCollisionZOld == true)*/
 	{
 		bCollisionZ = ExtrusionCollisionSquareZ(MyPos, MyMove, MyPosOld,
@@ -350,7 +350,7 @@ bool CCollision::ExtrusionCollisionSquareY(D3DXVECTOR3& MyPos, const D3DXVECTOR3
 		&& MyPos.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
 	{//‘ÎÛ‚Ì‰º’[‚ªƒ‚ƒfƒ‹‚Ìã’[‚É“–‚½‚Á‚½Žž‚Ìˆ—
 		float fPosY = fabsf(MyVtxMin.y);
-		MyPos.y += ComVtxMax.y + fPosY;
+		MyPos.y = ComVtxMax.y + fPosY;
 		return true;
 	}
 	//‰º

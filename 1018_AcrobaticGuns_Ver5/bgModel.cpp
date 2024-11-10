@@ -18,17 +18,18 @@
 //==================================================================
 //前方宣言
 //==================================================================
-const string CBgModel::BGMODEL_FILENAME[CBgModel::BGMODELTYPE::TYPE_MAX] =
+const string CBgModel::BGMODEL_FILENAME[static_cast<int>(CBgModel::BGMODELTYPE::MAX)] =
 {
-	"data\\MODEL\\BgModel\\bill.x",
+	"data\\MODEL\\BgModel\\Bill_000.x",
 	"data\\MODEL\\BgModel\\Tree_000.x",
+	"data\\MODEL\\BgModel\\Bill_001.x",
 };
 //======================================================================================================================
 
 //==================================================================
 //コンストラクタ
 //==================================================================
-CBgModel::CBgModel() : m_Type(BGMODELTYPE::TYPE_BILL_00)
+CBgModel::CBgModel() : m_Type(BGMODELTYPE::BILL_00)
 {
 
 }
@@ -105,7 +106,7 @@ CBgModel* CBgModel::Create(BGMODELTYPE bgModelType, D3DXVECTOR3 pos, D3DXVECTOR3
 	pBgModel->SetScale(Scale);               //拡大率
 
 	//モデル情報設定
-	int nIdx = CManager::GetObjectXInfo()->Regist(BGMODEL_FILENAME[bgModelType]);
+	int nIdx = CManager::GetObjectXInfo()->Regist(BGMODEL_FILENAME[static_cast<int>(bgModelType)]);
 
 	//モデル情報を割り当てる
 	pBgModel->BindObjectXInfo(CManager::GetObjectXInfo()->GetMesh(nIdx),
@@ -115,7 +116,7 @@ CBgModel* CBgModel::Create(BGMODELTYPE bgModelType, D3DXVECTOR3 pos, D3DXVECTOR3
 		CManager::GetObjectXInfo()->GetColorValue(nIdx));
 
 	pBgModel->SetManagerObjectType(CObject::MANAGEROBJECTTYPE_BGMODEL);           //マネージャーで呼び出す時の種類を設定
-
+	pBgModel->SetSize();//サイズを設定する
 	return pBgModel;
 }
 //======================================================================================================================
@@ -127,13 +128,13 @@ CBgModel* CBgModel::Create(BGMODELTYPE bgModelType, D3DXVECTOR3 pos, D3DXVECTOR3
 void CBgModel::SaveInfoTxt(fstream& WritingFile)
 {
 	WritingFile << "SETBGMODEL" << endl;
-	WritingFile << "TYPE = " << m_Type;
+	WritingFile << "TYPE = " << static_cast<int>(m_Type);
 	switch (m_Type)
 	{
-	case BGMODELTYPE::TYPE_BILL_00:
+	case BGMODELTYPE::BILL_00:
 		WritingFile << " # BILL00" << endl;
 		break;
-	case BGMODELTYPE::TYPE_TREE_00:
+	case BGMODELTYPE::TREE_00:
 		WritingFile << " # TREE00" << endl;
 		break;
 	default:
@@ -219,13 +220,13 @@ CObject* CBgModel::ManagerChengeObject(bool bAim)
 	{
 		nNewType--;
 	}
-	if (nNewType >= BGMODELTYPE::TYPE_MAX)
+	if (nNewType >= static_cast<int>(BGMODELTYPE::MAX))
 	{
 		nNewType = 0;
 	}
 	if (nNewType < 0)
 	{
-		nNewType = BGMODELTYPE::TYPE_MAX - 1;
+		nNewType = static_cast<int>(BGMODELTYPE::MAX) - 1;
 	}
 	//======================================================================================
 

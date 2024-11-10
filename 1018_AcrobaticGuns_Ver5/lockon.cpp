@@ -235,7 +235,7 @@ void CLockon::RayCollisionToObject()
 		{
 			CObject* pNext = pObj->GetNextObject();//次のオブジェクトのポインタを取得
 
-			if (pObj->GetType() == CObject::TYPE::ENEMY || pObj->GetType() == CObject::TYPE::BLOCK)
+			if (pObj->GetType() == CObject::TYPE::ENEMY || pObj->GetType() == CObject::TYPE::BLOCK || pObj->GetType() == CObject::TYPE::BGMODEL)
 			{
 				CObjectX* pObjX = static_cast<CObjectX*>(pObj);
 				//指定したモデルの位置
@@ -252,7 +252,7 @@ void CLockon::RayCollisionToObject()
 						float(SCREEN_WIDTH), float(SCREEN_HEIGHT));
 
 					float fRot = CCalculation::CalculationRandVecXY();
-					CParticle2D::Create(ScreenPos, D3DXVECTOR3(sinf(fRot) * 10.0f, cosf(fRot) * 10.0f, 0.0f), D3DXVECTOR3(0.0f,0.0f,0.0f), CObject2D::POLYGONTYPE01_SENTERROLLING,
+					CParticle2D::Create(ScreenPos, D3DXVECTOR3(sinf(fRot) * 10.0f, cosf(fRot) * 10.0f, 0.0f), D3DXVECTOR3(0.0f,0.0f,0.0f), CObject2D::POLYGONTYPE::SENTERROLLING,
 						15, 55.0f, 55.0f, CCalculation::CalRaibowColor());
 
 					VecCollisionSuccess.push_back(CollisionStartPos);//当たり判定が成功したオブジェクトの判定開始位置を保存する

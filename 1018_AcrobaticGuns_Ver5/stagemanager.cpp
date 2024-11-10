@@ -304,8 +304,8 @@ void CStageManager::SaveMapTxt(int nMapNum)
 	{//––”ö‚Ü‚ÅŒJ‚è•Ô‚·
 		if (&it != nullptr)
 		{
-			Type = ((CObject*)*it)->GetType();
-			((CObject*)*it)->SaveInfoTxt(WritingFile);
+			Type = static_cast<CObject*>(*it)->GetType();
+			static_cast<CObject*>(*it)->SaveInfoTxt(WritingFile);
 
 			WritingFile << endl << endl;//‰üsˆ—
 		}
@@ -592,7 +592,7 @@ void CStageManager::ChengeObject(CObject::MANAGEROBJECTTYPE ManagerObjectType)
 		m_pManagerObject = CBlock::Create(CBlock::BLOCKTYPE00_NORMAL, 10, m_SavePos,m_SaveRot,m_SaveScale);
 		break;
 	case CObject::MANAGEROBJECTTYPE_BGMODEL:
-		m_pManagerObject = CBgModel::Create(CBgModel::BGMODELTYPE::TYPE_BILL_00, m_SavePos, m_SaveRot, m_SaveScale);
+		m_pManagerObject = CBgModel::Create(CBgModel::BGMODELTYPE::BILL_00, m_SavePos, m_SaveRot, m_SaveScale);
 		break;
 		default:
 		break;

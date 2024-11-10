@@ -25,7 +25,7 @@
 //コンストラクタ
 //========================
 CObject2D::CObject2D(int nPriority) : CObject(nPriority),m_nCntBlinkingFrame(0),m_nMaxBlinkingFrame(0),m_bBlinkingAim(false),m_fLimitBlinkingRatio(0.0f),
-m_nLife(0),m_nMaxLife(0),m_fRatioLife(0.0f),m_bUseLifeRatioColor(false),m_bUseDraw(true),m_PolygonType(POLYGONTYPE00_NORMAL),m_bAnimFlag(false),m_bUse(false),m_bUseBlinking(false),
+m_nLife(0),m_nMaxLife(0),m_fRatioLife(0.0f),m_bUseLifeRatioColor(false),m_bUseDraw(true),m_PolygonType(POLYGONTYPE::NORMAL),m_bAnimFlag(false),m_bUse(false),m_bUseBlinking(false),
 m_bUseFloating(false),m_bUseLife(false),m_bUseScale(false),m_fAngle(0.0f),m_fAnimationSplit(0.0f),m_fFloatingAddSpeed(0.0f),m_fFloatingLimitSpeed(0.0f),m_fFloatingRot(0.0f),
 m_fFloatingSpeed(0.0f),m_fHeight(0.0f),m_fLength(0.0f),m_fMaxHeight(0.0f),m_fMaxWidth(0.0f),m_fPolygonRotSpeed(0.0f),m_fWidth(0.0f),m_nAnimaionPattern(0),m_nAnimationChange(0),
 m_nAnimationCnt(0),m_nMaxAnimationPattern(0),m_nTextureIndex(0),m_pos(D3DXVECTOR3(0.0f,0.0f,0.0f)), m_Move(D3DXVECTOR3(0.0f,0.0f,0.0f)), m_SupportPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_col(D3DXVECTOR3(0.0f,0.0f,0.0f)),
@@ -194,14 +194,14 @@ void CObject2D::Update()
 	switch (m_PolygonType)
 	{
 		//普通ポリゴン
-	case POLYGONTYPE00_NORMAL:
+	case POLYGONTYPE::NORMAL:
 		pVtx[0].pos = D3DXVECTOR3(m_pos.x - m_fWidth, m_pos.y - m_fHeight, 0.0f);
 		pVtx[1].pos = D3DXVECTOR3(m_pos.x + m_fWidth, m_pos.y - m_fHeight, 0.0f);
 		pVtx[2].pos = D3DXVECTOR3(m_pos.x - m_fWidth, m_pos.y + m_fHeight, 0.0f);
 		pVtx[3].pos = D3DXVECTOR3(m_pos.x + m_fWidth, m_pos.y + m_fHeight, 0.0f);
 		break;
 		//回転ポリゴン
-	case POLYGONTYPE01_SENTERROLLING:
+	case POLYGONTYPE::SENTERROLLING:
 		m_fLength = sqrtf(m_fWidth * m_fWidth + m_fHeight * m_fHeight) / 2.0f;
 		m_fAngle = atan2f(m_fWidth, m_fHeight);
 		//頂点座標の設定
@@ -221,7 +221,7 @@ void CObject2D::Update()
 		pVtx[3].pos.y = m_pos.y + cosf(m_rot.z + m_fAngle) * m_fLength;
 		pVtx[3].pos.z = 0.0f;
 		break;
-	case POLYGONTYPE02_DOWN://中心点が下
+	case POLYGONTYPE::DOWN://中心点が下
 		pVtx[0].pos.x = m_pos.x - m_fWidth;
 		pVtx[0].pos.y = m_pos.y - m_fHeight;
 		pVtx[0].pos.z = 0.0f;
@@ -238,13 +238,13 @@ void CObject2D::Update()
 		pVtx[3].pos.y = m_pos.y;//中点を下側につけるため
 		pVtx[3].pos.z = 0.0f;
 		break;
-	case POLYGONTYPE03_LEFT://中心点が左側
+	case POLYGONTYPE::LEFT://中心点が左側
 		pVtx[0].pos = D3DXVECTOR3(m_pos.x, m_pos.y - m_fHeight, 0.0f);
 		pVtx[1].pos = D3DXVECTOR3(m_pos.x + m_fWidth, m_pos.y - m_fHeight, 0.0f);
 		pVtx[2].pos = D3DXVECTOR3(m_pos.x, m_pos.y + m_fHeight, 0.0f);
 		pVtx[3].pos = D3DXVECTOR3(m_pos.x + m_fWidth, m_pos.y + m_fHeight, 0.0f);
 		break;
-	case POLYGONTYPE04_RIGHT://中心点が左側
+	case POLYGONTYPE::RIGHT://中心点が左側
 		pVtx[0].pos = D3DXVECTOR3(m_pos.x - m_fWidth, m_pos.y - m_fHeight, 0.0f);
 		pVtx[1].pos = D3DXVECTOR3(m_pos.x, m_pos.y - m_fHeight, 0.0f);
 		pVtx[2].pos = D3DXVECTOR3(m_pos.x - m_fWidth, m_pos.y + m_fHeight, 0.0f);

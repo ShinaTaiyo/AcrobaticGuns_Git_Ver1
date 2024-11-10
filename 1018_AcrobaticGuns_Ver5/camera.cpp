@@ -14,6 +14,7 @@
 #include "renderer.h"
 #include "input.h"
 #include "object.h"
+#include "particle.h"
 #include "game.h"
 #include "edit.h"
 //====================================================================================================
@@ -29,7 +30,7 @@ const float CCamera::m_BESIDECAMERALENGTH = 570.0f;//ƒrƒTƒCƒhƒrƒ…[‚ÌƒJƒƒ‰‚Ì‹——
 //====================================================================
 CCamera::CCamera() : m_SupportPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_fLength(0.0f), m_fTurningRotSpeed(0.0f),m_fTurningSpeedY(0.0f),m_PosV(D3DXVECTOR3(0.0f,0.0f,0.0f)),
 m_PosR(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_VecU(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Rot(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_mtxProjection(),m_mtxView(),m_CameraType(CAMERATYPE_BIRD),m_DifferenceLength(D3DXVECTOR3(0.0f,0.0f,0.0f)),
-m_ZoomSpeed(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_nShakeFrame(0),m_ModeTime(0),m_fShakePower(0.0f),m_fAddLength(0.0f),m_AddPosR(D3DXVECTOR3(0.0f,0.0f,0.0f))
+m_ZoomSpeed(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_nShakeFrame(0),m_ModeTime(0),m_fShakePower(0.0f),m_fAddLength(0.0f),m_AddPosR(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_AddPosV(D3DXVECTOR3(0.0f,0.0f,0.0f))
 {
 
 }
@@ -83,17 +84,17 @@ void CCamera::Update()
 	//========================================
 	//ƒJƒƒ‰‚ÌŒü‚«‚ð•Ï‚¦‚é
 	//========================================
-	if (CManager::GetInputKeyboard()->GetPress(DIK_E) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY_RB) == true)
+	if (CManager::GetInputKeyboard()->GetPress(DIK_E) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::RB) == true)
 	{
 		m_Rot.y += 0.02f;
 	}
-	else if (CManager::GetInputKeyboard()->GetPress(DIK_Q) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY_LB) == true)
+	else if (CManager::GetInputKeyboard()->GetPress(DIK_Q) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::LB) == true)
 	{
 		m_Rot.y -= 0.02f;
 	}
 
 	//===========================
-	//RTƒ{ƒ^ƒ“‚ð‰Ÿ‚µ‚Ä‚¢‚½‚ç
+	//Xƒ{ƒ^ƒ“‚ð‰Ÿ‚µ‚Ä‚¢‚½‚ç
 	//===========================
 	if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
 	{//ƒVƒtƒgƒL[‚ð‰Ÿ‚µ‚È‚ª‚çEEE
@@ -106,6 +107,23 @@ void CCamera::Update()
 	{
 		m_AddPosR.y += 5.0f;
 	}
+
+	//===========================
+    //Cƒ{ƒ^ƒ“‚ð‰Ÿ‚µ‚Ä‚¢‚½‚ç
+    //===========================
+	if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
+	{//ƒVƒtƒgƒL[‚ð‰Ÿ‚µ‚È‚ª‚çEEE
+		if (CManager::GetInputKeyboard()->GetPress(DIK_C) == true)
+		{
+			m_AddPosV.y -= 5.0f;
+		}
+	}
+	else if (CManager::GetInputKeyboard()->GetPress(DIK_C) == true)
+	{
+		m_AddPosV.y += 5.0f;
+	}
+
+
 
 	//=========================o==============
 	//ƒJƒƒ‰‚ð—h‚ç‚·
@@ -212,8 +230,12 @@ void CCamera::NormalCameraMove()
 			case CScene::MODE_GAME:
 				if (CGame::GetPlayer() != nullptr)
 				{
-					//m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f) + m_AddPosR;
-					//m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -200.0f, 0.0f, cosf(m_Rot.y) * -200.0f);
+
+					m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f) + m_AddPosR;
+					m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -200.0f, 0.0f, cosf(m_Rot.y) * -200.0f);
+					//m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -250.0f, 0.0f, cosf(m_Rot.y) * -250.0f); + m_AddPosV;
+
+					//CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 30, 30.0f, 30.0f, 100, 10, false, m_PosR, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
 				}
 				break;
 			case CScene::MODE_EDIT:
@@ -223,7 +245,7 @@ void CCamera::NormalCameraMove()
 					if (pManagerObject->GetObjectType() == CObject::OBJECTTYPE::OBJECTTYPE_X)
 					{
 						m_PosR = ((CObjectX*)pManagerObject)->GetPos() + m_AddPosR;
-						m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -200.0f, 400.0f, cosf(m_Rot.y) * -200.0f);
+						m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -400.0f, 400.0f, cosf(m_Rot.y) * -400.0f) + m_AddPosV;
 					}
 				}
 				break;

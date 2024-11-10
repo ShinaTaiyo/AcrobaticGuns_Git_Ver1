@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//７月４日：回避アクション実装[player.cpp]
+//１１月１０日：ダイブ実装[player.cpp]
 //Author:ShinaTaiyo
 //
 //=============================================================================
@@ -39,7 +39,7 @@
 //====================================================
 //コンストラクタ
 //====================================================
-CPlayer::CPlayer() : m_fRotAim(0.0f),m_pLockOn(nullptr)
+CPlayer::CPlayer(CPlayer_ActionMode* pPlayer_ActionMode) : m_fRotAim(0.0f),m_pLockOn(nullptr),m_pActionMode(pPlayer_ActionMode),m_NowActionMode(ACTIONMODE::SHOT)
 {
 
 }
@@ -61,7 +61,10 @@ HRESULT CPlayer::Init()
 {
     CObjectXAlive::Init();                 //Xオブジェクト初期化
 
-    m_pLockOn = CLockon::Create(D3DXVECTOR3(SCREEN_WIDTH / 2,SCREEN_HEIGHT / 2,0.0f), CObject2D::POLYGONTYPE01_SENTERROLLING, 100.0f, 100.0f, D3DXCOLOR(1.0f,1.0f,1.0f,1.0f));
+    SetAutoSubLife(false);//自動的に体力を減らすかどうか
+    SetUseGravity(true,1.0f);  //重力を使用する
+
+    m_pLockOn = CLockon::Create(D3DXVECTOR3(SCREEN_WIDTH / 2,SCREEN_HEIGHT / 2,0.0f), CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, D3DXCOLOR(1.0f,1.0f,1.0f,1.0f));
     m_pLockOn->SetUseDeath(true);
 
     return S_OK;
@@ -82,23 +85,21 @@ void CPlayer::Uninit()
 //====================================================
 void CPlayer::Update()
 {
-    //移動処理
-    MoveProcess();
+    MoveProcess();//移動処理
 
-    //向き調整処理
-    AdjustRot();
+    AdjustRot();//向き調整処理
 
-    //更新処理
-    CObjectXAlive::Update();
+    m_pActionMode->Move(this);//現在のアクションモードの移動処理を実行
 
-    //攻撃処理
-    AttackProcress();
+    ActionModeChenge(); //現在のアクションモードを変更する
 
-    //ロックオンの処理
-    LockOnProcess();
+    CObjectXAlive::Update();//更新処理
 
-    //ブロックとの当たり判定
-    CollisionBlock();
+    AdjustPos();//位置調整処理
+
+    CollisionProcess();//当たり判定全般処理
+
+    m_pActionMode->Attack(this);//現在のアクションモードの攻撃処理を実装
 
     //m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f) + m_AddPosR;
     //m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -200.0f, 0.0f, cosf(m_Rot.y) * -200.0f);
@@ -119,11 +120,20 @@ void CPlayer::Draw()
 //====================================================
 void CPlayer::SetDeath()
 {
+    //ロックオン
     if (m_pLockOn != nullptr)
     {
         m_pLockOn->SetUseDeath(true);
         m_pLockOn->SetDeath();
         m_pLockOn = nullptr;
+    }
+
+    //行動モード
+    if (m_pActionMode != nullptr)
+    {
+        m_pActionMode->SetUseDeath(true);
+        m_pActionMode->SetDeath();
+        m_pActionMode = nullptr;
     }
 
     CObject::SetDeath();
@@ -135,7 +145,7 @@ void CPlayer::SetDeath()
 //====================================================
 CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale)
 {
-    CPlayer* pPlayer = new CPlayer;                                                                             //プレイヤーを生成
+    CPlayer* pPlayer = new CPlayer(CPlayerShot::Create(CObject2D::POLYGONTYPE::SENTERROLLING,D3DXCOLOR(1.0f,1.0f,1.0f,1.0f),D3DXVECTOR3(100.0f,100.0f,0.0f),100.0f,100.0f));                                                                             //プレイヤーを生成
 
     bool bSuccess = pPlayer->CObject::GetCreateSuccess();
     int nIdx = 0;//テクスチャのインデックス
@@ -147,9 +157,6 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
             pPlayer->CObject::SetType(CObject::TYPE::PLAYER);                                 //オブジェクトの種類を決める
             pPlayer->CObjectXMove::SetObjXType(CObjectXMove::OBJECTXTYPE_PLAYER);                    //オブジェクトXのタイプを設定
             pPlayer->CObjectXMove::SetTypeNum(0);                                                //オブジェクトXごとのタイプ番号を設定
-            pPlayer->SetLife(1);
-            pPlayer->SetMaxLife(1);
-            pPlayer->SetAutoSubLife(false);//自動的に体力を減らすかどうか
             //pPlayer->SetUseGravity(true,1.0f);//重力
             nIdx = CManager::GetObjectXInfo()->Regist("data\\MODEL\\Player\\Player_ProtoType.x");
             pPlayer->BindObjectXInfo(CManager::GetObjectXInfo()->GetMesh(nIdx),
@@ -167,9 +174,9 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
             pPlayer->SetFormarScale(Scale);                                                               //元の拡大率を設定する
 
             //カメラ初期設定（プレイヤー基準なのでプレイヤーから設定）
-            CCamera* pCamera = CManager::GetCamera();
-            pCamera->SetPosR(pPlayer->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f));
-            pCamera->SetPosV(pCamera->GetPosR() + D3DXVECTOR3(sinf(pPlayer->GetRot().y) * 200.0f, 0.0f, cosf(pPlayer->GetRot().y) * 200.0f));
+            //CCamera* pCamera = CManager::GetCamera();
+            //pCamera->SetPosR(pPlayer->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f));
+            //pCamera->SetPosV(pCamera->GetPosR() + D3DXVECTOR3(sinf(pPlayer->GetRot().y) * 200.0f, 0.0f, cosf(pPlayer->GetRot().y) * 200.0f));
 
         }
     }
@@ -197,54 +204,67 @@ void CPlayer::MoveProcess()
     //CCalculation::CalculationCollectionRot2D(CalRot.y, m_fRotAim, 0.25f);
     
     //CManager::GetInputJoypad()->GetLStickPress();
-
-    SetMove(AddMove + D3DXVECTOR3(0.0f,Move.y,0.0f));
+    if (bMove == true)
+    {
+        SetMove(AddMove + D3DXVECTOR3(0.0f, Move.y, 0.0f));
+    }
     CManager::GetDebugProc()->PrintDebugProc("プレイヤーの位置：%f %f %f\n",Pos.x,Pos.y,Pos.z);
     CManager::GetDebugProc()->PrintDebugProc("目的の向き：%f\n", m_fRotAim);
 }
 //==========================================================================================================
 
 //========================================================
-//攻撃処理
-//========================================================
-void CPlayer::AttackProcress()
-{
-    //通常攻撃処理
-    NormalAttackProcess();
-}
-//==========================================================================================================
-
-//========================================================
-//通常攻撃処理
-//========================================================
-void CPlayer::NormalAttackProcess()
-{   
-    //攻撃を開始
-    AttackStart();
-}
-//==========================================================================================================
-
-//========================================================
 //攻撃開始
 //========================================================
-void CPlayer::AttackStart()
+void CPlayer::ActionModeChenge()
 {
-    D3DXVECTOR3 ShotPos = GetPos() + D3DXVECTOR3(0.0f, GetSize().y, 0.0f);
-    D3DXVECTOR3 Move = CCalculation::Calculation3DVec(ShotPos, m_pLockOn->GetNearRayColObjPos(), 20.0f);
-    CAttackPlayer* pAttackPlayer = nullptr;//プレイヤー攻撃へのポインタ
-    if (CManager::GetInputKeyboard()->GetTrigger(DIK_J) == true || CManager::GetInputJoypad()->GetRT_Repeat(6) == true)
+    if (CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::X) == true)
     {
-        pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::TYPE00_BULLET, 60, ShotPos,GetRot(), Move, D3DXVECTOR3(1.0f,1.0f,1.0f));
-        pAttackPlayer->SetUseInteria(false);
-        pAttackPlayer->SetAutoSubLife(true);
+
+        if (m_pActionMode != nullptr)
+        {
+            m_pActionMode->SetUseDeath(true);//死亡フラグを使用する
+            m_pActionMode->SetDeath();       //死亡フラグを設定する
+            m_pActionMode = nullptr;         //ポインタを初期化
+        }
+
+        //モードを切り替える
+        if (m_NowActionMode == ACTIONMODE::SHOT)
+        {//ショット→ダイブ
+            m_NowActionMode = ACTIONMODE::DIVE;
+            SetUseInteria(false);
+            SetUseGravity(false,GetNormalGravity());
+        }
+        else
+        {//ダイブ→ショット
+            m_NowActionMode = ACTIONMODE::SHOT;
+            SetUseInteria(true);
+            SetUseGravity(true, GetNormalGravity());
+        }
+
+        //モード生成
+        switch (m_NowActionMode)
+        {
+        case ACTIONMODE::SHOT:
+            m_pActionMode = CPlayerShot::Create(CObject2D::POLYGONTYPE::SENTERROLLING, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), 100.0f, 100.0f);
+            break;
+        case ACTIONMODE::DIVE:
+            m_pActionMode = CPlayerDive::Create(CObject2D::POLYGONTYPE::SENTERROLLING, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), 100.0f, 100.0f);
+            break;
+        default:
+            break;
+        }
+        m_pActionMode->SetUseDeath(false);
+
+
     }
 }
 //==========================================================================================================
 
 //========================================================
-//ブロックとの当たり判定
+//当たり判定全般処理
 //========================================================
-void CPlayer::CollisionBlock()
+void CPlayer::CollisionProcess()
 {
     D3DXVECTOR3 MyPos = GetPos();
     D3DXVECTOR3 MyPosOld = GetPosOld();
@@ -272,17 +292,21 @@ void CPlayer::CollisionBlock()
             //種類の取得（敵なら当たり判定）
             CObject::TYPE type = pObj->GetType();
 
-            if (type == CObject::TYPE::BLOCK)
+            if (type == CObject::TYPE::BLOCK || type == CObject::TYPE::BGMODEL)
             {
-                D3DXVECTOR3 ComPos = ((CBlock*)pObj)->GetPos();
-                D3DXVECTOR3 ComVtxMax = ((CBlock*)pObj)->GetVtxMax();
-                D3DXVECTOR3 ComVtxMin = ((CBlock*)pObj)->GetVtxMin();
+                D3DXVECTOR3 ComPos = static_cast<CObjectX*>(pObj)->GetPos();
+                D3DXVECTOR3 ComVtxMax = static_cast<CObjectX*>(pObj)->GetVtxMax();
+                D3DXVECTOR3 ComVtxMin = static_cast<CObjectX*>(pObj)->GetVtxMin();
 
                 bSuccessCollision = CCollision::ExtrusionCollisionSquare(MyPos, bCollisionX, bCollisionY, bCollisionZ, Move, MyPosOld, MyVtxMax, MyVtxMin,
-                    ComPos, ComVtxMax, ComVtxMin,bCollisionXOld,bCollisionYOld,bCollisionZOld);
+                    ComPos, ComVtxMax, ComVtxMin, bCollisionXOld, bCollisionYOld, bCollisionZOld);
+
+                if (bCollisionY == true)
+                {
+                    SetMove(D3DXVECTOR3(GetMove().x, 0.0f, GetMove().z));
+                }
 
                 if (bSuccessCollision == true)
-
                 {
                     SetPos(MyPos);
                     SetExtrusionCollisionSquareX(bCollisionX);
@@ -296,29 +320,14 @@ void CPlayer::CollisionBlock()
         }
 
     }
-
-    CManager::GetDebugProc()->PrintDebugProc("X方向の当たり判定が発動しているかどうか（０：いいえ、１：はい）：%d\n", bCollisionX);
-    CManager::GetDebugProc()->PrintDebugProc("Y方向の当たり判定が発動しているかどうか（０：いいえ、１：はい）：%d\n", bCollisionY);
-    CManager::GetDebugProc()->PrintDebugProc("Z方向の当たり判定が発動しているかどうか（０：いいえ、１：はい）：%d\n", bCollisionZ);
 }
 //==========================================================================================================
 
 //========================================================
-//ロックオンの処理
+//ブロックとの当たり判定
 //========================================================
-void CPlayer::LockOnProcess()
+void CPlayer::CollisionBlock()
 {
-    //移動処理
-    LockOnMove();
-}
-//==========================================================================================================
-
-//========================================================
-//ロックオンを動かす
-//========================================================
-void CPlayer::LockOnMove()
-{
-
 }
 //==========================================================================================================
 
@@ -348,7 +357,13 @@ void CPlayer::AdjustRot()
 void CPlayer::AdjustPos()
 {
     const D3DXVECTOR3& Pos = GetPos();
-    D3DXVECTOR3 ScreenPos = CCalculation::CalcWorldToScreenNoViewport(Pos, *CManager::GetCamera()->GetMtxView(), *CManager::GetCamera()->GetMtxView(),
+    D3DXVECTOR3 ScreenPos = CCalculation::CalcWorldToScreenNoViewport(Pos, *CManager::GetCamera()->GetMtxView(), *CManager::GetCamera()->GetMtxProjection(),
         static_cast<float>(SCREEN_WIDTH), static_cast<float>(SCREEN_HEIGHT));
+
+    //画面外に出ないように補正
+    if (ScreenPos.x > SCREEN_WIDTH || ScreenPos.x < 0.0f)
+    {
+        SetPos(GetPosOld());
+    }
 }
 //==========================================================================================================

@@ -14,6 +14,7 @@
 #include "main.h"
 #include "objectXAlive.h"
 #include "lockon.h"
+#include "player_actionmode.h"
 //==========================================
 
 //===========================================
@@ -22,7 +23,7 @@
 class CPlayer : public CObjectXAlive
 {
 public:
-	CPlayer();                  //コンストラクタ
+	CPlayer(CPlayer_ActionMode * pPlayer_ActionMode);                  //コンストラクタ
 	~CPlayer();                 //デストラクタ
 	HRESULT Init() override;    //初期化処理
 	void Uninit() override;     //終了処理
@@ -30,7 +31,20 @@ public:
 	void Draw() override;       //描画処理
 	void SetDeath() override;   //死亡フラグを設定
 	static CPlayer * Create(D3DXVECTOR3 pos,D3DXVECTOR3 rot,D3DXVECTOR3 move,D3DXVECTOR3 Scale);
+
+	CLockon* GetLockOn() { return m_pLockOn; }//ロックオンのインスタンスを取得
 private:
+	//================================================
+	//アクションモード列挙型
+	//================================================
+	enum class ACTIONMODE
+	{
+		SHOT = 0,
+		DIVE,
+		MAX
+	};
+	//===============================================================================================
+
 	//================================================
     //静的メンバ
     //================================================
@@ -40,8 +54,10 @@ private:
 	//================================================
 	//変数宣言
 	//================================================
-	float m_fRotAim;   //目的の向き
-	CLockon* m_pLockOn;//ロックオンカーソルへのポインタ
+	float m_fRotAim;                    //目的の向き
+	CLockon* m_pLockOn;                 //ロックオンカーソルへのポインタ
+	CPlayer_ActionMode* m_pActionMode;  //アクションモードへのポインタ
+	ACTIONMODE m_NowActionMode;  //現在のアクションモード
 	//===============================================================================================
 
 
@@ -50,36 +66,24 @@ private:
 	//================================================
 
 	//=============================
-	//基本形
+	//位置系
 	//=============================
-	void MoveProcess();//プレイヤーの移動処理
-	void AttackProcress();//攻撃処理
-	void NormalAttackProcess();//通常攻撃処理
+	void MoveProcess();//移動処理
+	void AdjustRot();//向き調整処理
+	void AdjustPos();//位置を調整する
 	//================================================
 
 	//=============================
-	//通常攻撃処理
+	//モードチェンジ
 	//=============================
-	void AttackStart();
-
-	//判定
-	void CollisionBlock();//ブロックとの当たり判定処理
-
-	//ロックオンコントローラー
-	void LockOnProcess();//ロックオンの処理
-	void LockOnMove();   //ロックオンを動かす
-
-	//攻撃処理
-	//void CalcWorldToScreenEnemyLength();//
-
-	//向き調整
-	void AdjustRot();//向き調整処理
-
-	//位置調整
-	void AdjustPos();//位置を調整する
-
-
+	void ActionModeChenge();//アクションモードを変更する
 	//===============================================================================================
+
+	//=============================
+	//判定系
+	//=============================
+	void CollisionProcess();//当たり判定処理全般
+	void CollisionBlock();//ブロックとの当たり判定処理
 };
 
 #endif

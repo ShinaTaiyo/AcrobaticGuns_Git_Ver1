@@ -81,6 +81,7 @@ private:
 	D3DXVECTOR3 m_PosV;                           //視点!
 	D3DXVECTOR3 m_PosR;                           //注視点!
 	D3DXVECTOR3 m_AddPosR;                        //加算注視点
+	D3DXVECTOR3 m_AddPosV;                        //加算視点
 	D3DXVECTOR3 m_VecU;                           //上方向ベクトル!
 	D3DXVECTOR3 m_Rot;                            //向き!
 	D3DXMATRIX m_mtxProjection;                   //プロジェクション行列!

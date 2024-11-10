@@ -18,9 +18,10 @@
 //====================================================
 //静的メンバ宣言
 //====================================================
-const char* CUi::m_apUI_FILENAME[int(CUi::UITYPE::MAX)] =
+const string CUi::UI_FILENAME[int(CUi::UITYPE::MAX)] =
 {
 	"data\\TEXTURE\\UI\\LockOn_001.png",
+	"data\\TEXTURE\\UI\\ActionModeWindow_000.png",
 };//テクスチャファイル名
 
 //====================================================
@@ -114,7 +115,7 @@ CUi* CUi::Create(UITYPE type, CObject2D::POLYGONTYPE PolygonType, float fWidth, 
 			pUi->SetUseScale(true);//拡大率を使用する
 			pUi->CObject2D::SetInfo(1, 1, fWidth, fHeight, col, PolygonType, true);//ポリゴンとテクスチャ情報を設定
 			pUi->SetUseDeath(true);                 //死亡フラグを発動するかどうかを設定する
-			pUi->SetTextureIndex(pTextureClass->Regist(m_apUI_FILENAME[int(type)]));
+			pUi->SetTextureIndex(pTextureClass->Regist(UI_FILENAME[int(type)]));
 			pUi->CObject2D::BindTexture(pTextureClass->GetAddress(pUi->GetTextureIndex()));
 			pUi->CObject::SetType(CObject::TYPE::UI);//オブジェクの種類を決める
 		}
@@ -137,7 +138,7 @@ void CUi::SetUiType(UITYPE type)
 {
 	m_Type = type;
 	CTexture* pTextureClass = CManager::GetTexture();           //テクスチャクラスを取得
-    SetTextureIndex(pTextureClass->Regist(m_apUI_FILENAME[int(type)]));
+    SetTextureIndex(pTextureClass->Regist(UI_FILENAME[int(type)]));
     CObject2D::BindTexture(pTextureClass->GetAddress(GetTextureIndex()));
 
 }
@@ -241,7 +242,7 @@ CUiEffect* CUiEffect::Create(UITYPE type, CObject2D::POLYGONTYPE PolygonType, fl
 			pUiEffect->SetUseScale(true);//拡大率を使用する
 			pUiEffect->CObject2D::SetInfo(1, 1, fWidth, fHeight, col, PolygonType, true);//ポリゴンとテクスチャ情報を設定
 			pUiEffect->SetUseDeath(true);                 //死亡フラグを発動するかどうかを設定する
-			pUiEffect->SetTextureIndex(pTextureClass->Regist(m_apUI_FILENAME[int(type)]));
+			pUiEffect->SetTextureIndex(pTextureClass->Regist(UI_FILENAME[int(type)]));
 			pUiEffect->CObject2D::BindTexture(pTextureClass->GetAddress(pUiEffect->GetTextureIndex()));
 			pUiEffect->CObject::SetType(CObject::TYPE::UI);//オブジェクの種類を決める
 		}

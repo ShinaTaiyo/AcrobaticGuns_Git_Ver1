@@ -23,7 +23,7 @@
 #include <algorithm>
 #include <vector> //ベクター管理で使う
 #include <iomanip>// setprecisionを使用するのに必要
-
+#include <cassert>
 using namespace std;
 
 //==============================

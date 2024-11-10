@@ -31,15 +31,15 @@ public:
 	//======================================
 	//ポリゴンの設定タイプ
 	//======================================
-	typedef enum
+	enum class POLYGONTYPE
 	{
-		POLYGONTYPE00_NORMAL = 0,   //普通に出すポリゴン
-		POLYGONTYPE01_SENTERROLLING,//中心点を軸に回転できるポリゴン
-		POLYGONTYPE02_DOWN,         //中心点が下側
-		POLYGONTYPE03_LEFT,         //中心点が左側
-		POLYGONTYPE04_RIGHT,        //中心点が右側
-		POLYGONTYPE_MAX
-	}POLYGONTYPE;
+	    NORMAL = 0,   //普通に出すポリゴン
+	    SENTERROLLING,//中心点を軸に回転できるポリゴン
+	    DOWN,         //中心点が下側
+	    LEFT,         //中心点が左側
+	    RIGHT,        //中心点が右側
+		MAX
+	};
 	//======================================================================================================
 
 	CObject2D(int nPriority = 6);     //描画順設定用コンストラクタ

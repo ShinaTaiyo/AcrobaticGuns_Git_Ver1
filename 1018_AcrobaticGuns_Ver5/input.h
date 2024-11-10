@@ -71,26 +71,26 @@ public:
 	//==========================================
     //ジョイパッドのボタン番号
     //==========================================
-	typedef enum
+	enum class JOYKEY
 	{
-		JOYKEY_UP = 0,	//上
-		JOYKEY_DOWN,	//下
-		JOYKEY_LEFT,	//左
-		JOYKEY_RIGHT,	//右
-		JOYKEY_START,	//スタート
-		JOYKEY_BACK,	//バック
-		JOYKEY_L3,		//L3(左スティック押込み)
-		JOYKEY_R3,		//R3(右スティック押込み)
-		JOYKEY_LB,		//LB
-		JOYKEY_RB,		//RB
-		JOYKEY_LT,		//LT
-		JOYKEY_RT,		//RT
-		JOYKEY_A,		//A
-		JOYKEY_B,		//B
-		JOYKEY_X,		//X
-		JOYKEY_Y,		//Y
-		JOYKEY_MAX
-	}JOYKEY;
+		UP = 0,	//上
+		DOWN,	//下
+		LEFT,	//左
+		RIGHT,	//右
+		START,	//スタート
+		BACK,	//バック
+		L3,		//L3(左スティック押込み)
+		R3,		//R3(右スティック押込み)
+		LB,		//LB
+		RB,		//RB
+		LT,		//LT
+		RT,		//RT
+		A,		//A
+		B,		//B
+		X,		//X
+		Y,		//Y
+		MAX
+	};
 	//==============================================================================================================================
 
 	CInputJoypad();                                                       //コンストラクタ
