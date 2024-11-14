@@ -16,16 +16,17 @@
 //==================================================================
 //前方宣言
 //==================================================================
-const string CAttack::ATTACK_FILENAME[CAttack::ATTACKTYPE::TYPE_MAX] =
+const string CAttack::ATTACK_FILENAME[static_cast<int>(CAttack::ATTACKTYPE::MAX)] =
 {
-	"data\\MODEL\\Attack\\Fire_000.x"
+	"data\\MODEL\\Attack\\Fire_000.x",
+	"data\\MODEL\\Attack\\Explosion_000.x",
 };
 //======================================================================================================================
 
 //==================================================================
 //コンストラクタ
 //==================================================================
-CAttack::CAttack() : m_Type(ATTACKTYPE::TYPE00_BULLET)
+CAttack::CAttack(int nPri) : m_Type(ATTACKTYPE::BULLET),CObjectXAlive(nPri)
 {
 
 }
@@ -104,7 +105,7 @@ CAttack* CAttack::Create(ATTACKTYPE AttackType, int nLife, D3DXVECTOR3 pos, D3DX
 	pAttack->SetScale(Scale);               //拡大率
 
 	//モデル情報設定
-	int nIdx = CManager::GetObjectXInfo()->Regist(ATTACK_FILENAME[AttackType]);
+	int nIdx = CManager::GetObjectXInfo()->Regist(ATTACK_FILENAME[static_cast<int>(AttackType)]);
 
 	//モデル情報を割り当てる
 	pAttack->BindObjectXInfo(CManager::GetObjectXInfo()->GetMesh(nIdx),
@@ -123,7 +124,7 @@ CAttack* CAttack::Create(ATTACKTYPE AttackType, int nLife, D3DXVECTOR3 pos, D3DX
 //==================================================================
 //コンストラクタ
 //==================================================================
-CAttackPlayer::CAttackPlayer()
+CAttackPlayer::CAttackPlayer(int nPri) : CAttack(nPri)
 {
 
 }
@@ -189,8 +190,8 @@ void CAttackPlayer::SetDeath()
 //==================================================================
 CAttackPlayer* CAttackPlayer::Create(ATTACKTYPE AttackType, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale)
 {
-	CAttackPlayer* pAttackPlayer = DBG_NEW CAttackPlayer;     //生成
-
+	CAttackPlayer* pAttackPlayer = nullptr;     //生成
+	pAttackPlayer = DBG_NEW CAttackPlayer(3);     //生成
 	pAttackPlayer->Init();                        //初期化処理
 	pAttackPlayer->SetType(CObject::TYPE::ATTACK); //オブジェクトごとのタイプを設定する
 	pAttackPlayer->SetAttackType(AttackType);     //攻撃の種類を設定する
@@ -200,9 +201,10 @@ CAttackPlayer* CAttackPlayer::Create(ATTACKTYPE AttackType, int nLife, D3DXVECTO
 	pAttackPlayer->SetRot(rot);                   //向き
 	pAttackPlayer->SetMove(move);                 //移動量
 	pAttackPlayer->SetScale(Scale);               //拡大率
+	pAttackPlayer->SetAutoSubLife(true);          //体力を使用する
 
 	//モデル情報設定
-	int nIdx = CManager::GetObjectXInfo()->Regist(ATTACK_FILENAME[AttackType]);
+	int nIdx = CManager::GetObjectXInfo()->Regist(ATTACK_FILENAME[static_cast<int>(AttackType)]);
 
 	//モデル情報を割り当てる
 	pAttackPlayer->BindObjectXInfo(CManager::GetObjectXInfo()->GetMesh(nIdx),
@@ -286,7 +288,7 @@ void CAttackEnemy::SetDeath()
 //==================================================================
 CAttackEnemy* CAttackEnemy::Create(ATTACKTYPE AttackType, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale)
 {
-	CAttackEnemy* pAttackEnemy = DBG_NEW CAttackEnemy;     //生成
+	CAttackEnemy* pAttackEnemy = DBG_NEW CAttackEnemy();
 
 	pAttackEnemy->Init();                        //初期化処理
 	pAttackEnemy->SetType(CObject::TYPE::ATTACK); //オブジェクトごとのタイプを設定する
@@ -299,7 +301,7 @@ CAttackEnemy* CAttackEnemy::Create(ATTACKTYPE AttackType, int nLife, D3DXVECTOR3
 	pAttackEnemy->SetScale(Scale);               //拡大率
 
 		//モデル情報設定
-	int nIdx = CManager::GetObjectXInfo()->Regist(ATTACK_FILENAME[AttackType]);
+	int nIdx = CManager::GetObjectXInfo()->Regist(ATTACK_FILENAME[static_cast<int>(AttackType)]);
 
 	//モデル情報を割り当てる
 	pAttackEnemy->BindObjectXInfo(CManager::GetObjectXInfo()->GetMesh(nIdx),

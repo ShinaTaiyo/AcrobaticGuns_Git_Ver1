@@ -26,7 +26,7 @@ const char* CField::m_apFIELD_FILENAME[CField::FIELDTYPE_MAX] =
 //==========================================
 //コンストラクタ
 //==========================================
-CField::CField() : m_FieldType(FIELDTYPE00_NORMAL)
+CField::CField(int nPri) : m_FieldType(FIELDTYPE00_NORMAL),CObject3D(nPri)
 {
 
 }
@@ -102,7 +102,7 @@ void CField::SetDeath()
 //===========================================
 CField* CField::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight, FIELDTYPE FieldType)
 {
-	CField* pField = DBG_NEW CField;                                                    //床を生成
+	CField* pField = DBG_NEW CField();                                             //床を生成
 	bool bSuccess = pField->CObject::GetCreateSuccess();                            //生成が成功したかどうか
 	if (bSuccess == true)
 	{

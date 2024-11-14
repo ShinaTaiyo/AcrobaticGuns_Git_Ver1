@@ -39,7 +39,8 @@
 //====================================================
 //コンストラクタ
 //====================================================
-CPlayer::CPlayer(CPlayer_ActionMode* pPlayer_ActionMode) : m_fRotAim(0.0f),m_pLockOn(nullptr),m_pActionMode(pPlayer_ActionMode),m_NowActionMode(ACTIONMODE::SHOT)
+CPlayer::CPlayer(CPlayerMove* pPlayerMove, CPlayerAttack* pPlayerAttack) : m_pMove(pPlayerMove),m_pAttack(pPlayerAttack),
+m_fRotAim(0.0f),m_pLockOn(nullptr),m_NowActionMode(ACTIONMODE::SHOT),m_pModeDisp(nullptr),m_bCollision(false),CObjectXAlive(2)
 {
 
 }
@@ -67,6 +68,9 @@ HRESULT CPlayer::Init()
     m_pLockOn = CLockon::Create(D3DXVECTOR3(SCREEN_WIDTH / 2,SCREEN_HEIGHT / 2,0.0f), CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, D3DXCOLOR(1.0f,1.0f,1.0f,1.0f));
     m_pLockOn->SetUseDeath(true);
 
+    m_pModeDisp = CUi::Create(CUi::UITYPE::ACTIONMODE_GUN, CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, 1, false, D3DXVECTOR3(50.0f, 50.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+        D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+
     return S_OK;
 }
 //==========================================================================================================
@@ -77,6 +81,18 @@ HRESULT CPlayer::Init()
 void CPlayer::Uninit()
 {
     CObjectXAlive::Uninit();//Xオブジェクト終了
+
+    if (m_pMove != nullptr)
+    {
+        delete m_pMove;
+        m_pMove = nullptr;
+    }
+
+    if (m_pAttack != nullptr)
+    {
+        delete m_pAttack;
+        m_pAttack = nullptr;
+    }
 }
 //==========================================================================================================
 
@@ -85,11 +101,9 @@ void CPlayer::Uninit()
 //====================================================
 void CPlayer::Update()
 {
-    MoveProcess();//移動処理
+    m_pMove->MoveProcess(this);//現在のアクションモードの移動処理を実行
 
     AdjustRot();//向き調整処理
-
-    m_pActionMode->Move(this);//現在のアクションモードの移動処理を実行
 
     ActionModeChenge(); //現在のアクションモードを変更する
 
@@ -97,9 +111,9 @@ void CPlayer::Update()
 
     AdjustPos();//位置調整処理
 
-    CollisionProcess();//当たり判定全般処理
+    CollisionProcess();
 
-    m_pActionMode->Attack(this);//現在のアクションモードの攻撃処理を実装
+    m_pAttack->AttackProcess(this);//現在のアクションモードの攻撃処理を実装
 
     //m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f) + m_AddPosR;
     //m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -200.0f, 0.0f, cosf(m_Rot.y) * -200.0f);
@@ -128,12 +142,11 @@ void CPlayer::SetDeath()
         m_pLockOn = nullptr;
     }
 
-    //行動モード
-    if (m_pActionMode != nullptr)
+    if (m_pModeDisp != nullptr)
     {
-        m_pActionMode->SetUseDeath(true);
-        m_pActionMode->SetDeath();
-        m_pActionMode = nullptr;
+        m_pModeDisp->SetUseDeath(true);
+        m_pModeDisp->SetDeath();
+        m_pModeDisp = nullptr;
     }
 
     CObject::SetDeath();
@@ -145,7 +158,7 @@ void CPlayer::SetDeath()
 //====================================================
 CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale)
 {
-    CPlayer* pPlayer = new CPlayer(CPlayerShot::Create(CObject2D::POLYGONTYPE::SENTERROLLING,D3DXCOLOR(1.0f,1.0f,1.0f,1.0f),D3DXVECTOR3(100.0f,100.0f,0.0f),100.0f,100.0f));                                                                             //プレイヤーを生成
+    CPlayer* pPlayer = DBG_NEW CPlayer(DBG_NEW CPlayerMove_Normal(),DBG_NEW CPlayerAttack_Shot());//プレイヤーを生成
 
     bool bSuccess = pPlayer->CObject::GetCreateSuccess();
     int nIdx = 0;//テクスチャのインデックス
@@ -191,49 +204,23 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
 //==========================================================================================================
 
 //========================================================
-//移動処理
-//========================================================
-void CPlayer::MoveProcess()
-{
-    const D3DXVECTOR3& Pos = GetPos();
-    float fRotDiff = 0.0f;//向きの差分
-    const D3DXVECTOR3 & Move = GetMove();
-    D3DXVECTOR3 AddMove = D3DXVECTOR3(0.0f,0.0f,0.0f);
-    bool bMove = false;//移動しているかどうか
-    bMove = CCalculation::CaluclationMove(true,AddMove, 10.0f, CCalculation::MOVEAIM_XZ,m_fRotAim);
-    //CCalculation::CalculationCollectionRot2D(CalRot.y, m_fRotAim, 0.25f);
-    
-    //CManager::GetInputJoypad()->GetLStickPress();
-    if (bMove == true)
-    {
-        SetMove(AddMove + D3DXVECTOR3(0.0f, Move.y, 0.0f));
-    }
-    CManager::GetDebugProc()->PrintDebugProc("プレイヤーの位置：%f %f %f\n",Pos.x,Pos.y,Pos.z);
-    CManager::GetDebugProc()->PrintDebugProc("目的の向き：%f\n", m_fRotAim);
-}
-//==========================================================================================================
-
-//========================================================
 //攻撃開始
 //========================================================
 void CPlayer::ActionModeChenge()
 {
     if (CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::X) == true)
     {
-
-        if (m_pActionMode != nullptr)
+        if (m_pModeDisp != nullptr)
         {
-            m_pActionMode->SetUseDeath(true);//死亡フラグを使用する
-            m_pActionMode->SetDeath();       //死亡フラグを設定する
-            m_pActionMode = nullptr;         //ポインタを初期化
+            m_pModeDisp->SetUseDeath(true);
+            m_pModeDisp->SetDeath();
+            m_pModeDisp = nullptr;
         }
 
         //モードを切り替える
         if (m_NowActionMode == ACTIONMODE::SHOT)
         {//ショット→ダイブ
             m_NowActionMode = ACTIONMODE::DIVE;
-            SetUseInteria(false);
-            SetUseGravity(false,GetNormalGravity());
         }
         else
         {//ダイブ→ショット
@@ -245,18 +232,55 @@ void CPlayer::ActionModeChenge()
         //モード生成
         switch (m_NowActionMode)
         {
-        case ACTIONMODE::SHOT:
-            m_pActionMode = CPlayerShot::Create(CObject2D::POLYGONTYPE::SENTERROLLING, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), 100.0f, 100.0f);
+        case ACTIONMODE::SHOT://発射モード
+            //m_pActionMode = DBG_NEW CPlayerShot;
+            ChengeMoveMode(DBG_NEW CPlayerMove_Normal()); //通常移動モードにする
+            ChengeAttackMode(DBG_NEW CPlayerAttack_Shot()); //攻撃可能モードにする
+            m_pModeDisp = CUi::Create(CUi::UITYPE::ACTIONMODE_GUN, CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, 1, false, D3DXVECTOR3(50.0f, 50.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+                D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
             break;
-        case ACTIONMODE::DIVE:
-            m_pActionMode = CPlayerDive::Create(CObject2D::POLYGONTYPE::SENTERROLLING, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), 100.0f, 100.0f);
+        case ACTIONMODE::DIVE://ダイブモード
+            //m_pActionMode = DBG_NEW CPlayerDive;
+            ChengeMoveMode(DBG_NEW CPlayerMove_PrepDive());//ダイブ準備モードにする
+            ChengeAttackMode(DBG_NEW CPlayerAttack_Dont);  //攻撃不能モードにする
+            m_pModeDisp = CUi::Create(CUi::UITYPE::ACTIONMODE_DIVE, CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, 1, false, D3DXVECTOR3(50.0f, 50.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+                D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
             break;
         default:
             break;
         }
-        m_pActionMode->SetUseDeath(false);
 
 
+    }
+}
+//==========================================================================================================
+
+//========================================================
+//移動モードをチェンジ
+//========================================================
+void CPlayer::ChengeMoveMode(CPlayerMove* pPlayerMove)
+{
+    if (m_pMove != nullptr)
+    {
+        delete m_pMove;
+        m_pMove = nullptr;
+
+        m_pMove = pPlayerMove;
+    }
+}
+//==========================================================================================================
+
+//========================================================
+//攻撃モードをチェンジ
+//========================================================
+void CPlayer::ChengeAttackMode(CPlayerAttack* pPlayerAttack)
+{
+    if (m_pAttack != nullptr)
+    {
+        delete m_pAttack;
+        m_pAttack = nullptr;
+
+        m_pAttack = pPlayerAttack;
     }
 }
 //==========================================================================================================
@@ -279,6 +303,7 @@ void CPlayer::CollisionProcess()
     bool bCollisionY = false;
     bool bCollisionZ = false;
 
+    m_bCollision = false;//判定状態をリセット
     bool bSuccessCollision = false;//当たり判定が成功したかどうか
     for (int nCntPri = 0; nCntPri < CObject::m_nMAXPRIORITY; nCntPri++)
     {
@@ -303,15 +328,13 @@ void CPlayer::CollisionProcess()
 
                 if (bCollisionY == true)
                 {
-                    SetMove(D3DXVECTOR3(GetMove().x, 0.0f, GetMove().z));
+                    SetMove(D3DXVECTOR3(GetMove().x, 0.0f, GetMove().z)); 
                 }
 
                 if (bSuccessCollision == true)
                 {
                     SetPos(MyPos);
-                    SetExtrusionCollisionSquareX(bCollisionX);
-                    SetExtrusionCollisionSquareY(bCollisionY);
-                    SetExtrusionCollisionSquareZ(bCollisionZ);
+                    m_bCollision = true;
                 }
             }
 
@@ -320,6 +343,10 @@ void CPlayer::CollisionProcess()
         }
 
     }
+
+    SetExtrusionCollisionSquareX(bCollisionX);
+    SetExtrusionCollisionSquareY(bCollisionY);
+    SetExtrusionCollisionSquareZ(bCollisionZ);
 }
 //==========================================================================================================
 
@@ -328,6 +355,16 @@ void CPlayer::CollisionProcess()
 //========================================================
 void CPlayer::CollisionBlock()
 {
+
+}
+//==========================================================================================================
+
+//========================================================
+//ジャンプ処理
+//========================================================
+void CPlayer::JumpProcess()
+{
+    //
 }
 //==========================================================================================================
 
@@ -338,7 +375,7 @@ void CPlayer::AdjustRot()
 {
     D3DXVECTOR3& Rot = GetRot();
     const D3DXVECTOR3& CameraRot = CManager::GetCamera()->GetRot();
-    SetRot(D3DXVECTOR3(0.0f,D3DX_PI + CameraRot.y,0.0f));
+    SetRot(D3DXVECTOR3(GetRot().x,D3DX_PI + CameraRot.y,GetRot().z));
 
     //CCamera* pCaemra = CManager::GetCamera();
     //if (m_pLockOn->GetEndState() == CLockon::ENDSTATE::RIGHTEND)

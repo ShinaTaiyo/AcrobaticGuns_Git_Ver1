@@ -226,8 +226,11 @@ void CObjectX::Draw()
 	//=======================================
 	//アルファテストを有効(アルファ値が０より大きい場合に描画する）
 	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-	pDevice->SetRenderState(D3DRS_ALPHAREF, 0);
+	pDevice->SetRenderState(D3DRS_ALPHAREF,50);
 	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
+
+	////Zバッファに書き込まない（重なり方に違和感がなくなる）
+    //pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 
 	//法線の長さを１にする。（スケールなどを使った時は、必ず使う。)
 	pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);
@@ -272,6 +275,8 @@ void CObjectX::Draw()
 	//法線の長さを１にする。（スケールなどを使った時は、必ず使う。)
 	pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, FALSE);
 
+	//Zバッファに書き込む
+    //pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 
 	//片面だけ描画する
 	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
@@ -701,7 +706,7 @@ void CObjectX::DrawShadow()
 	//D3DXMatrixMultiply(&mtxShadow, &mtxShadow, &mtxRot);
 
 	//位置を反映
-	D3DXMatrixTranslation(&mtxTrans, m_Pos.x,0.0f, m_Pos.z);
+	D3DXMatrixTranslation(&mtxTrans, m_Pos.x,1.0f, m_Pos.z);
 	D3DXMatrixMultiply(&mtxShadow, &mtxShadow, &mtxTrans);
 
 	//ワールドマトリックスの設定
@@ -724,7 +729,7 @@ void CObjectX::DrawShadow()
 	for (int nCntMat = 0; nCntMat < (int)m_ObjectXInfo.dwNumMat; nCntMat++)
 	{
 		//色合いの設定
-		pMat[nCntMat].MatD3D.Diffuse = D3DXCOLOR(0.0f,0.0f,0.0f,1.0f);
+		pMat[nCntMat].MatD3D.Diffuse = D3DXCOLOR(0.0f,0.0f,0.0f,m_ObjectXInfo.Diffuse[nCntMat].a);
 
 		//マテリアルの設定
 		pDevice->SetMaterial(&pMat[nCntMat].MatD3D);

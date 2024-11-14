@@ -28,8 +28,10 @@ class CUi : public CObject2D
 public:
 	enum class UITYPE
 	{
-		LOCKON = 0,//ロックオン
+		LOCKON = 0,      //ロックオン
 		ACTIONMODEWINDOW,//アクションモードウインドウ
+	    ACTIONMODE_GUN,  //ショットモードUI
+		ACTIONMODE_DIVE, //ダイブモードUI
 		MAX
 	};
 

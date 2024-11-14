@@ -365,7 +365,7 @@ bool CCollision::ExtrusionCollisionSquareY(D3DXVECTOR3& MyPos, const D3DXVECTOR3
 		return true;
 	}
 
-	return false;
+	return bCollisionY;
 }
 //====================================================================================================================
 

@@ -49,7 +49,7 @@ public:
 	}MAPTYPE;
 	//======================================================================
 
-	CBlock();                 //コンストラクタ
+	CBlock(int nPri = 2);                 //コンストラクタ
 	~CBlock() override;       //デストラクタ
 	HRESULT Init() override;  //初期化処理
 	void Uninit() override;   //終了処理

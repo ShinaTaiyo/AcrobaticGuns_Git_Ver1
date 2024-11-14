@@ -14,6 +14,7 @@
 #include "main.h"
 #include "objectXAlive.h"
 #include "lockon.h"
+#include "ui.h"
 #include "player_actionmode.h"
 //==========================================
 
@@ -23,7 +24,7 @@
 class CPlayer : public CObjectXAlive
 {
 public:
-	CPlayer(CPlayer_ActionMode * pPlayer_ActionMode);                  //コンストラクタ
+	CPlayer(CPlayerMove * pPlayerMove,CPlayerAttack * pPlayerAttack);                  //コンストラクタ
 	~CPlayer();                 //デストラクタ
 	HRESULT Init() override;    //初期化処理
 	void Uninit() override;     //終了処理
@@ -31,8 +32,20 @@ public:
 	void Draw() override;       //描画処理
 	void SetDeath() override;   //死亡フラグを設定
 	static CPlayer * Create(D3DXVECTOR3 pos,D3DXVECTOR3 rot,D3DXVECTOR3 move,D3DXVECTOR3 Scale);
-
 	CLockon* GetLockOn() { return m_pLockOn; }//ロックオンのインスタンスを取得
+
+	//================================================
+	//当たり判定
+	//================================================
+	void SetSuccessCollision(bool bSuccess) { m_bCollision = bSuccess; }//当たり判定が成功したかどうかを設定
+	const bool& GetCollisionSuccess() const { return m_bCollision; }//当たり判定が成功したかどうかを取得
+
+	//================================================
+	//モードチェンジ
+	//================================================
+	void ChengeMoveMode(CPlayerMove* pPlayerMove);//移動モードを変える
+	void ChengeAttackMode(CPlayerAttack* pPlayerAttack);//攻撃モードを変える
+	//===============================================================================================
 private:
 	//================================================
 	//アクションモード列挙型
@@ -56,8 +69,11 @@ private:
 	//================================================
 	float m_fRotAim;                    //目的の向き
 	CLockon* m_pLockOn;                 //ロックオンカーソルへのポインタ
-	CPlayer_ActionMode* m_pActionMode;  //アクションモードへのポインタ
-	ACTIONMODE m_NowActionMode;  //現在のアクションモード
+	ACTIONMODE m_NowActionMode;         //現在のアクションモード
+	CUi * m_pModeDisp;                  //モード表示UI
+	CPlayerMove* m_pMove;               //移動処理
+	CPlayerAttack* m_pAttack;           //攻撃処理
+	bool m_bCollision;                  //当たり判定が成功したかどうか
 	//===============================================================================================
 
 
@@ -68,7 +84,6 @@ private:
 	//=============================
 	//位置系
 	//=============================
-	void MoveProcess();//移動処理
 	void AdjustRot();//向き調整処理
 	void AdjustPos();//位置を調整する
 	//================================================
@@ -77,13 +92,20 @@ private:
 	//モードチェンジ
 	//=============================
 	void ActionModeChenge();//アクションモードを変更する
-	//===============================================================================================
+	//==============================================================================================
 
 	//=============================
 	//判定系
 	//=============================
 	void CollisionProcess();//当たり判定処理全般
 	void CollisionBlock();//ブロックとの当たり判定処理
+	//===============================================================================================
+
+	//=============================
+	//ジャンプ関係
+	//=============================
+	void JumpProcess();     //ジャンプ処理
+	//===============================================================================================
 };
 
 #endif

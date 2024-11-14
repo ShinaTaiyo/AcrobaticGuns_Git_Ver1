@@ -28,7 +28,7 @@ public:
 		FIELDTYPE_MAX
 	}FIELDTYPE;
 
-	CField();                                                                       //コンストラクタ
+	CField(int nPri = 0);                                                                       //コンストラクタ
 	~CField() override;                                                             //デストラクタ
 	HRESULT Init() override;                                                        //初期化処理
 	void Uninit() override;                                                         //終了処理

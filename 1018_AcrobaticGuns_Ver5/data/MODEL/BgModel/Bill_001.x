@@ -177,7 +177,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\BgModel\\AustorariaConquestUbaiman_000.png";
+    "data\\TEXTURE\\BgModel\\Rainbow_000.png";
    }
   }
  }

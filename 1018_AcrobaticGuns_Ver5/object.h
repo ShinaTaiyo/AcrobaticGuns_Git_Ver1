@@ -27,21 +27,21 @@ public:
 	enum class TYPE
 	{
 		NONE,            //タイプなし
-		PLAYER,          //プレイヤー3
-		ENEMY,           //敵2
+		PLAYER,          //プレイヤー2
+		ENEMY,           //敵3
 		BULLET,          //弾4
-		BLOCK,           //ブロック0
+		BLOCK,           //ブロック2
 		BG,              //背景
-		FIELD,           //床
+		FIELD,           //床0
 		STAGEMANAGER,    //ステージマネージャー
 		FADE,            //フェード4
-		ATTACK,          //攻撃
-		BGMODEL,         //背景モデル
+		ATTACK,          //攻撃2
+		BGMODEL,         //背景モデル1
 		UI3D,            //UI3D
 		LOCKON,          //ロックオン
 		PARTICLE,        //パーティクル
 	    PARTICLE2D,      //パーティクル２D
-		UI,
+		UI,              //UI
 		MAX
 	};
 	//===========================================
@@ -96,7 +96,7 @@ public:
 	void SetStageManagerObjNum(int nNum) { m_nStageManagerObjNum = nNum; }            //ステージマネージャーで管理されているオブジェクトの番号を設定
 	int GetStageManagerObjNum() { return m_nStageManagerObjNum; }                     //ステージマネージャーで管理されているオブジェクトの番号を取得する
 	static const int m_nMAXOBJECT = 1024;                                             //オブジェクト最大数
-	static const int m_nMAXPRIORITY = 10;                                              //描画順最大数
+	static const int m_nMAXPRIORITY = static_cast<int>(TYPE::MAX);                    //描画順最大数
 	static void ReleaseProcess();                                                     //リストの破棄をする処理
 	void Release();                                                                   //自分自身の開放
 	void SetUseDeath(bool bDeath) { m_bUseDeath = bDeath; }                           //死亡フラグを発動するかどうかを設定する

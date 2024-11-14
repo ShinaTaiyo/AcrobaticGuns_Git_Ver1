@@ -65,6 +65,9 @@ public:
 	void SetAutoSubLife(bool bUse) { m_bAutoSubLife = bUse; }       //体力を自動的に減らすかどうかを設定
 	int& GetHitStopTime() { return m_nHitStopTime; }                //ヒットストップ時間を取得する
 
+	//体力によって透明度を変えるかどうか
+	void SetUseRatioLifeAlpha(bool bUse) { m_bUseRatioLifeAlpha = bUse; }
+
 	//ダメージを与える
 	void SetDamage(int nDamage, int nHitStopTime);          //ダメージを与える
 

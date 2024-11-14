@@ -29,7 +29,7 @@ const string CBgModel::BGMODEL_FILENAME[static_cast<int>(CBgModel::BGMODELTYPE::
 //==================================================================
 //コンストラクタ
 //==================================================================
-CBgModel::CBgModel() : m_Type(BGMODELTYPE::BILL_00)
+CBgModel::CBgModel(int nPri) : m_Type(BGMODELTYPE::BILL_00),CObjectX(nPri)
 {
 
 }
