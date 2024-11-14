@@ -31,7 +31,7 @@ public:
 		DOWNEND,
 		MAX
 	};
-	CLockon();     //描画順設定用コンストラクタ
+	CLockon(int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::LOCKON, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_2D);     //描画順設定用コンストラクタ
 	~CLockon() override;       //デストラクタ
 	HRESULT Init() override;     //初期化処理
 	void Uninit() override;      //終了処理

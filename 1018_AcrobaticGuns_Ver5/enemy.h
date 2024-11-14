@@ -28,7 +28,7 @@ public:
 		MAX
 	};
 
-	CEnemy();                   //コンストラクタ
+	CEnemy(int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::ENEMY, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_X);                   //コンストラクタ
 	~CEnemy();                  //デストラクタ
 	HRESULT Init() override;    //初期化処理
 	void Uninit() override;     //終了処理

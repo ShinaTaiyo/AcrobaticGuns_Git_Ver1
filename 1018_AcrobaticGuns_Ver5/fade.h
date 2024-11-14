@@ -30,7 +30,7 @@ public:
 		FADEMODE_OUT, //フェードアウト
 		FADEMODE_MAX
 	}FADEMODE;
-	CFade(int nPriority = 9);                          //コンストラクタ
+	CFade(int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::FADE, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_2D);                          //コンストラクタ
 	~CFade() override;                //デストラクタ
 	HRESULT Init() override;          //初期化処理
 	void Uninit() override;           //終了処理

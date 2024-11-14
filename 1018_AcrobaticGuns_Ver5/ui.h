@@ -42,8 +42,8 @@ public:
 		UIMOVETYPE_MAX
 	}UIMOVETYPE;
 
-	CUi(int nPriority = 6);                      //コンストラクタ
-	virtual ~CUi();             //デストラクタ
+	CUi(int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::UI, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_2D);                      //コンストラクタ
+	~CUi() override;             //デストラクタ
 	HRESULT Init() override;    //初期化処理
 	void Uninit() override;     //終了処理
 	void Update() override;     //更新処理

@@ -26,7 +26,7 @@ public:
 		UI3DTYPE_MAX
 	}UI3DTYPE;
 
-	CUi3D();                                                                 //コンストラクタ
+	CUi3D(int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::UI3D, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_BILLBOARD);                                                                 //コンストラクタ
 	~CUi3D();                                                                //デストラクタ
 	HRESULT Init(void) override;                                             //初期化処理
 	void Uninit(void) override;                                              //終了処理

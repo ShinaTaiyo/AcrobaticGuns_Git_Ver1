@@ -20,7 +20,7 @@
 class CObjectXMove : public CObjectX
 {
 public:
-	CObjectXMove(int nPriority = 2);                                                       //コンストラクタ
+	CObjectXMove(int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::NONE, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_X);                                                       //コンストラクタ
 	~CObjectXMove() override;                                             //デストラクタ
 	HRESULT Init() override;                                              //初期化処理
 	void Uninit() override;                                               //終了処理

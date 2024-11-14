@@ -28,7 +28,7 @@ public:
 		BG_RESULT,   //リザルト背景
 		BG_MAX 
 	}BG;
-	CBg();                      //コンストラクタ
+	CBg(int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::BG, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_2D);                      //コンストラクタ
 	virtual ~CBg();             //デストラクタ
 	HRESULT Init() override;    //初期化処理
 	void Uninit() override;     //終了処理

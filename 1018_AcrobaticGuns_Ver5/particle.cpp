@@ -31,7 +31,7 @@ const char* CParticle::m_apPARTICLE_FILENAME[CParticle::TYPE_MAX] =
 //==========================================
 //コンストラクタ
 //==========================================
-CParticle::CParticle() : CBillboard(4), m_bBranding(true), m_Type(TYPE00_NORMAL), m_fReductionWidth(0.0f),m_fReductionHeight(0.0f), m_bAddSpeed(false),m_fAddSpeed(0.0f),
+CParticle::CParticle(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CBillboard(nPri,bUseintPri,type,ObjType), m_bBranding(true), m_Type(TYPE00_NORMAL), m_fReductionWidth(0.0f),m_fReductionHeight(0.0f), m_bAddSpeed(false),m_fAddSpeed(0.0f),
 m_bUseChargePartilce(false), m_bGravity(false), m_fGravity(0.0f),m_SupportPos(D3DXVECTOR3(0.0f,0.0f,0.0f))
 {
 

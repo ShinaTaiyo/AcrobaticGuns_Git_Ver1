@@ -29,7 +29,8 @@ const string CBgModel::BGMODEL_FILENAME[static_cast<int>(CBgModel::BGMODELTYPE::
 //==================================================================
 //コンストラクタ
 //==================================================================
-CBgModel::CBgModel(int nPri) : m_Type(BGMODELTYPE::BILL_00),CObjectX(nPri)
+CBgModel::CBgModel(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : m_Type(BGMODELTYPE::BILL_00),
+CObjectX(nPri,bUseintPri,type,ObjType)
 {
 
 }
@@ -95,7 +96,7 @@ void CBgModel::SetDeath()
 //==================================================================
 CBgModel* CBgModel::Create(BGMODELTYPE bgModelType, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 Scale)
 {
-	CBgModel* pBgModel = DBG_NEW CBgModel;     //生成
+	CBgModel* pBgModel = DBG_NEW CBgModel();     //生成
 
 	pBgModel->Init();                        //初期化処理
 	pBgModel->SetType(CObject::TYPE::BGMODEL);//オブジェクトごとのタイプを設定する

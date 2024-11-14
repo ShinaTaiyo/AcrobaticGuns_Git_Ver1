@@ -32,17 +32,24 @@ bool CObject::m_bActivationReleaseAll = false;            //ReleaseAllを発動する
 //=====================================================
 //コンストラクタ（描画順設定用）
 //=====================================================
-CObject::CObject(int nPriority) : m_bUseInitialSound(true) ,m_ObjectType(OBJECTTYPE::OBJECTTYPE_2D),m_bIsStageManagerObj(false),m_nID(0),m_nStageManagerObjNum(0),m_pStageManagerObj_Next(nullptr),
-m_pStageManagerObj_Prev(nullptr), m_bStageManagerChooseState(false),m_type(TYPE::NONE),m_bDeath(false), m_bUseDeath(false),m_pPrev(nullptr),m_pNext(nullptr),
-m_nPriority(0),m_bCreateSuccess(false),m_nCntFrame(0),m_ManagerObjectType(MANAGEROBJECTTYPE_NONE)
+CObject::CObject(int nPriority,bool bUseintPriority, TYPE Type, OBJECTTYPE ObjType) : m_type(Type), m_bUseInitialSound(true) ,m_ObjectType(ObjType),m_bIsStageManagerObj(false),m_nID(0),m_nStageManagerObjNum(0),m_pStageManagerObj_Next(nullptr),
+m_pStageManagerObj_Prev(nullptr), m_bStageManagerChooseState(false),m_bDeath(false), m_bUseDeath(false),m_pPrev(nullptr),m_pNext(nullptr),
+m_nPriority(nPriority),m_bCreateSuccess(false),m_nCntFrame(0),m_ManagerObjectType(MANAGEROBJECTTYPE_NONE)
 {
-	m_nPriority = nPriority;                        //描画順の情報を送る
 	m_bCreateSuccess = false;                       //生成に成功したかどうか
 	m_bDeath = false;                               //死亡フラグ
-	m_bUseDeath = true;                            //死亡フラグを発動するかどうか
-	m_type = (CObject::TYPE)(0);                    //種類
+	m_bUseDeath = true;                             //死亡フラグを発動するかどうか
 	m_bStageManagerChooseState = false;             //ステージマネージャーに選択されているかどうか
 	CObject* pObj = nullptr;                        //オブジェクト取得用
+
+	if (bUseintPriority == true)
+	{
+		m_nPriority = nPriority;
+	}
+	else
+	{
+		m_nPriority = static_cast<int>(m_type);
+	}
 
 	m_nCntFrame = 0;                                //フレーム数をカウントする
 	//先頭がいなかったら登録

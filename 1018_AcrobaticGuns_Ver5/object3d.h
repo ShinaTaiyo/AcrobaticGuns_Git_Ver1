@@ -21,7 +21,7 @@
 class CObject3D : public CObject
 {
 public:
-	CObject3D(int nPriority = 0);                                                           //コンストラクタ
+	CObject3D(int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::NONE, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_3D);                                                           //コンストラクタ
 	~CObject3D();                                                          //デストラクタ
 	HRESULT Init(void) override;                                           //初期化処理
 	void Uninit(void) override;                                            //終了処理

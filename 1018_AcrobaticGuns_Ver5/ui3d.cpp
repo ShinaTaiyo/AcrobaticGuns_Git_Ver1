@@ -24,7 +24,7 @@ const string CUi3D::m_UI3D_FILENAME[CUi3D::UI3DTYPE_MAX] =
 //=======================================================
 //コンストラクタ
 //=======================================================
-CUi3D::CUi3D()
+CUi3D::CUi3D(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CBillboard(nPri,bUseintPri,type,ObjType)
 {
 
 }

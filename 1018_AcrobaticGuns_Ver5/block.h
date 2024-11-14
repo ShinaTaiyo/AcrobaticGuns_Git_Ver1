@@ -49,7 +49,7 @@ public:
 	}MAPTYPE;
 	//======================================================================
 
-	CBlock(int nPri = 2);                 //コンストラクタ
+	CBlock(int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::BLOCK, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_X);                 //コンストラクタ
 	~CBlock() override;       //デストラクタ
 	HRESULT Init() override;  //初期化処理
 	void Uninit() override;   //終了処理

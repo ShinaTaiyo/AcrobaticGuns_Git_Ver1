@@ -17,7 +17,7 @@
 //===============================================================
 //コンストラクタ
 //===============================================================
-CParticle2D::CParticle2D()
+CParticle2D::CParticle2D(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject2D(nPri,bUseintPri,type,ObjType)
 {
 
 }

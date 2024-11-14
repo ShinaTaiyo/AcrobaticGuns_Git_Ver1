@@ -15,7 +15,8 @@
 //======================================================
 //コンストラクタ
 //======================================================
-CFade::CFade(int nPriority) : CObject2D(nPriority),m_FadeMode(FADEMODE_NONE),m_fAlpha(0.0f),m_nFadeCnt(0),m_nMaxFadeCnt(0)
+CFade::CFade(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject2D(nPri,bUseintPri,type,ObjType),
+m_FadeMode(FADEMODE_NONE),m_fAlpha(0.0f),m_nFadeCnt(0),m_nMaxFadeCnt(0)
 {
 
 }

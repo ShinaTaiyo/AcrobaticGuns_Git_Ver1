@@ -39,8 +39,10 @@
 //====================================================
 //コンストラクタ
 //====================================================
-CPlayer::CPlayer(CPlayerMove* pPlayerMove, CPlayerAttack* pPlayerAttack) : m_pMove(pPlayerMove),m_pAttack(pPlayerAttack),
-m_fRotAim(0.0f),m_pLockOn(nullptr),m_NowActionMode(ACTIONMODE::SHOT),m_pModeDisp(nullptr),m_bCollision(false),CObjectXAlive(2)
+CPlayer::CPlayer(CPlayerMove* pPlayerMove, CPlayerAttack* pPlayerAttack,
+    int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri,bUseintPri,type,ObjType)
+    ,m_pMove(pPlayerMove),m_pAttack(pPlayerAttack),
+m_fRotAim(0.0f),m_pLockOn(nullptr),m_NowActionMode(ACTIONMODE::SHOT),m_pModeDisp(nullptr),m_bCollision(false)
 {
 
 }

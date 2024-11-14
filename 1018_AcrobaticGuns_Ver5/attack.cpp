@@ -26,7 +26,7 @@ const string CAttack::ATTACK_FILENAME[static_cast<int>(CAttack::ATTACKTYPE::MAX)
 //==================================================================
 //コンストラクタ
 //==================================================================
-CAttack::CAttack(int nPri) : m_Type(ATTACKTYPE::BULLET),CObjectXAlive(nPri)
+CAttack::CAttack(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri, bUseintPri, type, ObjType),m_Type(ATTACKTYPE::BULLET)
 {
 
 }

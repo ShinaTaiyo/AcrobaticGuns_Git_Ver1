@@ -27,7 +27,7 @@ class CObjectX;
 class CBillboard : public CObject
 {
 public:
-	CBillboard(int nPriority = 5);                                              //コンストラクタ
+	CBillboard(int nPri = 6, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::NONE, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_BILLBOARD);                                              //コンストラクタ
 	~CBillboard();                                                              //デストラクタ
 	HRESULT Init(void) override;                                                //初期化処理
 	void Uninit(void) override;                                                 //終了処理

@@ -24,7 +24,8 @@ const string CEnemy::m_aENEMY_FILENAME[int(ENEMYTYPE::MAX)] =
 //====================================================================================
 //コンストラクタ
 //====================================================================================
-CEnemy::CEnemy() : m_Type(ENEMYTYPE::NORMAL)
+CEnemy::CEnemy(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri,bUseintPri,type,ObjType),
+m_Type(ENEMYTYPE::NORMAL)
 {
 
 }

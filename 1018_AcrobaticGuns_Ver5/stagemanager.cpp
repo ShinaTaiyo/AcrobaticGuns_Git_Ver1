@@ -38,7 +38,8 @@ const string CStageManager::m_aSAVE_FILENAME = "data\\TEXTFILE\\Ver2\\Practice.t
 //================================
 //コンストラクタ
 //================================
-CStageManager::CStageManager() : m_nWorldIndex(0),m_pBg3D(nullptr),m_VecObjList(),m_SaveScale(D3DXVECTOR3(1.0f,1.0f,1.0f)),m_SavePos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_SaveRot(D3DXVECTOR3(0.0f,0.0f,0.0f))
+CStageManager::CStageManager(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject(nPri,bUseintPri,type,ObjType),
+m_nWorldIndex(0),m_pBg3D(nullptr),m_VecObjList(),m_SaveScale(D3DXVECTOR3(1.0f,1.0f,1.0f)),m_SavePos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_SaveRot(D3DXVECTOR3(0.0f,0.0f,0.0f))
 {
 	for (int nCnt = 0; nCnt < m_nMAX_MAP; nCnt++)
 	{

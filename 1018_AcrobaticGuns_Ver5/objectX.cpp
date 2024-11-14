@@ -26,7 +26,8 @@
 //================================================
 //コンストラクタ
 //================================================
-CObjectX::CObjectX(int nPriority) : CObject(nPriority), m_bUseDraw(true),m_ObjectXInfo(),m_bColorChenge(false),m_bUseAddRot(false),
+CObjectX::CObjectX(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject(nPri,bUseintPri,type,ObjType),
+m_bUseDraw(true),m_ObjectXInfo(),m_bColorChenge(false),m_bUseAddRot(false),
 m_bUseAddScaling(false),m_bUseShadow(false),m_nChengeColorTime(0),m_nIndexObjectX(0),m_nManagerType(0),m_nObjXType(OBJECTXTYPE_BLOCK), 
 m_nTypeNum(0), m_bUseMultiScale(false), m_MultiScale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_bUseCulling(false), m_Pos(D3DXVECTOR3(0.0f,0.0f,0.0f)), m_SupportPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),
 m_PosOld(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Rot(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Scale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_FormarScale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Size(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_VtxMin(D3DXVECTOR3(0.0f,0.0f,0.0f)),

@@ -34,7 +34,7 @@ public:
 		TYPE_MAX
 	}TYPE;
 
-	CParticle();              //コンストラクタ
+	CParticle(int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::PARTICLE, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_BILLBOARD);              //コンストラクタ
 	~CParticle() override;    //デストラクタ
 	HRESULT Init() override;//初期化処理
 	void Uninit() override; //終了処理

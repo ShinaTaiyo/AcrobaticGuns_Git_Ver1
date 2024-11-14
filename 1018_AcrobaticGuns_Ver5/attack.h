@@ -12,6 +12,7 @@
 //インクルード
 //======================
 #include "main.h"
+#include "object.h"
 #include "objectXAlive.h"
 //==========================================
 
@@ -28,7 +29,7 @@ public:
 		MAX
 	};
 
-	CAttack(int nPri = 2);                  //コンストラクタ
+	CAttack(int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::ATTACK, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_X);                  //コンストラクタ
 	~CAttack();                 //デストラクタ
 	HRESULT Init() override;    //初期化処理
 	void Uninit() override;     //終了処理

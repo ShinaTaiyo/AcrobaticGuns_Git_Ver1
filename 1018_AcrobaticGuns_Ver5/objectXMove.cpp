@@ -23,7 +23,7 @@
 //===========================================================================================
 //コンストラクタ
 //===========================================================================================
-CObjectXMove::CObjectXMove(int nPriority) : CObjectX(nPriority),m_bUseAddSpeed(false), m_bUseGravity(false), m_bUseInteria(false), m_bUseMultiSpeed(false), m_fGravityPower(0.0f), m_fInertia(0.0f),
+CObjectXMove::CObjectXMove(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectX(nPri,bUseintPri,type,ObjType),m_bUseAddSpeed(false), m_bUseGravity(false), m_bUseInteria(false), m_bUseMultiSpeed(false), m_fGravityPower(0.0f), m_fInertia(0.0f),
 m_MultiSpeed(D3DXVECTOR3(0.0f,0.0f,0.0f)), m_AddSpeed(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Move(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_bUseUpdatePos(false)
 {
 

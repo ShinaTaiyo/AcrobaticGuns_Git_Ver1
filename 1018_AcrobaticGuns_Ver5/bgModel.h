@@ -29,7 +29,7 @@ public:
 		MAX
 	};
 
-	CBgModel(int nPri = 1);                  //コンストラクタ
+	CBgModel(int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::BGMODEL, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_X);                  //コンストラクタ
 	~CBgModel();                 //デストラクタ
 	HRESULT Init() override;    //初期化処理
 	void Uninit() override;     //終了処理

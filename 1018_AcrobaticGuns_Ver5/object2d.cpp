@@ -24,7 +24,8 @@
 //========================
 //コンストラクタ
 //========================
-CObject2D::CObject2D(int nPriority) : CObject(nPriority),m_nCntBlinkingFrame(0),m_nMaxBlinkingFrame(0),m_bBlinkingAim(false),m_fLimitBlinkingRatio(0.0f),
+CObject2D::CObject2D(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject(nPri,bUseintPri,type,ObjType),
+m_nCntBlinkingFrame(0),m_nMaxBlinkingFrame(0),m_bBlinkingAim(false),m_fLimitBlinkingRatio(0.0f),
 m_nLife(0),m_nMaxLife(0),m_fRatioLife(0.0f),m_bUseLifeRatioColor(false),m_bUseDraw(true),m_PolygonType(POLYGONTYPE::NORMAL),m_bAnimFlag(false),m_bUse(false),m_bUseBlinking(false),
 m_bUseFloating(false),m_bUseLife(false),m_bUseScale(false),m_fAngle(0.0f),m_fAnimationSplit(0.0f),m_fFloatingAddSpeed(0.0f),m_fFloatingLimitSpeed(0.0f),m_fFloatingRot(0.0f),
 m_fFloatingSpeed(0.0f),m_fHeight(0.0f),m_fLength(0.0f),m_fMaxHeight(0.0f),m_fMaxWidth(0.0f),m_fPolygonRotSpeed(0.0f),m_fWidth(0.0f),m_nAnimaionPattern(0),m_nAnimationChange(0),

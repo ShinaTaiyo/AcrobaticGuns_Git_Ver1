@@ -27,21 +27,21 @@ public:
 	enum class TYPE
 	{
 		NONE,            //タイプなし
-		PLAYER,          //プレイヤー2
-		ENEMY,           //敵3
-		BULLET,          //弾4
-		BLOCK,           //ブロック2
-		BG,              //背景
-		FIELD,           //床0
-		STAGEMANAGER,    //ステージマネージャー
-		FADE,            //フェード4
-		ATTACK,          //攻撃2
-		BGMODEL,         //背景モデル1
-		UI3D,            //UI3D
-		LOCKON,          //ロックオン
+		FIELD,           //床
+		BGMODEL,         //背景モデル
+		BLOCK,           //ブロック
+		PLAYER,          //プレイヤー
+		ENEMY,           //敵
+		BULLET,          //弾
+		ATTACK,          //攻撃
 		PARTICLE,        //パーティクル
+		UI3D,            //UI3D
 	    PARTICLE2D,      //パーティクル２D
+		LOCKON,          //ロックオン
 		UI,              //UI
+		STAGEMANAGER,    //ステージマネージャー
+		BG,              //背景
+		FADE,            //フェード
 		MAX
 	};
 	//===========================================
@@ -63,7 +63,8 @@ public:
 	//===========================
 	enum class OBJECTTYPE
 	{
-		OBJECTTYPE_2D = 0,
+		OBJECTTYPE_NONE = 0,
+		OBJECTTYPE_2D,
 		OBJECTTYPE_3D,
 		OBJECTTYPE_BILLBOARD,
 		OBJECTTYPE_X,
@@ -71,7 +72,7 @@ public:
 	};
 	//===========================================
 
-	CObject(int nPriority = 2);//描画優先設定(５月２８日New!：デフォルト引数（呼び出し時に引数設定しなければ３が代入されて処理される
+	CObject(int nPriority = 2,bool bUseintPriority = false,TYPE Type = TYPE::NONE,OBJECTTYPE ObjType = OBJECTTYPE::OBJECTTYPE_NONE);//描画優先設定(５月２８日New!：デフォルト引数（呼び出し時に引数設定しなければ３が代入されて処理される
 	virtual ~CObject();        //デストラクタ
 	virtual HRESULT Init() = 0;//初期化処理
 	virtual void Uninit() = 0; //終了処理

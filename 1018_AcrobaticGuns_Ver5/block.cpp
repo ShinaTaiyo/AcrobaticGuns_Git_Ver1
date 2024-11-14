@@ -36,7 +36,8 @@ const char* CBlock::m_BLOCK_FILENAME[CBlock::BLOCKTYPE_MAX] =
 //=========================
 //コンストラクタ
 //=========================
-CBlock::CBlock(int nPri) : CObjectXAlive(nPri),m_bCollision(false),m_type(BLOCKTYPE00_NORMAL)
+CBlock::CBlock(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri,bUseintPri,type,ObjType),
+m_bCollision(false),m_type(BLOCKTYPE00_NORMAL)
 {
 
 }

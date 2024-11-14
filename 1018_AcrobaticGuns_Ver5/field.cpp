@@ -26,7 +26,7 @@ const char* CField::m_apFIELD_FILENAME[CField::FIELDTYPE_MAX] =
 //==========================================
 //コンストラクタ
 //==========================================
-CField::CField(int nPri) : m_FieldType(FIELDTYPE00_NORMAL),CObject3D(nPri)
+CField::CField(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : m_FieldType(FIELDTYPE00_NORMAL),CObject3D(nPri,bUseintPri,type,ObjType)
 {
 
 }

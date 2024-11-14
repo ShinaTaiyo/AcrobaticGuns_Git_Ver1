@@ -42,7 +42,7 @@ public:
 	};
 	//======================================================================================================
 
-	CObject2D(int nPriority = 6);     //描画順設定用コンストラクタ
+	CObject2D(int nPri = 6, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::NONE, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_2D);     //描画順設定用コンストラクタ
 	~CObject2D() override;       //デストラクタ
 	HRESULT Init() override;     //初期化処理
 	void Uninit() override;      //終了処理

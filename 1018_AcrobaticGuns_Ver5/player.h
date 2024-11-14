@@ -24,7 +24,8 @@
 class CPlayer : public CObjectXAlive
 {
 public:
-	CPlayer(CPlayerMove * pPlayerMove,CPlayerAttack * pPlayerAttack);                  //コンストラクタ
+	CPlayer(CPlayerMove * pPlayerMove,CPlayerAttack * pPlayerAttack,
+		int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::PLAYER, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_X);                  //コンストラクタ
 	~CPlayer();                 //デストラクタ
 	HRESULT Init() override;    //初期化処理
 	void Uninit() override;     //終了処理

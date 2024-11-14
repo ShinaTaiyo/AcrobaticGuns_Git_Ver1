@@ -16,13 +16,10 @@
 //================================================
 //コンストラクタ
 //================================================
-CObject3D::CObject3D(int nPriority) : CObject(nPriority),m_fWidth(0.0f),m_fHeight(0.0f),m_nTextureIndex(0),m_Pos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Rot(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_mtxWorld(),
+CObject3D::CObject3D(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject(nPri,bUseintPri,type,ObjType),m_fWidth(0.0f),m_fHeight(0.0f),m_nTextureIndex(0),m_Pos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Rot(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_mtxWorld(),
 m_pVtxBuff(nullptr),m_pTexture(nullptr)
 {
-	m_pTexture = nullptr;
-	m_pVtxBuff = nullptr;
 
-	SetObjectType(CObject::OBJECTTYPE::OBJECTTYPE_3D);
 }
 //================================================================================================================================================
 
