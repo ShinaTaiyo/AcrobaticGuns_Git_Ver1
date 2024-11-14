@@ -260,7 +260,7 @@ D3DXCOLOR CCalculation::CalRaibowColor()
 //=========================================================
 // スクリーン座標をワールド座標に変換
 //=========================================================
-D3DXVECTOR3* CCalculation::CalcScreenToWorld(D3DXVECTOR3* pout, int Sx, int Sy, float fZ, int Screen_w, int Screen_h, D3DXMATRIX* View, D3DXMATRIX* Prj)
+D3DXVECTOR3* CCalculation::CalcScreenToWorld(D3DXVECTOR3* pout, float Sx, float Sy, float fZ, int Screen_w, int Screen_h, D3DXMATRIX* View, D3DXMATRIX* Prj)
 {
 	// 各行列の逆行列を算出
 	D3DXMATRIX InvView, InvPrj, VP, InvViewport;
@@ -272,7 +272,7 @@ D3DXVECTOR3* CCalculation::CalcScreenToWorld(D3DXVECTOR3* pout, int Sx, int Sy, 
 	D3DXMatrixInverse(&InvViewport, NULL, &VP);
 
 	//自分
-	D3DXVECTOR3 MyPos = D3DXVECTOR3(float(Sx), float(Sy),fZ);
+	D3DXVECTOR3 MyPos = D3DXVECTOR3(Sx,Sy,fZ);
 
 	// 逆変換
 	D3DXMATRIX tmp = InvViewport * InvPrj * InvView;//ワールド座標を求める
@@ -314,7 +314,7 @@ D3DXVECTOR3 CCalculation::CalcWorldToScreenNoViewport(D3DXVECTOR3 worldPos, D3DX
 //=========================================================
 // XZ平面とスクリーン座標の交点算出関数
 //=========================================================
-D3DXVECTOR3* CCalculation::CalcScreenToXZ(D3DXVECTOR3* pout, int Sx, int Sy, int Screen_w, int Screen_h, D3DXMATRIX* View, D3DXMATRIX* Prj)
+D3DXVECTOR3* CCalculation::CalcScreenToXZ(D3DXVECTOR3* pout,float Sx,float Sy, int Screen_w, int Screen_h, D3DXMATRIX* View, D3DXMATRIX* Prj)
 {
 	D3DXVECTOR3 nearpos;
 	D3DXVECTOR3 farpos;
@@ -415,8 +415,8 @@ bool CCalculation::CalcMatchRay(D3DXVECTOR3 AimPos, float fSx, float fSy, int nS
 	bool bCross = false;
 
 	D3DXVECTOR3 Pos1 = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-	CalcScreenToWorld(&nearpos1, int(fSx), int(fSy), 0.0f, nScreen_w, nScreen_h, View, Prj);//（椎名）多分カメラの位置
-	CalcScreenToWorld(&farpos1, int(fSx), int(fSy), 1.0f, nScreen_w, nScreen_h, View, Prj); //（椎名）多分描画範囲の一番奥の位置
+	CalcScreenToWorld(&nearpos1,fSx,fSy, 0.0f, nScreen_w, nScreen_h, View, Prj);//（椎名）多分カメラの位置
+	CalcScreenToWorld(&farpos1, fSx,fSy, 1.0f, nScreen_w, nScreen_h, View, Prj); //（椎名）多分描画範囲の一番奥の位置
 	ray1 = farpos1 - nearpos1;
 
 	D3DXVec3Normalize(&ray1, &ray1);

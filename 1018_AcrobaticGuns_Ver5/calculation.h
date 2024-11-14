@@ -51,8 +51,8 @@ public:
 
 	// スクリーン座標をワールド座標に変換
 	static D3DXVECTOR3* CalcScreenToWorld(D3DXVECTOR3* pout,
-		int Sx,  // スクリーンX座標
-		int Sy,  // スクリーンY座標
+		float Sx,  // スクリーンX座標
+		float Sy,  // スクリーンY座標
 		float fZ,  // 射影空間でのZ値（0～1）
 		int Screen_w,
 		int Screen_h,
@@ -65,8 +65,8 @@ public:
 	// XZ平面とスクリーン座標の交点算出関数
 	static D3DXVECTOR3* CalcScreenToXZ(
 		D3DXVECTOR3* pout,
-		int Sx,
-		int Sy,
+		float Sx,
+		float Sy,
 		int Screen_w,
 		int Screen_h,
 		D3DXMATRIX* View,

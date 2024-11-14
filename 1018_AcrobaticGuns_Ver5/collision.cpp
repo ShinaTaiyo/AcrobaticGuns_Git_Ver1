@@ -226,6 +226,23 @@ bool CCollision::RectAngleCollisionXY(D3DXVECTOR3 MyPos, D3DXVECTOR3 MyVtxMax, D
 	}
 	//======================================================================================================
 }
+
+//================================================================
+//“_‚ªAABB‚Ì’†‚É“ü‚Á‚Ä‚¢‚é‚©‚Ç‚¤‚©
+//================================================================
+bool CCollision::IsPointInsideAABB(const D3DXVECTOR3& Point, CObjectX* pComObjX)
+{
+	if (Point.x >= pComObjX->GetPos().x + pComObjX->GetVtxMin().x &&
+		Point.x <= pComObjX->GetPos().x + pComObjX->GetVtxMax().x &&
+		Point.y >= pComObjX->GetPos().y + pComObjX->GetVtxMin().y &&
+		Point.y <= pComObjX->GetPos().y + pComObjX->GetVtxMax().y &&
+		Point.z >= pComObjX->GetPos().z + pComObjX->GetVtxMin().z &&
+		Point.z <= pComObjX->GetPos().z + pComObjX->GetVtxMax().z)
+	{
+		return true;
+	}
+	return false;
+}
 //====================================================================================================================
 
 //================================================================

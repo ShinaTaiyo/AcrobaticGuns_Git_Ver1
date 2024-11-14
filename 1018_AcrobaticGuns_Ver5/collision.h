@@ -38,6 +38,10 @@ public:
 	static bool RectAngleCollisionXY(D3DXVECTOR3 MyPos, D3DXVECTOR3 MyVtxMax, D3DXVECTOR3 MyVtxMin, D3DXVECTOR3 Rot,
 		D3DXVECTOR3 ComparisonPos, D3DXVECTOR3 ComparisonVtxMax, D3DXVECTOR3 ComparisonVtxMin);
 
+
+	//点がAABBの中に入っているかどうか
+	static bool IsPointInsideAABB(const D3DXVECTOR3 & Point,CObjectX * pComObjX);
+
 	//==============================================
 	//正方形の押し出し判定
 	//==============================================
@@ -72,6 +76,9 @@ public:
 	//レイとaabbの当たり判定と判定箇所を求める
 	static bool RayIntersectsAABBCollisionPos(const D3DXVECTOR3& origin, const D3DXVECTOR3& direction, const D3DXVECTOR3& min, const D3DXVECTOR3& max,
 		D3DXVECTOR3 & CollisionPos);
+	//==============================================================================================================================================================================
+
+
 private:
 };
 #endif

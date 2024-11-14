@@ -18,7 +18,9 @@
 #include "particle2d.h"
 #include "calculation.h"
 #include "objectX.h"
+#include "game.h"
 #include "debugproc.h"
+#include "player.h"
 #include "ui.h"
 //==============================================================================================================
 
@@ -186,7 +188,7 @@ void CLockon::BackWallRayCollisionPosSearch()
 {
 	D3DXVECTOR3 Pos = GetPos();//位置
 
-	CCalculation::CalcScreenToWorld(&m_LockOnPos,int(GetPos().x),int(GetPos().y), 1.0f,SCREEN_WIDTH,SCREEN_HEIGHT,CManager::GetCamera()->GetMtxView(),
+	CCalculation::CalcScreenToWorld(&m_LockOnPos,GetPos().x,GetPos().y, 1.0f,SCREEN_WIDTH,SCREEN_HEIGHT,CManager::GetCamera()->GetMtxView(),
 		CManager::GetCamera()->GetMtxProjection()); //（椎名）多分描画範囲の一番奥の位置
 	CManager::GetDebugProc()->PrintDebugProc("床または壁との交点：%f %f %f\n", m_LockOnPos.x, m_LockOnPos.y, m_LockOnPos.z);
 
@@ -199,14 +201,15 @@ void CLockon::BackWallRayCollisionPosSearch()
 void CLockon::CalcRay()
 {
 	D3DXVECTOR3 FarPos = D3DXVECTOR3(0.0f,0.0f,0.0f); //奥
-	D3DXVECTOR3 Ray = D3DXVECTOR3(0.0f,0.0f,0.0f);    //レイ
 	//============================================
 	//カメラ手前と奥のワールド座標を求める
 	//============================================
-	CCalculation::CalcScreenToWorld(&m_FrontPos, int(GetPos().x), int(GetPos().y), 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT,
+	CCalculation::CalcScreenToWorld(&m_FrontPos,GetPos().x,GetPos().y, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT,
 		CManager::GetCamera()->GetMtxView(), CManager::GetCamera()->GetMtxProjection());//手前
 
-	CCalculation::CalcScreenToWorld(&FarPos, int(GetPos().x), int(GetPos().y), 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT,
+	//m_FrontPos = CGame::GetPlayer()->GetPos();
+
+	CCalculation::CalcScreenToWorld(&FarPos,GetPos().x,GetPos().y, 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT,
 		CManager::GetCamera()->GetMtxView(), CManager::GetCamera()->GetMtxProjection());//奥
 	//============================================================================================================================
 
@@ -238,26 +241,34 @@ void CLockon::RayCollisionToObject()
 
 			if (pObj->GetType() == CObject::TYPE::ENEMY || pObj->GetType() == CObject::TYPE::BLOCK || pObj->GetType() == CObject::TYPE::BGMODEL)
 			{
-				CObjectX* pObjX = static_cast<CObjectX*>(pObj);
+				CObjectX* pObjX = dynamic_cast<CObjectX*>(pObj);
 				//指定したモデルの位置
-				bCollision = CCollision::RayIntersectsAABBCollisionPos(m_FrontPos, m_NowRay, pObjX->GetVtxMin() + pObjX->GetPos(), pObjX->GetVtxMax() + pObjX->GetPos(),
-					CollisionStartPos);
 
-				if (bCollision == true)
-				{//レイとサイズ/２分の球の当たり判定成功
-					CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 20, 30.0f, 30.0f, 100, 10, false, CollisionStartPos, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f), true);
-					CManager::GetDebugProc()->PrintDebugProc("衝突した位置：%f %f %f\n", CollisionStartPos.x, CollisionStartPos.y, CollisionStartPos.z);
+				if (CCollision::IsPointInsideAABB(m_FrontPos, pObjX) == true)
+				{
+					//カメラの位置が判定オブジェクトのサイズの中に入っていたら
+				}
+				else
+				{
+					bCollision = CCollision::RayIntersectsAABBCollisionPos(m_FrontPos, m_NowRay, pObjX->GetVtxMin() + pObjX->GetPos(), pObjX->GetVtxMax() + pObjX->GetPos(),
+						CollisionStartPos);
 
-					//敵の最大頂点のスクリーン座標を求める
-					D3DXVECTOR3 ScreenPos = CCalculation::CalcWorldToScreenNoViewport(pObjX->GetSenterPos(), *CManager::GetCamera()->GetMtxView(), *CManager::GetCamera()->GetMtxProjection(),
-						float(SCREEN_WIDTH), float(SCREEN_HEIGHT));
+					if (bCollision == true)
+					{//レイとサイズ/２分の球の当たり判定成功
+						CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 20, 30.0f, 30.0f, 100, 10, false, CollisionStartPos, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f), true);
+						CManager::GetDebugProc()->PrintDebugProc("衝突した位置：%f %f %f\n", CollisionStartPos.x, CollisionStartPos.y, CollisionStartPos.z);
 
-					float fRot = CCalculation::CalculationRandVecXY();
-					CParticle2D::Create(ScreenPos, D3DXVECTOR3(sinf(fRot) * 10.0f, cosf(fRot) * 10.0f, 0.0f), D3DXVECTOR3(0.0f,0.0f,0.0f), CObject2D::POLYGONTYPE::SENTERROLLING,
-						15, 55.0f, 55.0f, CCalculation::CalRaibowColor());
+						//敵の最大頂点のスクリーン座標を求める
+						D3DXVECTOR3 ScreenPos = CCalculation::CalcWorldToScreenNoViewport(pObjX->GetSenterPos(), *CManager::GetCamera()->GetMtxView(), *CManager::GetCamera()->GetMtxProjection(),
+							float(SCREEN_WIDTH), float(SCREEN_HEIGHT));
 
-					VecCollisionSuccess.push_back(CollisionStartPos);//当たり判定が成功したオブジェクトの判定開始位置を保存する
-					CManager::GetDebugProc()->PrintDebugProc("判定成功したかどうか:%d\n", bCollision);
+						float fRot = CCalculation::CalculationRandVecXY();
+						CParticle2D::Create(ScreenPos, D3DXVECTOR3(sinf(fRot) * 10.0f, cosf(fRot) * 10.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), CObject2D::POLYGONTYPE::SENTERROLLING,
+							15, 55.0f, 55.0f, CCalculation::CalRaibowColor());
+
+						VecCollisionSuccess.push_back(CollisionStartPos);//当たり判定が成功したオブジェクトの判定開始位置を保存する
+						CManager::GetDebugProc()->PrintDebugProc("判定成功したかどうか:%d\n", bCollision);
+					}
 				}
 			}
 
