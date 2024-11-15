@@ -536,7 +536,6 @@ void CStageManager::TypeChenge()
 //==================================================
 void CStageManager::SetObjectX()
 {
-	CObject* pObject = nullptr;
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_RETURN) == true)
 	{//オブジェクトをVectorの先頭に保存する
 		m_VecObjList.push_back(m_pManagerObject->ManagerSaveObject());

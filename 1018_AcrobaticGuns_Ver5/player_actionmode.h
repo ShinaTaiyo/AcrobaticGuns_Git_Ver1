@@ -171,5 +171,36 @@ public:
 };
 //======================================================================================
 
+//==============================================
+//エフェクトクラス
+//==============================================
+
+//スーパークラス
+class CPlayerEffect
+{
+public:
+	CPlayerEffect();//コンストラクタ
+	virtual ~CPlayerEffect();//デストラクタ
+	virtual void EffectProcess(CPlayer * pPlayer);//エフェクト処理
+};
+
+//ダイブエフェクトクラス
+class CPlayerEffect_Dive : public CPlayerEffect
+{
+public:
+	CPlayerEffect_Dive();//コンストラクタ
+	~CPlayerEffect_Dive() override;//デストラクタ
+	void EffectProcess(CPlayer* pPlayer) override;//エフェクト処理
+};
+
+//エフェクトなしクラス
+class CPlayerEffect_None : public CPlayerEffect
+{
+public:
+	CPlayerEffect_None() {}; //コンストラクタ
+	~CPlayerEffect_None() {}; //デストラクタ
+	void EffectProcess(CPlayer* pPlayer) override {};//エフェクト処理
+};
+
 
 #endif

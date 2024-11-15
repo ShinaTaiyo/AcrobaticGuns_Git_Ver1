@@ -39,9 +39,9 @@
 //====================================================
 //コンストラクタ
 //====================================================
-CPlayer::CPlayer(CPlayerMove* pPlayerMove, CPlayerAttack* pPlayerAttack,
+CPlayer::CPlayer(CPlayerMove* pPlayerMove, CPlayerAttack* pPlayerAttack,CPlayerEffect* pPlayerEffect,
     int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri,bUseintPri,type,ObjType)
-    ,m_pMove(pPlayerMove),m_pAttack(pPlayerAttack),
+    ,m_pMove(pPlayerMove),m_pAttack(pPlayerAttack),m_pEffect(pPlayerEffect),m_pMeshOrbit(nullptr),
 m_fRotAim(0.0f),m_pLockOn(nullptr),m_NowActionMode(ACTIONMODE::SHOT),m_pModeDisp(nullptr),m_bCollision(false)
 {
 
@@ -70,6 +70,9 @@ HRESULT CPlayer::Init()
     m_pLockOn = CLockon::Create(D3DXVECTOR3(SCREEN_WIDTH / 2,SCREEN_HEIGHT / 2,0.0f), CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, D3DXCOLOR(1.0f,1.0f,1.0f,1.0f));
     m_pLockOn->SetUseDeath(true);
 
+    m_pMeshOrbit = CMeshOrbit::Create(CMeshOrbit::MESHORBITTYPE::DEATHENAGA);
+    m_pMeshOrbit->SetUseDeath(true);
+
     m_pModeDisp = CUi::Create(CUi::UITYPE::ACTIONMODE_GUN, CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, 1, false, D3DXVECTOR3(50.0f, 50.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
         D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 
@@ -95,6 +98,12 @@ void CPlayer::Uninit()
         delete m_pAttack;
         m_pAttack = nullptr;
     }
+
+    if (m_pEffect != nullptr)
+    {
+        delete m_pEffect;
+        m_pEffect = nullptr;
+    }
 }
 //==========================================================================================================
 
@@ -116,6 +125,8 @@ void CPlayer::Update()
     CollisionProcess();
 
     m_pAttack->AttackProcess(this);//現在のアクションモードの攻撃処理を実装
+
+    m_pEffect->EffectProcess(this);//エフェクト処理
 
     //m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f) + m_AddPosR;
     //m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -200.0f, 0.0f, cosf(m_Rot.y) * -200.0f);
@@ -151,6 +162,13 @@ void CPlayer::SetDeath()
         m_pModeDisp = nullptr;
     }
 
+    if (m_pMeshOrbit != nullptr)
+    {
+        m_pMeshOrbit->SetUseDeath(true);
+        m_pMeshOrbit->SetDeath();
+        m_pMeshOrbit = nullptr;
+    }
+
     CObject::SetDeath();
 }
 //===========================================================================================================
@@ -160,7 +178,7 @@ void CPlayer::SetDeath()
 //====================================================
 CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale)
 {
-    CPlayer* pPlayer = DBG_NEW CPlayer(DBG_NEW CPlayerMove_Normal(),DBG_NEW CPlayerAttack_Shot());//プレイヤーを生成
+    CPlayer* pPlayer = DBG_NEW CPlayer(DBG_NEW CPlayerMove_Normal(),DBG_NEW CPlayerAttack_Shot(),DBG_NEW CPlayerEffect());//プレイヤーを生成
 
     bool bSuccess = pPlayer->CObject::GetCreateSuccess();
     int nIdx = 0;//テクスチャのインデックス
@@ -169,6 +187,7 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
         if (pPlayer != nullptr)
         {
             pPlayer->Init();                                                                 //初期化処理
+            pPlayer->SetMove(move);//移動量
             pPlayer->CObject::SetType(CObject::TYPE::PLAYER);                                 //オブジェクトの種類を決める
             pPlayer->CObjectXMove::SetObjXType(CObjectXMove::OBJECTXTYPE_PLAYER);                    //オブジェクトXのタイプを設定
             pPlayer->CObjectXMove::SetTypeNum(0);                                                //オブジェクトXごとのタイプ番号を設定
@@ -238,6 +257,7 @@ void CPlayer::ActionModeChenge()
             //m_pActionMode = DBG_NEW CPlayerShot;
             ChengeMoveMode(DBG_NEW CPlayerMove_Normal()); //通常移動モードにする
             ChengeAttackMode(DBG_NEW CPlayerAttack_Shot()); //攻撃可能モードにする
+            ChengeEffectMode(DBG_NEW CPlayerEffect_None()); //エフェクトなしモードにする
             m_pModeDisp = CUi::Create(CUi::UITYPE::ACTIONMODE_GUN, CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, 1, false, D3DXVECTOR3(50.0f, 50.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
                 D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
             break;
@@ -283,6 +303,21 @@ void CPlayer::ChengeAttackMode(CPlayerAttack* pPlayerAttack)
         m_pAttack = nullptr;
 
         m_pAttack = pPlayerAttack;
+    }
+}
+//==========================================================================================================
+
+//========================================================
+//エフェクトモードをチェンジ
+//========================================================
+void CPlayer::ChengeEffectMode(CPlayerEffect* pPlayerEffect)
+{
+    if (m_pEffect != nullptr)
+    {
+        delete m_pEffect;
+        m_pEffect = nullptr;
+
+        m_pEffect = pPlayerEffect;
     }
 }
 //==========================================================================================================
@@ -375,7 +410,7 @@ void CPlayer::JumpProcess()
 //========================================================
 void CPlayer::AdjustRot()
 {
-    D3DXVECTOR3& Rot = GetRot();
+    //D3DXVECTOR3& Rot = GetRot();
     const D3DXVECTOR3& CameraRot = CManager::GetCamera()->GetRot();
     SetRot(D3DXVECTOR3(GetRot().x,D3DX_PI + CameraRot.y,GetRot().z));
 

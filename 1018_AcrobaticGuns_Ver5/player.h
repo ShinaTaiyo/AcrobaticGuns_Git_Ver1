@@ -14,6 +14,7 @@
 #include "main.h"
 #include "objectXAlive.h"
 #include "lockon.h"
+#include "meshorbit.h"
 #include "ui.h"
 #include "player_actionmode.h"
 //==========================================
@@ -24,7 +25,7 @@
 class CPlayer : public CObjectXAlive
 {
 public:
-	CPlayer(CPlayerMove * pPlayerMove,CPlayerAttack * pPlayerAttack,
+	CPlayer(CPlayerMove * pPlayerMove,CPlayerAttack * pPlayerAttack,CPlayerEffect * pPlayerEffect,
 		int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::PLAYER, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_X);                  //コンストラクタ
 	~CPlayer();                 //デストラクタ
 	HRESULT Init() override;    //初期化処理
@@ -40,12 +41,20 @@ public:
 	//================================================
 	void SetSuccessCollision(bool bSuccess) { m_bCollision = bSuccess; }//当たり判定が成功したかどうかを設定
 	const bool& GetCollisionSuccess() const { return m_bCollision; }//当たり判定が成功したかどうかを取得
+	//===============================================================================================
+	
+	//================================================
+	//軌跡
+	//================================================
+	CMeshOrbit* GetMeshOrbit() { return m_pMeshOrbit; }//軌跡を取得
+	//===============================================================================================
 
 	//================================================
 	//モードチェンジ
 	//================================================
 	void ChengeMoveMode(CPlayerMove* pPlayerMove);//移動モードを変える
 	void ChengeAttackMode(CPlayerAttack* pPlayerAttack);//攻撃モードを変える
+	void ChengeEffectMode(CPlayerEffect* pPlayerEffect);//エフェクトモードを変える
 	//===============================================================================================
 private:
 	//================================================
@@ -72,9 +81,13 @@ private:
 	CLockon* m_pLockOn;                 //ロックオンカーソルへのポインタ
 	ACTIONMODE m_NowActionMode;         //現在のアクションモード
 	CUi * m_pModeDisp;                  //モード表示UI
+	CMeshOrbit* m_pMeshOrbit;           //軌跡
+	bool m_bCollision;                  //当たり判定が成功したかどうか
+
+	//行動状態
 	CPlayerMove* m_pMove;               //移動処理
 	CPlayerAttack* m_pAttack;           //攻撃処理
-	bool m_bCollision;                  //当たり判定が成功したかどうか
+	CPlayerEffect* m_pEffect;           //エフェクト処理
 	//===============================================================================================
 
 

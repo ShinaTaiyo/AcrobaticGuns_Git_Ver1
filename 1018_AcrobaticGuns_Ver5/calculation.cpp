@@ -412,7 +412,6 @@ bool CCalculation::CalcMatchRay(D3DXVECTOR3 AimPos, float fSx, float fSy, int nS
 	D3DXVECTOR3 nearpos1;
 	D3DXVECTOR3 farpos1;
 	D3DXVECTOR3 ray1;
-	bool bCross = false;
 
 	D3DXVECTOR3 Pos1 = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 	CalcScreenToWorld(&nearpos1,fSx,fSy, 0.0f, nScreen_w, nScreen_h, View, Prj);//（椎名）多分カメラの位置

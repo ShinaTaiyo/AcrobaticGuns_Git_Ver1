@@ -264,15 +264,7 @@ void CCamera::NormalCameraMove()
 //====================================================================
 void CCamera::BossDefeatCameraProcess()
 {
-	float fVXaim = 0.0f;//X方向ベクトル
-	float fVYaim = 0.0f;//Y方向ベクトル
-	float fVZaim = 0.0f;//Z方向ベクトル
-	float fVLaim = 0.0f;//総合ベクトル
-	float fLength = 0.0f;
-	CObject* pObj = nullptr;
-	D3DXVECTOR3 ComparisonPos = D3DXVECTOR3(0.0f,0.0f,0.0f);
 
-	m_ModeTime++;
 }
 //====================================================================================================
 

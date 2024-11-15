@@ -609,7 +609,6 @@ void CBillboard::HormingProcess()
 	float fRotDiff = 0.0f;//現在の角度と目的の角度の差分
 	float fVXaim = 0.0f;  //Xベクトル
 	float fVYaim = 0.0f;  //Yベクトル
-	float fVLaim = 0.0f;  //総合ベクトル
 	D3DXVECTOR3 TargetPos = D3DXVECTOR3(0.0f,0.0f,0.0f);//ターゲットの位置
 	//===================================
 	//XZベクトルを出す

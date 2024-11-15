@@ -34,6 +34,8 @@ public:
 		ENEMY,           //敵
 		BULLET,          //弾
 		ATTACK,          //攻撃
+		MESHORBIT,       //軌跡メッシュ
+		EFFECT,          //エフェクト
 		PARTICLE,        //パーティクル
 		UI3D,            //UI3D
 	    PARTICLE2D,      //パーティクル２D

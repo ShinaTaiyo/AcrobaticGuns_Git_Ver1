@@ -315,7 +315,6 @@ void CParticle::SummonChargeParticle(TYPE type, int nNum, int nLife, float fInit
 	float fVZaim = 0.0f;//Z方向のベクトル
 	float fVLaim = 0.0f;//総合ベクトル
 	float fSpeed = 0.0f;//速さ
-	float fLength = float(rand() % nSummonLength - (nSummonLength / 2));
 	D3DXVECTOR3 Speed = D3DXVECTOR3(0.0f,0.0f,0.0f);//速さ
 	D3DXVECTOR3 SummonPos = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	CParticle* pParticle = nullptr;

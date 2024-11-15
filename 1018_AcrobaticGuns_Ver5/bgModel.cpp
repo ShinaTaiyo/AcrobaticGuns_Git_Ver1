@@ -155,7 +155,6 @@ void CBgModel::SaveInfoTxt(fstream& WritingFile)
 void CBgModel::LoadInfoTxt(fstream& LoadingFile, vector<CObject*>& VecSaveManager, string& Buff)
 {
 	int nType = 0;//Ží—Þ
-	int nLife = 0;//‘Ì—Í
 	D3DXVECTOR3 Move = D3DXVECTOR3(0.0f,0.0f,0.0f);  //ˆÚ“®—Ê
 	D3DXVECTOR3 Pos = D3DXVECTOR3(0.0f,0.0f,0.0f);   //ˆÊ’u
 	D3DXVECTOR3 Scale = D3DXVECTOR3(0.0f,0.0f,0.0f); //Šg‘å—¦
@@ -209,7 +208,6 @@ CObject* CBgModel::ManagerChengeObject(bool bAim)
 {
 	int nNewType = int(m_Type);
 	BGMODELTYPE NewType = {};
-	const D3DXVECTOR3& Pos = GetPos();
 	//=======================================
 	//Ží—Þ‚ð•Ï‚¦‚é
 	//=======================================

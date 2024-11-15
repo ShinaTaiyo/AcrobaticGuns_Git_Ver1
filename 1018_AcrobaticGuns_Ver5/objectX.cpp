@@ -594,9 +594,6 @@ void CObjectX::ChengeEditScaleZ()
 //===================================================================================================================
 void CObjectX::ChengeEditPos()
 {
-	float fMoveX = 0.0f;                                            //X•ûŒü‚ÌˆÚ“®—Ê
-	float fMoveZ = 0.0f;                                            //Z•ûŒü‚ÌˆÚ“®—Ê
-	bool bMove = false;                                             //ˆÚ“®‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚© 
 	D3DXVECTOR3 Move = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	SetColor(D3DXCOLOR(1.0f,0.0f,0.0f,0.5f),3,true,true);           //F‚ğ”¼“§–¾‚É‚·‚é
 
