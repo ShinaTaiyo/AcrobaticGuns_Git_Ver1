@@ -21,6 +21,7 @@ public:
 	{
 		NORMAL = 0,//普通
 		DEATHENAGA,//デスエナガ
+		AUTSTRALIAUBAIMAN,//オーストラリア奪いマン
 		MAX                    
 	};
 

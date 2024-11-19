@@ -27,10 +27,12 @@ public:
 	enum class TYPE
 	{
 		NONE,            //タイプなし
+		BG3D,            //3D背景
 		FIELD,           //床
 		BGMODEL,         //背景モデル
 		BLOCK,           //ブロック
 		PLAYER,          //プレイヤー
+		WIRE,            //ワイヤー
 		ENEMY,           //敵
 		BULLET,          //弾
 		ATTACK,          //攻撃

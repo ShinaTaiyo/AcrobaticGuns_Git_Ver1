@@ -232,7 +232,7 @@ void CCamera::NormalCameraMove()
 				{
 
 					m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f) + m_AddPosR;
-					m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -200.0f, 0.0f, cosf(m_Rot.y) * -200.0f);
+					m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -200.0f, 0.0f, cosf(m_Rot.y) * -200.0f) + m_AddPosV;
 					//m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -250.0f, 0.0f, cosf(m_Rot.y) * -250.0f); + m_AddPosV;
 
 					//CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 30, 30.0f, 30.0f, 100, 10, false, m_PosR, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);

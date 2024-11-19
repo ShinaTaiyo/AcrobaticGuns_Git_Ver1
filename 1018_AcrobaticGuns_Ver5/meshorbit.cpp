@@ -22,6 +22,7 @@ const string CMeshOrbit::m_aMESHORBIT_FILENAME[static_cast<int>(CMeshOrbit::MESH
 {
 	"data\\TEXTURE\\Shadow000.jpg",
 	"data\\TEXTURE\\UI\\CutIn_DeathEnaga.png",
+	"data\\TEXTURE\\UI\\AustorariaConquestUbaiman_000.png",
 };
 //=============================================================
 //コンストラクタ
@@ -193,7 +194,7 @@ void CMeshOrbit::Update()
 			fRatioVtx = float(nCntX) / float(m_nNUMBLOCK_X);
 
 			if (nCntZ == 0)
-			{
+			{//最初の一週目なので、１ブロック分を設定
 				//１ブロック分の情報を設定する
 				pVtx[nCol1].pos = pVtx[nCol1 - 1].pos;  //オフセット行　〇１：（２　＝　１）、〇２：（１　＝　０）
 				pVtx[nCol2].pos = pVtx[nCol2 - 1].pos;  //原点行 〇１：（５　＝　４）、〇２：（４　＝　３）
@@ -204,7 +205,7 @@ void CMeshOrbit::Update()
 
 			}
 			else
-			{
+			{//２週目以降なので、上のブロックにつながる頂点の位置を設定
 				pVtx[nCol2].pos = pVtx[nCol2 - 1].pos;  //原点行 〇１：（５　＝　４）、〇２：（４　＝　３）
 				pVtx[nCol2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, fRatioVtx);  //オフセット行　〇１：（２　＝　１）、〇２：（１　＝　０）
 			}

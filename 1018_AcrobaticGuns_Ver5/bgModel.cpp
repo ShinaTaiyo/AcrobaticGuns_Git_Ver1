@@ -99,7 +99,6 @@ CBgModel* CBgModel::Create(BGMODELTYPE bgModelType, D3DXVECTOR3 pos, D3DXVECTOR3
 	CBgModel* pBgModel = DBG_NEW CBgModel();     //生成
 
 	pBgModel->Init();                        //初期化処理
-	pBgModel->SetType(CObject::TYPE::BGMODEL);//オブジェクトごとのタイプを設定する
 	pBgModel->SetBgModelType(bgModelType);   //背景モデルの種類を設定する
 	pBgModel->SetPos(pos);                   //位置  
 	pBgModel->SetSupportPos(pos);            //支点となる位置を設定
