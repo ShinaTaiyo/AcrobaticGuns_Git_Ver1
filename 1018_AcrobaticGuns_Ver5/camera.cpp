@@ -160,7 +160,7 @@ void CCamera::SetCamera()
 			D3DXToRadian(45.0f),
 			(float)SCREEN_WIDTH / (float)SCREEN_HEIGHT,
 			10.0f,
-			20000.0f);
+			30000.0f);
 	}
 	else if (m_CameraType == CAMERATYPE_SIDE)
 	{

@@ -28,9 +28,10 @@ m_nNumVtx((m_nNumDivisionXZ + 1) * m_nNumDivisionY + 2),//頂点数（上面の中心点　
 m_nNumIdx((m_nNumDivisionXZ + 1) * 2 * (m_nNumDivisionY + 1) + 2 * m_nNumDivisionY),//インデックス数(１面は、XZ方向頂点数　＊　２)　＊　（Y方向頂点数 + 1) + 2 * (縮退計算数)
 m_nNumPolygon(2 * (m_nNumDivisionXZ + 1) * (m_nNumDivisionY + 1) + 2 * 2 + 1 * (m_nNumDivisionY - 1)),//ポリゴン数（底面と上面をつなぐ縮退ポリゴンは二つ）（側面と側面をつなぐ縮退ポリゴンは一つ）
 m_nTextureIndex(0),m_pIdxBuff(nullptr),m_pVtxBuff(nullptr),m_pTexture(nullptr),
-m_Pos(Pos),m_Rot(Rot),m_nCheckVtx(0),m_nCheckIdx(0)
+m_Pos(Pos),m_Rot(Rot),m_nCheckVtx(0),m_nCheckIdx(0),m_pMtxChild(nullptr)
 {
 	m_nNumPolygon = m_nNumIdx - 2;
+	m_pSenterPos = DBG_NEW D3DXVECTOR3[m_nNumDivisionY];
 }
 //=========================================================================================================================================
 
@@ -41,6 +42,7 @@ m_Pos(Pos),m_Rot(Rot),m_nCheckVtx(0),m_nCheckIdx(0)
 //==================================================================================================================
 CMeshCylinder::~CMeshCylinder()
 {
+
 }
 //=========================================================================================================================================
 
@@ -209,7 +211,6 @@ HRESULT CMeshCylinder::Init()
 //==================================================================================================================
 void CMeshCylinder::Uninit()
 {
-
 	//頂点バッファの破棄
 	if (m_pVtxBuff != nullptr)
 	{
@@ -230,6 +231,13 @@ void CMeshCylinder::Uninit()
 		m_pTexture = nullptr;
 	}
 
+	//それぞれの中心点の開放
+	if (m_pSenterPos != nullptr)
+	{
+		delete[] m_pSenterPos;
+		m_pSenterPos = nullptr;
+	}
+
 }
 //=========================================================================================================================================
 
@@ -238,7 +246,7 @@ void CMeshCylinder::Uninit()
 //==================================================================================================================
 void CMeshCylinder::Update()
 {
-
+	CheckMeshInfo();
 }
 //=========================================================================================================================================
 
@@ -259,12 +267,16 @@ void CMeshCylinder::Draw()
 
 	//向きを反映
 	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_Rot.y, m_Rot.x, m_Rot.z);
-
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
 
 	//位置を反映
-	D3DXMatrixTranslation(&mtxTrans,m_Pos.x, m_Pos.y, m_Pos.z);
+	D3DXMatrixTranslation(&mtxTrans, m_Pos.x, m_Pos.y, m_Pos.z);
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
+
+	if (m_pMtxChild != nullptr)
+	{//子マトリックスが存在するなら掛け合わせる
+		D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld,m_pMtxChild);
+	}
 
 	//ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);

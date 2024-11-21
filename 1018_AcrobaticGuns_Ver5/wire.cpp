@@ -11,7 +11,10 @@
 #include "wire.h"
 #include "texture.h"
 #include "renderer.h"
+#include "player.h"
 #include "manager.h"
+#include "debugproc.h"
+#include "calculation.h"
 //===================================================================================================================
 
 //===============================================================
@@ -30,7 +33,7 @@ CWire::CWire(WIRETYPE WireType, float fRadius, float fHeight,int nNumDivsionXZ,
 	D3DXVECTOR3 Pos, D3DXVECTOR3 Rot, 
 	int nNumDivisionY, int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CMeshCylinder(fRadius,fHeight,nNumDivsionXZ,nNumDivisionY,
 		Pos,Rot,
-		nPri,bUseintPri,type,ObjType),m_Type(WireType)
+		nPri,bUseintPri,type,ObjType),m_Type(WireType),m_bUseUpdate(true),m_pWireHead(nullptr),m_pPlayer(nullptr)
 {
 
 }
@@ -51,6 +54,13 @@ CWire::~CWire()
 HRESULT CWire::Init()
 {
 	CMeshCylinder::Init();
+
+	//ワイヤーヘッドを生成
+	m_pWireHead = CWireHead::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), 120);
+	m_pWireHead->SetAutoSubLife(false);
+	m_pWireHead->SetUseDeath(false);
+	m_pWireHead->SetUseDraw(true);
+
 	return S_OK;
 }
 //===================================================================================================================
@@ -61,6 +71,11 @@ HRESULT CWire::Init()
 void CWire::Uninit()
 {
 	CMeshCylinder::Uninit();
+
+	if (m_pPlayer != nullptr)
+	{
+		m_pPlayer = nullptr;
+	}
 }
 //===================================================================================================================
 
@@ -70,6 +85,82 @@ void CWire::Uninit()
 void CWire::Update()
 {
 	CMeshCylinder::Update();
+	const D3DXVECTOR3& Pos = GetPos();
+	//const D3DXVECTOR3* pSenterPos = GetSenterPos();
+	const int& nNumDivisionXZ = GetNumDivisionXZ();//XZ分割数
+	const int& nNumDivisionY = GetNumDivisionY();  //Y分割数
+	const int& nNumVtx = GetNumVtx();              //頂点数
+	const int& nNumIdx = GetNumIdx();              //インデックス数
+	const float& fRadius = GetRadius();            //半径
+	const float& fHeight = GetHeight();            //高さ
+
+	float fLength = CCalculation::CalculationLength(m_pPlayer->GetSenterPos(), m_pWireHead->GetSenterPos());
+	SetHeight(fLength);
+	//CManager::GetDebugProc()->PrintDebugProc("距離：%f\n", fLength);
+
+	VERTEX_3D* pVtx;
+	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBufferPointer();
+
+	//頂点バッファをロックし、頂点情報へのポインタを取得
+	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	if (m_bUseUpdate == true)
+	{
+		int nCntArray = nNumVtx - 1;
+		float fRatioXZ = 0.0f;
+		float fRatioY = 0.0f;
+		D3DXVECTOR3 LastSenterPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		D3DXVECTOR3 MeasureNor = D3DXVECTOR3(0.0f, 0.0f, 0.0f);//法線計算用
+		for (int nCntVtxY = 0; nCntVtxY < nNumDivisionY; nCntVtxY++)
+		{//Y方向のUVはそのまま使う
+			fRatioY = (1.0f / (nNumDivisionY - 1)) * nCntVtxY;
+			for (int nCntVtxXZ = 0; nCntVtxXZ < nNumDivisionXZ + 1; nCntVtxXZ++)
+			{//X方向のUVは重なる頂点があるので、+ 1
+				fRatioXZ = (1.0f / (nNumDivisionXZ)) * nCntVtxXZ;
+				if (nCntVtxY == 0 && nCntVtxXZ == 0)
+				{//最初の周なので上面の中心点を設定する
+					pVtx[nCntArray].pos = GetSenterPos(nNumDivisionY - 2);//Y方向分割数3つの場合、底面 = 1
+					nCntArray--;
+				}
+
+				if (nCntVtxY == nNumDivisionY - 1)
+				{//最後の周で基準点を決める（9,8,7,6,5,4,3,2,1)
+					pVtx[nCntArray].pos = D3DXVECTOR3(sinf((D3DX_PI * 2) * fRatioXZ) * fRadius,fHeight, cosf((D3DX_PI * 2) * fRatioXZ) * fRadius);
+				}
+				else
+				{//基準点に対して軌跡風に頂点を代入していく(18 = 27)
+					pVtx[nCntArray].pos = pVtx[nCntArray - (nNumDivisionXZ + 1)].pos;
+				}
+
+				if (nCntVtxXZ == 0 && nCntVtxY != nNumDivisionY - 1)
+				{//最後の一周以外なら各層の中心点を更新
+					SetSenterPos(nNumDivisionY - nCntVtxY - 1, GetSenterPos(nNumDivisionY - nCntVtxY - 2));
+				}
+
+				//配列カウント
+				nCntArray--;
+
+				if (nCntArray < 0 || nCntArray >= nNumVtx)
+				{//配列外アクセスチェック
+					int s = 0;
+				}
+
+				if (nCntVtxY == nNumDivisionY - 1 && nCntVtxXZ == nNumDivisionXZ)
+				{//最後
+					pVtx[nCntArray].pos = D3DXVECTOR3(0.0f,fHeight,0.0f);//底面の中心に位置を設定
+					SetSenterPos(0, D3DXVECTOR3(0.0f, fHeight, 0.0f));
+				}
+			}
+		}
+	}
+	//CManager::GetDebugProc()->PrintDebugProc("更新するかどうか：%d\n",m_bUseUpdate);
+
+	//for (int nCntVtx = 0; nCntVtx < nNumVtx; nCntVtx++)
+	//{
+	//	CManager::GetDebugProc()->PrintDebugProc("頂点情報：%d：%f %f %f\n", nCntVtx, pVtx[nCntVtx].pos.x, pVtx[nCntVtx].pos.y, pVtx[nCntVtx].pos.z);
+	//}
+	//頂点バッファをアンロックする 
+	pVtxBuff->Unlock();
 }
 //===================================================================================================================
 
@@ -78,7 +169,58 @@ void CWire::Update()
 //===============================================================
 void CWire::Draw()
 {
-	CMeshCylinder::Draw();
+	LPDIRECT3DDEVICE9 pDevice;//デバイスへのポインタ
+
+	//デバイスの取得
+	pDevice = CManager::GetRenderer()->GetDevice();
+
+	D3DXMATRIX mtxRot, mtxTrans;//計算用マトリックス
+	D3DXMATRIX& mtxWorld = GetMtxWorld();
+	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBufferPointer();
+	LPDIRECT3DINDEXBUFFER9 pIdxBuff = GetIdxBufferPointer();
+	LPDIRECT3DTEXTURE9 pTexture = GetTexture();
+	const int& nNumPolygon = GetNumPolygon();
+	const int& nNumVtx = GetNumVtx();
+
+	//ワールドマトリックスの初期化
+	D3DXMatrixIdentity(&mtxWorld);
+
+	if (m_pWireHead != nullptr)
+	{
+		//向きを反映
+		D3DXMatrixRotationYawPitchRoll(&mtxRot, m_pWireHead->GetRot().y, m_pWireHead->GetRot().x, m_pWireHead->GetRot().z);
+		D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxRot);
+	}
+
+	if (m_pPlayer != nullptr)
+	{
+		//位置を反映
+		D3DXMatrixTranslation(&mtxTrans, m_pPlayer->GetPos().x, m_pPlayer->GetPos().y, m_pPlayer->GetPos().z);
+		D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxTrans);
+	}
+	//ワールドマトリックスの設定
+	pDevice->SetTransform(D3DTS_WORLD, &mtxWorld);
+
+	//両面を描画する
+	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+
+	//頂点バッファをデータストリームに設定
+	pDevice->SetStreamSource(0, pVtxBuff, 0, sizeof(VERTEX_3D));//頂点バッファへのポインタと頂点情報の構造体のサイズ
+
+	//インデックスバッファをデータストリームに設定
+	pDevice->SetIndices(pIdxBuff);
+
+	//頂点フォーマットの設定
+	pDevice->SetFVF(FVF_VERTEX_3D);
+
+	//テクスチャの設定
+	pDevice->SetTexture(0, pTexture);
+
+	//ポリゴンの描画
+	pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP, 0, 0, nNumVtx, 0, nNumPolygon);
+
+	//片面だけ描画する
+	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 }
 //===================================================================================================================
 
@@ -87,6 +229,13 @@ void CWire::Draw()
 //===============================================================
 void CWire::SetDeath()
 {
+	if (m_pWireHead != nullptr)
+	{
+		m_pWireHead->SetUseDeath(true);
+		m_pWireHead->SetDeath();
+		m_pWireHead = nullptr;
+	}
+
 	CObject::SetDeath();
 }
 //===================================================================================================================

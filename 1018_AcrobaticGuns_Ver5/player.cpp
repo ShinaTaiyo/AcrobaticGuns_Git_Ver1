@@ -39,12 +39,13 @@
 //====================================================
 //コンストラクタ
 //====================================================
-CPlayer::CPlayer(CPlayerMove* pPlayerMove, CPlayerAttack* pPlayerAttack,CPlayerEffect* pPlayerEffect,
-    int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri,bUseintPri,type,ObjType)
-    ,m_pMove(pPlayerMove),m_pAttack(pPlayerAttack),m_pEffect(pPlayerEffect),m_pMeshOrbit(nullptr),
-m_fRotAim(0.0f),m_pLockOn(nullptr),m_NowActionMode(ACTIONMODE::SHOT),m_pModeDisp(nullptr),m_bCollision(false)
+CPlayer::CPlayer(CPlayerMove* pPlayerMove, CPlayerAttack* pPlayerAttack, CPlayerEffect* pPlayerEffect, CPlayerWireShot* pPlayerWireShot,
+    int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri, bUseintPri, type, ObjType)
+    , m_pMove(pPlayerMove), m_pAttack(pPlayerAttack), m_pEffect(pPlayerEffect), m_pWireShot(pPlayerWireShot),
+    m_pMeshOrbit(nullptr),
+    m_fRotAim(0.0f), m_pLockOn(nullptr), m_NowActionMode(ACTIONMODE::SHOT), m_pModeDisp(nullptr), m_bCollision(false),m_pWire(nullptr)
 {
-
+   
 }
 //==========================================================================================================
 
@@ -76,6 +77,9 @@ HRESULT CPlayer::Init()
     m_pModeDisp = CUi::Create(CUi::UITYPE::ACTIONMODE_GUN, CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, 1, false, D3DXVECTOR3(50.0f, 50.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
         D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 
+    m_pWire = CWire::Create(CWire::WIRETYPE::NORMAL, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 10.0f, 20.0f, 4, 60);
+    m_pWire->SetUseDeath(false);
+    m_pWire->SetPlayerPointer(this);//プレイヤーのポインタを設定
     return S_OK;
 }
 //==========================================================================================================
@@ -104,6 +108,12 @@ void CPlayer::Uninit()
         delete m_pEffect;
         m_pEffect = nullptr;
     }
+
+    if (m_pWireShot != nullptr)
+    {
+        delete m_pWireShot;
+        m_pWireShot = nullptr;
+    }
 }
 //==========================================================================================================
 
@@ -127,6 +137,8 @@ void CPlayer::Update()
     m_pAttack->AttackProcess(this);//現在のアクションモードの攻撃処理を実装
 
     m_pEffect->EffectProcess(this);//エフェクト処理
+
+    m_pWireShot->WireShotProcess(this);//ワイヤー発射状態処理
 
     //m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f) + m_AddPosR;
     //m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -200.0f, 0.0f, cosf(m_Rot.y) * -200.0f);
@@ -169,6 +181,13 @@ void CPlayer::SetDeath()
         m_pMeshOrbit = nullptr;
     }
 
+    if (m_pWire != nullptr)
+    {
+        m_pWire->SetUseDeath(true);
+        m_pWire->SetDeath();
+        m_pWire = nullptr;
+    }
+
     CObject::SetDeath();
 }
 //===========================================================================================================
@@ -178,7 +197,7 @@ void CPlayer::SetDeath()
 //====================================================
 CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale)
 {
-    CPlayer* pPlayer = DBG_NEW CPlayer(DBG_NEW CPlayerMove_Normal(),DBG_NEW CPlayerAttack_Shot(),DBG_NEW CPlayerEffect());//プレイヤーを生成
+    CPlayer* pPlayer = DBG_NEW CPlayer(DBG_NEW CPlayerMove_Normal(),DBG_NEW CPlayerAttack_Shot(),DBG_NEW CPlayerEffect(),DBG_NEW CPlayerWireShot_Dont());//プレイヤーを生成
 
     bool bSuccess = pPlayer->CObject::GetCreateSuccess();
     int nIdx = 0;//テクスチャのインデックス
@@ -318,6 +337,21 @@ void CPlayer::ChengeEffectMode(CPlayerEffect* pPlayerEffect)
         m_pEffect = nullptr;
 
         m_pEffect = pPlayerEffect;
+    }
+}
+
+
+//========================================================
+//ワイヤー発射モードをチェンジ
+//========================================================
+void CPlayer::ChengeWireShotMode(CPlayerWireShot* pPlayerWireShot)
+{
+    if (m_pWireShot != nullptr)
+    {
+        delete m_pWireShot;
+        m_pWireShot = nullptr;
+
+        m_pWireShot = pPlayerWireShot;
     }
 }
 //==========================================================================================================

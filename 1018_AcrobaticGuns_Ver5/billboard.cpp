@@ -349,9 +349,6 @@ void CBillboard::Draw(void)
 	else
 	{//親となるモデルがいたら
 		//位置を反映
-		D3DXMatrixTranslation(&mtxTrans, GetPos().x, GetPos().y, GetPos().z);
-		D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);//自分のマトリックスと位置をかけ合わせる
-
 		D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxParent);//親の敵のマトリックスとかけ合わせる
 	}
 	//ワールドマトリックスの設定

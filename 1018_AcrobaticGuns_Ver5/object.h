@@ -32,6 +32,7 @@ public:
 		BGMODEL,         //背景モデル
 		BLOCK,           //ブロック
 		PLAYER,          //プレイヤー
+		WIREHEAD,        //ワイヤー頭
 		WIRE,            //ワイヤー
 		ENEMY,           //敵
 		BULLET,          //弾

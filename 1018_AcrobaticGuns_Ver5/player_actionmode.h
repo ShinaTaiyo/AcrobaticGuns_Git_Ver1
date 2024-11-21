@@ -202,5 +202,36 @@ public:
 	void EffectProcess(CPlayer* pPlayer) override {};//エフェクト処理
 };
 
+//==============================================
+//ワイヤー発射中判定クラス
+//==============================================
+
+//スーパークラス
+class CPlayerWireShot
+{
+public:
+	CPlayerWireShot();//コンストラクタ
+	virtual ~CPlayerWireShot();//デストラクタ
+	virtual void WireShotProcess(CPlayer * pPlayer);//ワイヤー発射処理
+};
+
+//発射するクラス
+class CPlayerWireShot_Do : public CPlayerWireShot
+{
+public:
+	CPlayerWireShot_Do();//コンストラクタ
+	~CPlayerWireShot_Do() override;//デストラクタ
+	void WireShotProcess(CPlayer* pPlayer) override;//ワイヤー発射処理
+};
+
+//発射しないクラス
+class CPlayerWireShot_Dont : public CPlayerWireShot
+{
+public:
+	CPlayerWireShot_Dont();//コンストラクタ
+	~CPlayerWireShot_Dont() override;//デストラクタ
+	void WireShotProcess(CPlayer* pPlayer) override;//ワイヤー発射処理
+};
+
 
 #endif

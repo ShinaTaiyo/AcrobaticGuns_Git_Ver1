@@ -1,0 +1,34 @@
+//===============================================================================
+//
+//１１月２１日：ワイヤーを作る[wire_head.h]
+//Author:ShinaTaiyo
+//
+//===============================================================================
+
+#ifndef _WIREHEAD_H_
+#define _WIREHEAD_H_
+
+//==========================================
+//インクルード
+//==========================================
+#include "main.h"
+#include "objectXAlive.h"
+//===============================================================================
+
+class CWireHead : public CObjectXAlive
+{
+public:
+	CWireHead(int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::WIREHEAD, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_X);//コンストラクタ
+	~CWireHead();//デストラクタ
+	HRESULT Init() override; //初期化処理
+	void Uninit() override;  //終了処理
+	void Update() override;  //更新処理
+	void Draw() override;    //描画処理
+	void SetDeath() override;//死亡フラグ設定処理
+	static CWireHead* Create(D3DXVECTOR3 Pos,D3DXVECTOR3 Rot,D3DXVECTOR3 Move,D3DXVECTOR3 Scale,int nLife);
+	const bool& GetSuccessCollision() const { return m_bCollision; }
+private:
+	bool CollisionSquare();//正方形の当たり判定を行う
+	bool m_bCollision;//当たり判定が成功したかどうか
+};
+#endif // !_WIRE_H_

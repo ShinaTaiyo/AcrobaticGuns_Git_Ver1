@@ -24,6 +24,8 @@
 #include <vector> //ベクター管理で使う
 #include <iomanip>// setprecisionを使用するのに必要
 #include <cassert>
+#include <stdio.h>
+#include <stdlib.h>
 using namespace std;
 
 //==============================

@@ -34,20 +34,48 @@ public:
 	//向き
 	void SetRot(D3DXVECTOR3 Rot) { m_Rot = Rot; }
 	const D3DXVECTOR3& GetRot() const { return m_Rot; }
-private:
-	//typedef struct
-	//{
-	//	int nNumBlockXZ;                   //X方向のブロック数
-	//	int nNumBlockY;                    //Y方向のブロック数
-	//	int nNumVtxXZ;                     //XZ方向分割数
-	//	int nDivisionY;                    //Y方向分割数
-	//	float fRadius;                     //半径
-	//	float fHeight;                     //高さ
-	//	int nNumVtx;                       //頂点数
-	//	int nNumIdx;                       //インデックス数
-	//	int nNumPolygon;                   //ポリゴン数
-	//}Info;
 
+	//高さ
+	void SetHeight(float fHeight) { m_fHeight = fHeight; }
+	const float& GetHeight() const { return m_fHeight; }              //高さ
+
+	//メッシュ情報
+	LPDIRECT3DVERTEXBUFFER9 GetVtxBufferPointer() { return m_pVtxBuff; }//頂点バッファを取得する
+	LPDIRECT3DINDEXBUFFER9 GetIdxBufferPointer() { return m_pIdxBuff; } //インデックスバッファを取得する
+	LPDIRECT3DTEXTURE9 GetTexture() { return m_pTexture; }              //テクスチャを取得する
+
+	//マトリックスワールド系
+	void SetMtxChild(D3DXMATRIX* pMtxChild) { m_pMtxChild = pMtxChild; }	//子マトリックスのポインタを設定する
+	D3DXMATRIX& GetMtxWorld() { return m_mtxWorld; }                        //マトリックスワールドを取得
+
+	const int & GetNumDivisionXZ() const { return m_nNumDivisionXZ; } //XZ方向の分割数の取得
+	const int & GetNumDivisionY() const { return m_nNumDivisionY; }   //Y方向の分割数の取得
+	const int & GetNumVtx() const { return m_nNumVtx; }               //頂点数の取得
+	const int & GetNumIdx() const { return m_nNumIdx; }               //インデックス数の取得
+	const int & GetNumPolygon() const { return m_nNumPolygon; }       //ポリゴン数の取得
+	const float& GetRadius() const { return m_fRadius; }              //半径を取得
+
+	//それぞれのYの中心点を取得
+	const D3DXVECTOR3 & GetSenterPos(const int nArray) const
+	{
+		if (nArray < 0 || nArray >= m_nNumDivisionY)
+		{
+			int a = 0;
+			//assert("配列外アクセス");
+		}
+		return m_pSenterPos[nArray];
+	}//中心点の先頭ポインタを取得
+	void SetSenterPos(int nArray, D3DXVECTOR3 Pos)
+	{
+		if (nArray < 0 || nArray >= m_nNumDivisionY)
+		{
+			int k = 0;
+			//assert("配列外アクセス");
+		}
+		m_pSenterPos[nArray] = Pos;
+	}//それぞれの中心点を設定する
+
+private:
 	PDIRECT3DVERTEXBUFFER9 m_pVtxBuff;   //頂点バッファへのポインタ
 	LPDIRECT3DINDEXBUFFER9 m_pIdxBuff;   //インデックスバッファへのポインタ
 	LPDIRECT3DTEXTURE9 m_pTexture;       //テクスチャへのポインタ
@@ -69,6 +97,7 @@ private:
 	D3DXVECTOR3 m_Pos;                   //位置
 	D3DXVECTOR3 m_Rot;                   //向き
 	D3DXMATRIX m_mtxWorld;               //ワールドマトリックス
+	D3DXMATRIX* m_pMtxChild;             //子マトリックス
 
 	//テクスチャ
 	int m_nTextureIndex;                 //テクスチャ番号を設定する
@@ -76,6 +105,9 @@ private:
 	//頂点確認用
 	int m_nCheckVtx;
 	int m_nCheckIdx;
+
+	//それぞれの中心点
+	D3DXVECTOR3* m_pSenterPos;
 
 	//=============================================
 	//関数

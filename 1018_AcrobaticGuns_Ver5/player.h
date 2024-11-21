@@ -17,6 +17,7 @@
 #include "meshorbit.h"
 #include "ui.h"
 #include "player_actionmode.h"
+#include "wire.h"
 //==========================================
 
 //===========================================
@@ -25,7 +26,7 @@
 class CPlayer : public CObjectXAlive
 {
 public:
-	CPlayer(CPlayerMove * pPlayerMove,CPlayerAttack * pPlayerAttack,CPlayerEffect * pPlayerEffect,
+	CPlayer(CPlayerMove * pPlayerMove,CPlayerAttack * pPlayerAttack,CPlayerEffect * pPlayerEffect,CPlayerWireShot * pPlayer,
 		int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::PLAYER, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_X);                  //コンストラクタ
 	~CPlayer();                 //デストラクタ
 	HRESULT Init() override;    //初期化処理
@@ -44,9 +45,10 @@ public:
 	//===============================================================================================
 	
 	//================================================
-	//軌跡
+	//メッシュ
 	//================================================
 	CMeshOrbit* GetMeshOrbit() { return m_pMeshOrbit; }//軌跡を取得
+	CWire* GetWire() { return m_pWire; }//ワイヤーを取得
 	//===============================================================================================
 
 	//================================================
@@ -55,6 +57,7 @@ public:
 	void ChengeMoveMode(CPlayerMove* pPlayerMove);//移動モードを変える
 	void ChengeAttackMode(CPlayerAttack* pPlayerAttack);//攻撃モードを変える
 	void ChengeEffectMode(CPlayerEffect* pPlayerEffect);//エフェクトモードを変える
+	void ChengeWireShotMode(CPlayerWireShot* pPlayerWireShot);//ワイヤー発射モードを変える
 	//===============================================================================================
 private:
 	//================================================
@@ -78,16 +81,20 @@ private:
 	//変数宣言
 	//================================================
 	float m_fRotAim;                    //目的の向き
+	bool m_bCollision;                  //当たり判定が成功したかどうか
+
+	//他クラスインスタンス
 	CLockon* m_pLockOn;                 //ロックオンカーソルへのポインタ
 	ACTIONMODE m_NowActionMode;         //現在のアクションモード
 	CUi * m_pModeDisp;                  //モード表示UI
 	CMeshOrbit* m_pMeshOrbit;           //軌跡
-	bool m_bCollision;                  //当たり判定が成功したかどうか
-
+	CWire* m_pWire;                     //ワイヤー
+	
 	//行動状態
 	CPlayerMove* m_pMove;               //移動処理
 	CPlayerAttack* m_pAttack;           //攻撃処理
 	CPlayerEffect* m_pEffect;           //エフェクト処理
+	CPlayerWireShot* m_pWireShot;       //ワイヤーショット状態
 	//===============================================================================================
 
 
