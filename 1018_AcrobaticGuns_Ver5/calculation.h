@@ -93,7 +93,30 @@ public:
 		float x1, float y1, float x2, float y2,
 		float x3, float y3, float x4, float y4);
 
-	static int CalculationDigit(int nNum);//桁数を計算する
+	//桁数を計算する
+	static int CalculationDigit(int nNum);
+
+	//ベクトルを計算する
+	static D3DXVECTOR3 CalcVec(D3DXVECTOR3 MyPos, D3DXVECTOR3 AimPos,bool bNormalize);
+
+	//仰角を求める
+	static float CalcElevationAngle(const D3DXVECTOR3& MyPos, const D3DXVECTOR3& AimPos);
+
+	//================================================
+	//YawとPitchを求め、目的の位置への角度を求める
+	//================================================
+
+	//目的の位置への向きを計算する
+	static void CalcRotToTarget(const D3DXVECTOR3& MyPos, const D3DXVECTOR3& AimPos, float& OutYaw, float& OutPitch);
+
+	//目的の位置への向きをYawとPitchを使用して求める
+	static D3DXVECTOR3 CalcDirectionFromYawPitch(const float Yaw, const float Pitch);
+
+	//目的の位置への角度をまとめて求める
+	static D3DXVECTOR3 CalcSummarizeRotToTarget(const D3DXVECTOR3& MyPos, const D3DXVECTOR3& AimPos);
+	//=======================================================================================================================
+
+
 	//=============================================================================================================
 private:
 };

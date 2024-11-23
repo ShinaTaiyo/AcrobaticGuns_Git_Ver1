@@ -11,6 +11,7 @@
 #include "enemy.h"
 #include "manager.h"
 #include "objectXInfo.h"
+#include "game.h"
 //============================================================================================================================================
 
 //====================================================================================
@@ -65,6 +66,15 @@ void CEnemy::Uninit()
 void CEnemy::Update()
 {
 	CObjectXAlive::Update();
+
+	if (CScene::GetMode() == CScene::MODE_GAME)
+	{
+		const D3DXVECTOR3& Rot = GetRot();
+		const D3DXVECTOR3& Pos = GetPos();
+		const D3DXVECTOR3& PlayerPos = CGame::GetPlayer()->GetPos();
+		float fElevaRot = atan2f(PlayerPos.y - Pos.y, sqrtf(powf(PlayerPos.x - Pos.x, 2) + powf(PlayerPos.z - Pos.z, 2)));
+		SetRot(D3DXVECTOR3(fElevaRot, atan2f(PlayerPos.x - Pos.x, PlayerPos.z - Pos.z) + D3DX_PI,0.0f));
+	}
 }
 //============================================================================================================================================
 

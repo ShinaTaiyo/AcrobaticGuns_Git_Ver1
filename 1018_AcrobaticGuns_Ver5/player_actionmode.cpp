@@ -22,6 +22,7 @@
 #include "wire.h"
 #include "player.h"
 #include "wire_head.h"
+#include "camera.h"
 //===================================================================================================================
 
 //******************************************************************************************************************************************************
@@ -70,7 +71,6 @@ void CPlayerMove::MoveProcess(CPlayer* pPlayer)
 }
 //======================================================================================================================================================
 
-
 //******************************************************************************************************************************************************
 //プレイヤー普通移動クラス
 //******************************************************************************************************************************************************
@@ -78,7 +78,7 @@ void CPlayerMove::MoveProcess(CPlayer* pPlayer)
 //=====================================================================================================
 //コンストラクタ
 //=====================================================================================================
-CPlayerMove_Normal::CPlayerMove_Normal()
+CPlayerMove_Normal::CPlayerMove_Normal() : m_bIsLanding(false)
 {
 
 }
@@ -98,6 +98,33 @@ CPlayerMove_Normal::~CPlayerMove_Normal()
 void CPlayerMove_Normal::MoveProcess(CPlayer* pPlayer)
 {
 	CPlayerMove::MoveProcess(pPlayer);
+	JumpProcess(pPlayer);
+}
+//======================================================================================================================================================
+
+//=====================================================================================================
+//ジャンプ処理
+//=====================================================================================================
+void CPlayerMove_Normal::JumpProcess(CPlayer* pPlayer)
+{
+	if (pPlayer->GetPos().y <= 0.0f)
+	{
+		pPlayer->SetPos(D3DXVECTOR3(pPlayer->GetPos().x, 0.0f, pPlayer->GetPos().z));
+		m_bIsLanding = true;
+	}
+	else
+	{
+		m_bIsLanding = false;
+	}
+
+	if (m_bIsLanding == true)
+	{
+		pPlayer->SetUseGravity(true, 0.01f);
+		if (CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::A) == true)
+		{
+			pPlayer->SetMove(D3DXVECTOR3(pPlayer->GetMove().x, 10.0f, pPlayer->GetMove().z));
+		}
+	}
 }
 //======================================================================================================================================================
 
@@ -134,19 +161,28 @@ void CPlayerMove_PrepDive::MoveProcess(CPlayer* pPlayer)
 	CLockon* pLockon = pPlayer->GetLockOn();//ロックオンへのポインタ
 	D3DXVECTOR3 Move = CCalculation::Calculation3DVec(pPlayer->GetPos(), pLockon->GetNearRayColObjPos(), 40.0f);
 
+	D3DXVECTOR3 Rot = pLockon->GetNearRayColObjPos() - pPlayer->GetPos();
+	float fYaw = atan2f(Rot.x, Rot.z);
+	float fPitch = -atan2f(Rot.y, sqrtf(powf(Rot.x, 2) + powf(Rot.z, 2)));
+	CManager::GetDebugProc()->PrintDebugProc("Yaw : %f、Pitch : %f\n", fYaw, fPitch);
+
 	pWireHead->SetPos(pPlayer->GetPos());//ダイブ準備中なのでワイヤーヘッドをプレイヤーの位置に固定
 
 	CManager::GetDebugProc()->PrintDebugProc("移動量：%f %f %f\n", Move.x, Move.y, Move.z);
 	if (CManager::GetInputJoypad()->GetRT_Trigger() == true)
 	{//ワイヤー発射移動モードにチェンジ
 
-
 		//ワイヤーの頭を飛ばす
 		pPlayer->GetWire()->GetWireHead()->SetMove(Move);
 		pPlayer->GetWire()->GetWireHead()->SetUseInteria(false);
 		pPlayer->GetWire()->GetWireHead()->SetUseGravity(false,1.0f);
-		pPlayer->GetWire()->GetWireHead()->SetRot(D3DXVECTOR3(Move.y,Move.x,Move.z));
+		//D3DXVECTOR3 Rot = CCalculation::CalcSummarizeRotToTarget(pPlayer->GetPos(), pLockon->GetNearRayColObjPos());
+		//Rot *= D3DX_PI;
 
+		//D3DXVECTOR3 Aim = pLockon->GetNearRayColObjPos() - pPlayer->GetPos();
+		//D3DXVec3Normalize(&Aim, &Aim);
+
+		pPlayer->GetWire()->GetWireHead()->SetRot(D3DXVECTOR3(D3DX_PI * 0.5f + fPitch,fYaw,0.0f));
 		pPlayer->ChengeMoveMode(DBG_NEW CPlayerMove_Dont());//移動モード「なし」
 		pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_Dont());//攻撃モード「なし」
 		pPlayer->ChengeWireShotMode(DBG_NEW CPlayerWireShot_Do());//ワイヤーショットモード「する」
@@ -474,14 +510,21 @@ CPlayerWireShot_Do::~CPlayerWireShot_Do()
 //=====================================================================================================
 void CPlayerWireShot_Do::WireShotProcess(CPlayer* pPlayer)
 {
-	if (pPlayer->GetWire()->GetWireHead()->GetSuccessCollision() == true)
+	CWire* pWire = pPlayer->GetWire();
+	CWireHead* pWireHead = pWire->GetWireHead();
+	//D3DXVECTOR3 Vec = CCalculation::CalcVec(pPlayer->GetPos(), pWireHead->GetPos(),false);
+	//D3DXVECTOR3 CalcRot = D3DXVECTOR3(D3DX_PI * 0.5f - CCalculation::CalcElevationAngle(pPlayer->GetPos(), pWireHead->GetPos()),
+	//	CCalculation::CalculationXYaim(pPlayer->GetPos(),pWireHead->GetPos()),0.0f);
+
+	//pWireHead->SetRot(CalcRot);
+	if (pWireHead->GetSuccessCollision() == true)
 	{//ワイヤーがどれかのオブジェクトに当たったら
 		pPlayer->ChengeWireShotMode(DBG_NEW CPlayerWireShot_Dont());//ワイヤー発射モード「なし」
 		pPlayer->ChengeEffectMode(DBG_NEW CPlayerEffect_Dive());    //エフェクトモード「ダイブ」
 
-		pPlayer->GetWire()->GetWireHead()->SetMove(D3DXVECTOR3(0.0f, 0.0f, 0.0f));//ワイヤーヘッドの移動を止める
+		pWireHead->SetMove(D3DXVECTOR3(0.0f, 0.0f, 0.0f));//ワイヤーヘッドの移動を止める
 
-		D3DXVECTOR3 Move = CCalculation::Calculation3DVec(pPlayer->GetPos(), pPlayer->GetWire()->GetWireHead()->GetPos(),20.0f);
+		D3DXVECTOR3 Move = CCalculation::Calculation3DVec(pPlayer->GetPos(), pWireHead->GetPos(),20.0f);
 		CPlayerMove_Dive* pPlayerMove_Dive = DBG_NEW CPlayerMove_Dive();//移動モード「ダイブ」
         pPlayer->ChengeMoveMode(pPlayerMove_Dive);
 		pPlayer->SetMove(Move);

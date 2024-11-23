@@ -94,6 +94,9 @@ public:
 	CPlayerMove_Normal();                    //コンストラクタ
 	~CPlayerMove_Normal() override;                   //デストラクタ
 	void MoveProcess(CPlayer* pPlayer) override;//移動処理
+	void JumpProcess(CPlayer* pPlayer);        //ジャンプ処理
+private:
+	bool m_bIsLanding;
 };
 
 //ダイブ移動クラス

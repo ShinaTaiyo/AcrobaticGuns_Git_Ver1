@@ -217,7 +217,6 @@ bool CCalculation::CaluclationMove(bool bUseStick, D3DXVECTOR3& Move, float fSpe
 //目的の位置への移動量を計算する
 //=========================================================
 D3DXVECTOR3 CCalculation::Calculation3DVec(D3DXVECTOR3 MyPos, D3DXVECTOR3 AimPos, float fSpeed)
-
 {
 	D3DXVECTOR3 VecAim = D3DXVECTOR3(0.0f,0.0f,0.0f);       //それぞれの方向のベクトル
 	D3DXVECTOR3 ResultMove = D3DXVECTOR3(0.0f,0.0f,0.0f);   //結果の移動量
@@ -227,15 +226,15 @@ D3DXVECTOR3 CCalculation::Calculation3DVec(D3DXVECTOR3 MyPos, D3DXVECTOR3 AimPos
 	//３次元ベクトルを取る
 	//==========================
 
-	//それぞれの方向のベクトルを求める
+	//方向ベクトルの計算
 	VecAim.x = AimPos.x - MyPos.x;
 	VecAim.y = AimPos.y - MyPos.y;
 	VecAim.z = AimPos.z - MyPos.z;
 
-	//総合ベクトルを求める
+	//ベクトルの大きさを求める
 	fVLaim = sqrtf(powf(VecAim.x,2) + powf(VecAim.y,2) + powf(VecAim.z,2));
 
-	//目的の位置への移動量を求める
+	//方向ベクトルを正規化し、それぞれの軸に対する移動量を求める
 	ResultMove.x = VecAim.x / fVLaim * fSpeed;
 	ResultMove.y = VecAim.y / fVLaim * fSpeed;
 	ResultMove.z = VecAim.z / fVLaim * fSpeed;
@@ -492,5 +491,94 @@ int CCalculation::CalculationDigit(int nNum)
 		nDigit++;
 	}
 	return nDigit;
+}
+//===========================================================================================================
+
+//=========================================================
+//ベクトルを計算する
+//=========================================================
+D3DXVECTOR3 CCalculation::CalcVec(D3DXVECTOR3 MyPos, D3DXVECTOR3 AimPos, bool bNormalize)
+{
+	D3DXVECTOR3 Vec = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+	//ベクトルを求める
+	Vec = AimPos - MyPos;
+
+	if (bNormalize == true)
+	{//正規化するかどうか
+		D3DXVec3Normalize(&Vec, &Vec);
+	}
+	return Vec;
+}
+//===========================================================================================================
+
+//=========================================================
+//仰角を計算する
+//=========================================================
+float CCalculation::CalcElevationAngle(const D3DXVECTOR3& MyPos, const D3DXVECTOR3& AimPos)
+{
+	D3DXVECTOR3 Vec = CalcVec(MyPos, AimPos, false);
+	float fElevAngle = atan2f(Vec.y, sqrtf(powf(Vec.x, 2) + powf(Vec.z, 2)));
+	return fElevAngle;
+}
+//===========================================================================================================
+
+//=========================================================
+//目的の位置への向きを求める
+//=========================================================
+void CCalculation::CalcRotToTarget(const D3DXVECTOR3& MyPos, const D3DXVECTOR3& AimPos, float& OutYaw, float& OutPitch)
+{
+	D3DXVECTOR3 VecAim = D3DXVECTOR3(0.0f, 0.0f, 0.0f); // 方向ベクトル
+	float fVLaim = 0.0f; // ベクトルの大きさ
+
+	// 方向ベクトルを求める
+	VecAim.x = AimPos.x - MyPos.x;
+	VecAim.y = AimPos.y - MyPos.y;
+	VecAim.z = AimPos.z - MyPos.z;
+
+	// ベクトルの大きさを求める
+	fVLaim = sqrtf(VecAim.x * VecAim.x + VecAim.y * VecAim.y + VecAim.z * VecAim.z);
+
+	if (fVLaim != 0.0f) { // ゼロ除算を防ぐ
+		VecAim.x /= fVLaim; // 正規化
+		VecAim.y /= fVLaim;
+		VecAim.z /= fVLaim;
+	}
+
+	// Yaw (水平回転)
+	OutYaw = atan2f(VecAim.x, VecAim.z);
+
+	// Pitch (垂直回転)
+	OutPitch = asinf(-VecAim.y);
+}
+//===========================================================================================================
+
+//=========================================================
+//YawとPitchを用いて目的の角度を求める
+//=========================================================
+D3DXVECTOR3 CCalculation::CalcDirectionFromYawPitch(const float Yaw, const float Pitch)
+{
+	D3DXVECTOR3 direction;
+
+	// Yaw と Pitch を使用して方向ベクトルを計算
+	direction.x = cosf(Pitch) * sinf(Yaw);  // X成分
+	direction.y = sinf(Pitch);              // Y成分
+	direction.z = cosf(Pitch) * cosf(Yaw);  // Z成分
+
+	return direction;
+}
+//===========================================================================================================
+
+//=========================================================
+//目的の位置への角度をまとめて求める
+//=========================================================
+D3DXVECTOR3 CCalculation::CalcSummarizeRotToTarget(const D3DXVECTOR3& MyPos, const D3DXVECTOR3& AimPos)
+{
+	float fYaw = 0.0f;
+	float fPitch = 0.0f;
+	D3DXVECTOR3 Rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	CalcRotToTarget(MyPos, AimPos, fYaw, fPitch);
+	Rot = CalcDirectionFromYawPitch(fYaw, fPitch);
+	return Rot;
 }
 //===========================================================================================================

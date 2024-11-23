@@ -10,6 +10,7 @@
 //=================================================================
 #include "wire_head.h"
 #include "renderer.h"
+#include "game.h"
 #include "objectXInfo.h"
 #include "manager.h"
 #include "debugproc.h"
@@ -59,7 +60,28 @@ void CWireHead::Uninit()
 //=================================================================
 void CWireHead::Update()
 {
+	//float fPitch = 0.0f;
+	//float fYaw = 0.0f;
+	//float fRoll = 0.0f;
+	//if (CScene::GetMode() == CScene::MODE_GAME)
+	//{
+	//	const D3DXVECTOR3& Pos = GetPos();
+	//	const D3DXVECTOR3& LockOnPos = CGame::GetPlayer()->GetLockOn()->GetLockOnPos();
+	//	//SetRot(D3DXVECTOR3(-D3DX_PI * 0.5f, atan2f(PlayerPos.x - Pos.x, PlayerPos.z - Pos.z), 0.0f));
+	//	D3DXVECTOR3 Vec = LockOnPos - Pos;
+	//	fYaw = atan2f(Vec.x, Vec.z);
+ //   	fPitch = -atan2f(Vec.y,sqrtf(powf(Vec.x,2) + powf(Vec.z,2)));//Y方向のベクトルの大きさに対するXZベクトルの距離
+	//	fRoll = atan2f(Vec.x, Vec.y);
+	//}
+
+
+
+	//SetRot(D3DXVECTOR3(D3DX_PI * 0.5f + fPitch, fYaw,0.0f));
+	//CManager::GetDebugProc()->PrintDebugProc("ワイヤーヘッドのPitch：%f\n", fPitch);
+
 	CObjectXAlive::Update();
+
+	//CManager::GetDebugProc()->PrintDebugProc("ワイヤーヘッドの向き：%f %f %f\n", GetRot().x, GetRot().y, GetRot().z);
 
 	m_bCollision = CollisionSquare();
 }
