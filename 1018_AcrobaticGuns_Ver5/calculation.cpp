@@ -363,11 +363,6 @@ bool CCalculation::CalcRaySphere(D3DXVECTOR3 LayPos, D3DXVECTOR3 LayVec, D3DXVEC
 	float B = LayVec.x * SphereSenterPos.x + LayVec.y * SphereSenterPos.y + LayVec.z * SphereSenterPos.z;
 	float C = SphereSenterPos.x * SphereSenterPos.x + SphereSenterPos.y * SphereSenterPos.y + SphereSenterPos.z * SphereSenterPos.z - r * r;
 	
-	CManager::GetDebugProc()->PrintDebugProc("A = %f\n", A);
-	CManager::GetDebugProc()->PrintDebugProc("B = %f\n", B);
-	CManager::GetDebugProc()->PrintDebugProc("C = %f\n", C);
-
-
 	if (A == 0.0f)
 		return false; // レイの長さが0
 
@@ -375,14 +370,9 @@ bool CCalculation::CalcRaySphere(D3DXVECTOR3 LayPos, D3DXVECTOR3 LayVec, D3DXVEC
 	if (s < 0.0f)
 		return false; // 衝突していない
 
-	CManager::GetDebugProc()->PrintDebugProc("s = %f\n", s);
-
 	s = sqrtf(s);
 	float a1 = (B - s) / A;
 	float a2 = (B + s) / A;
-
-	CManager::GetDebugProc()->PrintDebugProc("a1 = %f\n", a1);
-	CManager::GetDebugProc()->PrintDebugProc("a2 = %f\n", a2);
 
 	if (a1 < 0.0f || a2 < 0.0f)
 		return false; // レイの反対で衝突
@@ -391,13 +381,11 @@ bool CCalculation::CalcRaySphere(D3DXVECTOR3 LayPos, D3DXVECTOR3 LayVec, D3DXVEC
 	CollisionStartPos.x = LayPos.x + a1 * LayVec.x;
 	CollisionStartPos.y = LayPos.y + a1 * LayVec.y;
 	CollisionStartPos.z = LayPos.z + a1 * LayVec.z;
-	CManager::GetDebugProc()->PrintDebugProc("レイ貫通開始位置： %f %f %f\n",CollisionStartPos.x,CollisionStartPos.y,CollisionStartPos.z);
 
 	//衝突終了位置を求める
 	CollisoinEndPos.x = LayPos.x + a2 * LayVec.x;
 	CollisoinEndPos.y = LayPos.y + a2 * LayVec.y;
 	CollisoinEndPos.z = LayPos.z + a2 * LayVec.z;
-	CManager::GetDebugProc()->PrintDebugProc("レイ貫通終了位置： %f %f %f\n", CollisoinEndPos.x, CollisoinEndPos.y, CollisoinEndPos.z);
 
 	return true;
 }
@@ -426,14 +414,10 @@ bool CCalculation::CalcMatchRay(D3DXVECTOR3 AimPos, float fSx, float fSy, int nS
 
 	D3DXVec3Normalize(&ray2, &ray2);
 
-	CManager::GetDebugProc()->PrintDebugProc("ray1:%f %f %f\n", ray1.x, ray1.y, ray1.z);
-	CManager::GetDebugProc()->PrintDebugProc("ray2:%f %f %f\n", ray2.x, ray2.y, ray2.z);
-
 	if (ray1.x >= ray2.x - 0.05f && ray1.x <= ray2.x + 0.05f &&
 		ray1.y >= ray2.y - 0.05f && ray1.y <= ray2.y + 0.05f &&
 		ray1.z >= ray2.z - 0.05f && ray1.z <= ray2.z + 0.05f)
 	{
-		CManager::GetDebugProc()->PrintDebugProc("レイの方向が一致\n");
 		return true;
 	}
 	return false;

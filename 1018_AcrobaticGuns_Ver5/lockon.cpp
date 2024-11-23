@@ -190,8 +190,6 @@ void CLockon::BackWallRayCollisionPosSearch()
 
 	CCalculation::CalcScreenToWorld(&m_LockOnPos,GetPos().x,GetPos().y, 1.0f,SCREEN_WIDTH,SCREEN_HEIGHT,CManager::GetCamera()->GetMtxView(),
 		CManager::GetCamera()->GetMtxProjection()); //（椎名）多分描画範囲の一番奥の位置
-	CManager::GetDebugProc()->PrintDebugProc("床または壁との交点：%f %f %f\n", m_LockOnPos.x, m_LockOnPos.y, m_LockOnPos.z);
-
 }
 //==============================================================================================================
 
@@ -215,8 +213,6 @@ void CLockon::CalcRay()
 
 	m_NowRay = FarPos - m_FrontPos;//ベクトルを求める
 	D3DXVec3Normalize(&m_NowRay, &m_NowRay);//正規化
-
-	CManager::GetDebugProc()->PrintDebugProc("レイの向き：%f %f %f\n", m_NowRay.x, m_NowRay.y, m_NowRay.z);
 }
 //==============================================================================================================
 
@@ -256,8 +252,6 @@ void CLockon::RayCollisionToObject()
 					if (bCollision == true)
 					{//レイとサイズ/２分の球の当たり判定成功
 						CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 20, 30.0f, 30.0f, 100, 10, false, CollisionStartPos, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f), true);
-						CManager::GetDebugProc()->PrintDebugProc("衝突した位置：%f %f %f\n", CollisionStartPos.x, CollisionStartPos.y, CollisionStartPos.z);
-
 						//敵の最大頂点のスクリーン座標を求める
 						D3DXVECTOR3 ScreenPos = CCalculation::CalcWorldToScreenNoViewport(pObjX->GetSenterPos(), *CManager::GetCamera()->GetMtxView(), *CManager::GetCamera()->GetMtxProjection(),
 							float(SCREEN_WIDTH), float(SCREEN_HEIGHT));
@@ -267,7 +261,6 @@ void CLockon::RayCollisionToObject()
 							15, 55.0f, 55.0f, CCalculation::CalRaibowColor());
 
 						VecCollisionSuccess.push_back(CollisionStartPos);//当たり判定が成功したオブジェクトの判定開始位置を保存する
-						CManager::GetDebugProc()->PrintDebugProc("判定成功したかどうか:%d\n", bCollision);
 					}
 				}
 			}

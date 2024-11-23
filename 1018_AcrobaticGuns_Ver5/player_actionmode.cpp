@@ -176,12 +176,7 @@ void CPlayerMove_PrepDive::MoveProcess(CPlayer* pPlayer)
 		pPlayer->GetWire()->GetWireHead()->SetMove(Move);
 		pPlayer->GetWire()->GetWireHead()->SetUseInteria(false);
 		pPlayer->GetWire()->GetWireHead()->SetUseGravity(false,1.0f);
-		//D3DXVECTOR3 Rot = CCalculation::CalcSummarizeRotToTarget(pPlayer->GetPos(), pLockon->GetNearRayColObjPos());
-		//Rot *= D3DX_PI;
-
-		//D3DXVECTOR3 Aim = pLockon->GetNearRayColObjPos() - pPlayer->GetPos();
-		//D3DXVec3Normalize(&Aim, &Aim);
-
+		pPlayer->GetWire()->SetUseDraw(true);
 		pPlayer->GetWire()->GetWireHead()->SetRot(D3DXVECTOR3(D3DX_PI * 0.5f + fPitch,fYaw,0.0f));
 		pPlayer->ChengeMoveMode(DBG_NEW CPlayerMove_Dont());//移動モード「なし」
 		pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_Dont());//攻撃モード「なし」
@@ -232,6 +227,7 @@ void CPlayerMove_Dive::MoveProcess(CPlayer* pPlayer)
 	if (pPlayer->GetCollisionSuccess() == true)
 	{//ダイブ時に判定したら移動モードと攻撃モードを通常に戻す
 		pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_Dive());
+		pPlayer->GetWire()->SetUseDraw(false);
 		pPlayer->ChengeMoveMode(DBG_NEW CPlayerMove_PrepDive());
 		pPlayer->SetRot(D3DXVECTOR3(-0.0f,pPlayer->GetRot().y, 0.0f));//向きを前に傾ける
 	}
@@ -524,7 +520,7 @@ void CPlayerWireShot_Do::WireShotProcess(CPlayer* pPlayer)
 
 		pWireHead->SetMove(D3DXVECTOR3(0.0f, 0.0f, 0.0f));//ワイヤーヘッドの移動を止める
 
-		D3DXVECTOR3 Move = CCalculation::Calculation3DVec(pPlayer->GetPos(), pWireHead->GetPos(),20.0f);
+		D3DXVECTOR3 Move = CCalculation::Calculation3DVec(pPlayer->GetPos(), pWireHead->GetPos(),40.0f);
 		CPlayerMove_Dive* pPlayerMove_Dive = DBG_NEW CPlayerMove_Dive();//移動モード「ダイブ」
         pPlayer->ChengeMoveMode(pPlayerMove_Dive);
 		pPlayer->SetMove(Move);

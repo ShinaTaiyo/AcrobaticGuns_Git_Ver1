@@ -39,6 +39,10 @@ public:
 	void SetHeight(float fHeight) { m_fHeight = fHeight; }
 	const float& GetHeight() const { return m_fHeight; }              //高さ
 
+	//描画するかどうか
+	void SetUseDraw(bool bUse) { m_bUseDraw = bUse; }
+	const bool& GetUseDraw() const { return m_bUseDraw; }
+
 	//メッシュ情報
 	LPDIRECT3DVERTEXBUFFER9 GetVtxBufferPointer() { return m_pVtxBuff; }//頂点バッファを取得する
 	LPDIRECT3DINDEXBUFFER9 GetIdxBufferPointer() { return m_pIdxBuff; } //インデックスバッファを取得する
@@ -108,6 +112,8 @@ private:
 
 	//それぞれの中心点
 	D3DXVECTOR3* m_pSenterPos;
+
+	bool m_bUseDraw;//描画するかどうか
 
 	//=============================================
 	//関数

@@ -28,7 +28,7 @@ m_nNumVtx((m_nNumDivisionXZ + 1) * m_nNumDivisionY + 2),//頂点数（上面の中心点　
 m_nNumIdx((m_nNumDivisionXZ + 1) * 2 * (m_nNumDivisionY + 1) + 2 * m_nNumDivisionY),//インデックス数(１面は、XZ方向頂点数　＊　２)　＊　（Y方向頂点数 + 1) + 2 * (縮退計算数)
 m_nNumPolygon(2 * (m_nNumDivisionXZ + 1) * (m_nNumDivisionY + 1) + 2 * 2 + 1 * (m_nNumDivisionY - 1)),//ポリゴン数（底面と上面をつなぐ縮退ポリゴンは二つ）（側面と側面をつなぐ縮退ポリゴンは一つ）
 m_nTextureIndex(0),m_pIdxBuff(nullptr),m_pVtxBuff(nullptr),m_pTexture(nullptr),
-m_Pos(Pos),m_Rot(Rot),m_nCheckVtx(0),m_nCheckIdx(0),m_pMtxChild(nullptr)
+m_Pos(Pos),m_Rot(Rot),m_nCheckVtx(0),m_nCheckIdx(0),m_pMtxChild(nullptr),m_bUseDraw(true)
 {
 	m_nNumPolygon = m_nNumIdx - 2;
 	m_pSenterPos = DBG_NEW D3DXVECTOR3[m_nNumDivisionY];
@@ -275,7 +275,7 @@ void CMeshCylinder::Draw()
 
 	if (m_pMtxChild != nullptr)
 	{//子マトリックスが存在するなら掛け合わせる
-		D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld,m_pMtxChild);
+		D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, m_pMtxChild);
 	}
 
 	//ワールドマトリックスの設定
@@ -285,7 +285,7 @@ void CMeshCylinder::Draw()
 	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
 	//頂点バッファをデータストリームに設定
-	pDevice->SetStreamSource(0,m_pVtxBuff, 0, sizeof(VERTEX_3D));//頂点バッファへのポインタと頂点情報の構造体のサイズ
+	pDevice->SetStreamSource(0, m_pVtxBuff, 0, sizeof(VERTEX_3D));//頂点バッファへのポインタと頂点情報の構造体のサイズ
 
 	//インデックスバッファをデータストリームに設定
 	pDevice->SetIndices(m_pIdxBuff);
@@ -296,9 +296,11 @@ void CMeshCylinder::Draw()
 	//テクスチャの設定
 	pDevice->SetTexture(0, m_pTexture);
 
-	//ポリゴンの描画
-	pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP, 0, 0,m_nNumVtx, 0,m_nNumPolygon);
-
+	if (m_bUseDraw == true)
+	{
+		//ポリゴンの描画
+		pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP, 0, 0, m_nNumVtx, 0, m_nNumPolygon);
+	}
 	//片面だけ描画する
 	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 }

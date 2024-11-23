@@ -33,9 +33,13 @@ CWire::CWire(WIRETYPE WireType, float fRadius, float fHeight,int nNumDivsionXZ,
 	D3DXVECTOR3 Pos, D3DXVECTOR3 Rot, 
 	int nNumDivisionY, int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CMeshCylinder(fRadius,fHeight,nNumDivsionXZ,nNumDivisionY,
 		Pos,Rot,
-		nPri,bUseintPri,type,ObjType),m_Type(WireType),m_bUseUpdate(true),m_pWireHead(nullptr),m_pPlayer(nullptr)
+		nPri,bUseintPri,type,ObjType),m_Type(WireType),m_bUseUpdate(true),m_pWireHead(nullptr),m_pPlayer(nullptr),m_VecMtxCircle()
 {
-
+	for (int nCnt = 0; nCnt < nNumDivsionXZ + 1; nCnt++)
+	{
+		CirclePosInfo Info = { D3DXVECTOR3(0.0f,0.0f,0.0f),{} };
+		m_VecMtxCircle.push_back(Info);
+	}
 }
 //===================================================================================================================
 
@@ -44,7 +48,7 @@ CWire::CWire(WIRETYPE WireType, float fRadius, float fHeight,int nNumDivsionXZ,
 //===============================================================
 CWire::~CWire()
 {
-
+	m_VecMtxCircle.clear();
 }
 //===================================================================================================================
 
@@ -111,6 +115,8 @@ void CWire::Update()
 		float fRatioY = 0.0f;
 		D3DXVECTOR3 LastSenterPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		D3DXVECTOR3 MeasureNor = D3DXVECTOR3(0.0f, 0.0f, 0.0f);//法線計算用
+		//D3DXVECTOR3 Rot = m_pWireHead->GetRot();
+		//D3DXVec3Normalize(&Rot, &Rot);
 		for (int nCntVtxY = 0; nCntVtxY < nNumDivisionY; nCntVtxY++)
 		{//Y方向のUVはそのまま使う
 			fRatioY = (1.0f / (nNumDivisionY - 1)) * nCntVtxY;
@@ -125,7 +131,9 @@ void CWire::Update()
 
 				if (nCntVtxY == nNumDivisionY - 1)
 				{//最後の周で基準点を決める（9,8,7,6,5,4,3,2,1)
-					pVtx[nCntArray].pos = D3DXVECTOR3(sinf((D3DX_PI * 2) * fRatioXZ) * fRadius,fHeight, cosf((D3DX_PI * 2) * fRatioXZ) * fRadius);
+					pVtx[nCntArray].pos = m_VecMtxCircle[nCntVtxXZ].Pos;
+					//CManager::GetDebugProc()->PrintDebugProc("頂点%d：%f %f %f\n",nCntVtxXZ,pVtx[nCntArray].pos.x, pVtx[nCntArray].pos.y, pVtx[nCntArray].pos.z);
+					/* D3DXVECTOR3(sinf((D3DX_PI * 2) * fRatioXZ) * fRadius,fHeight, cosf((D3DX_PI * 2) * fRatioXZ) * fRadius);*/
 				}
 				else
 				{//基準点に対して軌跡風に頂点を代入していく(18 = 27)
@@ -147,8 +155,9 @@ void CWire::Update()
 
 				if (nCntVtxY == nNumDivisionY - 1 && nCntVtxXZ == nNumDivisionXZ)
 				{//最後
-					pVtx[nCntArray].pos = D3DXVECTOR3(0.0f,fHeight,0.0f);//底面の中心に位置を設定
-					SetSenterPos(0, D3DXVECTOR3(0.0f, fHeight, 0.0f));
+					pVtx[nCntArray].pos = m_pWireHead->GetPos();//底面の中心に位置を設定
+					CManager::GetDebugProc()->PrintDebugProc("中心頂点：%f %f %f\n", pVtx[nCntArray].pos.x, pVtx[nCntArray].pos.y, pVtx[nCntArray].pos.z);
+					SetSenterPos(0,m_pWireHead->GetPos());
 				}
 			}
 		}
@@ -185,19 +194,58 @@ void CWire::Draw()
 	//ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&mtxWorld);
 
+	//向きを反映
+	D3DXMatrixRotationYawPitchRoll(&mtxRot,0.0f,0.0f,0.0f);
+	D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxRot);
+
+	//位置を反映
+	D3DXMatrixTranslation(&mtxTrans,0.0f,0.0f,0.0f);
+	D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxTrans);
+
+	//========================================================================================
+	//円状に点を配置するためのワールド座標を求める
+	//========================================================================================
 	if (m_pWireHead != nullptr)
 	{
-		//向きを反映
-		D3DXMatrixRotationYawPitchRoll(&mtxRot, m_pWireHead->GetRot().y, m_pWireHead->GetRot().x, m_pWireHead->GetRot().z);
-		D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxRot);
-	}
+		D3DXVECTOR3 PosZero = D3DXVECTOR3(0.0f, 0.0f, 0.0f);//ワールド座標代入処理で使用する
+		D3DXVECTOR3 WireHeadRot = m_pWireHead->GetRot();//ワイヤーヘッドの向き
+		D3DXVECTOR3 WireHeadPos = m_pWireHead->GetPos();//ワイヤーヘッドの位置
+		CManager::GetDebugProc()->PrintDebugProc("ワイヤーヘッド向き：%f %f %f\n", WireHeadRot.x,WireHeadRot.y,WireHeadRot.z);
+		int Size = m_VecMtxCircle.size();
 
-	if (m_pPlayer != nullptr)
-	{
-		//位置を反映
-		D3DXMatrixTranslation(&mtxTrans, m_pPlayer->GetPos().x, m_pPlayer->GetPos().y, m_pPlayer->GetPos().z);
-		D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxTrans);
+		for (int nCnt = 0; nCnt < Size; nCnt++)
+		{
+			D3DXMATRIX mtxSenter;
+			D3DXMatrixIdentity(&mtxSenter);
+
+			//割合を求める
+			float fRatio = (2.0f / (Size - 1)) * nCnt;
+
+			//ワールドマトリックスの初期化
+			D3DXMatrixIdentity(&m_VecMtxCircle[nCnt].WorldMtx);
+
+			//向きを反映（ワイヤーヘッドが向いている方向に）
+			D3DXMatrixRotationYawPitchRoll(&mtxRot,0.0f,0.0f,0.0f);
+			D3DXMatrixMultiply(&m_VecMtxCircle[nCnt].WorldMtx, &m_VecMtxCircle[nCnt].WorldMtx, &mtxRot);
+
+			//位置を反映（ワイヤーヘッドを中心に円状に）
+			D3DXMatrixTranslation(&mtxTrans,
+				sinf(D3DX_PI * fRatio) * GetRadius(),
+				0.0f,
+				cosf(D3DX_PI * fRatio) * GetRadius());
+			D3DXMatrixMultiply(&m_VecMtxCircle[nCnt].WorldMtx, &m_VecMtxCircle[nCnt].WorldMtx, &mtxTrans);
+
+			//ワイヤーヘッドとワールド変換行列を掛け合わせる
+			D3DXMatrixMultiply(&m_VecMtxCircle[nCnt].WorldMtx, &m_VecMtxCircle[nCnt].WorldMtx,&m_pWireHead->GetMatrixWorld());
+
+			//ワールド座標を代入
+			D3DXVec3TransformCoord(&m_VecMtxCircle[nCnt].Pos, &PosZero, &m_VecMtxCircle[nCnt].WorldMtx);
+
+			CManager::GetDebugProc()->PrintDebugProc("頂点%d：%f %f %f\n", nCnt, m_VecMtxCircle[nCnt].Pos.x, m_VecMtxCircle[nCnt].Pos.y, m_VecMtxCircle[nCnt].Pos.z);
+		}
 	}
+	//=======================================================================================================================
+
 	//ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &mtxWorld);
 
@@ -216,9 +264,11 @@ void CWire::Draw()
 	//テクスチャの設定
 	pDevice->SetTexture(0, pTexture);
 
-	//ポリゴンの描画
-	pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP, 0, 0, nNumVtx, 0, nNumPolygon);
-
+	if (GetUseDraw() == true)
+	{
+		//ポリゴンの描画
+		pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP, 0, 0, nNumVtx, 0, nNumPolygon);
+	}
 	//片面だけ描画する
 	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 }

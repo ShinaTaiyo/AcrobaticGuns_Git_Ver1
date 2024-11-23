@@ -81,7 +81,7 @@ void CWireHead::Update()
 
 	CObjectXAlive::Update();
 
-	//CManager::GetDebugProc()->PrintDebugProc("ワイヤーヘッドの向き：%f %f %f\n", GetRot().x, GetRot().y, GetRot().z);
+	CManager::GetDebugProc()->PrintDebugProc("ワイヤーヘッドの位置：%f %f %f\n", GetPos().x, GetPos().y, GetPos().z);
 
 	m_bCollision = CollisionSquare();
 }
