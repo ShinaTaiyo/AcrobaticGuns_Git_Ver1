@@ -141,6 +141,8 @@ void CPlayer::Update()
 
     m_pWireShot->WireShotProcess(this);//ワイヤー発射状態処理
 
+    CManager::GetDebugProc()->PrintDebugProc("プレイヤーの位置：%f %f %f\n", GetPos().x, GetPos().y, GetPos().z);
+
     //m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f) + m_AddPosR;
     //m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -200.0f, 0.0f, cosf(m_Rot.y) * -200.0f);
 }
@@ -278,6 +280,7 @@ void CPlayer::ActionModeChenge()
             ChengeMoveMode(DBG_NEW CPlayerMove_Normal()); //通常移動モードにする
             ChengeAttackMode(DBG_NEW CPlayerAttack_Shot()); //攻撃可能モードにする
             ChengeEffectMode(DBG_NEW CPlayerEffect_None()); //エフェクトなしモードにする
+            ChengeWireShotMode(DBG_NEW CPlayerWireShot_Dont);//ワイヤー発射状態をオフにする
             m_pModeDisp = CUi::Create(CUi::UITYPE::ACTIONMODE_GUN, CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, 1, false, D3DXVECTOR3(50.0f, 50.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
                 D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
             break;
@@ -285,6 +288,8 @@ void CPlayer::ActionModeChenge()
             //m_pActionMode = DBG_NEW CPlayerDive;
             ChengeMoveMode(DBG_NEW CPlayerMove_PrepDive());//ダイブ準備モードにする
             ChengeAttackMode(DBG_NEW CPlayerAttack_Dont);  //攻撃不能モードにする
+            ChengeEffectMode(DBG_NEW CPlayerEffect_None()); //エフェクトなしモードにする
+            ChengeWireShotMode(DBG_NEW CPlayerWireShot_Dont);//ワイヤー発射状態をオフにする
             m_pModeDisp = CUi::Create(CUi::UITYPE::ACTIONMODE_DIVE, CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, 1, false, D3DXVECTOR3(50.0f, 50.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
                 D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
             break;

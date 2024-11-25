@@ -27,8 +27,12 @@ public:
 	void SetDeath() override;//死亡フラグ設定処理
 	static CWireHead* Create(D3DXVECTOR3 Pos,D3DXVECTOR3 Rot,D3DXVECTOR3 Move,D3DXVECTOR3 Scale,int nLife);
 	const bool& GetSuccessCollision() const { return m_bCollision; }
+	void ResetCoolTime() { m_nCoolTime = s_nMAX_COOLTIME; m_bCollision = false; }
 private:
+	static constexpr int s_nMAX_COOLTIME = 3;
+
 	bool CollisionSquare();//正方形の当たり判定を行う
 	bool m_bCollision;//当たり判定が成功したかどうか
+	int m_nCoolTime;  //クールタイムを設定
 };
 #endif // !_WIRE_H_

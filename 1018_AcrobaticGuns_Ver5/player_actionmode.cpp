@@ -117,7 +117,7 @@ void CPlayerMove_Normal::JumpProcess(CPlayer* pPlayer)
 		m_bIsLanding = false;
 	}
 
-	if (m_bIsLanding == true)
+	if (m_bIsLanding == true || pPlayer->GetExtrusionCollisionSquareY() == true)
 	{
 		pPlayer->SetUseGravity(true, 0.01f);
 		if (CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::A) == true)
@@ -159,21 +159,23 @@ void CPlayerMove_PrepDive::MoveProcess(CPlayer* pPlayer)
 	CWire* pWire = pPlayer->GetWire();
 	CWireHead* pWireHead = pPlayer->GetWire()->GetWireHead();
 	CLockon* pLockon = pPlayer->GetLockOn();//ロックオンへのポインタ
-	D3DXVECTOR3 Move = CCalculation::Calculation3DVec(pPlayer->GetPos(), pLockon->GetNearRayColObjPos(), 40.0f);
-
-	D3DXVECTOR3 Rot = pLockon->GetNearRayColObjPos() - pPlayer->GetPos();
-	float fYaw = atan2f(Rot.x, Rot.z);
-	float fPitch = -atan2f(Rot.y, sqrtf(powf(Rot.x, 2) + powf(Rot.z, 2)));
-	CManager::GetDebugProc()->PrintDebugProc("Yaw : %f、Pitch : %f\n", fYaw, fPitch);
+	//CManager::GetDebugProc()->PrintDebugProc("Yaw : %f、Pitch : %f\n", fYaw, fPitch);
 
 	pWireHead->SetPos(pPlayer->GetPos());//ダイブ準備中なのでワイヤーヘッドをプレイヤーの位置に固定
 
-	CManager::GetDebugProc()->PrintDebugProc("移動量：%f %f %f\n", Move.x, Move.y, Move.z);
+	//CManager::GetDebugProc()->PrintDebugProc("移動量：%f %f %f\n", Move.x, Move.y, Move.z);
 	if (CManager::GetInputJoypad()->GetRT_Trigger() == true)
 	{//ワイヤー発射移動モードにチェンジ
 
+		D3DXVECTOR3 Move = CCalculation::Calculation3DVec(pPlayer->GetPos(), pLockon->GetNearRayColObjPos(), 40.0f);
+		D3DXVECTOR3 Rot = pLockon->GetNearRayColObjPos() - pPlayer->GetPos();
+		D3DXVec3Normalize(&Rot, &Rot);
+		float fYaw = atan2f(Rot.x, Rot.z);
+		float fPitch = atan2f(Rot.y, sqrtf(powf(Rot.x, 2) + powf(Rot.z, 2)));
+		fPitch *= -1;
 		//ワイヤーの頭を飛ばす
 		pPlayer->GetWire()->GetWireHead()->SetMove(Move);
+		pPlayer->GetWire()->GetWireHead()->ResetCoolTime();//当たるまでのクールタイムをリセット
 		pPlayer->GetWire()->GetWireHead()->SetUseInteria(false);
 		pPlayer->GetWire()->GetWireHead()->SetUseGravity(false,1.0f);
 		pPlayer->GetWire()->SetUseDraw(true);
@@ -217,19 +219,16 @@ CPlayerMove_Dive::~CPlayerMove_Dive()
 //=====================================================================================================
 void CPlayerMove_Dive::MoveProcess(CPlayer* pPlayer)
 {
-	//狙った方向に飛び続ける
+	CWireHead* pWireHead = pPlayer->GetWire()->GetWireHead();
+
 	pPlayer->SetMove(m_DiveMove);
-	CWire* pWire = pPlayer->GetWire();
 
-	//CEffect::Create(CEffect::EFFECTTYPE::NORMAL, 60, 40.0f, 40.0f, pPlayer->GetPos(), D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f));
-	
-
-	if (pPlayer->GetCollisionSuccess() == true)
+	if (CCalculation::CalculationLength(pPlayer->GetPos(), pWireHead->GetPos()) < 50.0f)
 	{//ダイブ時に判定したら移動モードと攻撃モードを通常に戻す
 		pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_Dive());
 		pPlayer->GetWire()->SetUseDraw(false);
 		pPlayer->ChengeMoveMode(DBG_NEW CPlayerMove_PrepDive());
-		pPlayer->SetRot(D3DXVECTOR3(-0.0f,pPlayer->GetRot().y, 0.0f));//向きを前に傾ける
+		pPlayer->SetRot(D3DXVECTOR3(0.0f,pPlayer->GetRot().y, 0.0f));//向きを前に傾ける
 	}
 }
 //======================================================================================================================================================
@@ -509,10 +508,6 @@ void CPlayerWireShot_Do::WireShotProcess(CPlayer* pPlayer)
 {
 	CWire* pWire = pPlayer->GetWire();
 	CWireHead* pWireHead = pWire->GetWireHead();
-	//D3DXVECTOR3 Vec = CCalculation::CalcVec(pPlayer->GetPos(), pWireHead->GetPos(),false);
-	//D3DXVECTOR3 CalcRot = D3DXVECTOR3(D3DX_PI * 0.5f - CCalculation::CalcElevationAngle(pPlayer->GetPos(), pWireHead->GetPos()),
-	//	CCalculation::CalculationXYaim(pPlayer->GetPos(),pWireHead->GetPos()),0.0f);
-
 	//pWireHead->SetRot(CalcRot);
 	if (pWireHead->GetSuccessCollision() == true)
 	{//ワイヤーがどれかのオブジェクトに当たったら
@@ -520,12 +515,12 @@ void CPlayerWireShot_Do::WireShotProcess(CPlayer* pPlayer)
 		pPlayer->ChengeEffectMode(DBG_NEW CPlayerEffect_Dive());    //エフェクトモード「ダイブ」
 
 		pWireHead->SetMove(D3DXVECTOR3(0.0f, 0.0f, 0.0f));//ワイヤーヘッドの移動を止める
-
 		D3DXVECTOR3 Move = CCalculation::Calculation3DVec(pPlayer->GetPos(), pWireHead->GetPos(),40.0f);
-		CPlayerMove_Dive* pPlayerMove_Dive = DBG_NEW CPlayerMove_Dive();//移動モード「ダイブ」
+		CPlayerMove_Dive * pPlayerMove_Dive = DBG_NEW CPlayerMove_Dive();
+		pPlayerMove_Dive->SetDiveMove(Move);
         pPlayer->ChengeMoveMode(pPlayerMove_Dive);
 		pPlayer->SetMove(Move);
-        pPlayerMove_Dive->SetDiveMove(Move);//ダイブの移動量を設定する
+        //pPlayerMove_Dive->SetDiveMove(Move);//ダイブの移動量を設定する
         pPlayer->SetSuccessCollision(false);//判定状態を確定解除   
 	}
 }

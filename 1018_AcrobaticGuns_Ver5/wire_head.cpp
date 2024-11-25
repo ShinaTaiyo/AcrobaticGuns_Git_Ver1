@@ -21,7 +21,7 @@
 //コンストラクタ
 //=================================================================
 CWireHead::CWireHead(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri, bUseintPri, type, ObjType),
-m_bCollision(false)
+m_bCollision(false),m_nCoolTime(0)
 {
 
 }
@@ -60,30 +60,19 @@ void CWireHead::Uninit()
 //=================================================================
 void CWireHead::Update()
 {
-	//float fPitch = 0.0f;
-	//float fYaw = 0.0f;
-	//float fRoll = 0.0f;
-	//if (CScene::GetMode() == CScene::MODE_GAME)
-	//{
-	//	const D3DXVECTOR3& Pos = GetPos();
-	//	const D3DXVECTOR3& LockOnPos = CGame::GetPlayer()->GetLockOn()->GetLockOnPos();
-	//	//SetRot(D3DXVECTOR3(-D3DX_PI * 0.5f, atan2f(PlayerPos.x - Pos.x, PlayerPos.z - Pos.z), 0.0f));
-	//	D3DXVECTOR3 Vec = LockOnPos - Pos;
-	//	fYaw = atan2f(Vec.x, Vec.z);
- //   	fPitch = -atan2f(Vec.y,sqrtf(powf(Vec.x,2) + powf(Vec.z,2)));//Y方向のベクトルの大きさに対するXZベクトルの距離
-	//	fRoll = atan2f(Vec.x, Vec.y);
-	//}
-
-
-
-	//SetRot(D3DXVECTOR3(D3DX_PI * 0.5f + fPitch, fYaw,0.0f));
-	//CManager::GetDebugProc()->PrintDebugProc("ワイヤーヘッドのPitch：%f\n", fPitch);
-
 	CObjectXAlive::Update();
 
 	CManager::GetDebugProc()->PrintDebugProc("ワイヤーヘッドの位置：%f %f %f\n", GetPos().x, GetPos().y, GetPos().z);
 
-	m_bCollision = CollisionSquare();
+	if (m_nCoolTime == 0)
+	{
+		m_bCollision = CollisionSquare();
+	}
+	else
+	{
+		m_bCollision = false;
+		m_nCoolTime--;
+	}
 }
 //===================================================================================================================================
 
@@ -149,7 +138,7 @@ bool CWireHead::CollisionSquare()
 			CObject* pNext = pObj->GetNextObject();
 			CObject::OBJECTTYPE ObjType = pObj->GetObjectType();
 			CObject::TYPE type = pObj->GetType();
-			if (ObjType == CObject::OBJECTTYPE::OBJECTTYPE_X && type != CObject::TYPE::WIREHEAD && type != CObject::TYPE::PLAYER)
+			if (ObjType == CObject::OBJECTTYPE::OBJECTTYPE_X && type != CObject::TYPE::WIREHEAD && type != CObject::TYPE::PLAYER && type != CObject::TYPE::ATTACK)
 			{
 				CObjectX* pObjX = static_cast<CObjectX*>(pObj);
 				if (CCollision::CollisionSquare(GetPos(), GetVtxMax(), GetVtxMin(), pObjX->GetPos(), pObjX->GetVtxMax(), pObjX->GetVtxMin()) == true)
