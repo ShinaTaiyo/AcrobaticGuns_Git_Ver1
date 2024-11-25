@@ -41,6 +41,7 @@ public:
 		EFFECT,          //エフェクト
 		PARTICLE,        //パーティクル
 		UI3D,            //UI3D
+		NUMBER3D,        //数字3D
 	    PARTICLE2D,      //パーティクル２D
 		LOCKON,          //ロックオン
 		UI,              //UI

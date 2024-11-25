@@ -24,7 +24,8 @@
 //コンストラクタ
 //===========================================================================================
 CObjectXMove::CObjectXMove(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectX(nPri,bUseintPri,type,ObjType),m_bUseAddSpeed(false), m_bUseGravity(false), m_bUseInteria(false), m_bUseMultiSpeed(false), m_fGravityPower(0.0f), m_fInertia(0.0f),
-m_MultiSpeed(D3DXVECTOR3(0.0f,0.0f,0.0f)), m_AddSpeed(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Move(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_bUseUpdatePos(false)
+m_MultiSpeed(D3DXVECTOR3(0.0f,0.0f,0.0f)), m_AddSpeed(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Move(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_bUseUpdatePos(false),
+m_bAdjustPos(true)
 {
 
 }
@@ -159,7 +160,7 @@ void CObjectXMove::UpdatePos()
 		//位置の設定
 		SetPos(Pos + m_Move);
 
-		if (Pos.y <= fabs(GetVtxMin().y))
+		if (Pos.y <= fabs(GetVtxMin().y) && m_bAdjustPos == true)
 		{
 			SetPos(D3DXVECTOR3(Pos.x, 0.0f + fabs(GetVtxMin().y), Pos.z));
 			m_Move.y = 0.0f;

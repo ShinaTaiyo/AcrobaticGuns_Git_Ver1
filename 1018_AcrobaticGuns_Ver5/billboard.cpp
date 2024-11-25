@@ -26,14 +26,14 @@
 //コンストラクタ
 //==================================================
 CBillboard::CBillboard(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject(nPri, bUseintPri, type, ObjType) ,
-m_bAnimFlag(false),m_bDraw(false),m_bMtxChild(false),m_bMultiplication(false),m_bScaling(false),
-m_bSetEffect(false),m_bUseAddSpeed(false),m_bUseCurve(false),m_bUseGravity(false),m_bUseHorming(false),m_bUseLengthCurve(false),m_bUsePolygonRot(false),
+m_bAnimFlag(false),m_bDraw(false),m_bMultiplication(false),m_bScaling(false),
+m_bUseAddSpeed(false),m_bUseCurve(false),m_bUseGravity(false),m_bUseHorming(false),m_bUseLengthCurve(false),m_bUsePolygonRot(false),
 m_fAddCurveLength(0.0f),m_fAddGravity(0.0f),m_fAddRot(0.0f),m_fAddScale(0.0f),m_fAddSpeed(0.0f),m_fAnimationSplit(0.0f),m_fCurveSpeed(0.0f),m_fFormarHeight(0.0f),
 m_fFormarWidth(0.0f),m_fGravity(0.0f),m_fGravityPower(0.0f),m_fHeight(0.0f),m_fPolygonRotPower(0.0f),m_fRotMove(0.0f),m_fScale(0.0f),m_fSpeed(0.0f),m_fStartRot(0.0f),
-m_fSupportCurveLength(0.0f),m_fWidth(0.0f),m_nMaxAnimationPattern(0),m_nAnimationChange(0),m_nAnimationCnt(0),m_nCntTime(0),m_nLife(0),m_nMaxLife(0),m_nSetEffectLife(0),
-m_nTextureIndex(0),m_pMtxParent(nullptr),m_nAnimaionPattern(0), m_nCntBlinkingFrame(0), m_nMaxBlinkingFrame(0), m_bBlinkingAim(false), m_bUseBlinking(false), 
+m_fSupportCurveLength(0.0f),m_fWidth(0.0f),m_nMaxAnimationPattern(0),m_nAnimationChange(0),m_nAnimationCnt(0),m_nCntTime(0),m_nLife(0),m_nMaxLife(0),
+m_nTextureIndex(0),m_nAnimaionPattern(0), m_nCntBlinkingFrame(0), m_nMaxBlinkingFrame(0), m_bBlinkingAim(false), m_bUseBlinking(false), 
 m_fLimitBlinkingRatio(0.0f),m_Pos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_PosOld(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_SupportPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Move(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Rot(D3DXVECTOR3(0.0f,0.0f,0.0f)), m_mtxWorld(),
-m_Col(D3DXCOLOR(1.0f,1.0f,1.0f,1.0f)),m_SetEffectCol(D3DXCOLOR(1.0f,1.0f,1.0f,1.0f)),m_SetEffectSize(D3DXVECTOR2(0.0f,0.0f)),m_TransPos(D3DXVECTOR3(0.0f,0.0f,0.0f))
+m_Col(D3DXCOLOR(1.0f,1.0f,1.0f,1.0f))
 {
 	m_pTexture = nullptr;
 	m_pVtxBuff = nullptr;
@@ -46,7 +46,6 @@ m_Col(D3DXCOLOR(1.0f,1.0f,1.0f,1.0f)),m_SetEffectCol(D3DXCOLOR(1.0f,1.0f,1.0f,1.
 CBillboard::~CBillboard()
 {
 	m_mtxWorld = {};
-	m_pMtxParent = nullptr;
 }
 //=============================================================================================
 
@@ -65,9 +64,6 @@ HRESULT CBillboard::Init(void)
 	m_Rot = D3DXVECTOR3(0.0f,0.0f,0.0f);                     //向き
 	m_Move = D3DXVECTOR3(0.0f,0.0f,0.0f);                    //移動量
 	m_mtxWorld = {};                          //マトリックスワールド
-	m_TransPos = D3DXVECTOR3(0.0f,0.0f,0.0f);                //子マトリックスを使用している場合のワールド座標
-	m_SetEffectCol = D3DXCOLOR(1.0f,1.0f,1.0f,1.0f);              //設定するエフェクトの色合い
-	m_SetEffectSize = D3DXVECTOR2(0.0f, 0.0f);//設定するエフェクトのサイズ
 
 	m_bDraw = true;                           //基本的には描画する
 	m_fScale = 1.0f;                          //拡大率
@@ -238,15 +234,6 @@ void CBillboard::Update(void)
 	//==============================================================================================
 
 	//========================================
-	//親オブジェクトX関係
-	//========================================
-	if (m_pMtxParent != nullptr)
-	{
-
-	}
-	//==============================================================================================
-
-	//========================================
 	//ポリゴン回転処理
 	//========================================
 	if (m_bUsePolygonRot == true)
@@ -321,11 +308,6 @@ void CBillboard::Draw(void)
 	D3DXMATRIX mtxView;//ビューマトリックス取得用
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();
 
-	if (m_bMtxChild == true && m_pMtxParent != nullptr)
-	{
-		mtxParent = *m_pMtxParent;
-	}
-
 	//ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
 
@@ -340,17 +322,10 @@ void CBillboard::Draw(void)
 	m_mtxWorld._42 = 0.0f;
 	m_mtxWorld._43 = 0.0f;
 
-	if (m_pMtxParent == nullptr && m_bMtxChild == false)
-	{//親となるモデルがいなかったら
-		//位置を反映
-		D3DXMatrixTranslation(&mtxTrans, GetPos().x, GetPos().y, GetPos().z);
-		D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
-	}
-	else
-	{//親となるモデルがいたら
-		//位置を反映
-		D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxParent);//親の敵のマトリックスとかけ合わせる
-	}
+	//位置を反映
+	D3DXMatrixTranslation(&mtxTrans, GetPos().x, GetPos().y, GetPos().z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
+
 	//ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
 
@@ -390,11 +365,6 @@ void CBillboard::Draw(void)
 
 	D3DXVECTOR3 PosZero = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	D3DXVECTOR3 PosBullet;
-	//if (m_bMtxChild == true)
-	//{//子マトリックスを使用する場合に、ワールド座標を判定する
-		D3DXVec3TransformCoord(&PosBullet, &PosZero, &m_mtxWorld);//左の引数のローカル座標に真ん中の引数のワールド座標を代入する
-		m_TransPos = PosBullet;
-	//}
 	//================================================
 	//描画の調整を元に戻す
 	//================================================
@@ -542,29 +512,6 @@ void CBillboard::SetUseLengthCurve(bool bUse, float fStartRot, float fCurveSpeed
 	m_fSupportCurveLength = fSupportLength;
 }
 //================================================================================================================
-
-//===============================================================
-//エフェクトの使用する場合の設定
-//===============================================================
-void CBillboard::SetUseEffect(int nSetEffectLife, D3DXVECTOR2 Size, D3DXCOLOR Col)
-{
-	m_bSetEffect = true;                //エフェクトをONにする
-	m_nSetEffectLife = nSetEffectLife;  //設定するエフェクトの体力
-	m_SetEffectSize = Size;             //設定するエフェクトのサイズ
-	m_SetEffectCol = Col;               //設定するエフェクトの色合い
-}
-//================================================================================================================
-
-//===============================================================
-//子マトリックスを設定
-//===============================================================
-void CBillboard::SetParent(D3DXMATRIX* pMtxParent, bool bUse)
-{
-	m_pMtxParent = pMtxParent;
-	m_bMtxChild = bUse;
-}
-//================================================================================================================
-
 
 //===============================================================
 //重力を設定

@@ -61,15 +61,10 @@ public:
 	LPDIRECT3DTEXTURE9& GetTexture() { return m_pTexture; }     //テクスチャを取得する
 
 	void SetScaling(float fAddScale);//拡大をするかどうか
-	void SetUseEffect(int nSetEffectLife, D3DXVECTOR2 Size, D3DXCOLOR Col);//エフェクトを使用するかどうか
-	void SetParent(D3DXMATRIX* pMtxParent,bool bUse);//子マトリックスを設定
 	void SetUseGravity(float fGravity); //重力を設定
 	void SetAddGravity(float fAddGravity) { m_fAddGravity = fAddGravity; };//加算する重力を設定
 	void SetUseHorming(float fSpeed);   //ホーミングを設定
 	void SetUseAddSpeed(bool bUseAddSpeed, bool bMultiplication, float fAddSpeed);//加速を設定
-
-	D3DXVECTOR3& GetMtxTransPos() {return m_TransPos; }                                //子マトリックスのワールド座標を取得する
-	bool GetUseMtxChild() { return m_bMtxChild; }                               //子マトリックスを使っているかどうかを取得する    
 
 	//====================================================
 	//カーブ関係
@@ -169,19 +164,6 @@ private:
 	//========================================
 	bool m_bDraw;               //描画するかどうか!
 	//=======================================================================================================
-
-	bool m_bSetEffect;          //エフェクトを使用するかどうか!
-	D3DXCOLOR m_SetEffectCol;   //設定するエフェクトの色合い!
-	int m_nSetEffectLife;       //設定するエフェクトの体力!
-	D3DXVECTOR2 m_SetEffectSize;//設定するエフェクトのサイズ!
-
-	//===============================
-	//親マトリックス系
-	//===============================
-	D3DXMATRIX* m_pMtxParent; //親マトリックスへのポインタ!
-	bool m_bMtxChild;        //子マトリックスにするかどうか!
-	D3DXVECTOR3 m_TransPos;  //子マトリックスにしている場合の位置!
-	//================================================================================
 
 	//====================================================
 	//点滅関係

@@ -9,8 +9,12 @@
 //インクルード
 //==================================================================
 #include "attack.h"
+#include "damage.h"
 #include "manager.h"
+#include "enemy.h"
+#include "player.h"
 #include "objectXInfo.h"
+#include "collision.h"
 //======================================================================================================================
 
 //==================================================================
@@ -26,7 +30,8 @@ const string CAttack::ATTACK_FILENAME[static_cast<int>(CAttack::ATTACKTYPE::MAX)
 //==================================================================
 //コンストラクタ
 //==================================================================
-CAttack::CAttack(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri, bUseintPri, type, ObjType),m_Type(ATTACKTYPE::BULLET)
+CAttack::CAttack(int nPower, int nSetHitStopTime, int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri, bUseintPri, type, ObjType),
+m_Type(ATTACKTYPE::BULLET), m_nPower(nPower), m_HitStop({0,nSetHitStopTime}),m_bCollisionRelease(true)
 {
 
 }
@@ -47,6 +52,8 @@ CAttack::~CAttack()
 HRESULT CAttack::Init()
 {
 	CObjectXAlive::Init();
+
+	SetAdjustPos(false);
 	return S_OK;
 }
 //======================================================================================================================
@@ -66,6 +73,8 @@ void CAttack::Uninit()
 void CAttack::Update()
 {
 	CObjectXAlive::Update();
+
+	Collision();
 }
 //======================================================================================================================
 
@@ -88,34 +97,37 @@ void CAttack::SetDeath()
 //======================================================================================================================
 
 //==================================================================
-//生成処理
+//当たり判定処理
 //==================================================================
-CAttack* CAttack::Create(ATTACKTYPE AttackType, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale)
+void CAttack::Collision()
 {
-	CAttack* pAttack = DBG_NEW CAttack;     //生成
+	bool bCollision = false;
+	for (int nCntPri = 0; nCntPri < m_nMAXPRIORITY; nCntPri++)
+	{
+		CObject* pObj = GetTopObject(nCntPri);
+		while (pObj != nullptr)
+		{
+			CObject* pNext = pObj->GetNextObject();
 
-	pAttack->Init();                        //初期化処理
-	pAttack->SetType(CObject::TYPE::ATTACK); //オブジェクトごとのタイプを設定する
-	pAttack->SetAttackType(AttackType);     //攻撃の種類を設定する
-	pAttack->SetLife(nLife);                //体力を設定
-	pAttack->SetMaxLife(nLife);             //最大体力を設定
-	pAttack->SetPos(pos);                   //位置  
-	pAttack->SetRot(rot);                   //向き
-	pAttack->SetMove(move);                 //移動量
-	pAttack->SetScale(Scale);               //拡大率
+			if (pObj->GetType() == CObject::TYPE::ENEMY)
+			{
+				CObjectXAlive* pObjX = static_cast<CObjectXAlive*>(pObj);
+				
+				if (CCollision::CollisionSquare(GetPos(), GetVtxMax(), GetVtxMin(), pObjX->GetPos(), pObjX->GetVtxMax(), pObjX->GetVtxMin()) == true)
+				{
+					bCollision = true;
+					pObjX->SetDamage(m_nPower,m_HitStop.nSetTime);
+					pObjX->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), m_HitStop.nSetTime, false, false);
+				}
+			}
+			pObj = pNext;
+		}
+	}
 
-	//モデル情報設定
-	int nIdx = CManager::GetObjectXInfo()->Regist(ATTACK_FILENAME[static_cast<int>(AttackType)]);
-
-	//モデル情報を割り当てる
-	pAttack->BindObjectXInfo(CManager::GetObjectXInfo()->GetMesh(nIdx),
-		CManager::GetObjectXInfo()->GetBuffMat(nIdx),
-		CManager::GetObjectXInfo()->GetdwNumMat(nIdx),
-		CManager::GetObjectXInfo()->GetTexture(nIdx),
-		CManager::GetObjectXInfo()->GetColorValue(nIdx));
-
-
-	return pAttack;
+	if (bCollision == true && m_bCollisionRelease == true)
+	{
+		SetDeath();
+	}
 }
 //======================================================================================================================
 
@@ -124,7 +136,7 @@ CAttack* CAttack::Create(ATTACKTYPE AttackType, int nLife, D3DXVECTOR3 pos, D3DX
 //==================================================================
 //コンストラクタ
 //==================================================================
-CAttackPlayer::CAttackPlayer(int nPri) : CAttack(nPri)
+CAttackPlayer::CAttackPlayer(int nPower, int nSetHitStopTime) : CAttack(nPower,nSetHitStopTime)
 {
 
 }
@@ -188,21 +200,21 @@ void CAttackPlayer::SetDeath()
 //==================================================================
 //生成処理
 //==================================================================
-CAttackPlayer* CAttackPlayer::Create(ATTACKTYPE AttackType, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale)
+CAttackPlayer* CAttackPlayer::Create(ATTACKTYPE AttackType, int nPower, int nSetHitStopTime, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale)
 {
-	CAttackPlayer* pAttackPlayer = nullptr;     //生成
-	pAttackPlayer = DBG_NEW CAttackPlayer(3);     //生成
+	CAttackPlayer* pAttackPlayer = nullptr;       //生成
+	pAttackPlayer = DBG_NEW CAttackPlayer(nPower,nSetHitStopTime);//生成
 	pAttackPlayer->Init();                        //初期化処理
-	pAttackPlayer->SetType(CObject::TYPE::ATTACK); //オブジェクトごとのタイプを設定する
+	pAttackPlayer->SetType(CObject::TYPE::ATTACK);//オブジェクトごとのタイプを設定する
 	pAttackPlayer->SetAttackType(AttackType);     //攻撃の種類を設定する
 	pAttackPlayer->SetLife(nLife);                //体力を設定
 	pAttackPlayer->SetMaxLife(nLife);             //最大体力を設定
 	pAttackPlayer->SetPos(pos);                   //位置  
+	pAttackPlayer->SetSupportPos(pos);            //支点位置
 	pAttackPlayer->SetRot(rot);                   //向き
 	pAttackPlayer->SetMove(move);                 //移動量
 	pAttackPlayer->SetScale(Scale);               //拡大率
 	pAttackPlayer->SetAutoSubLife(true);          //体力を使用する
-
 	//モデル情報設定
 	int nIdx = CManager::GetObjectXInfo()->Regist(ATTACK_FILENAME[static_cast<int>(AttackType)]);
 
@@ -213,6 +225,7 @@ CAttackPlayer* CAttackPlayer::Create(ATTACKTYPE AttackType, int nLife, D3DXVECTO
 		CManager::GetObjectXInfo()->GetTexture(nIdx),
 		CManager::GetObjectXInfo()->GetColorValue(nIdx));
 
+	pAttackPlayer->SetSize();//サイズを設定する
 	return pAttackPlayer;
 }
 //======================================================================================================================
@@ -222,7 +235,7 @@ CAttackPlayer* CAttackPlayer::Create(ATTACKTYPE AttackType, int nLife, D3DXVECTO
 //==================================================================
 //コンストラクタ
 //==================================================================
-CAttackEnemy::CAttackEnemy()
+CAttackEnemy::CAttackEnemy(int nPower, int nSetHitStopTime) : CAttack(nPower,nSetHitStopTime)
 {
 
 }
@@ -286,9 +299,9 @@ void CAttackEnemy::SetDeath()
 //==================================================================
 //生成処理
 //==================================================================
-CAttackEnemy* CAttackEnemy::Create(ATTACKTYPE AttackType, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale)
+CAttackEnemy* CAttackEnemy::Create(ATTACKTYPE AttackType, int nPower, int nSetHitStopTime, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale)
 {
-	CAttackEnemy* pAttackEnemy = DBG_NEW CAttackEnemy();
+	CAttackEnemy* pAttackEnemy = DBG_NEW CAttackEnemy(nPower,nSetHitStopTime);
 
 	pAttackEnemy->Init();                        //初期化処理
 	pAttackEnemy->SetType(CObject::TYPE::ATTACK); //オブジェクトごとのタイプを設定する
