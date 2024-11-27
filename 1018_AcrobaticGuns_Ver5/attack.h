@@ -29,6 +29,11 @@ public:
 		MAX
 	};
 
+	struct HitStop
+	{
+		int nCntTime;
+		const int nSetTime;
+	};
 	CAttack(int nPower,int nSetHitStopTime,int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::ATTACK, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_X);                  //コンストラクタ
 	~CAttack();                 //デストラクタ
 	HRESULT Init() override;    //初期化処理
@@ -37,6 +42,8 @@ public:
 	void Draw() override;       //描画処理
 	void SetDeath() override;   //死亡フラグを設定
 	void SetCollisionRelease(bool bUse) { m_bCollisionRelease = bUse; }
+	const HitStop & GetHitStop() const { return m_HitStop; }
+	const int& GetPower() const { return m_nPower; }
 protected:
 	void SetAttackType(ATTACKTYPE AttackType) { m_Type = AttackType;}//攻撃の種類を設定する
 	const ATTACKTYPE & GetAttackType() const { return m_Type; }      //攻撃の種類を取得する
@@ -44,15 +51,10 @@ protected:
 private:
 	virtual void Collision();//当たり判定を行う処理
 	int m_nPower;     //攻撃力
-	struct HitStop
-	{
-		int nCntTime;
-		const int nSetTime;
-	};
 
 	bool m_bCollisionRelease;//衝突時に消すかどうか
 
-	HitStop m_HitStop;
+	HitStop m_HitStop;//ヒットストップ
 	ATTACKTYPE m_Type;//タイプ
 };
 //==================================================================================================================================================

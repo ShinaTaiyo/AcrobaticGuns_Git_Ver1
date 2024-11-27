@@ -111,6 +111,11 @@ HRESULT CMeshCylinder::Init()
 				pVtx[nCntArray].nor = MeasureNor;
 				pVtx[nCntArray].tex = D3DXVECTOR2(0.0f, fRatioY);
 			}
+
+			if (nCntArray >= m_nNumVtx)
+			{
+				assert(false);
+			}
 		}
 	}
 	//頂点バッファをアンロックする 
@@ -195,6 +200,11 @@ HRESULT CMeshCylinder::Init()
 			}
 			nCntArray2 += 2;
 		}
+
+		//if (nCntArray2 >= m_nNumIdx)
+		//{
+		//	assert(false);
+		//}
 
 	}
 

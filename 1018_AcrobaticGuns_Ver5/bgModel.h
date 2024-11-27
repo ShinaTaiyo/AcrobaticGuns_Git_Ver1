@@ -43,7 +43,7 @@ public:
 	//==========================================================
 	//関数
 	void SaveInfoTxt(fstream& WritingFile) override;  //テキストファイルに情報を保存するための関数
-	static void LoadInfoTxt(fstream& LoadingFile, vector<CObject*>& VecSaveManager, string& Buff);  //テキストファイルから情報を読み込むための関数   
+	static void LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveManager, string& Buff);  //テキストファイルから情報を読み込むための関数   
 	CObject* ManagerChengeObject(bool bAim) override; //ステージマネージャーに変更したオブジェクトを渡す
 	CObject* ManagerSaveObject() override;             //ステージマネージャーに今のオブジェクトを保存する
 	//=================================================================================================================

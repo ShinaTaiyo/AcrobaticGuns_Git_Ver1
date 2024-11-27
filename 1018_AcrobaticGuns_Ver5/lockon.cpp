@@ -168,11 +168,13 @@ void CLockon::MoveProcess()
 	{//上
 		Pos.y = SCREEN_HEIGHT - GetHeight() * 0.5f;
 		m_EndState = ENDSTATE::UPEND;
+		//CManager::GetCamera()->SetPosR(CManager::GetCamera()->GetPosR() + D3DXVECTOR3(0.0f, 5.0f, 0.0f));
 	}
 	if (Pos.y - GetHeight() * 0.5f < 0.0f)
 	{//下
 		Pos.y = 0.0f + GetHeight() * 0.5f;
 		m_EndState = ENDSTATE::DOWNEND;
+		//CManager::GetCamera()->SetPosR(CManager::GetCamera()->GetPosR() + D3DXVECTOR3(0.0f, -5.0f, 0.0f));
 	}
 
 
@@ -301,7 +303,8 @@ void CLockon::RayCollisionToObject()
 	//====================================================================================================================================================================
 
 	//Vectorをクリア
-	VecCollisionSuccess.clear();
+	VecCollisionSuccess.clear();         //確保した配列を空にする
+	VecCollisionSuccess.shrink_to_fit(); //現在のサイズに合わせてメモリ領域をコンパクトにする
 
 }
 //==============================================================================================================

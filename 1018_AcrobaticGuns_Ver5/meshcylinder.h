@@ -64,8 +64,7 @@ public:
 	{
 		if (nArray < 0 || nArray >= m_nNumDivisionY)
 		{
-			int a = 0;
-			//assert("配列外アクセス");
+			assert(false);
 		}
 		return m_pSenterPos[nArray];
 	}//中心点の先頭ポインタを取得
@@ -73,8 +72,7 @@ public:
 	{
 		if (nArray < 0 || nArray >= m_nNumDivisionY)
 		{
-			int k = 0;
-			//assert("配列外アクセス");
+			assert(false);
 		}
 		m_pSenterPos[nArray] = Pos;
 	}//それぞれの中心点を設定する

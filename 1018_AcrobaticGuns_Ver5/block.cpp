@@ -467,7 +467,7 @@ CObject* CBlock::ManagerChengeObject(bool bAim)
 //=======================================================================
 //テキストファイルから読み込んだ情報を保存する処理
 //=======================================================================
-void CBlock::LoadInfoTxt(fstream& LoadingFile, vector<CObject*>& VecSaveManager, string& Buff)
+void CBlock::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveManager, string& Buff)
 {
 	int nType = 0;//種類
 	int nLife = 0;//体力
@@ -524,7 +524,7 @@ void CBlock::LoadInfoTxt(fstream& LoadingFile, vector<CObject*>& VecSaveManager,
 	}
 	Type = BLOCKTYPE(nType);
 
-	VecSaveManager.push_back(CBlock::Create(Type, nLife, Pos, Rot, Scale));//vectorに情報を保存する
+	listSaveManager.push_back(CBlock::Create(Type, nLife, Pos, Rot, Scale));//vectorに情報を保存する
 }
 //=========================================================================================================================
 

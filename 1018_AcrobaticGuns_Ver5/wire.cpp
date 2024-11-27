@@ -48,7 +48,8 @@ CWire::CWire(WIRETYPE WireType, float fRadius, float fHeight,int nNumDivsionXZ,
 //===============================================================
 CWire::~CWire()
 {
-	m_VecMtxCircle.clear();
+	m_VecMtxCircle.clear();        //メモリ初期化
+	m_VecMtxCircle.shrink_to_fit();//メモリ開放
 }
 //===================================================================================================================
 
@@ -150,7 +151,7 @@ void CWire::Update()
 
 				if (nCntArray < 0 || nCntArray >= nNumVtx)
 				{//配列外アクセスチェック
-					int s = 0;
+					assert(false);
 				}
 
 				if (nCntVtxY == nNumDivisionY - 1 && nCntVtxXZ == nNumDivisionXZ)
@@ -162,12 +163,7 @@ void CWire::Update()
 			}
 		}
 	}
-	//CManager::GetDebugProc()->PrintDebugProc("更新するかどうか：%d\n",m_bUseUpdate);
 
-	//for (int nCntVtx = 0; nCntVtx < nNumVtx; nCntVtx++)
-	//{
-	//	CManager::GetDebugProc()->PrintDebugProc("頂点情報：%d：%f %f %f\n", nCntVtx, pVtx[nCntVtx].pos.x, pVtx[nCntVtx].pos.y, pVtx[nCntVtx].pos.z);
-	//}
 	//頂点バッファをアンロックする 
 	pVtxBuff->Unlock();
 }

@@ -133,13 +133,13 @@ void CDebugProc::PrintDebugProc(const char* fmt, ...)
 				switch (*p)
 				{
 				case 'd':	//”Žš
-					sprintf(&aSaveString[0], "%d", va_arg(args, int));
+					snprintf(&aSaveString[0],100, "%d", va_arg(args, int));
 
 					//•¶Žš—ñ‚Ì’·‚³‚ðŽæ“¾
 					nLength = (int)strlen(&aSaveString[0]);
 					break;
 				case 'f':	//¬”
-					sprintf(&aSaveString[0], "%f", va_arg(args, double));
+					snprintf(&aSaveString[0],100, "%f", va_arg(args, double));
 
 					//•¶Žš—ñ‚Ì’·‚³‚ðŽæ“¾
 					nLength = (int)strlen(&aSaveString[0]);
@@ -163,7 +163,7 @@ void CDebugProc::PrintDebugProc(const char* fmt, ...)
 
 					break;
 				case 'c':	//•¶Žš
-					sprintf(&aSaveString[0], "%c", va_arg(args, char));
+					snprintf(&aSaveString[0],100, "%c", va_arg(args, char));
 
 					//•¶Žš—ñ‚Ì’·‚³‚ðŽæ“¾
 					nLength = (int)strlen(&aSaveString[0]);
@@ -191,8 +191,13 @@ void CDebugProc::PrintDebugProc(const char* fmt, ...)
 
 		//•¶Žš—ñ‚ð˜AŒ‹‚·‚é
 		strcat(&m_aStrDebug[0], &aString[0]);
-	}
 
+		int strLength = std::strlen(&m_aStrDebug[0]);
+		if (strLength >= MAX_DEBUGSTRING)
+		{
+			assert(false);
+		}
+	}
 }
 //====================================================================================================================================
 

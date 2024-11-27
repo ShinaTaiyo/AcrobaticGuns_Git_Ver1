@@ -26,7 +26,7 @@
 //================================
 //静的メンバ宣言
 //================================
-const char* CStageManager::m_apWORLDMAP_TXT[CStageManager::WORLDTYPE_MAX] =
+const char* CStageManager::m_apWORLDMAP_TXT[static_cast<int>(CStageManager::WORLDTYPE::MAX)] =
 {
 	"data\\TEXTFILE\\Map\\EasyMap.txt",
 	"data\\TEXTFILE\\Map\\NormalMap.txt",
@@ -39,7 +39,9 @@ const string CStageManager::m_aSAVE_FILENAME = "data\\TEXTFILE\\Ver2\\Practice.t
 //コンストラクタ
 //================================
 CStageManager::CStageManager(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject(nPri,bUseintPri,type,ObjType),
-m_nWorldIndex(0),m_pBg3D(nullptr),m_VecObjList(),m_SaveScale(D3DXVECTOR3(1.0f,1.0f,1.0f)),m_SavePos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_SaveRot(D3DXVECTOR3(0.0f,0.0f,0.0f))
+m_nWorldIndex(0),m_pBg3D(nullptr), m_StgObjList(),m_SaveScale(D3DXVECTOR3(1.0f,1.0f,1.0f)),m_SavePos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_SaveRot(D3DXVECTOR3(0.0f,0.0f,0.0f)),
+m_SaveBeforeChoosePos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_pManagerObject(nullptr),m_aMapFilePass(), m_nMapIndex(0), m_nMapNum(0), m_pChooseObject(nullptr),
+m_ManagerMode(MANAGERMODE::ALREADYSTAGE),m_bChooseObject(false),m_bMakeMapMode(false),m_bUseSizeMove(false),m_StgObjIt()
 {
 	for (int nCnt = 0; nCnt < m_nMAX_MAP; nCnt++)
 	{
@@ -56,7 +58,7 @@ m_nWorldIndex(0),m_pBg3D(nullptr),m_VecObjList(),m_SaveScale(D3DXVECTOR3(1.0f,1.
 //================================
 CStageManager::~CStageManager()
 {
-	m_VecObjList.clear();//vectorの中身をクリア（忘れたとき対策）
+	m_StgObjList.clear();//vectorの中身をクリア（忘れたとき対策）
 }
 //==========================================================
 
@@ -70,20 +72,11 @@ HRESULT CStageManager::Init()
 	//===========================
 	m_nMapIndex = 0;                                     //マップのインデックス
 	m_nMapNum = 0;                                       //マップの総数
-	m_SaveScale = D3DXVECTOR3(1.0f,1.0f,1.0f);                               //拡大率
-	m_SaveRot = D3DXVECTOR3(0.0f,0.0f,0.0f);                                //向き
-	m_SavePos = D3DXVECTOR3(0.0f,0.0f,0.0f);                                //位置
-	m_SaveBeforeChoosePos = D3DXVECTOR3(0.0f,0.0f,0.0f);                //選択処理をする前の位置を記憶する
- 	m_pManagerObject = nullptr;                          //マネージャーに表示するオブジェクト
-	m_ManagerMode = MANAGERMODE_ALREADYSTAGE;            //現在のステージマネーシャーのモード
 
 	//=========================
 	//選択系
 	//=========================
 	m_pChooseObject = nullptr;                          //選択オブジェクトへの
-	m_nIndexChooseObject = 0;                           //選択しているオブジェクトの番号
-	m_bChooseObject = false;                            //オブジェクトを選択しているかどうか
-	m_bMakeMapMode = false;                             //マップ制作モードかどうか
 	//=======================================================================================
 #ifdef _DEBUG
 #endif // _DEBUG
@@ -91,8 +84,6 @@ HRESULT CStageManager::Init()
 	//===========================
 	//移動モードを決める
 	//===========================
-	m_MoveMode = MOVEMODE00_XY;     //移動方法の種類
-	m_FocusType = FOCUSTYPE_NORMAL;//カメラが追う位置の種類
 	m_bUseSizeMove = false;//現在のオブジェクトのサイズ分移動するかどうか
 	//=======================================================================================
 
@@ -210,7 +201,7 @@ void CStageManager::SetDeath()
 		m_pManagerObject = nullptr;
 	}
 
-	m_VecObjList.clear();//vectorの中身をクリア
+	m_StgObjList.clear();//vectorの中身をクリア
 
 	CObject::SetDeath();
 }
@@ -223,7 +214,7 @@ void CStageManager::LoadMapTxt(int nMapNum)
 {
 
 	//vectorに保存した情報をリセットする
-	m_VecObjList.clear();
+	m_StgObjList.clear();
 
 	fstream ReadingFile;//読み取り用ファイル
 	string Reading_Buff;//読み取り用ファイルの文字列
@@ -236,11 +227,11 @@ void CStageManager::LoadMapTxt(int nMapNum)
 
 		if (Reading_Buff == "SETBLOCK")
 		{
-			CBlock::LoadInfoTxt(ReadingFile, m_VecObjList,Reading_Buff);
+			CBlock::LoadInfoTxt(ReadingFile, m_StgObjList,Reading_Buff);
 		}
 		else if (Reading_Buff == "SETBGMODEL")
 		{
-			CBgModel::LoadInfoTxt(ReadingFile, m_VecObjList, Reading_Buff);
+			CBgModel::LoadInfoTxt(ReadingFile, m_StgObjList, Reading_Buff);
 		}
 	}
 
@@ -301,12 +292,12 @@ void CStageManager::SaveMapTxt(int nMapNum)
 	WritingFile.open(m_aSAVE_FILENAME, ios::out);//読み取りモードでファイルを開く	
 
 	//ファイルに情報を保存する
-	for (vector<CObject*>::iterator it = m_VecObjList.begin(); it != m_VecObjList.end(); it++)
+	for (list<CObject*>::iterator it = m_StgObjList.begin(); it != m_StgObjList.end();++it)
 	{//末尾まで繰り返す
 		if (&it != nullptr)
 		{
-			Type = static_cast<CObject*>(*it)->GetType();
-			static_cast<CObject*>(*it)->SaveInfoTxt(WritingFile);
+			Type = (*it)->GetType();
+			(*it)->SaveInfoTxt(WritingFile);
 
 			WritingFile << endl << endl;//改行処理
 		}
@@ -314,7 +305,7 @@ void CStageManager::SaveMapTxt(int nMapNum)
 
 	WritingFile.close();//ファイルを閉じる
 
-	m_VecObjList.clear();//Vectorの中身をクリアする
+	m_StgObjList.clear();//Vectorの中身をクリアする
 	ReleaseAll();        //全ての死亡フラグを発動
 }
 //======================================================================================================================
@@ -538,7 +529,7 @@ void CStageManager::SetObjectX()
 {
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_RETURN) == true)
 	{//オブジェクトをVectorの先頭に保存する
-		m_VecObjList.push_back(m_pManagerObject->ManagerSaveObject());
+		m_StgObjList.push_back(m_pManagerObject->ManagerSaveObject());
 	}
 
 }
@@ -551,14 +542,14 @@ void CStageManager::DeleteManagerObject()
 {
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_BACKSPACE) == true)
 	{
-		if (m_VecObjList.size() > 0)
+		if (m_StgObjList.size() > 0)
 		{
-			auto it = m_VecObjList.end() - 1;//配列マックスー１
+			auto it = m_StgObjList.end();//配列マックスー１
 
-			((CObject*)*it)->SetUseDeath(true);
-			((CObject*)*it)->SetDeath();
+			(*it)->SetUseDeath(true);
+			(*it)->SetDeath();
 
-			m_VecObjList.pop_back();//末尾の要素を削除する
+			m_StgObjList.pop_back();//末尾の要素を削除する
 		}
 	}
 }
@@ -642,13 +633,13 @@ void CStageManager::MapChenge()
 	{
 		SaveMapTxt(m_nMapIndex);//現在のマップを保存する
 
-		if (m_ManagerMode == MANAGERMODE_ALREADYSTAGE)
+		if (m_ManagerMode == MANAGERMODE::ALREADYSTAGE)
 		{
-			m_ManagerMode = MANAGERMODE_NEWSTAGE;
+			m_ManagerMode = MANAGERMODE::NEWSTAGE;
 		}
 		else
 		{
-			m_ManagerMode = MANAGERMODE_ALREADYSTAGE;
+			m_ManagerMode = MANAGERMODE::ALREADYSTAGE;
 		}
 
 
@@ -656,7 +647,7 @@ void CStageManager::MapChenge()
 	}
 	//=======================================================================================================
 
-	if (CManager::GetInputKeyboard()->GetTrigger(DIK_F3) == true && m_ManagerMode == MANAGERMODE_ALREADYSTAGE)
+	if (CManager::GetInputKeyboard()->GetTrigger(DIK_F3) == true && m_ManagerMode == MANAGERMODE::ALREADYSTAGE)
 	{
 		SaveMapTxt(m_nMapIndex);//現在のマップ情報をセーブする
 		m_nMapIndex++;
@@ -667,7 +658,7 @@ void CStageManager::MapChenge()
 
 		LoadMapTxt(m_nMapIndex);//番号のマップを読み込む
 	}
-	else if (CManager::GetInputKeyboard()->GetTrigger(DIK_F2) == true && m_ManagerMode == MANAGERMODE_ALREADYSTAGE)
+	else if (CManager::GetInputKeyboard()->GetTrigger(DIK_F2) == true && m_ManagerMode == MANAGERMODE::ALREADYSTAGE)
 	{
 		SaveMapTxt(m_nMapIndex);//現在のマップ情報をセーブする
 		m_nMapIndex--;
@@ -703,7 +694,7 @@ void CStageManager::DispInfo()
 		strcpy(&aChooseString[0], "選択中・・・");
 	}
 
-	if (m_ManagerMode == MANAGERMODE_ALREADYSTAGE)
+	if (m_ManagerMode == MANAGERMODE::ALREADYSTAGE)
 	{
 		strcpy(&aMapModeString[0], "既存のステージを編集");
 	}
@@ -715,7 +706,7 @@ void CStageManager::DispInfo()
 	CManager::GetDebugProc()->PrintDebugProc("//=================================\n");
 	CManager::GetDebugProc()->PrintDebugProc("//マップエディタの情報\n");
 	CManager::GetDebugProc()->PrintDebugProc("//=================================\n");
-	CManager::GetDebugProc()->PrintDebugProc("現在のステージマネージャー管理オブジェクトの数：%d\n", m_VecObjList.size());
+	CManager::GetDebugProc()->PrintDebugProc("現在のステージマネージャー管理オブジェクトの数：%d\n", m_StgObjList.size());
 	CManager::GetDebugProc()->PrintDebugProc("現在のワールド：%s\n",&m_apWORLDMAP_TXT[m_nWorldIndex][0]);
 	CManager::GetDebugProc()->PrintDebugProc("現在のマップ番号(F2、F3で変更）：%d\n", m_nMapIndex);
 	CManager::GetDebugProc()->PrintDebugProc("現在のマップファイルパス：%s\n",&m_aMapFilePass[m_nMapIndex][0]);
@@ -811,41 +802,6 @@ void CStageManager::ChooseObject()
 	//}
 
 
-}
-//=======================================================================================================================
-
-//===========================================================
-//サイズ分動かすときの処理
-//===========================================================
-D3DXVECTOR3 CStageManager::SizeMoveProcess(float fMoveX, float fMoveY,D3DXVECTOR3 Size)
-{
-	D3DXVECTOR3 ResultSize = D3DXVECTOR3(0.0f,0.0f,0.0f);
-
-	ResultSize.x = float(floor(Size.x));
-	ResultSize.y = float(floor(Size.y));
-	ResultSize.z = float(floor(Size.z));
-
-	D3DXVECTOR3 Move = D3DXVECTOR3(0.0f,0.0f,0.0f);
-	if (CManager::GetInputKeyboard()->GetTrigger(DIK_DOWN) == true ||
-		CManager::GetInputKeyboard()->GetTrigger(DIK_UP) == true ||
-		CManager::GetInputKeyboard()->GetTrigger(DIK_RIGHT) == true ||
-		CManager::GetInputKeyboard()->GetTrigger(DIK_LEFT) == true)
-	{
-		if (m_MoveMode == MOVEMODE00_XY)
-		{
-			if (fMoveX != 0.0f)
-			{
-				Move.x = sinf(atan2f(fMoveX, 0.0f)) * ResultSize.x;
-			}
-			else if (fMoveY != 0.0f)
-			{
-				Move.y = cosf(atan2f(0.0f, fMoveY)) * ResultSize.x;
-			}
-		}
-	}
-
-
-	return Move;
 }
 //=======================================================================================================================
 

@@ -41,7 +41,6 @@ CScene* CManager::m_pScene = nullptr;
 CSceneFade* CManager::m_pSceneFade = nullptr;
 CText* CManager::m_pText = nullptr;
 CDebugProc* CManager::m_pDebugProc = nullptr;
-CEventManager* CManager::m_pEventManager = nullptr;
 //===================================================
 
 //=======================

@@ -131,6 +131,11 @@ HRESULT CMeshOrbit::Init()
 			pIdx[nCntArray + 1] = static_cast<WORD>(m_nNUMVERTEX_X * (nCntBlockZ + 2));
 			nCntArray += 2;
 		}
+
+		//if (nCntArray >= m_nTOTAL_INDEX || nCntArray < 0)
+		//{
+		//	assert(false);
+		//}
 	}
 	//頂点バッファをアンロックする
 	m_pVtxBuff->Unlock();
@@ -202,12 +207,22 @@ void CMeshOrbit::Update()
 				//色合い
 				pVtx[nCol1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, fRatioVtx);  //オフセット行　〇１：（２　＝　１）、〇２：（１　＝　０）
 				pVtx[nCol2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, fRatioVtx);  //原点行 〇１：（５　＝　４）、〇２：（４　＝　３）
+			    if ( nCol1 >= m_nTOTAL_VERTEX || nCol2 >= m_nTOTAL_VERTEX || 
+					nCol1 < 0 || nCol2 < 0)
+		        {
+					assert(false);
+		        }
 
 			}
 			else
 			{//２週目以降なので、上のブロックにつながる頂点の位置を設定
 				pVtx[nCol2].pos = pVtx[nCol2 - 1].pos;  //原点行 〇１：（５　＝　４）、〇２：（４　＝　３）
 				pVtx[nCol2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, fRatioVtx);  //オフセット行　〇１：（２　＝　１）、〇２：（１　＝　０）
+				if (nCol1 >= m_nTOTAL_VERTEX || nCol2 >= m_nTOTAL_VERTEX || 
+					nCol1 < 0 || nCol2 < 0)
+				{
+					assert(false);
+				}
 			}
 
 			nCol1--;
@@ -243,6 +258,7 @@ void CMeshOrbit::Update()
 	//	}
 	//}
 	////===============================================================================================
+	//m_pIdxBuff->Unlock();
 
 
 }

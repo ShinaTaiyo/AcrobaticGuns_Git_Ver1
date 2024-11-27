@@ -151,7 +151,7 @@ void CBgModel::SaveInfoTxt(fstream& WritingFile)
 //==================================================================
 //ステージマネージャーから情報を読み込む
 //==================================================================
-void CBgModel::LoadInfoTxt(fstream& LoadingFile, vector<CObject*>& VecSaveManager, string& Buff)
+void CBgModel::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveManager, string& Buff)
 {
 	int nType = 0;//種類
 	D3DXVECTOR3 Move = D3DXVECTOR3(0.0f,0.0f,0.0f);  //移動量
@@ -195,7 +195,7 @@ void CBgModel::LoadInfoTxt(fstream& LoadingFile, vector<CObject*>& VecSaveManage
 	}
 	Type = BGMODELTYPE(nType);
 
-	VecSaveManager.push_back(CBgModel::Create(Type,Pos, Rot, Scale));//vectorに情報を保存する
+	listSaveManager.push_back(CBgModel::Create(Type,Pos, Rot, Scale));//vectorに情報を保存する
 
 }
 //======================================================================================================================

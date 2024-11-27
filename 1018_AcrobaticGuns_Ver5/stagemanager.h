@@ -31,19 +31,19 @@ class CBg3D;
 class CStageManager : public CObject
 {
 public:
-	typedef enum
+	enum class FOCUSTYPE
 	{
 		FOCUSTYPE_NORMAL = 0,//カメラが追う位置が普通
 		FOCUSTYPE_WARPPOS,   //カメラがワープ先の位置を追う
-	}FOCUSTYPE;
+	};
 
-	typedef enum
+	enum class WORLDTYPE
 	{
-		WORLDTYPE00_EASY = 0,
-		WORLDTYPE01_NORMAL,
-		WORLDTYPE02_BOSSRUSH,
-		WORLDTYPE_MAX
-	}WORLDTYPE;
+		EASY = 0,
+		NORMAL,
+		BOSSRUSH,
+		MAX
+	};
 
 	CStageManager(int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::STAGEMANAGER, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_NONE);  //コンストラクタ
 	~CStageManager(); //デストラクタ
@@ -58,7 +58,6 @@ public:
 	void LoadMapBin(int nMapNum);               //マップをバイナリファイルからロードする
 	void SaveMapBin();                          //マップをバイナリファイルにセーブする
 	int GetMapIndex() { return m_nMapIndex; }   //現在のマップ番号を取得する
-	FOCUSTYPE GetFocusType() { return m_FocusType; }//集中する位置を取得する
 
 	CObject* GetStageManagerObject() { return m_pManagerObject; }//操作オブジェクトの取得
 
@@ -67,23 +66,16 @@ public:
 	static const int m_nMAXMANAGEROBJECT = 1024;//管理するブロックの最大数
 private:
 
-	typedef enum
+	enum class MANAGERMODE
 	{
-		MANAGERMODE_ALREADYSTAGE = 0,//既にあるステージを編集するモード
-		MANAGERMODE_NEWSTAGE,        //新しくステージを作るモード
-		MANAGERMODE_MAX
-	}MANAGERMDOE;
-
-	typedef enum
-	{
-		MOVEMODE00_XY = 0,//移動モード０：XY
-		MOVEMODE01_XZ,    //移動モード１：XZ
-		MOVEMODE_MAX
-	}MOVEMODE;
+		ALREADYSTAGE = 0,//既にあるステージを編集するモード
+		NEWSTAGE,        //新しくステージを作るモード
+		MAX
+	};
 
 	static const int m_nMAX_MAP = 20;
 	static const int m_nMAX_WORD = 126;
-	static const char* m_apWORLDMAP_TXT[WORLDTYPE_MAX];
+	static const char* m_apWORLDMAP_TXT[static_cast<int>(WORLDTYPE::MAX)];
 	static const string m_aSAVE_FILENAME;//保存するファイル名
 
 	void TypeChenge();                          //オブジェクトXの種類を変える
@@ -103,7 +95,7 @@ private:
 	D3DXVECTOR3 m_SaveScale;                        //拡大率
 	D3DXVECTOR3 m_SaveBeforeChoosePos;          //選択処理をする前のする位置
 	CObject* m_pManagerObject;                  //色々な派生クラスにキャストするオブジェクト
-	MANAGERMDOE m_ManagerMode;                  //現在のステージマネーシャーのモード
+	MANAGERMODE m_ManagerMode;                  //現在のステージマネーシャーのモード
 	char m_aMapFilePass[m_nMAX_MAP][m_nMAX_WORD];//マップのファイルパス
 	//========================================================================================
 
@@ -120,17 +112,13 @@ private:
 	//====================
 	CObject* m_pChooseObject;                   //選択オブジェクト
 	bool m_bChooseObject;                       //オブジェクトを選択しているかどうか
-	int m_nIndexChooseObject;                   //選択しているオブジェクトの番号
 	//========================================================================================
 
 	//===================
 	//モード関係
 	//===================
-	MOVEMODE m_MoveMode;//移動モード
-	FOCUSTYPE m_FocusType;//カメラが追う物の種類
 	bool m_bMakeMapMode;                        //マップを作るモード
 	bool m_bUseSizeMove;//現在のオブジェクトのサイズ分移動するかどうか
-	D3DXVECTOR3 SizeMoveProcess(float fMoveX,float fMoveY,D3DXVECTOR3 Size);//サイズ分動かすときの処理
 	//========================================================================================
 
 	//===================
@@ -142,7 +130,8 @@ private:
 	//===================
 	//オブジェクトリスト
 	//===================
-	vector <CObject*> m_VecObjList;//オブジェクトのリスト
+	list <CObject*> m_StgObjList;//オブジェクトのリスト
+	list <CObject*>::iterator m_StgObjIt;//ステージオブジェクトリストへのイテレータ
 	//========================================================================================
 
 	//===================

@@ -22,6 +22,7 @@
 #include <sstream> //ファイル入出力で使う
 #include <algorithm>
 #include <vector> //ベクター管理で使う
+#include <list>
 #include <iomanip>// setprecisionを使用するのに必要
 #include <cassert>
 #include <stdio.h>
