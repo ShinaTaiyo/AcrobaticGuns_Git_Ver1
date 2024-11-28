@@ -34,7 +34,7 @@ bool CObject::m_bActivationReleaseAll = false;            //ReleaseAllÇî≠ìÆÇ∑ÇÈ
 //=====================================================
 CObject::CObject(int nPriority,bool bUseintPriority, TYPE Type, OBJECTTYPE ObjType) : m_type(Type), m_bUseInitialSound(true) ,m_ObjectType(ObjType),m_bIsStageManagerObj(false),m_nID(0),m_nStageManagerObjNum(0),m_pStageManagerObj_Next(nullptr),
 m_pStageManagerObj_Prev(nullptr), m_bStageManagerChooseState(false),m_bDeath(false), m_bUseDeath(false),m_pPrev(nullptr),m_pNext(nullptr),
-m_nPriority(nPriority),m_bCreateSuccess(false),m_nCntFrame(0),m_ManagerObjectType(MANAGEROBJECTTYPE_NONE)
+m_nPriority(nPriority),m_bCreateSuccess(false),m_nCntFrame(0),m_ManagerObjectType(MANAGEROBJECTTYPE::NONE)
 {
 	m_bCreateSuccess = false;                       //ê∂ê¨Ç…ê¨å˜ÇµÇΩÇ©Ç«Ç§Ç©
 	m_bDeath = false;                               //éÄñSÉtÉâÉO

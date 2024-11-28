@@ -55,13 +55,15 @@ public:
 	//====================================================
 	//ステージマネージャー管理オブジェクトタイプ列挙型
 	//====================================================
-	typedef enum
+	enum class MANAGEROBJECTTYPE
 	{
-		MANAGEROBJECTTYPE_NONE = 0,//なし
-		MANAGEROBJECTTYPE_BLOCK,   //ブロック
-		MANAGEROBJECTTYPE_BGMODEL, //背景モデル
-		MANAGEROBJECTTYPE_MAX
-	}MANAGEROBJECTTYPE;
+		NONE = 0, //なし
+		BLOCK,    //ブロック
+		BGMODEL,  //背景モデル
+		SHOTWEAKENEMY,//射撃に弱い敵
+		DIVEWEAKENEMY,//ダイブに弱い敵
+		MAX
+	};
 	//===========================================
 
 	//===========================

@@ -19,6 +19,7 @@
 #include "calculation.h"
 #include "debugproc.h"
 #include "bgModel.h"
+#include "enemy.h"
 #include <stdio.h>
 #include <string.h>
 //==========================================================
@@ -207,11 +208,19 @@ void CStageManager::LoadMapTxt(int nMapNum)
 
 		if (Reading_Buff == "SETBLOCK")
 		{
-			CBlock::LoadInfoTxt(ReadingFile, m_StgObjList,Reading_Buff);
+			CBlock::LoadInfoTxt(ReadingFile, m_StgObjList, Reading_Buff);
 		}
 		else if (Reading_Buff == "SETBGMODEL")
 		{
 			CBgModel::LoadInfoTxt(ReadingFile, m_StgObjList, Reading_Buff);
+		}
+		else if (Reading_Buff == "SETSHOTWEAKENEMY")
+		{
+			CShotWeakEnemy::LoadInfoTxt(ReadingFile, m_StgObjList, Reading_Buff);
+		}
+		else if (Reading_Buff == "SETDIVEWEAKENEMY")
+		{
+			CDiveWeakEnemy::LoadInfoTxt(ReadingFile, m_StgObjList, Reading_Buff);
 		}
 	}
 
@@ -716,8 +725,8 @@ void CStageManagerState_NewObject::DeleteManagerObject(CStageManager* pStageMana
 void CStageManagerState_NewObject::ChengeObject(CStageManager* pStageManager)
 {
 	bool bChengeFlag = false;
-	int nNumType = m_pManagerObject->GetManagerObjectType();
-	CObject::MANAGEROBJECTTYPE ManagerObjectType = CObject::MANAGEROBJECTTYPE_NONE;
+	int nNumType = static_cast<int>(m_pManagerObject->GetManagerObjectType());
+	CObject::MANAGEROBJECTTYPE ManagerObjectType = CObject::MANAGEROBJECTTYPE::NONE;
 
 	//=====================================================================
 	//オブジェクトXの種類を変更する
@@ -736,13 +745,13 @@ void CStageManagerState_NewObject::ChengeObject(CStageManager* pStageManager)
 	if (bChengeFlag == true)
 	{
 		ReleaseObject(pStageManager);
-		if (nNumType >= CObject::MANAGEROBJECTTYPE_MAX)
+		if (nNumType >= static_cast<int>(CObject::MANAGEROBJECTTYPE::MAX))
 		{
-			nNumType = CObject::MANAGEROBJECTTYPE_NONE + 1;
+			nNumType = static_cast<int>(CObject::MANAGEROBJECTTYPE::NONE) + 1;
 		}
 		if (nNumType < 1)
 		{
-			nNumType = CObject::MANAGEROBJECTTYPE_MAX - 1;
+			nNumType = static_cast<int>(CObject::MANAGEROBJECTTYPE::MAX) - 1;
 		}
 
 		ManagerObjectType = CObject::MANAGEROBJECTTYPE(nNumType);
@@ -752,11 +761,17 @@ void CStageManagerState_NewObject::ChengeObject(CStageManager* pStageManager)
 	//オブジェクトの種類を変える
 	switch (ManagerObjectType)
 	{
-	case  CObject::MANAGEROBJECTTYPE_BLOCK:
+	case  CObject::MANAGEROBJECTTYPE::BLOCK:
 		m_pManagerObject = CBlock::Create(CBlock::BLOCKTYPE00_NORMAL, 10, pStageManager->GetSavePos(),pStageManager->GetSaveRot(),pStageManager->GetSaveScale());
 		break;
-	case CObject::MANAGEROBJECTTYPE_BGMODEL:
+	case CObject::MANAGEROBJECTTYPE::BGMODEL:
 		m_pManagerObject = CBgModel::Create(CBgModel::BGMODELTYPE::BILL_00, pStageManager->GetSavePos(), pStageManager->GetSaveRot(), pStageManager->GetSaveScale());
+		break;
+	case CObject::MANAGEROBJECTTYPE::SHOTWEAKENEMY:
+		m_pManagerObject = CShotWeakEnemy::Create(CShotWeakEnemy::SHOTWEAKENEMYTYPE::NORMAL, 10, pStageManager->GetSavePos(), pStageManager->GetSaveRot(), pStageManager->GetSaveScale());
+		break;
+	case CObject::MANAGEROBJECTTYPE::DIVEWEAKENEMY:
+		m_pManagerObject = CDiveWeakEnemy::Create(CDiveWeakEnemy::DIVEWEAKENEMYTYPE::NORMAL, 10, pStageManager->GetSavePos(), pStageManager->GetSaveRot(), pStageManager->GetSaveScale());
 		break;
 	default:
 		break;
@@ -836,6 +851,8 @@ void CStageManagerState_PlacedObject::ChooseObject(CStageManager* pStageManager)
 	advance(it, m_nChooseObjIdx);//現在のポインタから見た選んでいる番号まで移動する
 
 	(*it)->ManagerChooseControlInfo();
+
+	DeleteObject(it, StgObjList);
 }
 //=======================================================================================================================
 
@@ -862,6 +879,19 @@ void CStageManagerState_PlacedObject::ChengeIdx(CStageManager* pStageManager)
 	if (m_nChooseObjIdx < 0)
 	{
 		m_nChooseObjIdx = nSize - 1;
+	}
+}
+//=======================================================================================================================
+
+//===========================================================
+//選択オブジェクトを消去する
+//===========================================================
+void CStageManagerState_PlacedObject::DeleteObject(list<CObject*>::iterator& it, list<CObject*>& StgObjList)
+{
+	auto Input = CManager::GetInputKeyboard();
+	if (Input->GetTrigger(DIK_BACKSPACE))
+	{
+		StgObjList.erase(it);
 	}
 }
 //=======================================================================================================================

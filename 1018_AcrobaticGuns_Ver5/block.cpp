@@ -145,8 +145,7 @@ CBlock* CBlock::Create(BLOCKTYPE type, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 r
 			pBlock->CObjectX::SetObjXType(CObjectX::OBJECTXTYPE_BLOCK);               //オブジェクトXのタイプを設定
 			pBlock->CObjectX::SetTypeNum((int)(type));                                //オブジェクトXごとのタイプ番号を設定
 			pBlock->SetSize();                                                        //Xオブジェクトのサイズを設定する
-			pBlock->SetManagerObjectType(CObject::MANAGEROBJECTTYPE_BLOCK);           //マネージャーで呼び出す時の種類を設定
-
+			pBlock->SetManagerObjectType(CObject::MANAGEROBJECTTYPE::BLOCK);           //マネージャーで呼び出す時の種類を設定
 		}
 	}
 	else

@@ -197,7 +197,9 @@ public:
 	void Process(CStageManager* pStageManager) override;
 private:
 	void ChooseObject(CStageManager * pStageManager);
+
 	void ChengeIdx(CStageManager* pStageManager);
+	void DeleteObject(list<CObject*>::iterator & it,list<CObject*> & StgObjList);
 	int m_nChooseObjIdx;//現在選んでいるオブジェクトの番号
 };
 

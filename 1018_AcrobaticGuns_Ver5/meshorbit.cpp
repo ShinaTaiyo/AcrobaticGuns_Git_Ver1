@@ -231,36 +231,6 @@ void CMeshOrbit::Update()
 	}
 	//頂点バッファをアンロックする
 	m_pVtxBuff->Unlock();
-
-	////インデックスバッファのロック
-	//m_pIdxBuff->Lock(0, 0, (void**)&pIdx, 0);
-	//int nCntIdxX = 0;
-	//nCntArray = 0;
-	////=======================================================================
- //   //インデックスを求める
- //   //=======================================================================
-	//for (int nCntBlockZ = 0; nCntBlockZ < m_nNUMBLOCK_Z; nCntBlockZ++)
-	//{
-	//	for (int nCntBlockX = 0; nCntBlockX < m_nNUMVERTEX_X; nCntBlockX++)
-	//	{
-	//		pIdx[nCntArray] = m_nNUMVERTEX_X + nCntIdxX;                    //インデックスを代入
-	//		pIdx[nCntArray + 1] = nCntIdxX;               //ブロックXの行の上側を設定
-
-	//		nCntIdxX++;
-	//		nCntArray += 2;
-	//	}
-
-	//	if (nCntBlockZ != (m_nNUMBLOCK_Z - 1))
-	//	{//最後の行だけは縮退ポリゴンを計算しない
-	//		pIdx[nCntArray] = m_nNUMVERTEX_X * (nCntBlockZ + 1) - 1;
-	//		pIdx[nCntArray + 1] = m_nNUMVERTEX_X * (nCntBlockZ + 2);
-	//		nCntArray += 2;
-	//	}
-	//}
-	////===============================================================================================
-	//m_pIdxBuff->Unlock();
-
-
 }
 //===============================================================================================
 

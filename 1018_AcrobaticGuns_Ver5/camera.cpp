@@ -84,13 +84,29 @@ void CCamera::Update()
 	//========================================
 	//カメラの向きを変える
 	//========================================
-	if (CManager::GetInputKeyboard()->GetPress(DIK_E) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::RB) == true)
-	{
-		m_Rot.y += 0.02f;
+	if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
+	{//シフトキーを押しながら・・・
+		if (CManager::GetInputKeyboard()->GetPress(DIK_X) == true)
+		{
+			m_Rot.y -= 0.01f;
+		}
 	}
-	else if (CManager::GetInputKeyboard()->GetPress(DIK_Q) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::LB) == true)
+	else if (CManager::GetInputKeyboard()->GetPress(DIK_X) == true)
 	{
-		m_Rot.y -= 0.02f;
+		m_Rot.y += 0.01f;
+		if (CManager::GetInputKeyboard()->GetPress(DIK_LCONTROL))
+		{
+			m_Rot.y = 0.0f;
+		}
+	}
+
+	if (CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::LB))
+	{
+		m_Rot.y -= 0.01f;
+	}
+	if (CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::RB))
+	{
+		m_Rot.y += 0.01f;
 	}
 
 	//===========================

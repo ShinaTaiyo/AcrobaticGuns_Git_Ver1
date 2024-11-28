@@ -115,7 +115,7 @@ CBgModel* CBgModel::Create(BGMODELTYPE bgModelType, D3DXVECTOR3 pos, D3DXVECTOR3
 		CManager::GetObjectXInfo()->GetTexture(nIdx),
 		CManager::GetObjectXInfo()->GetColorValue(nIdx));
 
-	pBgModel->SetManagerObjectType(CObject::MANAGEROBJECTTYPE_BGMODEL);           //マネージャーで呼び出す時の種類を設定
+	pBgModel->SetManagerObjectType(CObject::MANAGEROBJECTTYPE::BGMODEL);           //マネージャーで呼び出す時の種類を設定
 	pBgModel->SetSize();//サイズを設定する
 	return pBgModel;
 }
