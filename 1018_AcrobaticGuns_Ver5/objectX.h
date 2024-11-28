@@ -160,7 +160,7 @@ public:
 	int GetTypeNum() { return m_nTypeNum;}                                                  //オブジェクトごとのタイプ番号を設定
 
 	//情報表示処理＆操作
-	void ManagerChooseControlInfo() override;              //ステージマネージャーが情報を操作する
+	void ManagerChooseControlInfo() override;                                               //ステージマネージャーが情報を操作する
 
 	void SaveInfoTxt(fstream& WritingFile) override;//テキストファイルに情報を保存するための関数
 

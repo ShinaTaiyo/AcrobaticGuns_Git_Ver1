@@ -84,6 +84,13 @@ private:
 		MAX
 	};
 
+	enum class STATE
+	{
+		NEWOBJECT = 0,
+		PLACEDOBJECT,
+		MAX
+	};
+
 	//*静的メンバ変数
 
 	static const int m_nMAX_MAP = 20;
@@ -143,14 +150,15 @@ private:
 	//ステート
 	//===================
 	CStageManagerState* m_pState;
+	STATE m_NowState;
 	//========================================================================================
 
 	//*関数
 	
 	void ResetScale();  //拡大率をリセットする処理
 	void DispInfo();    //現在のマップエディタの情報を表示
-	void ChooseObject();//オブジェクト選択処理
-	void StateChenge(CStageManagerState* pStageManagerState);
+
+	void ChengeState();
 };
 
 //ステージマネージャー状態スーパークラス
@@ -178,6 +186,19 @@ private:
 	void ChengeObject(CStageManager * pStageManager);                       //オブジェクトの種類を消す
 	void ReleaseObject(CStageManager * pStageManager);                      //オブジェクトをリリースする
 
+};
+
+//既存のオブジェクトの編集を行う状態
+class CStageManagerState_PlacedObject : public CStageManagerState
+{
+public:
+	CStageManagerState_PlacedObject();
+	~CStageManagerState_PlacedObject() override;
+	void Process(CStageManager* pStageManager) override;
+private:
+	void ChooseObject(CStageManager * pStageManager);
+	void ChengeIdx(CStageManager* pStageManager);
+	int m_nChooseObjIdx;//現在選んでいるオブジェクトの番号
 };
 
 #endif
