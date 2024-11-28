@@ -25,6 +25,12 @@ class CBg3D;
 //======================
 #define SAVE_BIN "data\\BINARYFILE\\Save.bin"
 #define SAVE_TXT "data\\TEXTFILE\\stagemanager\\Save.txt"
+
+//======================
+//前方宣言
+//======================
+class CStageManagerState;
+
 //============================
 //ステージ管理クラス
 //============================
@@ -53,19 +59,24 @@ public:
 	void Draw() override;      //描画処理
 	void SetDeath() override;  //死亡フラグを設定
 	void LoadMapTxt(int nMapNum);               //マップをテキストファイルからロードする
-	void LoadMapFilePass(WORLDTYPE type);           //マップのファイルパスをロードする
+	void LoadMapFilePass(WORLDTYPE type);       //マップのファイルパスをロードする
 	void SaveMapTxt(int nMapNum);               //マップをテキストファイルにセーブする
 	void LoadMapBin(int nMapNum);               //マップをバイナリファイルからロードする
 	void SaveMapBin();                          //マップをバイナリファイルにセーブする
 	int GetMapIndex() { return m_nMapIndex; }   //現在のマップ番号を取得する
+	void MapChenge();                            //マップを変更する
 
-	CObject* GetStageManagerObject() { return m_pManagerObject; }//操作オブジェクトの取得
-
+	list <CObject*> & GetStgObjList() { return m_StgObjList; }//管理オブジェクトリストを取得する
+	const D3DXVECTOR3& GetSavePos() const { return m_SavePos; }
+	void SetSavePos(D3DXVECTOR3 Pos) { m_SavePos = Pos; }
+	const D3DXVECTOR3& GetSaveRot() const { return m_SaveRot; }
+	void SetSaveRot(D3DXVECTOR3 Rot) { m_SaveRot = Rot; }
+	const D3DXVECTOR3& GetSaveScale() const { return m_SaveScale; }
+	void SetSaveScale(D3DXVECTOR3 Scale) { m_SaveScale = Scale; }
 	static CStageManager* Create();             //生成処理
-
-	static const int m_nMAXMANAGEROBJECT = 1024;//管理するブロックの最大数
 private:
 
+	//*列挙型
 	enum class MANAGERMODE
 	{
 		ALREADYSTAGE = 0,//既にあるステージを編集するモード
@@ -73,30 +84,23 @@ private:
 		MAX
 	};
 
+	//*静的メンバ変数
+
 	static const int m_nMAX_MAP = 20;
 	static const int m_nMAX_WORD = 126;
 	static const char* m_apWORLDMAP_TXT[static_cast<int>(WORLDTYPE::MAX)];
 	static const string m_aSAVE_FILENAME;//保存するファイル名
 
-	void TypeChenge();                          //オブジェクトXの種類を変える
-	void SetObjectX();                          //オブジェクトXを設定する
-	void DeleteManagerObject();                       //オブジェクトXを消す
-	void ChengeObject(CObject::MANAGEROBJECTTYPE ManagerObjectType);                        //オブジェクトの種類を消す
-	void ReleaseObject();                       //オブジェクトをリリースする
-	void MapChenge();                           //マップを変える
-	void DispInfo();                            //現在のマップエディタの情報を表示
-	void ChooseObject();                        //オブジェクト選択処理
+	//*変数
 
 	//====================
 	//基本系
 	//====================
-	D3DXVECTOR3 m_SaveRot;                          //向き
-	D3DXVECTOR3 m_SavePos;                          //位置
-	D3DXVECTOR3 m_SaveScale;                        //拡大率
+	D3DXVECTOR3 m_SaveRot;                      //向き
+	D3DXVECTOR3 m_SavePos;                      //位置
+	D3DXVECTOR3 m_SaveScale;                    //拡大率
 	D3DXVECTOR3 m_SaveBeforeChoosePos;          //選択処理をする前のする位置
-	CObject* m_pManagerObject;                  //色々な派生クラスにキャストするオブジェクト
 	MANAGERMODE m_ManagerMode;                  //現在のステージマネーシャーのモード
-	char m_aMapFilePass[m_nMAX_MAP][m_nMAX_WORD];//マップのファイルパス
 	//========================================================================================
 
 	//====================
@@ -121,11 +125,6 @@ private:
 	bool m_bUseSizeMove;//現在のオブジェクトのサイズ分移動するかどうか
 	//========================================================================================
 
-	//===================
-	//拡大率関係
-	//===================
-	void ResetScale();//拡大率をリセットする処理
-	//========================================================================================
 
 	//===================
 	//オブジェクトリスト
@@ -139,5 +138,46 @@ private:
 	//===================
 	CBg3D* m_pBg3D;//背景へのポインタ
 	//========================================================================================
+
+	//===================
+	//ステート
+	//===================
+	CStageManagerState* m_pState;
+	//========================================================================================
+
+	//*関数
+	
+	void ResetScale();  //拡大率をリセットする処理
+	void DispInfo();    //現在のマップエディタの情報を表示
+	void ChooseObject();//オブジェクト選択処理
+	void StateChenge(CStageManagerState* pStageManagerState);
 };
+
+//ステージマネージャー状態スーパークラス
+class CStageManagerState
+{
+public:
+	CStageManagerState() {}; //コンストラクタ
+	virtual ~CStageManagerState() {};//デストラクタ
+	virtual void Process(CStageManager* pStageManager) {};//処理
+};
+
+//新しいオブジェクトの配置を行う状態
+class CStageManagerState_NewObject : public CStageManagerState
+{
+public:
+	CStageManagerState_NewObject();
+	~CStageManagerState_NewObject() override;
+	void Process(CStageManager* pStageManager) override;//処理
+private:
+	CObject* m_pManagerObject;//設置予定オブジェクトへのポインタ
+
+	void TypeChenge(CStageManager* pStageManager);                          //オブジェクトXの種類を変える
+	void SetObjectX(CStageManager* pStageManager);                          //オブジェクトXを設定する
+	void DeleteManagerObject(CStageManager* pStageManager);                 //オブジェクトXを消す
+	void ChengeObject(CStageManager * pStageManager);                       //オブジェクトの種類を消す
+	void ReleaseObject(CStageManager * pStageManager);                      //オブジェクトをリリースする
+
+};
+
 #endif

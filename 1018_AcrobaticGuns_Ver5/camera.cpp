@@ -238,17 +238,17 @@ void CCamera::NormalCameraMove()
 					//CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 30, 30.0f, 30.0f, 100, 10, false, m_PosR, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
 				}
 				break;
-			case CScene::MODE_EDIT:
-				pManagerObject = CEdit::GetStageManager()->GetStageManagerObject();
-				if (pManagerObject != nullptr)
-				{
-					if (pManagerObject->GetObjectType() == CObject::OBJECTTYPE::OBJECTTYPE_X)
-					{
-						m_PosR = ((CObjectX*)pManagerObject)->GetPos() + m_AddPosR;
-						m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -400.0f, 400.0f, cosf(m_Rot.y) * -400.0f) + m_AddPosV;
-					}
-				}
-				break;
+			//case CScene::MODE_EDIT:
+			//	pManagerObject = CEdit::GetStageManager()->GetStageManagerObject();
+			//	if (pManagerObject != nullptr)
+			//	{
+			//		if (pManagerObject->GetObjectType() == CObject::OBJECTTYPE::OBJECTTYPE_X)
+			//		{
+			//			m_PosR = ((CObjectX*)pManagerObject)->GetPos() + m_AddPosR;
+			//			m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -400.0f, 400.0f, cosf(m_Rot.y) * -400.0f) + m_AddPosV;
+			//		}
+			//	}
+			//	break;
 			default:
 				break;
 			}
