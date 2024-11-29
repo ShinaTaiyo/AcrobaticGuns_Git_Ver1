@@ -105,7 +105,7 @@ CAIModel* CAIModel::Create(AIMODELTYPE type, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D
 	pAiModel->CObjectX::SetPos(pos);                                                //オブジェクト２Ｄの位置を設定
 	pAiModel->SetPosOld(pos);                                                       //1f前の位置を設定
 	pAiModel->SetUseDraw(true);
-	pAiModel->SetUseShadow(false);
+	pAiModel->SetUseShadow(true);
 	pAiModel->SetSupportPos(pos);                                                   //設置位置
 	pAiModel->CObjectX::SetScale(Scale);                                            //オブジェクトの拡大率
 	pAiModel->SetFormarScale(Scale);                                                //元の拡大率を設定する

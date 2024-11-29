@@ -862,7 +862,6 @@ void CStageManagerState_PlacedObject::ChooseObject(CStageManager* pStageManager)
 void CStageManagerState_PlacedObject::ChengeIdx(CStageManager* pStageManager)
 {
 	list<CObject*>& StgObjList = pStageManager->GetStgObjList();
-	int nSize = StgObjList.size();
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_RIGHT) == true)
 	{
 		m_nChooseObjIdx++;
@@ -872,6 +871,7 @@ void CStageManagerState_PlacedObject::ChengeIdx(CStageManager* pStageManager)
 		m_nChooseObjIdx--;
 	}
 
+	int nSize = StgObjList.size();
 	if (m_nChooseObjIdx >= nSize)
 	{
 		m_nChooseObjIdx = 0;

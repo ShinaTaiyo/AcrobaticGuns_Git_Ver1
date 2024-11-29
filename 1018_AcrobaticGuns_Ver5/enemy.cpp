@@ -26,14 +26,15 @@
 //{
 //	"data\\MODEL\\Enemy\\Normal\\noobSlime.x"
 //};
+int CEnemy::m_nNumEnemy = 0;
 
 //====================================================================================
 //コンストラクタ
 //====================================================================================
 CEnemy::CEnemy(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri, bUseintPri, type, ObjType),
-m_Type(ENEMYTYPE::SHOTWEAK), m_VecMoveAi(), m_MoveAiSavePos(D3DXVECTOR3(0.0f, 0.0f, 0.0f))
+m_Type(ENEMYTYPE::SHOTWEAK), m_VecMoveAi(), m_MoveAiSavePos(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),m_nIdxMoveAi(0)
 {
-
+	m_nNumEnemy++;//敵総数カウントアップ
 }
 //============================================================================================================================================
 
@@ -42,7 +43,7 @@ m_Type(ENEMYTYPE::SHOTWEAK), m_VecMoveAi(), m_MoveAiSavePos(D3DXVECTOR3(0.0f, 0.
 //====================================================================================
 CEnemy::~CEnemy()
 {
-
+	m_nNumEnemy--;//敵総数カウントダウン
 }
 //============================================================================================================================================
 
@@ -82,6 +83,8 @@ void CEnemy::Update()
 		const D3DXVECTOR3& PlayerPos = CGame::GetPlayer()->GetPos();
 		float fElevaRot = atan2f(PlayerPos.y - Pos.y, sqrtf(powf(PlayerPos.x - Pos.x, 2) + powf(PlayerPos.z - Pos.z, 2)));
 		SetRot(D3DXVECTOR3(fElevaRot, atan2f(PlayerPos.x - Pos.x, PlayerPos.z - Pos.z) + D3DX_PI,0.0f));
+
+		AIMoveProcess();//AI移動処理を行う
 	}
 
 	CollisionProcess();
@@ -117,9 +120,6 @@ void CEnemy::SetDeath()
 		pObj->SetUseDeath(true);
 		pObj->SetDeath();
 	}
-
-	m_VecMoveAi.clear();         //メモリを初期化
-	m_VecMoveAi.shrink_to_fit(); //確保メモリを開放
 }
 //============================================================================================================================================
 
@@ -328,7 +328,6 @@ CObject* CEnemy::ManagerSaveObject()
 //====================================================================================
 void CEnemy::ManagerChooseControlInfo()
 {
-
 	SetMoveAiPoint();//移動AIの設定を行う
 
 	CObjectXAlive::ManagerChooseControlInfo();
@@ -452,8 +451,40 @@ void CEnemy::SetMoveAiPoint()
 
 	if (Input->GetTrigger(DIK_O))
 	{
-		m_VecMoveAi.push_back(CAIModel::Create(CAIModel::AIMODELTYPE::MOVEPOINT, m_MoveAiSavePos, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(3.0f, 3.0f, 3.0f), &GetMatrixWorld()));
+		m_VecMoveAi.push_back(CAIModel::Create(CAIModel::AIMODELTYPE::MOVEPOINT, m_MoveAiSavePos + GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(3.0f, 3.0f, 3.0f),nullptr));
 	}
+}
+//============================================================================================================================================
+
+//====================================================================================
+//AI移動処理
+//====================================================================================
+void CEnemy::AIMoveProcess()
+{
+	auto it = m_VecMoveAi.begin();//最初のポインタを取得
+
+	advance(it, m_nIdxMoveAi);//指定している番号まで進める
+
+	float fLength = CCalculation::CalculationLength(GetPos(), (*it)->GetPos());//距離を測る
+	float fRot = atan2f((*it)->GetPos().x - GetPos().x, (*it)->GetPos().z - GetPos().z);
+	SetMove(D3DXVECTOR3(sinf(fRot) * 5.0f, GetMove().y, cosf(fRot) * 5.0f));
+
+	if (fLength < 20.0f)
+	{
+		m_nIdxMoveAi++;//目的地を次の位置に変更
+	}
+
+	int nSize = m_VecMoveAi.size();
+	if (m_nIdxMoveAi >= nSize)
+	{
+		m_nIdxMoveAi = 0;
+	}
+	if (m_nIdxMoveAi < 0)
+	{
+		m_nIdxMoveAi = nSize - 1;
+	}
+
+
 }
 //============================================================================================================================================
 
@@ -700,7 +731,13 @@ void CShotWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 						}
 						else if (Buff == "END_SETNUM")
 						{
-							VecMoveAi.push_back(CAIModel::Create(CAIModel::AIMODELTYPE::MOVEPOINT, MoveAiPos, MoveAiRot, MoveAiScale, nullptr));
+							CAIModel* pAiModel = CAIModel::Create(CAIModel::AIMODELTYPE::MOVEPOINT, MoveAiPos, MoveAiRot, MoveAiScale, nullptr);
+							if (CScene::GetMode() == CScene::MODE_GAME)
+							{
+								pAiModel->SetUseDraw(false);
+								pAiModel->SetUseShadow(false);
+							}
+							VecMoveAi.push_back(pAiModel);
 							break;
 						}
 					}
@@ -713,16 +750,15 @@ void CShotWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 		}
 	}
 	ShotWeakEnemyType = static_cast<SHOTWEAKENEMYTYPE>(nShotWeakEnemyType);
-	EnemyType = static_cast<ENEMYTYPE>(nLife);
+	EnemyType = static_cast<ENEMYTYPE>(nType);
 	//listSaveManager.push_back(CShotWeakEnemy::Create(ShotWeakEnemyType, nLife, Pos, Rot, Scale));//vectorに情報を保存する
 
 	//DiveWeakEnemyType = static_cast<DIVEWEAKENEMYTYPE>(nDiveWeakEnemyType);
-	EnemyType = static_cast<ENEMYTYPE>(nLife);
 	CShotWeakEnemy* pShotWeakEnemy = CShotWeakEnemy::Create(ShotWeakEnemyType, nLife, Pos, Rot, Scale);
-	for (auto Ai : VecMoveAi)
-	{
-		Ai->SetMtxParent(&pShotWeakEnemy->GetMatrixWorld());//親マトリックスをAIモデルに設定
-	}
+	//for (auto Ai : VecMoveAi)
+	//{
+	//	Ai->SetMtxParent(&pShotWeakEnemy->GetMatrixWorld());//親マトリックスをAIモデルに設定
+	//}
 	pShotWeakEnemy->SetVecMoveAiInfo(VecMoveAi);
 	listSaveManager.push_back(pShotWeakEnemy);//vectorに情報を保存する
 
@@ -1030,7 +1066,13 @@ void CDiveWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 						}
 						else if (Buff == "END_SETNUM")
 						{
-							VecMoveAi.push_back(CAIModel::Create(CAIModel::AIMODELTYPE::MOVEPOINT, MoveAiPos, MoveAiRot, MoveAiScale, nullptr));
+							CAIModel* pAiModel = CAIModel::Create(CAIModel::AIMODELTYPE::MOVEPOINT, MoveAiPos, MoveAiRot, MoveAiScale, nullptr);
+							if (CScene::GetMode() == CScene::MODE_GAME)
+							{
+								pAiModel->SetUseDraw(false);
+								pAiModel->SetUseShadow(false);
+							}
+							VecMoveAi.push_back(pAiModel);
 							break;
 						}
 					}
@@ -1043,12 +1085,8 @@ void CDiveWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 		}
 	}
 	DiveWeakEnemyType = static_cast<DIVEWEAKENEMYTYPE>(nDiveWeakEnemyType);
-	EnemyType = static_cast<ENEMYTYPE>(nLife);
+	EnemyType = static_cast<ENEMYTYPE>(nType);
 	CDiveWeakEnemy* pDiveWeakEnemy = CDiveWeakEnemy::Create(DiveWeakEnemyType, nLife, Pos, Rot, Scale);
-	for (auto Ai : VecMoveAi)
-	{
-		Ai->SetMtxParent(&pDiveWeakEnemy->GetMatrixWorld());//親マトリックスをAIモデルに設定
-	}
 	pDiveWeakEnemy->SetVecMoveAiInfo(VecMoveAi);
 	listSaveManager.push_back(pDiveWeakEnemy);//vectorに情報を保存する
 

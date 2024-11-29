@@ -72,7 +72,7 @@ HRESULT CPlayer::Init()
     m_pLockOn->SetUseDeath(true);
     m_pLockOn->SetPolygonRotSpeed(0.01f);
 
-    m_pMeshOrbit = CMeshOrbit::Create(CMeshOrbit::MESHORBITTYPE::AUTSTRALIAUBAIMAN);
+    m_pMeshOrbit = CMeshOrbit::Create(CMeshOrbit::MESHORBITTYPE::DEATHENAGA);
     m_pMeshOrbit->SetUseDeath(true);
 
     m_pModeDisp = CUi::Create(CUi::UITYPE::ACTIONMODE_GUN, CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, 1, false, D3DXVECTOR3(50.0f, 50.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
@@ -404,16 +404,18 @@ void CPlayer::CollisionProcess()
                 bSuccessCollision = CCollision::ExtrusionCollisionSquare(MyPos, bCollisionX, bCollisionY, bCollisionZ, Move, MyPosOld, MyVtxMax, MyVtxMin,
                     ComPos, ComVtxMax, ComVtxMin, bCollisionXOld, bCollisionYOld, bCollisionZOld);
 
-                if (bCollisionY == true)
-                {
-                    SetMove(D3DXVECTOR3(GetMove().x, 0.0f, GetMove().z)); 
-                }
-
                 if (bSuccessCollision == true)
                 {
                     SetPos(MyPos);
                     m_bCollision = true;
                 }
+
+                if (bCollisionY == true)
+                {
+                    SetMove(D3DXVECTOR3(GetMove().x, -0.1f, GetMove().z)); 
+                    CManager::GetDebugProc()->PrintDebugProc("乗っている\n");
+                }
+
             }
 
             //オブジェクトを次に進める

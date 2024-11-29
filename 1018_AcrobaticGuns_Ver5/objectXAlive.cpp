@@ -12,6 +12,7 @@
 #include "manager.h"
 #include "input.h"
 #include "damage.h"
+#include "debugproc.h"
 //======================================================================================================================
 
 //============================================================
@@ -196,29 +197,31 @@ void CObjectXAlive::EditLife()
 	{//Lコントロールキーを押しながら
 		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
 		{//シフトキーを押しながら・・・
-			if (CManager::GetInputKeyboard()->GetPress(DIK_1) == true)
+			if (CManager::GetInputKeyboard()->GetPress(DIK_3) == true)
 			{
-				m_nLife++;
+				m_nMaxLife++;
 			}
 		}
-		else if (CManager::GetInputKeyboard()->GetPress(DIK_1) == true)
+		else if (CManager::GetInputKeyboard()->GetPress(DIK_3) == true)
 		{
-			m_nLife--;
+			m_nMaxLife--;
 		}
 	}
 	else
 	{//Lコントロールキーを押していない
 		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
 		{//シフトキーを押しながら・・・
-			if (CManager::GetInputKeyboard()->GetTrigger(DIK_1) == true)
+			if (CManager::GetInputKeyboard()->GetTrigger(DIK_3) == true)
 			{
-				m_nLife++;
+				m_nMaxLife++;
 			}
 		}
-		else if (CManager::GetInputKeyboard()->GetTrigger(DIK_1) == true)
+		else if (CManager::GetInputKeyboard()->GetTrigger(DIK_3) == true)
 		{
-			m_nLife--;
+			m_nMaxLife--;
 		}
 	}
+
+	CManager::GetDebugProc()->PrintDebugProc("最大体力(1)：%d\n", m_nMaxLife);
 }
 //================================================================================================================================================
