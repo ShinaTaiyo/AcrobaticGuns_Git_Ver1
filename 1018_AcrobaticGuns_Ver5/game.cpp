@@ -18,6 +18,7 @@
 #include "bg3d.h"
 #include "enemy.h"
 #include "input.h"
+#include "debugproc.h"
 #include "wire.h"
 //=========================================================================================================================
 
@@ -112,6 +113,8 @@ void CGame::Update()
 	{
 		CManager::GetSceneFade()->SetSceneFade(CFade::FADEMODE_IN, CScene::MODE_RESULT);
 	}
+
+	CManager::GetDebugProc()->PrintDebugProc("Œ»Ý‚Ì“G‚Ì”G%d\n", CEnemy::GetNumEnemy());
 #else
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_1) == true || CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::START) == true)
 	{

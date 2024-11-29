@@ -46,7 +46,9 @@ public:
 	    PARTICLE2D,      //パーティクル２D
 		LOCKON,          //ロックオン
 		UI,              //UI
+		PHASEINFO,       //フェーズ情報
 		STAGEMANAGER,    //ステージマネージャー
+		PHASEMANAGER,    //フェーズマネージャー
 		BG,              //背景
 		FADE,            //フェード
 		MAX

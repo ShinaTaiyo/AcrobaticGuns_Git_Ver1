@@ -32,7 +32,7 @@ int CEnemy::m_nNumEnemy = 0;
 //コンストラクタ
 //====================================================================================
 CEnemy::CEnemy(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri, bUseintPri, type, ObjType),
-m_Type(ENEMYTYPE::SHOTWEAK), m_VecMoveAi(), m_MoveAiSavePos(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),m_nIdxMoveAi(0)
+m_Type(ENEMYTYPE::SHOTWEAK), m_VecMoveAi(), m_MoveAiSavePos(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_nIdxMoveAi(0), m_nPhaseNum(0)
 {
 	m_nNumEnemy++;//敵総数カウントアップ
 }
@@ -172,6 +172,9 @@ void CEnemy::SaveInfoTxt(fstream& WritingFile)
 		assert(false);
 		break;
 	}
+
+	//フェーズ番号を設定
+	WritingFile << "PHASENUM = " << m_nPhaseNum << endl;
 
 	//移動AIの位置を保存
 	WritingFile << "SETMOVEAI" << endl;
@@ -580,7 +583,7 @@ void CShotWeakEnemy::SetDeath()
 //====================================================================================
 //生成処理
 //====================================================================================
-CShotWeakEnemy* CShotWeakEnemy::Create(SHOTWEAKENEMYTYPE Type, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 Scale)
+CShotWeakEnemy* CShotWeakEnemy::Create(SHOTWEAKENEMYTYPE Type, int nLife, int nPhaseNum, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 Scale)
 {
 	CShotWeakEnemy* pShotWeakEnemy = DBG_NEW CShotWeakEnemy;
 
@@ -592,6 +595,7 @@ CShotWeakEnemy* CShotWeakEnemy::Create(SHOTWEAKENEMYTYPE Type, int nLife, D3DXVE
 		CManager::GetObjectXInfo()->GetTexture(nIdx),
 		CManager::GetObjectXInfo()->GetColorValue(nIdx));
 
+	pShotWeakEnemy->SetPhaseNum(nPhaseNum);//フェーズ番号を設定する
 	pShotWeakEnemy->m_ShotWeakEnemyType = Type;
 	pShotWeakEnemy->SetLife(nLife);    //体力
 	pShotWeakEnemy->SetMaxLife(nLife); //最大体力
@@ -639,6 +643,7 @@ void CShotWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 	int nType = 0;                                     //種類
 	int nShotWeakEnemyType = 0;                        //ショットに弱い敵タイプ   
 	int nLife = 0;                                     //体力
+	int nPhaseNum = 0;                                 //フェーズ番号
 	D3DXVECTOR3 Move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);  //移動量
 	D3DXVECTOR3 Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);   //位置
 	D3DXVECTOR3 Scale = D3DXVECTOR3(0.0f, 0.0f, 0.0f); //拡大率
@@ -694,6 +699,11 @@ void CShotWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 			LoadingFile >> Scale.x;      //拡大率X
 			LoadingFile >> Scale.y;      //拡大率Y
 			LoadingFile >> Scale.z;      //拡大率Z
+		}
+		else if (Buff == "PHASENUM")
+		{
+			LoadingFile >> Buff;//イコール
+			LoadingFile >> nPhaseNum;//フェーズ番号
 		}
 		else if (Buff == "SETMOVEAI")
 		{
@@ -754,7 +764,7 @@ void CShotWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 	//listSaveManager.push_back(CShotWeakEnemy::Create(ShotWeakEnemyType, nLife, Pos, Rot, Scale));//vectorに情報を保存する
 
 	//DiveWeakEnemyType = static_cast<DIVEWEAKENEMYTYPE>(nDiveWeakEnemyType);
-	CShotWeakEnemy* pShotWeakEnemy = CShotWeakEnemy::Create(ShotWeakEnemyType, nLife, Pos, Rot, Scale);
+	CShotWeakEnemy* pShotWeakEnemy = CShotWeakEnemy::Create(ShotWeakEnemyType, nLife,nPhaseNum,Pos, Rot, Scale);
 	//for (auto Ai : VecMoveAi)
 	//{
 	//	Ai->SetMtxParent(&pShotWeakEnemy->GetMatrixWorld());//親マトリックスをAIモデルに設定
@@ -806,7 +816,7 @@ CObject* CShotWeakEnemy::ManagerChengeObject(bool bAim)
 	SetDeath();
 	//======================================================================================
 
-	return CShotWeakEnemy::Create(NewType,GetLife(), GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
+	return CShotWeakEnemy::Create(NewType, GetLife(), GetPhaseNum(), GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
 }
 //============================================================================================================================================
 
@@ -815,7 +825,7 @@ CObject* CShotWeakEnemy::ManagerChengeObject(bool bAim)
 //====================================================================================
 CObject* CShotWeakEnemy::ManagerSaveObject()
 {
-	CShotWeakEnemy * pShotWeakEnemy = CShotWeakEnemy::Create(m_ShotWeakEnemyType, GetLife(), GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
+	CShotWeakEnemy * pShotWeakEnemy = CShotWeakEnemy::Create(m_ShotWeakEnemyType, GetLife(),GetPhaseNum(),GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
 	pShotWeakEnemy->SetVecMoveAiInfo(GetVecAiModelInfo());
 	return pShotWeakEnemy;
 }
@@ -916,7 +926,7 @@ void CDiveWeakEnemy::SetDeath()
 //====================================================================================
 //生成処理
 //====================================================================================
-CDiveWeakEnemy* CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE Type, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 Scale)
+CDiveWeakEnemy* CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE Type, int nLife, int nPhaseNum, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 Scale)
 {
 	CDiveWeakEnemy* pDiveWeakEnemy = DBG_NEW CDiveWeakEnemy;
 
@@ -928,6 +938,7 @@ CDiveWeakEnemy* CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE Type, int nLife, D3DXVE
 		CManager::GetObjectXInfo()->GetTexture(nIdx),
 		CManager::GetObjectXInfo()->GetColorValue(nIdx));
 
+	pDiveWeakEnemy->SetPhaseNum(nPhaseNum);//フェーズ番号を設定する
 	pDiveWeakEnemy->m_DiveWeakEnemyType = Type;
 	pDiveWeakEnemy->SetLife(nLife);    //体力
 	pDiveWeakEnemy->SetMaxLife(nLife); //最大体力
@@ -975,6 +986,7 @@ void CDiveWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 	int nType = 0;                                     //種類
 	int nDiveWeakEnemyType = 0;                        //ダイブに弱い敵タイプ   
 	int nLife = 0;                                     //体力
+	int nPhaseNum = 0;                                 //フェーズ番号
  	D3DXVECTOR3 Move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);  //移動量
 	D3DXVECTOR3 Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);   //位置
 	D3DXVECTOR3 Scale = D3DXVECTOR3(0.0f, 0.0f, 0.0f); //拡大率
@@ -1030,6 +1042,11 @@ void CDiveWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 			LoadingFile >> Scale.y;      //拡大率Y
 			LoadingFile >> Scale.z;      //拡大率Z
 		}
+		else if (Buff == "PHASENUM")
+		{
+			LoadingFile >> Buff;      //イコール
+			LoadingFile >> nPhaseNum; //フェーズ番号
+		}
 		else if (Buff == "SETMOVEAI")
 		{
 			while (1)
@@ -1084,12 +1101,12 @@ void CDiveWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 			}
 		}
 	}
+
 	DiveWeakEnemyType = static_cast<DIVEWEAKENEMYTYPE>(nDiveWeakEnemyType);
 	EnemyType = static_cast<ENEMYTYPE>(nType);
-	CDiveWeakEnemy* pDiveWeakEnemy = CDiveWeakEnemy::Create(DiveWeakEnemyType, nLife, Pos, Rot, Scale);
+	CDiveWeakEnemy* pDiveWeakEnemy = CDiveWeakEnemy::Create(DiveWeakEnemyType, nLife, nPhaseNum, Pos, Rot, Scale);
 	pDiveWeakEnemy->SetVecMoveAiInfo(VecMoveAi);
-	listSaveManager.push_back(pDiveWeakEnemy);//vectorに情報を保存する
-
+	listSaveManager.push_back(pDiveWeakEnemy);      //vectorに情報を保存する
 }
 //============================================================================================================================================
 
@@ -1134,7 +1151,7 @@ CObject* CDiveWeakEnemy::ManagerChengeObject(bool bAim)
 	SetDeath();
 	//======================================================================================
 
-	return CDiveWeakEnemy::Create(NewType, GetLife(), GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
+	return CDiveWeakEnemy::Create(NewType, GetLife(),GetPhaseNum(),GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
 }
 //============================================================================================================================================
 
@@ -1143,7 +1160,7 @@ CObject* CDiveWeakEnemy::ManagerChengeObject(bool bAim)
 //====================================================================================
 CObject* CDiveWeakEnemy::ManagerSaveObject()
 {
-	CDiveWeakEnemy * pDiveWeakEnemy = CDiveWeakEnemy::Create(m_DiveWeakEnemyType, GetLife(), GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
+	CDiveWeakEnemy * pDiveWeakEnemy = CDiveWeakEnemy::Create(m_DiveWeakEnemyType, GetLife(),GetPhaseNum(),GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
 	pDiveWeakEnemy->SetVecMoveAiInfo(GetVecAiModelInfo());
 	return pDiveWeakEnemy;//生成したオブジェクトを返す
 }

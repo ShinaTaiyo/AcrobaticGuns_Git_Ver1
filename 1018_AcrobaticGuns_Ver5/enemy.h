@@ -23,6 +23,13 @@
 class CEnemy : public CObjectXAlive
 {
 public:
+	struct MoveAiInfo
+	{
+		D3DXVECTOR3 Pos;
+		D3DXVECTOR3 Rot;
+		D3DXVECTOR3 Scale;
+	};
+
 	enum class ENEMYTYPE
 	{
 		SHOTWEAK = 0,
@@ -48,8 +55,9 @@ public:
 	//CObject* ManagerChengeObject(bool bAim) override; //ステージマネージャーに変更したオブジェクトを渡す
 	CObject* ManagerSaveObject() override;             //ステージマネージャーに今のオブジェクトを保存する
 	void ManagerChooseControlInfo() override;          //ステージマネージャーから操作する
-	
-	//=================================================================================================================
+	void SetPhaseNum(int nNum) { m_nPhaseNum = nNum; } //フェーズ番号を設定する
+	const int& GetPhaseNum() const { return m_nPhaseNum; }//フェーズ番号を取得する   
+ 	//=================================================================================================================
 
 	//==========================================================
 	//移動AI
@@ -60,11 +68,30 @@ public:
 
 	static int GetNumEnemy() { return m_nNumEnemy; }
 protected:
-	//================================================
-    //静的メンバ
-    //================================================
-	//static const string m_aENEMY_FILENAME[static_cast<int>(ENEMYTYPE::MAX)];//敵のモデルファイル名
-    //===============================================================================================
+	//struct  MoveAiInfo
+	//{
+	//	D3DXVECTOR3 Pos;
+	//	D3DXVECTOR3 Rot;
+	//	D3DXVECTOR3 Scale;
+	//};
+
+	//struct PhaseSaveInfo
+	//{
+	//	D3DXVECTOR3 Pos;     //位置
+	//	D3DXVECTOR3 Rot;     //向き
+	//	D3DXVECTOR3 Scale;   //拡大率
+	//	int nLife;           //体力
+	//	ENEMYTYPE EnemyType; //敵タイプ
+	//	int nTypeNum;        //クラスごとのタイプ
+	//	int nPhaseNum;       //フェーズ番号を設定
+
+	//	vector<MoveAiInfo> VecMoveAi;//移動AIのVector
+	//};
+	////================================================
+ //   //静的メンバ
+ //   //================================================
+	//static list<PhaseSaveInfo>
+ //   //===============================================================================================
 
 	//================================================
 	//プロトタイプ宣言
@@ -91,6 +118,7 @@ private:
 	vector<CAIModel*> m_VecMoveAi;//移動AIモデル
 	D3DXVECTOR3 m_MoveAiSavePos;//移動AIの保存する位置
 	int m_nIdxMoveAi;           //移動AIの移動位置の配列を指定する
+	int m_nPhaseNum;            //フェーズ番号
 	//===============================================================================================
 
 	//================================================
@@ -121,7 +149,7 @@ public:
 	void Update() override;             //更新処理
 	void Draw() override;               //描画処理
 	void SetDeath() override;           //死亡フラグを設定
-	static CShotWeakEnemy* Create(SHOTWEAKENEMYTYPE Type, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 Scale);
+	static CShotWeakEnemy* Create(SHOTWEAKENEMYTYPE Type, int nLife,int nPhaseNum,D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 Scale);
 
 	//==========================================================
     //エディタ関係
@@ -172,7 +200,7 @@ public:
 	void Update() override;             //更新処理
 	void Draw() override;               //描画処理
 	void SetDeath() override;           //死亡フラグを設定
-	static CDiveWeakEnemy* Create(DIVEWEAKENEMYTYPE Type, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 Scale);
+	static CDiveWeakEnemy* Create(DIVEWEAKENEMYTYPE Type, int nLife,int nPhaseNum,D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 Scale);
 
 	//==========================================================
     //エディタ関係
