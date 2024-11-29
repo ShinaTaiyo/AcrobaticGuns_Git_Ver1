@@ -222,6 +222,30 @@ void CObject2D::Update()
 		pVtx[3].pos.y = m_pos.y + cosf(m_rot.z + m_fAngle) * m_fLength;
 		pVtx[3].pos.z = 0.0f;
 		break;
+	case POLYGONTYPE::DOWNSENTERROLLING:
+		//頂点座標の設定
+		m_fLength = sqrtf(m_fWidth * m_fWidth + (m_fHeight * 2.0f) * (m_fHeight * 2.0f)) / 2;
+
+		//対角線の角度を算出する
+		m_fAngle = atan2f(m_fWidth,m_fHeight * 2.0f);
+
+		//頂点座標の設定
+		pVtx[0].pos.x = m_pos.x + sinf(m_rot.z - (D3DX_PI - m_fAngle)) * m_fLength;
+		pVtx[0].pos.y = m_pos.y + cosf(m_rot.z - (D3DX_PI - m_fAngle)) * m_fLength;
+		pVtx[0].pos.z = 0.0f;
+
+		pVtx[1].pos.x = m_pos.x + sinf(m_rot.z + (D3DX_PI - m_fAngle)) * m_fLength;
+		pVtx[1].pos.y = m_pos.y + cosf(m_rot.z + (D3DX_PI - m_fAngle)) * m_fLength;
+		pVtx[1].pos.z = 0.0f;
+
+		pVtx[2].pos.x = m_pos.x + sinf(m_rot.z - (D3DX_PI * 0.5f)) * m_fWidth / 2;
+		pVtx[2].pos.y = m_pos.y + cosf(m_rot.z - (D3DX_PI * 0.5f)) * m_fWidth / 2;
+		pVtx[2].pos.z = 0.0f;
+
+		pVtx[3].pos.x = m_pos.x + sinf(m_rot.z + (D3DX_PI * 0.5f)) * m_fWidth / 2;
+		pVtx[3].pos.y = m_pos.y + cosf(m_rot.z + (D3DX_PI * 0.5f)) * m_fWidth / 2;
+		pVtx[3].pos.z = 0.0f;
+		break;
 	case POLYGONTYPE::DOWN://中心点が下
 		pVtx[0].pos.x = m_pos.x - m_fWidth;
 		pVtx[0].pos.y = m_pos.y - m_fHeight;

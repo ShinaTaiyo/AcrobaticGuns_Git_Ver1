@@ -32,7 +32,7 @@ m_bUseAddScaling(false),m_bUseShadow(false),m_nChengeColorTime(0),m_nIndexObject
 m_nTypeNum(0), m_bUseMultiScale(false), m_MultiScale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_bUseCulling(false), m_Pos(D3DXVECTOR3(0.0f,0.0f,0.0f)), m_SupportPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),
 m_PosOld(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Rot(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Scale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_FormarScale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Size(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_VtxMin(D3DXVECTOR3(0.0f,0.0f,0.0f)),
 m_OriginVtxMin(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_VtxMax(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_OriginVtxMax(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_mtxWorld(),m_AddRot(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_SenterPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),
-m_AddScale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_fAxis(0.0f),m_VecAxis(D3DXVECTOR3(0.0f,1.0f,0.0f))
+m_AddScale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_fAxis(0.0f),m_VecAxis(D3DXVECTOR3(0.0f,1.0f,0.0f)),m_pMtxParent(nullptr)
 {
 	SetObjectType(CObject::OBJECTTYPE::OBJECTTYPE_X);
 }
@@ -209,6 +209,12 @@ void CObjectX::Draw()
 	//ˆÊ’u‚ð”½‰f
 	D3DXMatrixTranslation(&mtxTrans, m_Pos.x, m_Pos.y, m_Pos.z);
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
+
+	if (m_pMtxParent != nullptr)
+	{
+		D3DXMatrixTranslation(&mtxTrans,m_pMtxParent->_41,m_pMtxParent->_42,m_pMtxParent->_43);
+		D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
+	}
 
 	if (m_ObjectXInfo.Diffuse[0].a > 0.0f && m_Pos.y + m_VtxMax.y >= 0.0f && m_bUseShadow == true)
 	{

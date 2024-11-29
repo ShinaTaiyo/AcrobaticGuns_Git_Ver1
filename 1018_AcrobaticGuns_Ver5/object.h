@@ -38,6 +38,7 @@ public:
 		BULLET,          //弾
 		ATTACK,          //攻撃
 		MESHORBIT,       //軌跡メッシュ
+		AIMODEL,         //AIモデル
 		EFFECT,          //エフェクト
 		PARTICLE,        //パーティクル
 		UI3D,            //UI3D

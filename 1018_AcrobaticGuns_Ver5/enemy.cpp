@@ -13,7 +13,10 @@
 #include "objectXInfo.h"
 #include "game.h"
 #include "calculation.h"
+#include "debugproc.h"
 #include "collision.h"
+#include "particle.h"
+#include "input.h"
 //============================================================================================================================================
 
 //====================================================================================
@@ -27,8 +30,8 @@
 //====================================================================================
 //コンストラクタ
 //====================================================================================
-CEnemy::CEnemy(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri,bUseintPri,type,ObjType),
-m_Type(ENEMYTYPE::SHOTWEAK)
+CEnemy::CEnemy(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri, bUseintPri, type, ObjType),
+m_Type(ENEMYTYPE::SHOTWEAK), m_VecMoveAi(), m_MoveAiSavePos(D3DXVECTOR3(0.0f, 0.0f, 0.0f))
 {
 
 }
@@ -91,6 +94,14 @@ void CEnemy::Update()
 void CEnemy::Draw()
 {
 	CObjectXAlive::Draw();
+
+	//if (CScene::GetMode() == CScene::MODE_EDIT)
+	//{
+		for (auto pObj : m_VecMoveAi)
+		{
+			pObj->ExtraDraw();
+		}
+	//}
 }
 //============================================================================================================================================
 
@@ -100,6 +111,15 @@ void CEnemy::Draw()
 void CEnemy::SetDeath()
 {
 	CObjectXAlive::SetDeath();
+
+	for (auto pObj : m_VecMoveAi)
+	{
+		pObj->SetUseDeath(true);
+		pObj->SetDeath();
+	}
+
+	m_VecMoveAi.clear();         //メモリを初期化
+	m_VecMoveAi.shrink_to_fit(); //確保メモリを開放
 }
 //============================================================================================================================================
 
@@ -152,6 +172,31 @@ void CEnemy::SaveInfoTxt(fstream& WritingFile)
 		assert(false);
 		break;
 	}
+
+	//移動AIの位置を保存
+	WritingFile << "SETMOVEAI" << endl;
+
+	int nCnt = 0;
+	for (auto it = m_VecMoveAi.begin(); it != m_VecMoveAi.end(); ++it)
+	{
+		WritingFile << "SETNUM = " << nCnt << endl;
+
+		WritingFile << "POS = " << fixed << setprecision(3) << (*it)->GetPos().x << " " <<
+			fixed << setprecision(3) << (*it)->GetPos().y << " " <<
+			fixed << setprecision(3) << (*it)->GetPos().z << " " << endl;//位置
+		WritingFile << "ROT = " << fixed << setprecision(3) << (*it)->GetRot().x << " " <<
+			fixed << setprecision(3) << (*it)->GetRot().y << " " <<
+			fixed << setprecision(3) << (*it)->GetRot().z << " " << endl;//向き
+		WritingFile << "SCALE = " << fixed << setprecision(3) << (*it)->GetScale().x << " " <<
+			fixed << setprecision(3) << (*it)->GetScale().y << " " <<
+			fixed << setprecision(3) << (*it)->GetScale().z << " " << endl;//拡大率
+
+		WritingFile << "END_SETNUM" << endl;
+
+		nCnt++;//カウントアップ
+	}
+
+	WritingFile << "END_SETMOVEAI" << endl;
 
 	CObjectXAlive::SaveInfoTxt(WritingFile);
 }
@@ -279,6 +324,27 @@ CObject* CEnemy::ManagerSaveObject()
 //============================================================================================================================================
 
 //====================================================================================
+//ステージマネージャーから操作する
+//====================================================================================
+void CEnemy::ManagerChooseControlInfo()
+{
+
+	SetMoveAiPoint();//移動AIの設定を行う
+
+	CObjectXAlive::ManagerChooseControlInfo();
+}
+//============================================================================================================================================
+
+//====================================================================================
+//移動AIの情報を設定する
+//====================================================================================
+void CEnemy::SetVecMoveAiInfo(vector<CAIModel*>& vec)
+{
+	m_VecMoveAi = vec;
+}
+//============================================================================================================================================
+
+//====================================================================================
 //当たり判定の処理を行う
 //====================================================================================
 void CEnemy::CollisionProcess()
@@ -339,6 +405,55 @@ void CEnemy::CollisionProcess()
 	SetExtrusionCollisionSquareY(bCollisionY);
 	SetExtrusionCollisionSquareZ(bCollisionZ);
 
+}
+//============================================================================================================================================
+
+//====================================================================================
+//移動AIの配置をする
+//====================================================================================
+void CEnemy::SetMoveAiPoint()
+{
+	float fX = 0;
+	float fZ = 0;
+	bool bMove = false;
+	auto Input = CManager::GetInputKeyboard();
+	if (Input->GetPress(DIK_I))
+	{
+		fZ = 1;
+		bMove = true;
+	}
+	else if (Input->GetPress(DIK_K))
+	{
+		fZ = -1;
+		bMove = true;
+	}
+	if (Input->GetPress(DIK_L))
+	{
+		fX = 1;
+		bMove = true;
+	}
+	else if (Input->GetPress(DIK_J))
+	{
+		fX = -1;
+		bMove = true;
+	}
+
+	CManager::GetDebugProc()->PrintDebugProc("移動AIの設置位置の移動：IKLJ\n");
+
+	if (bMove == true)
+	{
+		float fRot = atan2f(fX, fZ);
+		m_MoveAiSavePos += D3DXVECTOR3(sinf(fRot) * 5.0f, 0.0f, cosf(fRot) * 5.0f);
+	}
+
+	CManager::GetDebugProc()->PrintDebugProc("移動AIを保存：O\n");
+
+	CParticle::SummonParticle(CParticle::TYPE::TYPE00_NORMAL, 1, 45, 30.0f, 30.0f, 100, 10, false, m_MoveAiSavePos + GetPos(), D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f), true);
+
+	if (Input->GetTrigger(DIK_O))
+	{
+		m_VecMoveAi.push_back(CAIModel::Create(CAIModel::AIMODELTYPE::MOVEPOINT, m_MoveAiSavePos, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(3.0f, 3.0f, 3.0f), &GetMatrixWorld()));
+	}
 }
 //============================================================================================================================================
 
@@ -499,6 +614,13 @@ void CShotWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 	D3DXVECTOR3 Rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);   //向き
 	SHOTWEAKENEMYTYPE ShotWeakEnemyType = {};          //背景モデルの種類
 	ENEMYTYPE EnemyType = {};
+
+	vector<CAIModel*> VecMoveAi = {};
+	int nCntMoveAi = 0;
+	D3DXVECTOR3 MoveAiPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	D3DXVECTOR3 MoveAiRot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	D3DXVECTOR3 MoveAiScale = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
 	while (Buff != "END_SETSHOTWEAKENEMY")
 	{
 		LoadingFile >> Buff;//単語を読み込む
@@ -542,10 +664,67 @@ void CShotWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 			LoadingFile >> Scale.y;      //拡大率Y
 			LoadingFile >> Scale.z;      //拡大率Z
 		}
+		else if (Buff == "SETMOVEAI")
+		{
+			while (1)
+			{
+				LoadingFile >> Buff;
+				if (Buff == "SETNUM")
+				{
+					LoadingFile >> Buff;//イコール
+					LoadingFile >> nCntMoveAi;//番号
+					while (1)
+					{
+						LoadingFile >> Buff;
+
+						if (Buff == "POS")
+						{
+							LoadingFile >> Buff;//イコール
+							LoadingFile >> MoveAiPos.x;      //位置X
+							LoadingFile >> MoveAiPos.y;      //位置Y
+							LoadingFile >> MoveAiPos.z;      //位置Z
+						}
+						else if (Buff == "ROT")
+						{
+							LoadingFile >> Buff;//イコール
+							LoadingFile >> MoveAiRot.x;      //位置X
+							LoadingFile >> MoveAiRot.y;      //位置Y
+							LoadingFile >> MoveAiRot.z;      //位置Z
+						}
+						else if (Buff == "SCALE")
+						{
+							LoadingFile >> Buff;//イコール
+							LoadingFile >> MoveAiScale.x;      //拡大率X
+							LoadingFile >> MoveAiScale.y;      //拡大率Y
+							LoadingFile >> MoveAiScale.z;      //拡大率Z
+						}
+						else if (Buff == "END_SETNUM")
+						{
+							VecMoveAi.push_back(CAIModel::Create(CAIModel::AIMODELTYPE::MOVEPOINT, MoveAiPos, MoveAiRot, MoveAiScale, nullptr));
+							break;
+						}
+					}
+				}
+				else if (Buff == "END_SETMOVEAI")
+				{
+					break;
+				}
+			}
+		}
 	}
 	ShotWeakEnemyType = static_cast<SHOTWEAKENEMYTYPE>(nShotWeakEnemyType);
 	EnemyType = static_cast<ENEMYTYPE>(nLife);
-	listSaveManager.push_back(CShotWeakEnemy::Create(ShotWeakEnemyType, nLife, Pos, Rot, Scale));//vectorに情報を保存する
+	//listSaveManager.push_back(CShotWeakEnemy::Create(ShotWeakEnemyType, nLife, Pos, Rot, Scale));//vectorに情報を保存する
+
+	//DiveWeakEnemyType = static_cast<DIVEWEAKENEMYTYPE>(nDiveWeakEnemyType);
+	EnemyType = static_cast<ENEMYTYPE>(nLife);
+	CShotWeakEnemy* pShotWeakEnemy = CShotWeakEnemy::Create(ShotWeakEnemyType, nLife, Pos, Rot, Scale);
+	for (auto Ai : VecMoveAi)
+	{
+		Ai->SetMtxParent(&pShotWeakEnemy->GetMatrixWorld());//親マトリックスをAIモデルに設定
+	}
+	pShotWeakEnemy->SetVecMoveAiInfo(VecMoveAi);
+	listSaveManager.push_back(pShotWeakEnemy);//vectorに情報を保存する
 
 }
 //============================================================================================================================================
@@ -600,7 +779,9 @@ CObject* CShotWeakEnemy::ManagerChengeObject(bool bAim)
 //====================================================================================
 CObject* CShotWeakEnemy::ManagerSaveObject()
 {
-	return CShotWeakEnemy::Create(m_ShotWeakEnemyType, GetLife(), GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
+	CShotWeakEnemy * pShotWeakEnemy = CShotWeakEnemy::Create(m_ShotWeakEnemyType, GetLife(), GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
+	pShotWeakEnemy->SetVecMoveAiInfo(GetVecAiModelInfo());
+	return pShotWeakEnemy;
 }
 //============================================================================================================================================
 
@@ -758,12 +939,18 @@ void CDiveWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 	int nType = 0;                                     //種類
 	int nDiveWeakEnemyType = 0;                        //ダイブに弱い敵タイプ   
 	int nLife = 0;                                     //体力
-	D3DXVECTOR3 Move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);  //移動量
+ 	D3DXVECTOR3 Move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);  //移動量
 	D3DXVECTOR3 Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);   //位置
 	D3DXVECTOR3 Scale = D3DXVECTOR3(0.0f, 0.0f, 0.0f); //拡大率
 	D3DXVECTOR3 Rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);   //向き
     DIVEWEAKENEMYTYPE DiveWeakEnemyType = {};          //背景モデルの種類
 	ENEMYTYPE EnemyType = {};
+
+	vector<CAIModel*> VecMoveAi = {};
+	int nCntMoveAi = 0;
+	D3DXVECTOR3 MoveAiPos = D3DXVECTOR3(0.0f,0.0f,0.0f);
+	D3DXVECTOR3 MoveAiRot = D3DXVECTOR3(0.0f,0.0f,0.0f);
+	D3DXVECTOR3 MoveAiScale = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	while (Buff != "END_SETDIVEWEAKENEMY")
 	{
 		LoadingFile >> Buff;//単語を読み込む
@@ -807,10 +994,63 @@ void CDiveWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 			LoadingFile >> Scale.y;      //拡大率Y
 			LoadingFile >> Scale.z;      //拡大率Z
 		}
+		else if (Buff == "SETMOVEAI")
+		{
+			while (1)
+			{
+				LoadingFile >> Buff;
+				if (Buff == "SETNUM")
+				{
+					LoadingFile >> Buff;//イコール
+					LoadingFile >> nCntMoveAi;//番号
+					while (1)
+					{
+						LoadingFile >> Buff;
+
+						if (Buff == "POS")
+						{
+							LoadingFile >> Buff;//イコール
+							LoadingFile >> MoveAiPos.x;      //位置X
+							LoadingFile >> MoveAiPos.y;      //位置Y
+							LoadingFile >> MoveAiPos.z;      //位置Z
+						}
+						else if (Buff == "ROT")
+						{
+							LoadingFile >> Buff;//イコール
+							LoadingFile >> MoveAiRot.x;      //位置X
+							LoadingFile >> MoveAiRot.y;      //位置Y
+							LoadingFile >> MoveAiRot.z;      //位置Z
+						}
+						else if (Buff == "SCALE")
+						{
+							LoadingFile >> Buff;//イコール
+							LoadingFile >> MoveAiScale.x;      //拡大率X
+							LoadingFile >> MoveAiScale.y;      //拡大率Y
+							LoadingFile >> MoveAiScale.z;      //拡大率Z
+						}
+						else if (Buff == "END_SETNUM")
+						{
+							VecMoveAi.push_back(CAIModel::Create(CAIModel::AIMODELTYPE::MOVEPOINT, MoveAiPos, MoveAiRot, MoveAiScale, nullptr));
+							break;
+						}
+					}
+				}
+				else if (Buff == "END_SETMOVEAI")
+				{
+					break;
+				}
+			}
+		}
 	}
 	DiveWeakEnemyType = static_cast<DIVEWEAKENEMYTYPE>(nDiveWeakEnemyType);
 	EnemyType = static_cast<ENEMYTYPE>(nLife);
-	listSaveManager.push_back(CDiveWeakEnemy::Create(DiveWeakEnemyType,nLife, Pos, Rot, Scale));//vectorに情報を保存する
+	CDiveWeakEnemy* pDiveWeakEnemy = CDiveWeakEnemy::Create(DiveWeakEnemyType, nLife, Pos, Rot, Scale);
+	for (auto Ai : VecMoveAi)
+	{
+		Ai->SetMtxParent(&pDiveWeakEnemy->GetMatrixWorld());//親マトリックスをAIモデルに設定
+	}
+	pDiveWeakEnemy->SetVecMoveAiInfo(VecMoveAi);
+	listSaveManager.push_back(pDiveWeakEnemy);//vectorに情報を保存する
 
 }
 //============================================================================================================================================
@@ -865,6 +1105,8 @@ CObject* CDiveWeakEnemy::ManagerChengeObject(bool bAim)
 //====================================================================================
 CObject* CDiveWeakEnemy::ManagerSaveObject()
 {
-	return CDiveWeakEnemy::Create(m_DiveWeakEnemyType, GetLife(), GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
+	CDiveWeakEnemy * pDiveWeakEnemy = CDiveWeakEnemy::Create(m_DiveWeakEnemyType, GetLife(), GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
+	pDiveWeakEnemy->SetVecMoveAiInfo(GetVecAiModelInfo());
+	return pDiveWeakEnemy;//生成したオブジェクトを返す
 }
 //============================================================================================================================================

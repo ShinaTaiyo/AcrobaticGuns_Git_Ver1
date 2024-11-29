@@ -70,6 +70,7 @@ HRESULT CPlayer::Init()
 
     m_pLockOn = CLockon::Create(D3DXVECTOR3(SCREEN_WIDTH / 2,SCREEN_HEIGHT / 2,0.0f), CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, D3DXCOLOR(1.0f,1.0f,1.0f,1.0f));
     m_pLockOn->SetUseDeath(true);
+    m_pLockOn->SetPolygonRotSpeed(0.01f);
 
     m_pMeshOrbit = CMeshOrbit::Create(CMeshOrbit::MESHORBITTYPE::AUTSTRALIAUBAIMAN);
     m_pMeshOrbit->SetUseDeath(true);

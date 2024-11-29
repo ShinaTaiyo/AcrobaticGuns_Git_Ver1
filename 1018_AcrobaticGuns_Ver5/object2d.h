@@ -35,6 +35,7 @@ public:
 	{
 	    NORMAL = 0,   //普通に出すポリゴン
 	    SENTERROLLING,//中心点を軸に回転できるポリゴン
+		DOWNSENTERROLLING,//中心点が下の回転できるポリゴン
 	    DOWN,         //中心点が下側
 	    LEFT,         //中心点が左側
 	    RIGHT,        //中心点が右側
