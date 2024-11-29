@@ -10,6 +10,8 @@
 //===============================================================
 #include "phasemanager.h"
 #include "aimodel.h"
+#include "manager.h"
+#include "fade.h"
 //======================================================================================================================
 
 //===============================================================
@@ -17,6 +19,8 @@
 //===============================================================
 list<CPhaseManager::PhaseSaveInfo> CPhaseManager::s_PhaseList = {};
 int CPhaseManager::s_nNowPhase = 0;
+int CPhaseManager::s_MaxPhase = 0;
+bool CPhaseManager::s_bStartFade = false;
 //======================================================================================================================
 
 //===============================================================
@@ -24,7 +28,9 @@ int CPhaseManager::s_nNowPhase = 0;
 //===============================================================
 CPhaseManager::CPhaseManager(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) :CObject(nPri, bUseintPri, type, ObjType)
 {
-
+	s_nNowPhase = 0;
+	s_MaxPhase = 0;
+	s_bStartFade = false;
 }
 //======================================================================================================================
 
@@ -61,6 +67,7 @@ void CPhaseManager::Uninit()
 //===============================================================
 void CPhaseManager::Update()
 {
+	AdvancePhase();
 	CObject::Update();
 }
 //======================================================================================================================
@@ -99,6 +106,12 @@ void CPhaseManager::PushPhaseInfo(D3DXVECTOR3 Pos, D3DXVECTOR3 Rot, D3DXVECTOR3 
 	Info.nPhaseNum = nPhaseNum;
 	Info.VecMoveAi = VecMoveAi;
 
+	//フェーズ最大数を超えていたら更新
+	if (nPhaseNum > s_MaxPhase)
+	{
+		s_MaxPhase = nPhaseNum;
+	}
+
 	s_PhaseList.push_back(Info);
 }
 //======================================================================================================================
@@ -108,8 +121,9 @@ void CPhaseManager::PushPhaseInfo(D3DXVECTOR3 Pos, D3DXVECTOR3 Rot, D3DXVECTOR3 
 //===============================================================
 void CPhaseManager::AdvancePhase()
 {
-	if (CEnemy::GetNumEnemy() <= 0)
+	if (CEnemy::GetNumEnemy() <= 0 && s_nNowPhase <= s_MaxPhase)
 	{
+
 		CEnemy::ENEMYTYPE EnemyType = {};
 		CEnemy* pEnemy = nullptr;
 		vector<CAIModel*> VecMoveAi = {};//移動AIのvector
@@ -122,9 +136,10 @@ void CPhaseManager::AdvancePhase()
 				//移動AIが設定されていたら
 				if (it.VecMoveAi.size() > 0)
 				{
-					for (auto it2 : it.VecMoveAi)
+					for (const auto it2 : it.VecMoveAi)
 					{
 						VecMoveAi.push_back(CAIModel::Create(CAIModel::AIMODELTYPE::MOVEPOINT, it2.Pos, it2.Rot, it2.Scale, nullptr));
+						
 					}
 				}
 
@@ -146,8 +161,14 @@ void CPhaseManager::AdvancePhase()
 			}
 
 		}
-
+		
 		s_nNowPhase++;
+	}
+
+	if (CEnemy::GetNumEnemy() <= 0 && s_nNowPhase == s_MaxPhase + 1 && s_bStartFade == false)
+	{
+		s_bStartFade = true;
+		CManager::GetSceneFade()->SetSceneFade(CFade::FADEMODE_IN, CScene::MODE_RESULT);
 	}
 }
 //======================================================================================================================

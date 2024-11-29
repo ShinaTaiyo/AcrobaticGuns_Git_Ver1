@@ -16,6 +16,7 @@
 #include "debugproc.h"
 #include "collision.h"
 #include "particle.h"
+#include "phasemanager.h"
 #include "input.h"
 //============================================================================================================================================
 
@@ -333,6 +334,8 @@ void CEnemy::ManagerChooseControlInfo()
 {
 	SetMoveAiPoint();//移動AIの設定を行う
 
+	PhaseNumDecision();//フェーズ番号の決定を行う
+
 	CObjectXAlive::ManagerChooseControlInfo();
 }
 //============================================================================================================================================
@@ -464,30 +467,54 @@ void CEnemy::SetMoveAiPoint()
 //====================================================================================
 void CEnemy::AIMoveProcess()
 {
-	auto it = m_VecMoveAi.begin();//最初のポインタを取得
+	//auto it = m_VecMoveAi.begin();//最初のポインタを取得
 
-	advance(it, m_nIdxMoveAi);//指定している番号まで進める
+	//advance(it, m_nIdxMoveAi);//指定している番号まで進める
 
-	float fLength = CCalculation::CalculationLength(GetPos(), (*it)->GetPos());//距離を測る
-	float fRot = atan2f((*it)->GetPos().x - GetPos().x, (*it)->GetPos().z - GetPos().z);
-	SetMove(D3DXVECTOR3(sinf(fRot) * 5.0f, GetMove().y, cosf(fRot) * 5.0f));
+	//float fLength = CCalculation::CalculationLength(GetPos(), (*it)->GetPos());//距離を測る
+	//float fRot = atan2f((*it)->GetPos().x - GetPos().x, (*it)->GetPos().z - GetPos().z);
+	//SetMove(D3DXVECTOR3(sinf(fRot) * 5.0f, GetMove().y, cosf(fRot) * 5.0f));
 
-	if (fLength < 20.0f)
+	//if (fLength < 20.0f)
+	//{
+	//	m_nIdxMoveAi++;//目的地を次の位置に変更
+	//}
+
+	//int nSize = m_VecMoveAi.size();
+	//if (m_nIdxMoveAi >= nSize)
+	//{
+	//	m_nIdxMoveAi = 0;
+	//}
+	//if (m_nIdxMoveAi < 0)
+	//{
+	//	m_nIdxMoveAi = nSize - 1;
+	//}
+
+
+}
+//============================================================================================================================================
+
+
+//====================================================================================
+//フェーズ番号を決定する
+//====================================================================================
+void CEnemy::PhaseNumDecision()
+{
+	if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == false)
 	{
-		m_nIdxMoveAi++;//目的地を次の位置に変更
+		if (CManager::GetInputKeyboard()->GetTrigger(DIK_4))
+		{
+			m_nPhaseNum++;
+		}
 	}
-
-	int nSize = m_VecMoveAi.size();
-	if (m_nIdxMoveAi >= nSize)
+	else
 	{
-		m_nIdxMoveAi = 0;
+		if (CManager::GetInputKeyboard()->GetTrigger(DIK_4))
+		{
+			m_nPhaseNum--;
+		}
 	}
-	if (m_nIdxMoveAi < 0)
-	{
-		m_nIdxMoveAi = nSize - 1;
-	}
-
-
+	CManager::GetDebugProc()->PrintDebugProc("フェーズ番号の変更：%d\n", m_nPhaseNum);
 }
 //============================================================================================================================================
 
@@ -652,6 +679,8 @@ void CShotWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 	ENEMYTYPE EnemyType = {};
 
 	vector<CAIModel*> VecMoveAi = {};
+	vector<MoveAiInfo> VecMoveAiInfo = {};
+
 	int nCntMoveAi = 0;
 	D3DXVECTOR3 MoveAiPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	D3DXVECTOR3 MoveAiRot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -741,13 +770,21 @@ void CShotWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 						}
 						else if (Buff == "END_SETNUM")
 						{
-							CAIModel* pAiModel = CAIModel::Create(CAIModel::AIMODELTYPE::MOVEPOINT, MoveAiPos, MoveAiRot, MoveAiScale, nullptr);
-							if (CScene::GetMode() == CScene::MODE_GAME)
-							{
+							//if (CScene::GetMode() == CScene::MODE_EDIT)
+							//{
+								CAIModel* pAiModel = CAIModel::Create(CAIModel::AIMODELTYPE::MOVEPOINT, MoveAiPos, MoveAiRot, MoveAiScale, nullptr);
 								pAiModel->SetUseDraw(false);
 								pAiModel->SetUseShadow(false);
-							}
-							VecMoveAi.push_back(pAiModel);
+								VecMoveAi.push_back(pAiModel);
+							//}
+							//else if (CScene::GetMode() == CScene::MODE_GAME)
+							//{
+							//	MoveAiInfo Info = {};
+							//	Info.Pos = MoveAiPos;
+							//	Info.Rot = MoveAiRot;
+							//	Info.Scale = MoveAiScale;
+							//	VecMoveAiInfo.push_back(Info);
+							//}
 							break;
 						}
 					}
@@ -761,16 +798,16 @@ void CShotWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 	}
 	ShotWeakEnemyType = static_cast<SHOTWEAKENEMYTYPE>(nShotWeakEnemyType);
 	EnemyType = static_cast<ENEMYTYPE>(nType);
-	//listSaveManager.push_back(CShotWeakEnemy::Create(ShotWeakEnemyType, nLife, Pos, Rot, Scale));//vectorに情報を保存する
-
-	//DiveWeakEnemyType = static_cast<DIVEWEAKENEMYTYPE>(nDiveWeakEnemyType);
-	CShotWeakEnemy* pShotWeakEnemy = CShotWeakEnemy::Create(ShotWeakEnemyType, nLife,nPhaseNum,Pos, Rot, Scale);
-	//for (auto Ai : VecMoveAi)
+	//if (CScene::GetMode() == CScene::MODE_EDIT)
 	//{
-	//	Ai->SetMtxParent(&pShotWeakEnemy->GetMatrixWorld());//親マトリックスをAIモデルに設定
+		CShotWeakEnemy* pShotWeakEnemy = CShotWeakEnemy::Create(ShotWeakEnemyType,nLife,nPhaseNum,Pos,Rot,Scale);
+		pShotWeakEnemy->SetVecMoveAiInfo(VecMoveAi);
+		listSaveManager.push_back(pShotWeakEnemy);      //vectorに情報を保存する
 	//}
-	pShotWeakEnemy->SetVecMoveAiInfo(VecMoveAi);
-	listSaveManager.push_back(pShotWeakEnemy);//vectorに情報を保存する
+	//else if (CScene::GetMode() == CScene::MODE_GAME)
+	//{
+	//	CGame::GetPhaseManager()->PushPhaseInfo(Pos, Rot, Scale, nLife, static_cast<int>(EnemyType), nType, nPhaseNum, VecMoveAiInfo);
+	//}
 
 }
 //============================================================================================================================================
@@ -995,6 +1032,8 @@ void CDiveWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 	ENEMYTYPE EnemyType = {};
 
 	vector<CAIModel*> VecMoveAi = {};
+	vector<MoveAiInfo> VecMoveAiInfo = {};
+
 	int nCntMoveAi = 0;
 	D3DXVECTOR3 MoveAiPos = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	D3DXVECTOR3 MoveAiRot = D3DXVECTOR3(0.0f,0.0f,0.0f);
@@ -1083,13 +1122,21 @@ void CDiveWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 						}
 						else if (Buff == "END_SETNUM")
 						{
-							CAIModel* pAiModel = CAIModel::Create(CAIModel::AIMODELTYPE::MOVEPOINT, MoveAiPos, MoveAiRot, MoveAiScale, nullptr);
-							if (CScene::GetMode() == CScene::MODE_GAME)
-							{
+							//if (CScene::GetMode() == CScene::MODE_EDIT)
+							//{
+								CAIModel* pAiModel = CAIModel::Create(CAIModel::AIMODELTYPE::MOVEPOINT, MoveAiPos, MoveAiRot, MoveAiScale, nullptr);
 								pAiModel->SetUseDraw(false);
 								pAiModel->SetUseShadow(false);
-							}
-							VecMoveAi.push_back(pAiModel);
+								VecMoveAi.push_back(pAiModel);
+							//}
+							//else if (CScene::GetMode() == CScene::MODE_GAME)
+							//{
+							//	MoveAiInfo Info = {};
+							//	Info.Pos = MoveAiPos;
+							//	Info.Rot = MoveAiRot;
+							//	Info.Scale = MoveAiScale;
+							//	VecMoveAiInfo.push_back(Info);
+							//}
 							break;
 						}
 					}
@@ -1104,9 +1151,16 @@ void CDiveWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 
 	DiveWeakEnemyType = static_cast<DIVEWEAKENEMYTYPE>(nDiveWeakEnemyType);
 	EnemyType = static_cast<ENEMYTYPE>(nType);
-	CDiveWeakEnemy* pDiveWeakEnemy = CDiveWeakEnemy::Create(DiveWeakEnemyType, nLife, nPhaseNum, Pos, Rot, Scale);
-	pDiveWeakEnemy->SetVecMoveAiInfo(VecMoveAi);
-	listSaveManager.push_back(pDiveWeakEnemy);      //vectorに情報を保存する
+	//if (CScene::GetMode() == CScene::MODE_EDIT)
+	//{
+		CDiveWeakEnemy* pDiveWeakEnemy = CDiveWeakEnemy::Create(DiveWeakEnemyType, nLife, nPhaseNum, Pos, Rot, Scale);
+		pDiveWeakEnemy->SetVecMoveAiInfo(VecMoveAi);
+		listSaveManager.push_back(pDiveWeakEnemy);      //vectorに情報を保存する
+	//}
+	//else if (CScene::GetMode() == CScene::MODE_GAME)
+	//{
+	//	CGame::GetPhaseManager()->PushPhaseInfo(Pos, Rot, Scale, nLife, static_cast<int>(EnemyType), nType, nPhaseNum, VecMoveAiInfo);
+	//}
 }
 //============================================================================================================================================
 

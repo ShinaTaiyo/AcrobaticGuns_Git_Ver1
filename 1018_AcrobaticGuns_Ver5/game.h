@@ -16,6 +16,7 @@
 #include "stagemanager.h"
 #include "player.h"
 #include "main.h"
+#include "phasemanager.h"
 //===============================================================================
 
 //========================================
@@ -30,8 +31,12 @@ public:
 	void Uninit() override;                                                //終了処理
 	void Update() override;                                                //更新処理
 	static CPlayer* GetPlayer() { return m_pPlayer; }                      //プレイヤーを取得する
+	static CPhaseManager* GetPhaseManager() { return m_pPhaseManager; }    //フェーズマネージャーを取得する
 private:
 	static CPlayer* m_pPlayer;                                             //プレイヤー
 	static CStageManager* m_pStageManager;                                 //ステージマネージャー
+	static CPhaseManager* m_pPhaseManager;                                 //フェーズマネージャー
+	static int s_nPhaseNum;                                                //フェーズ番号
+	bool bStartFade;
 };
 #endif

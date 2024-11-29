@@ -127,6 +127,7 @@ private:
 	void CollisionProcess();//当たり判定を行う
 	void SetMoveAiPoint();  //移動AIの配置をする
 	void AIMoveProcess();//AI移動処理
+	void PhaseNumDecision();//フェーズ番号を設定する
 	//===============================================================================================
 };
 

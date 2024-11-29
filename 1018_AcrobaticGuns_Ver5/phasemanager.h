@@ -50,7 +50,9 @@ private:
 		vector<CEnemy::MoveAiInfo> VecMoveAi;//移動AIのVector
 	};
 	static list<PhaseSaveInfo>s_PhaseList;  //フェーズ情報のリスト
+	static int s_MaxPhase;                  //フェーズの最大数
 	static int s_nNowPhase;                 //現在のフェーズ番号
+	static bool s_bStartFade;               //フェードを開始する
 	void AdvancePhase();//次のフェーズに移行する処理
 };
 #endif

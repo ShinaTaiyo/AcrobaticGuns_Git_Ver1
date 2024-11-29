@@ -210,11 +210,11 @@ void CObjectX::Draw()
 	D3DXMatrixTranslation(&mtxTrans, m_Pos.x, m_Pos.y, m_Pos.z);
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
 
-	if (m_pMtxParent != nullptr)
-	{
-		D3DXMatrixTranslation(&mtxTrans,m_pMtxParent->_41,m_pMtxParent->_42,m_pMtxParent->_43);
-		D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
-	}
+	//if (m_pMtxParent != nullptr)
+	//{
+	//	D3DXMatrixTranslation(&mtxTrans,m_pMtxParent->_41,m_pMtxParent->_42,m_pMtxParent->_43);
+	//	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
+	//}
 
 	if (m_ObjectXInfo.Diffuse[0].a > 0.0f && m_Pos.y + m_VtxMax.y >= 0.0f && m_bUseShadow == true)
 	{
