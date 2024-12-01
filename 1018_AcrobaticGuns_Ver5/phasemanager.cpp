@@ -138,7 +138,10 @@ void CPhaseManager::AdvancePhase()
 				{
 					for (const auto it2 : it.VecMoveAi)
 					{
-						VecMoveAi.push_back(CAIModel::Create(CAIModel::AIMODELTYPE::MOVEPOINT, it2.Pos, it2.Rot, it2.Scale, nullptr));
+						CAIModel* pAiModel = CAIModel::Create(CAIModel::AIMODELTYPE::MOVEPOINT, it2.Pos, it2.Rot, it2.Scale, nullptr);
+						pAiModel->SetUseDraw(false);
+						pAiModel->SetUseShadow(false);
+						VecMoveAi.push_back(pAiModel);
 						
 					}
 				}
@@ -156,8 +159,9 @@ void CPhaseManager::AdvancePhase()
 					break;
 				}
 
+				auto CopyVec = move(VecMoveAi);
 				//ˆÚ“®AI‚ðÝ’è‚·‚é
-				pEnemy->SetVecMoveAiInfo(VecMoveAi);
+				pEnemy->SetVecMoveAiInfo(CopyVec);
 			}
 
 		}
