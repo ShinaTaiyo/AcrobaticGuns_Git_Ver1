@@ -401,7 +401,7 @@ void CMeshCylinder::CheckMeshInfo()
 	CManager::GetDebugProc()->PrintDebugProc("確認している頂点番号：%d、頂点の位置：%f %f %f\n",
 		m_nCheckVtx, pVtx[m_nCheckVtx].pos.x, pVtx[m_nCheckVtx].pos.y, pVtx[m_nCheckVtx].pos.z);
 
-	CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 60, 40.0f, 40.0f, 100, 10, true, pVtx[m_nCheckVtx].pos, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), true);
+	//CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 60, 40.0f, 40.0f, 100, 10, true, pVtx[m_nCheckVtx].pos, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), true);
 
 	//==============================
 	//インデックス情報の設定
@@ -435,7 +435,7 @@ void CMeshCylinder::CheckMeshInfo()
 
 	CManager::GetDebugProc()->PrintDebugProc("確認しているインデックス番号：%d、頂点の位置：%f %f %f\n", m_nCheckIdx, pVtx[nCheck].pos.x, pVtx[nCheck].pos.y, pVtx[nCheck].pos.z);
 
-	CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 60, 40.0f, 40.0f, 100, 10, false, pVtx[nCheck].pos, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
+	//CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 60, 40.0f, 40.0f, 100, 10, false, pVtx[nCheck].pos, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
 
 	m_pIdxBuff->Unlock();
 

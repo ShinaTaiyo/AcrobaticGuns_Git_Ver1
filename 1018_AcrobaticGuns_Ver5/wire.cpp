@@ -13,6 +13,7 @@
 #include "renderer.h"
 #include "player.h"
 #include "manager.h"
+#include "particle.h"
 #include "debugproc.h"
 #include "calculation.h"
 //===================================================================================================================
@@ -89,6 +90,84 @@ void CWire::Uninit()
 //===============================================================
 void CWire::Update()
 {
+	//CMeshCylinder::Update();
+	//const D3DXVECTOR3& Pos = GetPos();
+	////const D3DXVECTOR3* pSenterPos = GetSenterPos();
+	//const int& nNumDivisionXZ = GetNumDivisionXZ();//XZ分割数
+	//const int& nNumDivisionY = GetNumDivisionY();  //Y分割数
+	//const int& nNumVtx = GetNumVtx();              //頂点数
+	//const int& nNumIdx = GetNumIdx();              //インデックス数
+	//const float& fRadius = GetRadius();            //半径
+	//const float& fHeight = GetHeight();            //高さ
+
+	//float fLength = CCalculation::CalculationLength(m_pPlayer->GetSenterPos(), m_pWireHead->GetSenterPos());
+	//SetHeight(fLength);
+	////CManager::GetDebugProc()->PrintDebugProc("距離：%f\n", fLength);
+
+	//VERTEX_3D* pVtx;
+	//LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBufferPointer();
+
+	////頂点バッファをロックし、頂点情報へのポインタを取得
+	//pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	//if (m_bUseUpdate == true)
+	//{
+	//	int nCntArray = nNumVtx - 1;
+	//	float fRatioXZ = 0.0f;
+	//	float fRatioY = 0.0f;
+	//	D3DXVECTOR3 LastSenterPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	//	D3DXVECTOR3 MeasureNor = D3DXVECTOR3(0.0f, 0.0f, 0.0f);//法線計算用
+	//	//D3DXVECTOR3 Rot = m_pWireHead->GetRot();
+	//	//D3DXVec3Normalize(&Rot, &Rot);
+	//	for (int nCntVtxY = 0; nCntVtxY < nNumDivisionY; nCntVtxY++)
+	//	{//Y方向のUVはそのまま使う
+	//		fRatioY = (1.0f / (nNumDivisionY - 1)) * nCntVtxY;
+	//		for (int nCntVtxXZ = 0; nCntVtxXZ < nNumDivisionXZ + 1; nCntVtxXZ++)
+	//		{//X方向のUVは重なる頂点があるので、+ 1
+	//			fRatioXZ = (1.0f / (nNumDivisionXZ)) * nCntVtxXZ;
+	//			if (nCntVtxY == 0 && nCntVtxXZ == 0)
+	//			{//最初の周なので上面の中心点を設定する
+	//				pVtx[nCntArray].pos = GetSenterPos(nNumDivisionY - 2);//Y方向分割数3つの場合、底面 = 1
+	//				nCntArray--;
+	//			}
+
+	//			if (nCntVtxY == nNumDivisionY - 1)
+	//			{//最後の周で基準点を決める（9,8,7,6,5,4,3,2,1)
+	//				pVtx[nCntArray].pos = m_VecMtxCircle[nCntVtxXZ].Pos;
+	//				//CManager::GetDebugProc()->PrintDebugProc("頂点%d：%f %f %f\n",nCntVtxXZ,pVtx[nCntArray].pos.x, pVtx[nCntArray].pos.y, pVtx[nCntArray].pos.z);
+	//				/* D3DXVECTOR3(sinf((D3DX_PI * 2) * fRatioXZ) * fRadius,fHeight, cosf((D3DX_PI * 2) * fRatioXZ) * fRadius);*/
+	//			}
+	//			else
+	//			{//基準点に対して軌跡風に頂点を代入していく(18 = 27)
+	//				pVtx[nCntArray].pos = pVtx[nCntArray - (nNumDivisionXZ + 1)].pos;
+	//			}
+
+	//			if (nCntVtxXZ == 0 && nCntVtxY != nNumDivisionY - 1)
+	//			{//最後の一周以外なら各層の中心点を更新
+	//				SetSenterPos(nNumDivisionY - nCntVtxY - 1, GetSenterPos(nNumDivisionY - nCntVtxY - 2));
+	//			}
+
+	//			//配列カウント
+	//			nCntArray--;
+
+	//			if (nCntArray < 0 || nCntArray >= nNumVtx)
+	//			{//配列外アクセスチェック
+	//				assert(false);
+	//			}
+
+	//			if (nCntVtxY == nNumDivisionY - 1 && nCntVtxXZ == nNumDivisionXZ)
+	//			{//最後
+	//				pVtx[nCntArray].pos = m_pWireHead->GetPos();//底面の中心に位置を設定
+	//				CManager::GetDebugProc()->PrintDebugProc("中心頂点：%f %f %f\n", pVtx[nCntArray].pos.x, pVtx[nCntArray].pos.y, pVtx[nCntArray].pos.z);
+	//				SetSenterPos(0,m_pWireHead->GetPos());
+	//			}
+	//		}
+	//	}
+	//}
+
+	////頂点バッファをアンロックする 
+	//pVtxBuff->Unlock();
+
 	CMeshCylinder::Update();
 	const D3DXVECTOR3& Pos = GetPos();
 	//const D3DXVECTOR3* pSenterPos = GetSenterPos();
@@ -99,19 +178,23 @@ void CWire::Update()
 	const float& fRadius = GetRadius();            //半径
 	const float& fHeight = GetHeight();            //高さ
 
-	float fLength = CCalculation::CalculationLength(m_pPlayer->GetSenterPos(), m_pWireHead->GetSenterPos());
+	float fLength = CCalculation::CalculationLength(m_pPlayer->GetPos(), m_pWireHead->GetPos());
 	SetHeight(fLength);
 	//CManager::GetDebugProc()->PrintDebugProc("距離：%f\n", fLength);
 
+	D3DXVECTOR3 RotMove = m_pWireHead->GetPos() - m_pPlayer->GetPos();
+	D3DXVec3Normalize(&RotMove, &RotMove);
 	VERTEX_3D* pVtx;
 	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBufferPointer();
+
+	//CParticle::SummonParticle(CParticle::TYPE::TYPE00_NORMAL,1,30,30.0f,30.0f,100,10,false,m_pPlayer->GetPos(),D3DXCOLOR(1.0f,1.0f,0.0f,1.0f),true);
 
 	//頂点バッファをロックし、頂点情報へのポインタを取得
 	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 	if (m_bUseUpdate == true)
 	{
-		int nCntArray = nNumVtx - 1;
+		int nCntArray = 0;
 		float fRatioXZ = 0.0f;
 		float fRatioY = 0.0f;
 		D3DXVECTOR3 LastSenterPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -126,28 +209,29 @@ void CWire::Update()
 				fRatioXZ = (1.0f / (nNumDivisionXZ)) * nCntVtxXZ;
 				if (nCntVtxY == 0 && nCntVtxXZ == 0)
 				{//最初の周なので上面の中心点を設定する
-					pVtx[nCntArray].pos = GetSenterPos(nNumDivisionY - 2);//Y方向分割数3つの場合、底面 = 1
-					nCntArray--;
+					pVtx[nCntArray].pos = m_pWireHead->GetPos();//Y方向分割数3つの場合、底面 = 1
+					nCntArray++;
 				}
 
-				if (nCntVtxY == nNumDivisionY - 1)
-				{//最後の周で基準点を決める（9,8,7,6,5,4,3,2,1)
+				if (nCntVtxY == 0)
+				{//最初の周で基準点を決める（9,8,7,6,5,4,3,2,1)
 					pVtx[nCntArray].pos = m_VecMtxCircle[nCntVtxXZ].Pos;
 					//CManager::GetDebugProc()->PrintDebugProc("頂点%d：%f %f %f\n",nCntVtxXZ,pVtx[nCntArray].pos.x, pVtx[nCntArray].pos.y, pVtx[nCntArray].pos.z);
 					/* D3DXVECTOR3(sinf((D3DX_PI * 2) * fRatioXZ) * fRadius,fHeight, cosf((D3DX_PI * 2) * fRatioXZ) * fRadius);*/
 				}
 				else
 				{//基準点に対して軌跡風に頂点を代入していく(18 = 27)
-					pVtx[nCntArray].pos = pVtx[nCntArray - (nNumDivisionXZ + 1)].pos;
+					D3DXVECTOR3 AdjustPos = RotMove * fLength * fRatioY;
+					pVtx[nCntArray].pos = pVtx[1 + nCntVtxXZ].pos - AdjustPos;
 				}
 
-				if (nCntVtxXZ == 0 && nCntVtxY != nNumDivisionY - 1)
-				{//最後の一周以外なら各層の中心点を更新
-					SetSenterPos(nNumDivisionY - nCntVtxY - 1, GetSenterPos(nNumDivisionY - nCntVtxY - 2));
-				}
+				//if (nCntVtxXZ == 0 && nCntVtxY != nNumDivisionY - 1)
+				//{//最後の一周以外なら各層の中心点を更新
+				//	SetSenterPos(nNumDivisionY - nCntVtxY - 1, GetSenterPos(nNumDivisionY - nCntVtxY - 2));
+				//}
 
 				//配列カウント
-				nCntArray--;
+				nCntArray++;
 
 				if (nCntArray < 0 || nCntArray >= nNumVtx)
 				{//配列外アクセスチェック
@@ -156,9 +240,9 @@ void CWire::Update()
 
 				if (nCntVtxY == nNumDivisionY - 1 && nCntVtxXZ == nNumDivisionXZ)
 				{//最後
-					pVtx[nCntArray].pos = m_pWireHead->GetPos();//底面の中心に位置を設定
-					CManager::GetDebugProc()->PrintDebugProc("中心頂点：%f %f %f\n", pVtx[nCntArray].pos.x, pVtx[nCntArray].pos.y, pVtx[nCntArray].pos.z);
-					SetSenterPos(0,m_pWireHead->GetPos());
+					pVtx[nCntArray].pos = m_pPlayer->GetPos();//底面の中心に位置を設定
+					//CManager::GetDebugProc()->PrintDebugProc("中心頂点：%f %f %f\n", pVtx[nCntArray].pos.x, pVtx[nCntArray].pos.y, pVtx[nCntArray].pos.z);
+					//SetSenterPos(0,m_pWireHead->GetPos());
 				}
 			}
 		}
@@ -166,6 +250,7 @@ void CWire::Update()
 
 	//頂点バッファをアンロックする 
 	pVtxBuff->Unlock();
+
 }
 //===================================================================================================================
 
