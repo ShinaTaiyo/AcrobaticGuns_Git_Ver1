@@ -102,6 +102,16 @@ public:
 	//仰角を求める
 	static float CalcElevationAngle(const D3DXVECTOR3& MyPos, const D3DXVECTOR3& AimPos);
 
+	//二つのベクトルのなす角を求める
+	static float GetAngleBetweenVectors(const D3DXVECTOR3& v1, const D3DXVECTOR3& v2);
+
+	//プレイヤーから見て線形範囲にオブジェクトが入っているかどうかを判定
+	static bool IsObjectInFieldOfView(const D3DXVECTOR3& PlayerPos, const D3DXVECTOR3& PlayerViewDir,
+		const D3DXVECTOR3& ObjectPos, float fovAngle, float maxDistance);
+
+	//ラジアンを方向ベクトルに変える
+	static D3DXVECTOR3 RadToVec(const D3DXVECTOR3& Rot);//ラジアンを方向ベクトルに変える
+
 	//================================================
 	//YawとPitchを求め、目的の位置への角度を求める
 	//================================================

@@ -18,7 +18,10 @@
 #include "bg3d.h"
 #include "enemy.h"
 #include "input.h"
+#include "attack.h"
 #include "debugproc.h"
+#include "calculation.h"
+#include "particle.h"
 #include "wire.h"
 //=========================================================================================================================
 
@@ -34,7 +37,7 @@ int CGame::s_nPhaseNum = 0;
 //=============================================================
 //コンストラクタ
 //=============================================================
-CGame::CGame()
+CGame::CGame() : m_pBgModel(nullptr)
 {
 	m_pPlayer = nullptr;
 	m_pStageManager = nullptr;
@@ -70,6 +73,8 @@ HRESULT CGame::Init()
 	m_pPhaseManager = CPhaseManager::Create();//フェーズマネージャーを生成
 
 	m_pStageManager = CStageManager::Create();//ステージマネージャーを生成
+
+	m_pBgModel = CBgModel::Create(CBgModel::BGMODELTYPE::TREE_00, D3DXVECTOR3(200.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(2.0f, 2.0f, 2.0f));
 
 	CField::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(0.0f,0.0f,0.0f), 2000.0f, 2000.0f,CField::FIELDTYPE00_NORMAL);
 	return S_OK;
@@ -114,6 +119,13 @@ void CGame::Uninit()
 	}
 	//=====================================================================
 
+	if (m_pBgModel != nullptr)
+	{
+		m_pBgModel->SetUseDeath(true);
+		m_pBgModel->SetDeath();
+		m_pBgModel = nullptr;
+	}
+
 	CManager::GetSound()->StopSound();
 
 	CScene::Uninit();//シーン終了処理
@@ -125,6 +137,19 @@ void CGame::Uninit()
 //=============================================================
 void CGame::Update()
 {
+	//D3DXVECTOR3 Vec1 = D3DXVECTOR3(sinf(m_pPlayer->GetRot().y + D3DX_PI * 0.7f) * 10.0f, 0.0f, cosf(m_pPlayer->GetRot().y + D3DX_PI * 0.7f) * 10.0f);
+	//D3DXVECTOR3 Vec2 = D3DXVECTOR3(sinf(m_pPlayer->GetRot().y - D3DX_PI * 0.7f) * 10.0f, 0.0f, cosf(m_pPlayer->GetRot().y - D3DX_PI * 0.7f) * 10.0f);
+	////D3DXVECTOR3 Vec1Move = CCalculation::Calculation3DVec(m_pPlayer->GetPos(), Vec1, 10.0f);
+	////CAttackPlayer::Create(CAttack::ATTACKTYPE::BULLET, 10, 1, 100, m_pPlayer->GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+	////	Vec1 * 10.0f, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+	////CAttackPlayer::Create(CAttack::ATTACKTYPE::BULLET, 10, 1, 100, m_pPlayer->GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+	////	Vec2 * 10.0f, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+
+	//CManager::GetDebugProc()->PrintDebugProc("プレイヤーの向き：%f %f %f\n", m_pPlayer->GetRot().x, m_pPlayer->GetRot().y, m_pPlayer->GetRot().z);
+
+	//float fRot = 0.0f;
+	//fRot = CCalculation::GetAngleBetweenVectors(Vec1, Vec2);
+	//CManager::GetDebugProc()->PrintDebugProc("二つのベクトルがなす角：%f\n", fRot);
 #ifdef _DEBUG
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_RETURN) == true || CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::START) == true)
 	{

@@ -14,6 +14,7 @@
 //========================================
 #include "scene.h"
 #include "stagemanager.h"
+#include "bgModel.h"
 #include "player.h"
 #include "main.h"
 #include "phasemanager.h"
@@ -36,6 +37,7 @@ private:
 	static CPlayer* m_pPlayer;                                             //プレイヤー
 	static CStageManager* m_pStageManager;                                 //ステージマネージャー
 	static CPhaseManager* m_pPhaseManager;                                 //フェーズマネージャー
+	CBgModel* m_pBgModel;                                                  //背景モデル
 	static int s_nPhaseNum;                                                //フェーズ番号
 	bool bStartFade;
 };

@@ -70,6 +70,8 @@ public:
 	void SetAddLength(float fAddLength) { m_fAddLength = fAddLength; }
 	float& GetAddLength() { return m_fAddLength; }
 
+	void SetCustomMode(bool bActive) { m_bCustom = bActive; }
+
 	//======================================
 	//マトリックス系
 	//======================================
@@ -99,6 +101,8 @@ private:
 	int m_nShakeFrame;                            //カメラを揺らすフレーム数!
 	int m_ModeTime;                               //カメラモードの時間!
 	float m_fShakePower;                          //カメラを揺らす力!
+
+	bool m_bCustom;                               //カメラの挙動をカスタムにするかどうか
 
 	void BossDefeatCameraProcess();               //ボスを倒したときのカメラの処理を行う
 	void TurningCameraProcess();                  //旋回のカメラの処理を行う

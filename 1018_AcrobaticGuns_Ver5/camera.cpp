@@ -16,7 +16,9 @@
 #include "object.h"
 #include "particle.h"
 #include "game.h"
+#include "debugproc.h"
 #include "edit.h"
+#include "calculation.h"
 //====================================================================================================
 
 //====================================================================
@@ -31,6 +33,7 @@ const float CCamera::m_BESIDECAMERALENGTH = 570.0f;//ƒrƒTƒCƒhƒrƒ…[‚ÌƒJƒƒ‰‚Ì‹——
 CCamera::CCamera() : m_SupportPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_fLength(0.0f), m_fTurningRotSpeed(0.0f),m_fTurningSpeedY(0.0f),m_PosV(D3DXVECTOR3(0.0f,0.0f,0.0f)),
 m_PosR(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_VecU(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Rot(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_mtxProjection(),m_mtxView(),m_CameraType(CAMERATYPE_BIRD),m_DifferenceLength(D3DXVECTOR3(0.0f,0.0f,0.0f)),
 m_ZoomSpeed(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_nShakeFrame(0),m_ModeTime(0),m_fShakePower(0.0f),m_fAddLength(0.0f),m_AddPosR(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_AddPosV(D3DXVECTOR3(0.0f,0.0f,0.0f))
+,m_bCustom(false)
 {
 
 }
@@ -53,7 +56,7 @@ HRESULT CCamera::Init()
 	m_PosV = D3DXVECTOR3(0.0f, 200.0f,-400.0f);     //Žx“_
 	m_PosR = D3DXVECTOR3(0.0f,0.0f,0.0f);                          //’Ž‹“_
 	m_VecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);         //ã•ûŒüƒxƒNƒgƒ‹i–@üj
-	m_Rot = D3DXVECTOR3(0.0f,0.0f,0.0f);                           //Œü‚«
+	m_Rot = D3DXVECTOR3(-D3DX_PI * 0.5f,0.0f,0.0f);                           //Œü‚«
 	m_mtxProjection = {};                           //ƒvƒƒWƒFƒNƒVƒ‡ƒ“ƒ}ƒgƒŠƒbƒNƒX
 	m_mtxView = {};                                 //ƒrƒ…[ƒ}ƒgƒŠƒbƒNƒX
 	m_CameraType = CAMERATYPE_BIRD;                 //ƒJƒƒ‰ƒ‚[ƒh‚ÌŽí—Þ
@@ -246,11 +249,14 @@ void CCamera::NormalCameraMove()
 			case CScene::MODE_GAME:
 				if (CGame::GetPlayer() != nullptr)
 				{
-
-					m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f) + m_AddPosR;
-					m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -200.0f, 0.0f, cosf(m_Rot.y) * -200.0f) + m_AddPosV;
-					//m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -250.0f, 0.0f, cosf(m_Rot.y) * -250.0f); + m_AddPosV;
-
+					if (m_bCustom == false)
+					{
+						D3DXVECTOR3 RotVec = CCalculation::RadToVec(m_Rot);
+						CManager::GetDebugProc()->PrintDebugProc("ƒJƒƒ‰‚ÌŒü‚«F%f %f %f\n", m_Rot.x, m_Rot.y, m_Rot.z);
+						m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f) + m_AddPosR;
+						m_PosV = m_PosR + RotVec * 200.0f;
+						//m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -250.0f, 0.0f, cosf(m_Rot.y) * -250.0f); + m_AddPosV;
+					}
 					//CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 30, 30.0f, 30.0f, 100, 10, false, m_PosR, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
 				}
 				break;

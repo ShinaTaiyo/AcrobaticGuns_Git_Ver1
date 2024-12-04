@@ -120,6 +120,17 @@ public:
 	void MoveProcess(CPlayer* pPlayer) override; //移動処理
 };
 
+//引っ付きクラス
+class CPlayerMove_Stuck : public CPlayerMove
+{
+public: 
+	CPlayerMove_Stuck(CPlayer * pPlayer);                         //コンストラクタ
+	~CPlayerMove_Stuck();                        //デストラクタ
+	void MoveProcess(CPlayer* pPlayer) override; //移動処理
+private:
+	D3DXVECTOR3 m_NowPos;//カメラの位置のモーションに使う
+};
+
 //移動できないクラス
 class CPlayerMove_Dont : public CPlayerMove
 {
@@ -235,6 +246,5 @@ public:
 	~CPlayerWireShot_Dont() override;//デストラクタ
 	void WireShotProcess(CPlayer* pPlayer) override;//ワイヤー発射処理
 };
-
 
 #endif

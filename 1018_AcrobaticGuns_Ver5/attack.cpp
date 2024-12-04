@@ -215,6 +215,8 @@ CAttackPlayer* CAttackPlayer::Create(ATTACKTYPE AttackType, int nPower, int nSet
 	pAttackPlayer->SetMove(move);                 //ˆÚ“®—Ê
 	pAttackPlayer->SetScale(Scale);               //Šg‘å—¦
 	pAttackPlayer->SetAutoSubLife(true);          //‘Ì—Í‚ðŽg—p‚·‚é
+	pAttackPlayer->SetUseInteria(false);
+	pAttackPlayer->SetUseGravity(false,1.0f);
 	//ƒ‚ƒfƒ‹î•ñÝ’è
 	int nIdx = CManager::GetObjectXInfo()->Regist(ATTACK_FILENAME[static_cast<int>(AttackType)]);
 

@@ -187,7 +187,7 @@ bool CCalculation::CaluclationMove(bool bUseStick, D3DXVECTOR3& Move, float fSpe
 		}
 		else
 		{
-			fRot = atan2f(fMoveX, fMoveZ) + fCameraRot + D3DX_PI;
+			fRot = atan2f(fMoveX, fMoveZ) + fCameraRot;
 		}
 		switch (MoveAim)
 		{
@@ -504,6 +504,68 @@ float CCalculation::CalcElevationAngle(const D3DXVECTOR3& MyPos, const D3DXVECTO
 	D3DXVECTOR3 Vec = CalcVec(MyPos, AimPos, false);
 	float fElevAngle = atan2f(Vec.y, sqrtf(powf(Vec.x, 2) + powf(Vec.z, 2)));
 	return fElevAngle;
+}
+//===========================================================================================================
+
+//=========================================================
+//二つのベクトルがなす角
+//=========================================================
+float CCalculation::GetAngleBetweenVectors(const D3DXVECTOR3& v1, const D3DXVECTOR3& v2)
+{
+	// ベクトルの正規化
+	D3DXVECTOR3 v1_normalized = v1;
+	D3DXVECTOR3 v2_normalized = v2;
+	D3DXVec3Normalize(&v1_normalized, &v1);
+	D3DXVec3Normalize(&v2_normalized, &v2);
+
+	// 内積を計算
+	float dotProduct = D3DXVec3Dot(&v1_normalized, &v2_normalized);
+
+	// 内積から角度を計算 (acosでラジアンに変換)(v1 *v2 = |v1| * |v2| cosθ)なので、逆三角関数を求めれば良い
+	float angle = acosf(dotProduct);
+	return angle; // 結果はラジアン
+}
+//===========================================================================================================
+
+
+//=====================================================================
+//プレイヤーから見て線形範囲にオブジェクトが入っているかどうかを判定
+//=====================================================================
+bool CCalculation::IsObjectInFieldOfView(const D3DXVECTOR3& PlayerPos, const D3DXVECTOR3& PlayerViewDir, const D3DXVECTOR3& ObjectPos, float fovAngle, float maxDistance)
+{
+
+	// プレイヤーからオブジェクトへの方向ベクトルを計算
+	D3DXVECTOR3 objectDir = ObjectPos - PlayerPos;
+
+	// プレイヤーの視線とオブジェクトの方向ベクトルとの角度を計算
+	float angle = GetAngleBetweenVectors(PlayerViewDir, objectDir);
+
+	// オブジェクトが視野角度内に入っているかどうかを判定
+	if (angle <= fovAngle) {
+		// 視野範囲内にあるか確認（距離も判定）
+		float distance = D3DXVec3Length(&objectDir);
+		if (distance <= maxDistance) {
+			return true; // 視野内かつ距離範囲内
+		}
+	}
+
+	return false; // 視野角度外または距離が遠すぎる
+}
+//===========================================================================================================
+
+//=====================================================================
+//ラジアンを方向ベクトルに変換する
+//=====================================================================
+D3DXVECTOR3 CCalculation::RadToVec(const D3DXVECTOR3& Rot)
+{
+	D3DXVECTOR3 RotToVec = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+	RotToVec.x = sinf(Rot.x) * sinf(Rot.y);
+	RotToVec.y = cosf(Rot.x);
+	RotToVec.z = sinf(Rot.x) * cosf(Rot.y);
+
+	D3DXVec3Normalize(&RotToVec, &RotToVec);
+	return RotToVec;
 }
 //===========================================================================================================
 
