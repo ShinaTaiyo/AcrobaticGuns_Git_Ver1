@@ -187,7 +187,7 @@ bool CCalculation::CaluclationMove(bool bUseStick, D3DXVECTOR3& Move, float fSpe
 		}
 		else
 		{
-			fRot = atan2f(fMoveX, fMoveZ) + fCameraRot;
+			fRot = atan2f(fMoveX, fMoveZ) + fCameraRot + D3DX_PI;
 		}
 		switch (MoveAim)
 		{
@@ -566,6 +566,35 @@ D3DXVECTOR3 CCalculation::RadToVec(const D3DXVECTOR3& Rot)
 
 	D3DXVec3Normalize(&RotToVec, &RotToVec);
 	return RotToVec;
+}
+//===========================================================================================================
+
+//=====================================================================
+//方向ベクトルに対して点が左右どちらにいるかを判定する
+//=====================================================================
+float CCalculation::DetermineSide3D(const D3DXVECTOR3& origin, const D3DXVECTOR3& direction, const D3DXVECTOR3& up, const D3DXVECTOR3& point)
+{
+	// 相対ベクトルを計算
+	D3DXVECTOR3 Relative = { point.x - origin.x, point.y - origin.y, point.z - origin.z };
+
+	// 右方向ベクトルを計算
+	D3DXVECTOR3 Right = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	D3DXVec3Cross(&Right,&direction,&up);
+
+	// 右方向ベクトルと相対ベクトルの内積を計算
+	float fDot = D3DXVec3Dot(&Right,&Relative);
+
+	return fDot;
+	// 符号で判定
+	//if (dot > 0) {
+	//	return "右側";
+	//}
+	//else if (dot < 0) {
+	//	return "左側";
+	//}
+	//else {
+	//	return "平面上";
+	//}
 }
 //===========================================================================================================
 

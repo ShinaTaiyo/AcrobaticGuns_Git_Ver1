@@ -112,6 +112,9 @@ public:
 	//ラジアンを方向ベクトルに変える
 	static D3DXVECTOR3 RadToVec(const D3DXVECTOR3& Rot);//ラジアンを方向ベクトルに変える
 
+	//ベクトルに対して点が左右どちらにいるかを求める
+	static float DetermineSide3D(const D3DXVECTOR3& origin, const D3DXVECTOR3& direction, const D3DXVECTOR3& up, const D3DXVECTOR3& point);
+
 	//================================================
 	//YawとPitchを求め、目的の位置への角度を求める
 	//================================================
