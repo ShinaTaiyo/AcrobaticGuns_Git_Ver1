@@ -19,7 +19,7 @@
 //コンストラクタ
 //============================================================
 CObjectXAlive::CObjectXAlive(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXMove(nPri,bUseintPri,type,ObjType), m_bHitStop(false), m_nHitStopTime(0), m_bAutoSubLife(false), m_nLife(0), m_nMaxLife(0),m_bUseRatioLifeAlpha(false),
-m_bExtrusionCollisionSquareX(false),m_bExtrusionCollisionSquareY(false),m_bExtrusionCollisionSquareZ(false)
+m_bExtrusionCollisionSquareX(false),m_bExtrusionCollisionSquareY(false),m_bExtrusionCollisionSquareZ(false), m_bAutoDeath(true)
 {
 
 }
@@ -96,7 +96,7 @@ void CObjectXAlive::Update()
 	//==============================================
 	//死亡フラグ発動処理（体力がなくなったら）
 	//==============================================
-	if (m_nLife < 1)
+	if (m_nLife < 1 && m_bAutoDeath == true)
 	{
 		SetDeath();
 	}

@@ -229,7 +229,7 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
             pPlayer->SetRot(rot);                                                            //向きの設定
             pPlayer->SetScale(Scale);                                                        //拡大率の設定
             pPlayer->SetFormarScale(Scale);                                                               //元の拡大率を設定する
-
+            pPlayer->SetAutoDeath(false);
             //カメラ初期設定（プレイヤー基準なのでプレイヤーから設定）
             //CCamera* pCamera = CManager::GetCamera();
             //pCamera->SetPosR(pPlayer->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f));

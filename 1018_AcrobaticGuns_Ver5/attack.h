@@ -29,6 +29,22 @@ public:
 		MAX
 	};
 
+	enum class COLLISIONTYPE
+	{
+		NONE = 0,
+		SQUARE,
+		RECTANGLE_XZ,
+		MAX
+	};
+
+	enum class TARGETTYPE
+	{
+		NONE = 0,
+		PLAYER,
+		ENEMY,
+		MAX
+	};
+
 	struct HitStop
 	{
 		int nCntTime;
@@ -44,18 +60,41 @@ public:
 	void SetCollisionRelease(bool bUse) { m_bCollisionRelease = bUse; }
 	const HitStop & GetHitStop() const { return m_HitStop; }
 	const int& GetPower() const { return m_nPower; }
+	const bool& GetCollisionRelease() const{ return m_bCollisionRelease; }
+
+	//判定タイプを設定する
+	void SetCollisionType(COLLISIONTYPE Type) { m_CollisionType = Type; }
+	const COLLISIONTYPE GetCollisionType() const { return m_CollisionType; }
+
+	//ターゲットタイプを設定する
+	void SetTargetType(TARGETTYPE Type) { m_TargetType = Type; }
+	const TARGETTYPE GetTargetType() const { return m_TargetType; }
+
 protected:
 	void SetAttackType(ATTACKTYPE AttackType) { m_Type = AttackType;}//攻撃の種類を設定する
 	const ATTACKTYPE & GetAttackType() const { return m_Type; }      //攻撃の種類を取得する
 	static const string ATTACK_FILENAME[static_cast<int>(ATTACKTYPE::MAX)];//攻撃モデルのファイル名 
 private:
-	virtual void Collision();//当たり判定を行う処理
+
+	//================================================
+	//変数宣言
+	//================================================
 	int m_nPower;     //攻撃力
 
 	bool m_bCollisionRelease;//衝突時に消すかどうか
 
 	HitStop m_HitStop;//ヒットストップ
 	ATTACKTYPE m_Type;//タイプ
+	COLLISIONTYPE m_CollisionType;//判定タイプ
+	TARGETTYPE m_TargetType;//狙うオブジェクトの種類
+	//==========================================================================================
+
+	//================================================
+	//プロトタイプ宣言
+	//================================================
+	void Collision();//当たり判定を行う処理
+	void CollisionProcess(bool& bCollision,bool & bNowCollision,CObjectXAlive * pObjX);
+	//==========================================================================================
 };
 //==================================================================================================================================================
 
@@ -72,7 +111,7 @@ public:
 	void Update() override;           //更新処理
 	void Draw() override;             //描画処理
 	void SetDeath() override;         //死亡フラグを設定
-	static CAttackPlayer* Create(ATTACKTYPE AttackType,int nPower,int nSetHitStopTime,int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale);//生成処理
+	static CAttackPlayer* Create(ATTACKTYPE AttackType,TARGETTYPE TargetType,COLLISIONTYPE CollisionType,int nPower,int nSetHitStopTime,int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale);//生成処理
 private:
 };
 //==================================================================================================================================================
@@ -90,7 +129,7 @@ public:
 	void Update() override;           //更新処理
 	void Draw() override;             //描画処理
 	void SetDeath() override;         //死亡フラグを設定
-	static CAttackEnemy* Create(ATTACKTYPE AttackType, int nPower, int nSetHitStopTime, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale);//生成処理
+	static CAttackEnemy* Create(ATTACKTYPE AttackType, TARGETTYPE TargetType, COLLISIONTYPE CollisionType, int nPower, int nSetHitStopTime, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale);//生成処理
 private:
 
 };

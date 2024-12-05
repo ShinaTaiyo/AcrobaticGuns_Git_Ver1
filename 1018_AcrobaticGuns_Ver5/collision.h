@@ -38,6 +38,8 @@ public:
 	static bool RectAngleCollisionXY(D3DXVECTOR3 MyPos, D3DXVECTOR3 MyVtxMax, D3DXVECTOR3 MyVtxMin, D3DXVECTOR3 Rot,
 		D3DXVECTOR3 ComparisonPos, D3DXVECTOR3 ComparisonVtxMax, D3DXVECTOR3 ComparisonVtxMin);
 
+	//ŽÎ‚ß‚Ì“–‚½‚è”»’èXZ
+	static bool RectAngleCollisionXZ(CObjectX* pMyObj, CObjectX* pComObj);
 
 	//“_‚ªAABB‚Ì’†‚É“ü‚Á‚Ä‚¢‚é‚©‚Ç‚¤‚©
 	static bool IsPointInsideAABB(const D3DXVECTOR3 & Point,CObjectX * pComObjX);

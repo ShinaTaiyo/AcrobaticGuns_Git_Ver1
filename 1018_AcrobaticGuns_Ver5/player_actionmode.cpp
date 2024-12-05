@@ -389,7 +389,7 @@ void CPlayerAttack_Shot::AttackProcess(CPlayer* pPlayer)
 	CAttackPlayer* pAttackPlayer = nullptr;//プレイヤー攻撃へのポインタ
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_J) == true || CManager::GetInputJoypad()->GetRT_Repeat(6) == true)
 	{
-		pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::BULLET,5,5,60,ShotPos, pPlayer->GetRot(), Move, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+		pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::BULLET,CAttack::TARGETTYPE::ENEMY,CAttack::COLLISIONTYPE::SQUARE,5,5,60,ShotPos, pPlayer->GetRot(), Move, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 		pAttackPlayer->SetUseInteria(false);
 		pAttackPlayer->SetAutoSubLife(true);
 	}
@@ -454,7 +454,7 @@ CPlayerAttack_Dive::~CPlayerAttack_Dive()
 //=====================================================================================================
 void CPlayerAttack_Dive::AttackProcess(CPlayer* pPlayer)
 {
-	CAttackPlayer* pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::EXPLOSION,1,0,120, pPlayer->GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.1f, 0.1f, 0.1f),
+	CAttackPlayer* pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::EXPLOSION,CAttack::TARGETTYPE::ENEMY,CAttack::COLLISIONTYPE::SQUARE,1,0,120, pPlayer->GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.1f, 0.1f, 0.1f),
 		D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 
 	pAttackPlayer->SetUseAddScale(D3DXVECTOR3(0.4f, 0.4f, 0.4f), true);

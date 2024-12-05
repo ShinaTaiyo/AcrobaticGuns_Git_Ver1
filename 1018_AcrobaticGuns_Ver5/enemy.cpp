@@ -18,6 +18,7 @@
 #include "particle.h"
 #include "phasemanager.h"
 #include "input.h"
+#include "attack.h"
 //============================================================================================================================================
 
 //====================================================================================
@@ -33,7 +34,7 @@ int CEnemy::m_nNumEnemy = 0;
 //コンストラクタ
 //====================================================================================
 CEnemy::CEnemy(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri, bUseintPri, type, ObjType),
-m_Type(ENEMYTYPE::SHOTWEAK), m_VecMoveAi(), m_MoveAiSavePos(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_nIdxMoveAi(0), m_nPhaseNum(0),m_pEnemyMove(DBG_NEW CEnemyMove_AI())
+m_Type(ENEMYTYPE::SHOTWEAK), m_VecMoveAi(), m_MoveAiSavePos(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),m_nCntTime(0),m_nIdxMoveAi(0), m_nPhaseNum(0),m_pEnemyMove(DBG_NEW CEnemyMove_AI())
 {
 	m_nNumEnemy++;//敵総数カウントアップ
 }
@@ -85,6 +86,7 @@ void CEnemy::Update()
 
 	if (CScene::GetMode() == CScene::MODE_GAME)
 	{
+
 		const D3DXVECTOR3& Rot = GetRot();
 		const D3DXVECTOR3& Pos = GetPos();
 		const D3DXVECTOR3& PlayerPos = CGame::GetPlayer()->GetPos();
@@ -94,11 +96,7 @@ void CEnemy::Update()
 		float fLength = CCalculation::CalculationLength(Pos, PlayerPos);
 		m_pEnemyMove->Process(this);
 
-		//D3DXVECTOR3 Ray = PlayerPos - Pos;
-
-		//D3DXVec3Normalize(&Ray, &Ray);
-
-		//CCollision::RayIntersectsAABBCollisionPos(Pos,Ray,)
+		m_nCntTime++;//時間をカウントする
 	}
 
 	CollisionProcess();
@@ -681,6 +679,7 @@ const string CShotWeakEnemy::s_aSHOTWEAKENEMY_FILENAME[static_cast<int>(SHOTWEAK
 {
 	"data\\MODEL\\Enemy\\ShotWeak\\noobSlime.x"
 };
+const int CShotWeakEnemy::s_nATTACK_FREQUENCY = 90;//攻撃頻度
 //============================================================================================================================================
 
 //====================================================================================
@@ -729,6 +728,16 @@ void CShotWeakEnemy::Uninit()
 void CShotWeakEnemy::Update()
 {
 	CEnemy::Update();
+
+	if (CScene::GetMode() == CScene::MODE_GAME)
+	{
+		if (GetCntTime() % s_nATTACK_FREQUENCY == 0)
+		{
+			D3DXVECTOR3 Aim = CCalculation::Calculation3DVec(GetSenterPos(), CGame::GetPlayer()->GetSenterPos(), 20.0f);
+
+			CAttackEnemy::Create(CAttack::ATTACKTYPE::EXPLOSION,CAttack::TARGETTYPE::PLAYER,CAttack::COLLISIONTYPE::SQUARE, 1, 60, 200, GetSenterPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), Aim, D3DXVECTOR3(2.0f, 2.0f, 2.0f));
+		}
+	}
 }
 //============================================================================================================================================
 
@@ -769,6 +778,7 @@ CShotWeakEnemy* CShotWeakEnemy::Create(SHOTWEAKENEMYTYPE Type, int nLife, int nP
 	pShotWeakEnemy->m_ShotWeakEnemyType = Type;
 	pShotWeakEnemy->SetLife(nLife);    //体力
 	pShotWeakEnemy->SetMaxLife(nLife); //最大体力
+	pShotWeakEnemy->SetAutoSubLife(false);
 	pShotWeakEnemy->SetPos(pos);       //位置
 	pShotWeakEnemy->SetSupportPos(pos);//支点位置
 	pShotWeakEnemy->SetRot(rot);       //向き
@@ -776,7 +786,6 @@ CShotWeakEnemy* CShotWeakEnemy::Create(SHOTWEAKENEMYTYPE Type, int nLife, int nP
 	pShotWeakEnemy->SetFormarScale(Scale);//元の拡大率を設定
 
 	pShotWeakEnemy->SetSize();//モデルサイズを設定
-	pShotWeakEnemy->SetAutoSubLife(false);//自動的に体力を減らすかどうか
 	pShotWeakEnemy->SetManagerObjectType(CObject::MANAGEROBJECTTYPE::SHOTWEAKENEMY);           //マネージャーで呼び出す時の種類を設定
 	return pShotWeakEnemy;
 }
