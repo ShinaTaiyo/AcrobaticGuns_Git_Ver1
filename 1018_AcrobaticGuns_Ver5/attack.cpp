@@ -24,6 +24,7 @@ const string CAttack::ATTACK_FILENAME[static_cast<int>(CAttack::ATTACKTYPE::MAX)
 {
 	"data\\MODEL\\Attack\\Fire_000.x",
 	"data\\MODEL\\Attack\\Explosion_000.x",
+	"data\\MODEL\\Attack\\MagicSword_000.x",
 };
 //======================================================================================================================
 
@@ -357,7 +358,6 @@ CAttackEnemy* CAttackEnemy::Create(ATTACKTYPE AttackType, TARGETTYPE TargetType,
 	pAttackEnemy->SetScale(Scale);               //Šg‘å—¦
 	pAttackEnemy->SetUseInteria(false);
 	pAttackEnemy->SetUseGravity(false, 1.0f);
-
 	//ƒ‚ƒfƒ‹î•ñÝ’è
 	int nIdx = CManager::GetObjectXInfo()->Regist(ATTACK_FILENAME[static_cast<int>(AttackType)]);
 
@@ -367,6 +367,7 @@ CAttackEnemy* CAttackEnemy::Create(ATTACKTYPE AttackType, TARGETTYPE TargetType,
 		CManager::GetObjectXInfo()->GetdwNumMat(nIdx),
 		CManager::GetObjectXInfo()->GetTexture(nIdx),
 		CManager::GetObjectXInfo()->GetColorValue(nIdx));
+	pAttackEnemy->SetSize();
 	return pAttackEnemy;
 }
 //======================================================================================================================

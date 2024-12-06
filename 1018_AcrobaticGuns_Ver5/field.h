@@ -21,12 +21,13 @@
 class CField : public CObject3D
 {
 public:
-	typedef enum
+	enum class FIELDTYPE
 	{
-		FIELDTYPE00_NORMAL = 0,//普通
-		FIELDTYPE01_FLOOR,     //フロア
-		FIELDTYPE_MAX
-	}FIELDTYPE;
+		NORMAL = 0,    //普通
+		FLOOR_000,     //フロア
+		TILE_000,      //タイル
+		MAX
+	};
 
 	CField(int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::FIELD, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_3D);                                                                       //コンストラクタ
 	~CField() override;                                                             //デストラクタ
@@ -40,7 +41,7 @@ public:
 
 private:
 	FIELDTYPE m_FieldType;                                                          //フィールドの種類
-	static const char* m_apFIELD_FILENAME[FIELDTYPE_MAX];                           //フィールドのテクスチャのファイル名
+	static const char* m_apFIELD_FILENAME[static_cast<int>(FIELDTYPE::MAX)];        //フィールドのテクスチャのファイル名
 };
 //============================================================================================================
 

@@ -307,7 +307,7 @@ bool CCollision::RectAngleCollisionXZ(CObjectX* pMyObj, CObjectX* pComObj)
 	for (int nCntVtx = 0; nCntVtx < 4; nCntVtx++)
 	{
 		//”»’è‚ð‡‚í‚¹‚é‚½‚ßARot‚É-‚ð•t‚¯‚é
-		FourVtxRotPos[nCntVtx] = D3DXVECTOR2(sinf(-MyRot.y + fVaim[nCntVtx]) * fLength[nCntVtx] + MyPos.x, cosf(-MyRot.y + fVaim[nCntVtx]) * fLength[nCntVtx] + MyPos.z);
+		FourVtxRotPos[nCntVtx] = D3DXVECTOR2(sinf(MyRot.y + fVaim[nCntVtx]) * fLength[nCntVtx] + MyPos.x, cosf(MyRot.y + fVaim[nCntVtx]) * fLength[nCntVtx] + MyPos.z);
 	}
 	//=============================================================================================================================================================================
 

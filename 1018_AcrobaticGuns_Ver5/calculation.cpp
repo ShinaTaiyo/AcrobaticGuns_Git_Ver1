@@ -598,6 +598,64 @@ float CCalculation::DetermineSide3D(const D3DXVECTOR3& origin, const D3DXVECTOR3
 }
 //===========================================================================================================
 
+//=====================================================================
+//方向ベクトルに対して点が左右どちらにいるかを判定する
+//=====================================================================
+D3DXVECTOR3 CCalculation::HormingVecRotXZ(float& fRotMove, const D3DXVECTOR3& MyPos, const D3DXVECTOR3& AimPos, float CorrectionRot, float fSpeed)
+{
+	float fRotDest = 0.0f;//目的の位置への角度
+	float fRotDiff = 0.0f;//現在の角度と目的の角度の差分
+	float fVXaim = 0.0f;  //Xベクトル
+	float fVZaim = 0.0f;  //Yベクトル
+	D3DXVECTOR3 Move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);//移動量
+	//===================================
+	//XZベクトルを出す
+	//===================================
+	fVXaim = AimPos.x - MyPos.x;
+	fVZaim = AimPos.z - MyPos.z;
+
+	fRotDest = atan2f(fVXaim, fVZaim);
+
+	//==========================================================================================================================================================
+
+	//現在の移動方向の角度と、目的の移動方向の角度の差分を求める
+	fRotDiff = fRotDest - fRotMove;
+
+	//===============================
+	//角度差分の修正
+	//===============================
+	//向きの差分の調整(3.14を超えたら近い向きに補正）
+	if (fRotDiff > D3DX_PI)
+	{
+		fRotDiff -= D3DX_PI * 2;
+	}
+	else if (fRotDiff < -D3DX_PI)
+	{
+		fRotDiff += D3DX_PI * 2;
+	}
+
+	CManager::GetDebugProc()->PrintDebugProc("向きの差分：%f\n", fRotDiff);
+
+	//==============================================================================================
+	fRotMove += fRotDiff * CorrectionRot;//移動方向（角度補正）
+
+	//向きの調整（カメラを基準に値を3.14～-3.14の中に固定したいので・・・）
+	if (fRotMove >= D3DX_PI)
+	{//3.14→-3.14にする
+		fRotMove -= D3DX_PI * 2;
+	}
+	else if (fRotMove <= -D3DX_PI)
+	{//-3.14→3.14にする
+		fRotMove += D3DX_PI * 2;
+	}
+
+	Move.x = sinf(fRotMove) * fSpeed;
+	Move.z = cosf(fRotMove) * fSpeed;
+
+	return Move;
+}
+//===========================================================================================================
+
 //=========================================================
 //目的の位置への向きを求める
 //=========================================================

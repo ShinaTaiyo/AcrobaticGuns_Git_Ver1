@@ -52,9 +52,9 @@ HRESULT CEdit::Init()
 	CScene::Init();//ƒV[ƒ“‰Šú‰»ˆ—
 
 	m_pStageManager = CStageManager::Create();
-	m_pField = CField::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(0.0f,0.0f,0.0f), 2000.0f, 2000.0f, CField::FIELDTYPE00_NORMAL);
+	m_pField = CField::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(0.0f,0.0f,0.0f), 2000.0f, 2000.0f, CField::FIELDTYPE::NORMAL);
 	m_pField->SetUseDeath(false);
-	CField::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(0.0f,0.0f,0.0f), 2000.0f, 2000.0f, CField::FIELDTYPE00_NORMAL);
+	CField::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(0.0f,0.0f,0.0f), 2000.0f, 2000.0f, CField::FIELDTYPE::TILE_000);
 
 	return S_OK;
 }

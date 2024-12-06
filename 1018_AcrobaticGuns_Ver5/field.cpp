@@ -17,16 +17,17 @@
 //==========================================
 //静的メンバ宣言
 //==========================================
-const char* CField::m_apFIELD_FILENAME[CField::FIELDTYPE_MAX] =
+const char* CField::m_apFIELD_FILENAME[static_cast<int>(CField::FIELDTYPE::MAX)] =
 {
 	"data\\TEXTURE\\Field\\Field_000.jpg",
 	"data\\TEXTURE\\Field\\Field_001.png",
+	"data\\TEXTURE\\Field\\Tile_000.jpg",
 };
 
 //==========================================
 //コンストラクタ
 //==========================================
-CField::CField(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : m_FieldType(FIELDTYPE00_NORMAL),CObject3D(nPri,bUseintPri,type,ObjType)
+CField::CField(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : m_FieldType(FIELDTYPE::NORMAL),CObject3D(nPri,bUseintPri,type,ObjType)
 {
 
 }
@@ -112,7 +113,7 @@ CField* CField::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHe
 			pField->SetRot(rot);
 			pField->SetPos(pos);
 			pField->SetUseDeath(true);                                                                  //死亡フラグを発動するかどうかを設定する
-			pField->SetTextureIndex(CManager::GetTexture()->Regist(m_apFIELD_FILENAME[FieldType]));     //テクスチャインデックスを設定
+			pField->SetTextureIndex(CManager::GetTexture()->Regist(m_apFIELD_FILENAME[static_cast<int>(FieldType)]));     //テクスチャインデックスを設定
 			pField->bindTexture(CManager::GetTexture()->GetAddress(pField->GetTextureIndex()));         //テクスチャをセットする　
 			pField->CObject::SetType(CObject::TYPE::FIELD);                                              //オブジェクトの種類を決める
 			pField->CObject3D::SetWidth(fWidth);                                                        //横幅

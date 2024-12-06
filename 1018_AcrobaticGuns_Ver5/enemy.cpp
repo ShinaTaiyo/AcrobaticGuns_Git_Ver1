@@ -34,7 +34,8 @@ int CEnemy::m_nNumEnemy = 0;
 //コンストラクタ
 //====================================================================================
 CEnemy::CEnemy(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri, bUseintPri, type, ObjType),
-m_Type(ENEMYTYPE::SHOTWEAK), m_VecMoveAi(), m_MoveAiSavePos(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),m_nCntTime(0),m_nIdxMoveAi(0), m_nPhaseNum(0),m_pEnemyMove(DBG_NEW CEnemyMove_AI())
+m_Type(ENEMYTYPE::SHOTWEAK), m_VecMoveAi(), m_MoveAiSavePos(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),m_nCntTime(0),m_nIdxMoveAi(0), m_nPhaseNum(0),m_pEnemyMove(DBG_NEW CEnemyMove_AI()),
+m_fRotMove(0.0f),m_fSensingRange(0.0f),m_fNormalSpeed(0.0f)
 {
 	m_nNumEnemy++;//敵総数カウントアップ
 }
@@ -86,12 +87,11 @@ void CEnemy::Update()
 
 	if (CScene::GetMode() == CScene::MODE_GAME)
 	{
-
 		const D3DXVECTOR3& Rot = GetRot();
 		const D3DXVECTOR3& Pos = GetPos();
 		const D3DXVECTOR3& PlayerPos = CGame::GetPlayer()->GetPos();
-		float fElevaRot = atan2f(PlayerPos.y - Pos.y, sqrtf(powf(PlayerPos.x - Pos.x, 2) + powf(PlayerPos.z - Pos.z, 2)));
-		SetRot(D3DXVECTOR3(fElevaRot, atan2f(PlayerPos.x - Pos.x, PlayerPos.z - Pos.z) + D3DX_PI,0.0f));
+		//float fElevaRot = atan2f(PlayerPos.y - Pos.y, sqrtf(powf(PlayerPos.x - Pos.x, 2) + powf(PlayerPos.z - Pos.z, 2)));
+		//SetRot(D3DXVECTOR3(fElevaRot, atan2f(PlayerPos.x - Pos.x, PlayerPos.z - Pos.z) + D3DX_PI,0.0f));
 
 		float fLength = CCalculation::CalculationLength(Pos, PlayerPos);
 		m_pEnemyMove->Process(this);
@@ -497,7 +497,7 @@ void CEnemy::AIMoveProcess()
 	if (CScene::GetMode() == CScene::MODE_GAME)
 	{
 		float fLengthPlayer = CCalculation::CalculationLength(CGame::GetPlayer()->GetPos(), GetPos());
-		if (fLengthPlayer < 300.0f)
+		if (fLengthPlayer < m_fSensingRange)
 		{
 			ChengeMove(DBG_NEW CEnemyMove_Battle());
 		}
@@ -510,7 +510,7 @@ void CEnemy::AIMoveProcess()
 
 			float fLength = CCalculation::CalculationLength(GetPos(), (*it)->GetPos());//距離を測る
 			float fRot = atan2f((*it)->GetPos().x - GetPos().x, (*it)->GetPos().z - GetPos().z);
-			SetMove(D3DXVECTOR3(sinf(fRot) * 5.0f, GetMove().y, cosf(fRot) * 5.0f));
+			SetMove(D3DXVECTOR3(sinf(fRot) * m_fNormalSpeed, GetMove().y, cosf(fRot) * m_fNormalSpeed));
 
 			if (fLength < 20.0f)
 			{
@@ -544,10 +544,11 @@ void CEnemy::BattleMoveProcess()
 	D3DXVec3Normalize(&Aim, &Aim);
 	float fRot = atan2f(Aim.x,Aim.z);
 
-	SetMove(D3DXVECTOR3(sinf(fRot) * 5.0f, GetMove().y, cosf(fRot) * 5.0f));
-
+	D3DXVECTOR3 Move = CCalculation::HormingVecRotXZ(m_fRotMove, GetPos(), CGame::GetPlayer()->GetPos(), 0.1f, m_fNormalSpeed);
+	SetRot(D3DXVECTOR3(GetRot().x, m_fRotMove + D3DX_PI, GetRot().z));
+	SetMove(D3DXVECTOR3(Move.x, GetMove().y,Move.z));
 	CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 30, 20.0f, 20.0f, 100, 10, false, Pos, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
-	if (fLengthPlayer > 600.0f)
+	if (fLengthPlayer > m_fSensingRange)
 	{
 		ChengeMove(DBG_NEW CEnemyMove_AI());
 	}
@@ -629,18 +630,17 @@ void CEnemy::RayCollision()
 			D3DXVECTOR3 Aim = PlayerPos - Pos;
 			D3DXVec3Normalize(&Aim, &Aim);
 			float fRot = atan2f(Aim.x, Aim.z);
+
 			if (fDot > 0.0f)
-			{
-				SetMove(D3DXVECTOR3(sinf(fRot - D3DX_PI * 0.5f) * 5.0f, GetMove().y, cosf(fRot - D3DX_PI * 0.5f) * 5.0f));
+			{//ベクトルに対してプレイヤーが右側にいたら
+				SetMove(D3DXVECTOR3(sinf(fRot - D3DX_PI * 0.5f) * m_fNormalSpeed, GetMove().y, cosf(fRot - D3DX_PI * 0.5f) * m_fNormalSpeed));
 			}
 			else if (fDot < 0.0f)
-			{
-				SetMove(D3DXVECTOR3(sinf(fRot + D3DX_PI * 0.5f) * 5.0f, GetMove().y, cosf(fRot + D3DX_PI * 0.5f) * 5.0f));
+			{//ベクトルに対してプレイヤーが左側にいたら
+				SetMove(D3DXVECTOR3(sinf(fRot + D3DX_PI * 0.5f) * m_fNormalSpeed, GetMove().y, cosf(fRot + D3DX_PI * 0.5f) * m_fNormalSpeed));
 			}
 		}
 	}
-
-	
 }
 //============================================================================================================================================
 
@@ -680,6 +680,7 @@ const string CShotWeakEnemy::s_aSHOTWEAKENEMY_FILENAME[static_cast<int>(SHOTWEAK
 	"data\\MODEL\\Enemy\\ShotWeak\\noobSlime.x"
 };
 const int CShotWeakEnemy::s_nATTACK_FREQUENCY = 90;//攻撃頻度
+const float CShotWeakEnemy::s_fSENSINGRANGE = 600.0f;
 //============================================================================================================================================
 
 //====================================================================================
@@ -784,6 +785,8 @@ CShotWeakEnemy* CShotWeakEnemy::Create(SHOTWEAKENEMYTYPE Type, int nLife, int nP
 	pShotWeakEnemy->SetRot(rot);       //向き
 	pShotWeakEnemy->SetScale(Scale);   //拡大率
 	pShotWeakEnemy->SetFormarScale(Scale);//元の拡大率を設定
+	pShotWeakEnemy->SetSensingRange(450.0f);//感知射程
+	pShotWeakEnemy->SetNormalSpeed(5.0f);//通常移動速度
 
 	pShotWeakEnemy->SetSize();//モデルサイズを設定
 	pShotWeakEnemy->SetManagerObjectType(CObject::MANAGEROBJECTTYPE::SHOTWEAKENEMY);           //マネージャーで呼び出す時の種類を設定
@@ -1051,7 +1054,7 @@ const string CDiveWeakEnemy::s_aDIVEWEAKENEMY_FILENAME[static_cast<int>(CDiveWea
 //コンストラクタ
 //====================================================================================
 CDiveWeakEnemy::CDiveWeakEnemy(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CEnemy(nPri, bUseintPri, type, ObjType),
-m_DiveWeakEnemyType(DIVEWEAKENEMYTYPE::NORMAL)
+m_DiveWeakEnemyType(DIVEWEAKENEMYTYPE::NORMAL),m_pMagicSword(nullptr)
 {
 
 }
@@ -1073,6 +1076,9 @@ HRESULT CDiveWeakEnemy::Init()
 {
 	CEnemy::Init();
 
+	m_pMagicSword = CAttackEnemy::Create(CAttack::ATTACKTYPE::MAGICSWORD, CAttack::TARGETTYPE::PLAYER, CAttack::COLLISIONTYPE::RECTANGLE_XZ,
+		2, 60, 200, GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f),D3DXVECTOR3(0.0f,0.0f,0.0f),D3DXVECTOR3(2.0f, 2.0f, 4.0f));
+	m_pMagicSword->SetUseDeath(false);
 	SetEnemyType(CEnemy::ENEMYTYPE::DIVEWEAK);//敵タイプを設定
 	return S_OK;
 }
@@ -1093,6 +1099,9 @@ void CDiveWeakEnemy::Uninit()
 void CDiveWeakEnemy::Update()
 {
 	CEnemy::Update();
+
+	m_pMagicSword->SetPos(GetPos());
+	m_pMagicSword->SetRot(m_pMagicSword->GetRot() + D3DXVECTOR3(0.0f, 0.05f, 0.0f));
 }
 //============================================================================================================================================
 
@@ -1111,6 +1120,12 @@ void CDiveWeakEnemy::Draw()
 void CDiveWeakEnemy::SetDeath()
 {
 	CEnemy::SetDeath();
+
+	if (m_pMagicSword != nullptr)
+	{
+		m_pMagicSword->SetUseDeath(true);
+		m_pMagicSword->SetDeath();
+	}
 }
 //============================================================================================================================================
 
@@ -1138,6 +1153,8 @@ CDiveWeakEnemy* CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE Type, int nLife, int nP
 	pDiveWeakEnemy->SetRot(rot);       //向き
 	pDiveWeakEnemy->SetScale(Scale);   //拡大率
 	pDiveWeakEnemy->SetFormarScale(Scale);//元の拡大率を設定
+	pDiveWeakEnemy->SetSensingRange(1350.0f);//感知射程
+	pDiveWeakEnemy->SetNormalSpeed(15.0f);//通常移動速度
 
 	pDiveWeakEnemy->SetSize();//モデルサイズを設定
 	pDiveWeakEnemy->SetAutoSubLife(false);//自動的に体力を減らすかどうか
@@ -1477,5 +1494,36 @@ CEnemyMove_Battle::~CEnemyMove_Battle()
 void CEnemyMove_Battle::Process(CEnemy* pEnemy)
 {
 	pEnemy->BattleMoveProcess();
+}
+//============================================================================================================================================
+
+//********************************************************************************************************************************************
+//敵移動タイプ：なしクラス
+//********************************************************************************************************************************************
+
+//====================================================================================
+//コンストラクタ
+//====================================================================================
+CEnemyMove_None::CEnemyMove_None()
+{
+
+}
+//============================================================================================================================================
+
+//====================================================================================
+//デストラクタ
+//====================================================================================
+CEnemyMove_None::~CEnemyMove_None()
+{
+
+}
+//============================================================================================================================================
+
+//====================================================================================
+//処理
+//====================================================================================
+void CEnemyMove_None::Process(CEnemy* pEnemy)
+{
+
 }
 //============================================================================================================================================

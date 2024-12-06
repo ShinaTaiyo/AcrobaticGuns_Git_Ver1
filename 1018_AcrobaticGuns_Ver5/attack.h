@@ -26,6 +26,7 @@ public:
 	{
 		BULLET = 0,
 		EXPLOSION,
+		MAGICSWORD,
 		MAX
 	};
 

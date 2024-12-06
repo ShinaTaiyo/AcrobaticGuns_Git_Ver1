@@ -120,10 +120,10 @@ void CPlayerMove_Normal::JumpProcess(CPlayer* pPlayer)
 
 	if (m_bIsLanding == true || pPlayer->GetExtrusionCollisionSquareY() == true)
 	{
-		pPlayer->SetUseGravity(true, 0.01f);
+		pPlayer->SetUseGravity(true,1.0f);
 		if (CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::A) == true)
 		{
-			pPlayer->SetMove(D3DXVECTOR3(pPlayer->GetMove().x, 10.0f, pPlayer->GetMove().z));
+			pPlayer->SetMove(D3DXVECTOR3(pPlayer->GetMove().x, 20.0f, pPlayer->GetMove().z));
 		}
 	}
 }

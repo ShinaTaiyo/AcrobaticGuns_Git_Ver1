@@ -21,6 +21,7 @@
 //前方宣言
 //===========================================
 class CEnemyMove;
+class CAttackEnemy;
 
 //===========================================
 //エネミークラス
@@ -79,6 +80,14 @@ public:
 	//バトル関係
 	//==========================================================
 	const int GetCntTime() const { return m_nCntTime; }
+
+	//感知射程
+	void SetSensingRange(float fRange) { m_fSensingRange = fRange; }
+	const float & GetSensingRange() const { return m_fSensingRange; }
+
+	//通常移動速度
+	void SetNormalSpeed(float fSpeed) { m_fNormalSpeed = fSpeed; }
+	const float& GetNormalSpeed() const { return m_fNormalSpeed; }
 	//=================================================================================================================
 
 	static int GetNumEnemy() { return m_nNumEnemy; }
@@ -136,6 +145,11 @@ private:
 	int m_nPhaseNum;            //フェーズ番号
 	CEnemyMove* m_pEnemyMove;   //敵の移動ステート
 	int m_nCntTime;             //時間を測る
+	float m_fRotMove;
+
+	float m_fSensingRange;//感知射程
+	float m_fNormalSpeed; //通常移動速度
+	
 	//===============================================================================================
 
 	//================================================
@@ -184,6 +198,7 @@ private:
 	//================================================
 	static const string s_aSHOTWEAKENEMY_FILENAME[static_cast<int>(SHOTWEAKENEMYTYPE::MAX)];//敵のモデルファイル名
 	static const int s_nATTACK_FREQUENCY;//攻撃頻度
+	static const float s_fSENSINGRANGE;  //感知射程
 	//===============================================================================================
 
 	//================================================
@@ -244,6 +259,7 @@ private:
 	//変数宣言
 	//================================================
 	DIVEWEAKENEMYTYPE m_DiveWeakEnemyType;//敵の種類
+	CAttackEnemy* m_pMagicSword;//魔法剣
 	//===============================================================================================
 
 	//================================================
@@ -290,6 +306,16 @@ public:
 	~CEnemyMove_Battle() override;//デストラクタ
 	void Process(CEnemy* pEnemy) override;
 };
+
+//移動タイプ：なし
+class CEnemyMove_None : public CEnemyMove
+{
+public:
+	CEnemyMove_None();//コンストラクタ
+	~CEnemyMove_None() override;//デストラクタ
+	void Process(CEnemy* pEnemy) override;
+};
+
 //===================================================================================================================================
 
 #endif
