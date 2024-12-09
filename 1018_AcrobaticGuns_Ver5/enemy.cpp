@@ -436,16 +436,35 @@ void CEnemy::SetMoveAiPoint()
 	float fX = 0;
 	float fZ = 0;
 	bool bMove = false;
+	bool bMoveY = false;
+	float fAddPosY = 0.0f;
 	auto Input = CManager::GetInputKeyboard();
-	if (Input->GetPress(DIK_I))
+
+	if (Input->GetPress(DIK_LSHIFT))
 	{
-		fZ = 1;
-		bMove = true;
+		if (Input->GetPress(DIK_I))
+		{
+			fAddPosY = 5.0f;
+			bMoveY = true;
+		}
+		else if (Input->GetPress(DIK_K))
+		{
+			fAddPosY = -5.0f;
+			bMoveY = true;
+		}
 	}
-	else if (Input->GetPress(DIK_K))
+	else
 	{
-		fZ = -1;
-		bMove = true;
+		if (Input->GetPress(DIK_I))
+		{
+			fZ = 1;
+			bMove = true;
+		}
+		else if (Input->GetPress(DIK_K))
+		{
+			fZ = -1;
+			bMove = true;
+		}
 	}
 	if (Input->GetPress(DIK_L))
 	{
@@ -458,6 +477,7 @@ void CEnemy::SetMoveAiPoint()
 		bMove = true;
 	}
 
+	SetMove(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 	CManager::GetDebugProc()->PrintDebugProc("移動AIの設置位置の移動：IKLJ\n");
 
 	if (bMove == true)
@@ -465,6 +485,15 @@ void CEnemy::SetMoveAiPoint()
 		float fRot = atan2f(fX, fZ);
 		m_MoveAiSavePos += D3DXVECTOR3(sinf(fRot) * 5.0f, 0.0f, cosf(fRot) * 5.0f);
 	}
+
+	if (bMoveY == true)
+	{
+		m_MoveAiSavePos += D3DXVECTOR3(0.0f, fAddPosY, 0.0f);
+	}
+
+	D3DXVECTOR3 NowPos = m_MoveAiSavePos + GetPos();
+
+	CManager::GetDebugProc()->PrintDebugProc("移動AIの位置：%f %f %f\n", NowPos.x,NowPos.y,NowPos.z);
 
 	CManager::GetDebugProc()->PrintDebugProc("移動AIを保存：O\n");
 
@@ -1002,6 +1031,7 @@ void CShotWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 		CShotWeakEnemy* pShotWeakEnemy = CShotWeakEnemy::Create(ShotWeakEnemyType,nLife,nPhaseNum,Pos,Rot,Scale);
 		pShotWeakEnemy->SetVecMoveAiInfo(VecMoveAi);
 		listSaveManager.push_back(pShotWeakEnemy);      //vectorに情報を保存する
+
 	}
 	else if (CScene::GetMode() == CScene::MODE_GAME)
 	{
@@ -1152,7 +1182,7 @@ const string CDiveWeakEnemy::s_aDIVEWEAKENEMY_FILENAME[static_cast<int>(CDiveWea
 };
 const int CDiveWeakEnemy::s_nATTACK_FREQUENCY = 90;//攻撃頻度
 const float CDiveWeakEnemy::s_fSENSINGRANGE = 600.0f;
-
+const float CDiveWeakEnemy::s_fNORMAL_SPEED = 3.0f;
 //====================================================================================
 //コンストラクタ
 //====================================================================================
@@ -1244,7 +1274,7 @@ CDiveWeakEnemy* CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE Type, int nLife, int nP
 	pDiveWeakEnemy->SetScale(Scale);   //拡大率
 	pDiveWeakEnemy->SetFormarScale(Scale);//元の拡大率を設定
 	pDiveWeakEnemy->SetSensingRange(550.0f);//感知射程
-	pDiveWeakEnemy->SetNormalSpeed(5.0f);//通常移動速度
+	pDiveWeakEnemy->SetNormalSpeed(s_fNORMAL_SPEED);//通常移動速度
 	pDiveWeakEnemy->SetUseInteria(false, GetNormalInertia());
 
 	pDiveWeakEnemy->SetSize();//モデルサイズを設定

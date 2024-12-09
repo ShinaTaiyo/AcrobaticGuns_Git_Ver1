@@ -25,12 +25,13 @@
 //静的メンバ宣言
 //====================================================================
 const float CCamera::m_BESIDECAMERALENGTH = 570.0f;//ビサイドビューのカメラの距離
+const float CCamera::s_fINITIAL_LENGTH = 400.0f;   //カメラとの最初の距離
 //====================================================================================================
 
 //====================================================================
 //コンストラクタ
 //====================================================================
-CCamera::CCamera() : m_SupportPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_fLength(0.0f), m_fTurningRotSpeed(0.0f),m_fTurningSpeedY(0.0f),m_PosV(D3DXVECTOR3(0.0f,0.0f,0.0f)),
+CCamera::CCamera() : m_SupportPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_fLength(s_fINITIAL_LENGTH), m_fTurningRotSpeed(0.0f),m_fTurningSpeedY(0.0f),m_PosV(D3DXVECTOR3(0.0f,0.0f,0.0f)),
 m_PosR(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_VecU(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Rot(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_mtxProjection(),m_mtxView(),m_CameraType(CAMERATYPE_BIRD),m_DifferenceLength(D3DXVECTOR3(0.0f,0.0f,0.0f)),
 m_ZoomSpeed(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_nShakeFrame(0),m_ModeTime(0),m_fShakePower(0.0f),m_fAddLength(0.0f),m_AddPosR(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_AddPosV(D3DXVECTOR3(0.0f,0.0f,0.0f))
 ,m_bCustom(false)
@@ -87,19 +88,19 @@ void CCamera::Update()
 	//========================================
 	//カメラの向きを変える
 	//========================================
-	if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
-	{//シフトキーを押しながら・・・
-		if (CManager::GetInputKeyboard()->GetPress(DIK_X) == true)
-		{
-			m_Rot.y -= 0.01f;
-		}
-	}
-	else if (CManager::GetInputKeyboard()->GetPress(DIK_X) == true)
+	if (CManager::GetInputKeyboard()->GetPress(DIK_Q))
 	{
-		m_Rot.y += 0.01f;
-		if (CManager::GetInputKeyboard()->GetPress(DIK_LCONTROL))
+		m_Rot.y -= 0.01f;
+	}
+	if (CManager::GetInputKeyboard()->GetPress(DIK_E))
+	{
+		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT))
 		{
 			m_Rot.y = 0.0f;
+		}
+		else
+		{
+			m_Rot.y += 0.01f;
 		}
 	}
 
@@ -142,6 +143,20 @@ void CCamera::Update()
 		m_AddPosV.y += 5.0f;
 	}
 
+	//===========================
+    //Vボタンを押していたら
+    //===========================
+	if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
+	{//シフトキーを押しながら・・・
+		if (CManager::GetInputKeyboard()->GetPress(DIK_V) == true)
+		{
+			m_fLength -= 5.0f;
+		}
+	}
+	else if (CManager::GetInputKeyboard()->GetPress(DIK_V) == true)
+	{
+		m_fLength += 5.0f;
+	}
 
 
 	//=========================o==============
@@ -261,7 +276,8 @@ void CCamera::NormalCameraMove()
 				}
 				break;
 			case CScene::MODE_EDIT:
-			    m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -400.0f, 400.0f, cosf(m_Rot.y) * -400.0f) + m_AddPosV;
+				m_PosR += m_AddPosR;
+			    m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -m_fLength, m_fLength, cosf(m_Rot.y) * -m_fLength) + m_AddPosV;
 			    break;
 			default:
 				break;

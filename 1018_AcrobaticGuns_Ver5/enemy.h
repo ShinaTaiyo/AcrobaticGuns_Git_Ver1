@@ -292,6 +292,7 @@ private:
 	static const string s_aDIVEWEAKENEMY_FILENAME[static_cast<int>(DIVEWEAKENEMYTYPE::MAX)];//敵のモデルファイル名
 	static const int s_nATTACK_FREQUENCY;//攻撃頻度
 	static const float s_fSENSINGRANGE;  //感知射程
+	static const float s_fNORMAL_SPEED;//通常の速度
 	//===============================================================================================
 
 	//================================================

@@ -43,8 +43,8 @@ bool CCollision::CollisionSquare(D3DXVECTOR3 MyPos, D3DXVECTOR3 MyVtxMax, D3DXVE
 		MyPos.x + MyVtxMax.x >= ComparisonPos.x + ComparisonVtxMin.x &&
 		MyPos.y + MyVtxMin.y <= ComparisonPos.y + ComparisonVtxMax.y &&
 		MyPos.y + MyVtxMax.y >= ComparisonPos.y + ComparisonVtxMin.y &&
-		MyPos.z + MyVtxMin.z <= ComparisonPos.z + ComparisonVtxMax.x &&
-		MyPos.z + MyVtxMax.z >= ComparisonPos.z + ComparisonVtxMin.x)
+		MyPos.z + MyVtxMin.z <= ComparisonPos.z + ComparisonVtxMax.z &&
+		MyPos.z + MyVtxMax.z >= ComparisonPos.z + ComparisonVtxMin.z)
 	{
 		return true;
 	}
@@ -233,7 +233,6 @@ bool CCollision::RectAngleCollisionXY(D3DXVECTOR3 MyPos, D3DXVECTOR3 MyVtxMax, D
 //================================================================
 bool CCollision::RectAngleCollisionXZ(CObjectX* pMyObj, CObjectX* pComObj)
 {
-
 	D3DXVECTOR2 FourVtxPos[4] = {};   //ÇSí∏ì_ÇÃà íu
 	D3DXVECTOR2 FourVtxRotPos[4] = {};//âÒì]ÇµÇΩÇSí∏ì_ÇÃà íu
 	D3DXVECTOR2 FourComparisonVtxPos[4] = {};    //î‰ärópÇSí∏ì_
@@ -404,21 +403,7 @@ bool CCollision::ExtrusionCollisionSquare(D3DXVECTOR3& MyPos, bool& bCollisionX,
 
 	//ÇªÇÍÇºÇÍÇÃbCollisionÇ™Ç∑Ç≈Ç…trueÇÃèÍçáÇÕÅAílÇï‘Ç≥Ç»Ç¢
 
-	if (bCollisionXOld == true)
-	{
-		bCollisionX = ExtrusionCollisionSquareX(MyPos, MyMove, MyPosOld,
-			MyVtxMax, MyVtxMin, ComPos,
-			ComVtxMax, ComVtxMin,bCollisionX);
-			
-		bCollisionZ = ExtrusionCollisionSquareZ(MyPos, MyMove, MyPosOld,
-			MyVtxMax, MyVtxMin, ComPos,
-			ComVtxMax, ComVtxMin,bCollisionZ);
-
-	    bCollisionY = ExtrusionCollisionSquareY(MyPos, MyMove, MyPosOld,
-				MyVtxMax, MyVtxMin, ComPos,
-				ComVtxMax, ComVtxMin,bCollisionY);
-	}
-	else if (bCollisionYOld == true)
+    if (bCollisionYOld == true)
 	{
 		bCollisionY = ExtrusionCollisionSquareY(MyPos, MyMove, MyPosOld,
 			MyVtxMax, MyVtxMin, ComPos,
@@ -431,6 +416,20 @@ bool CCollision::ExtrusionCollisionSquare(D3DXVECTOR3& MyPos, bool& bCollisionX,
 		bCollisionZ = ExtrusionCollisionSquareZ(MyPos, MyMove, MyPosOld,
 			MyVtxMax, MyVtxMin, ComPos,
 			ComVtxMax, ComVtxMin,bCollisionZ);
+	}
+	else if (bCollisionXOld == true)
+	{
+		bCollisionX = ExtrusionCollisionSquareX(MyPos, MyMove, MyPosOld,
+			MyVtxMax, MyVtxMin, ComPos,
+			ComVtxMax, ComVtxMin,bCollisionX);
+			
+		bCollisionZ = ExtrusionCollisionSquareZ(MyPos, MyMove, MyPosOld,
+			MyVtxMax, MyVtxMin, ComPos,
+			ComVtxMax, ComVtxMin,bCollisionZ);
+
+	    bCollisionY = ExtrusionCollisionSquareY(MyPos, MyMove, MyPosOld,
+				MyVtxMax, MyVtxMin, ComPos,
+				ComVtxMax, ComVtxMin,bCollisionY);
 	}
 	else/* if (bCollisionZOld == true)*/
 	{

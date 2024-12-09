@@ -891,6 +891,8 @@ void CStageManagerState_PlacedObject::DeleteObject(list<CObject*>::iterator& it,
 	auto Input = CManager::GetInputKeyboard();
 	if (Input->GetTrigger(DIK_BACKSPACE))
 	{
+		(*it)->SetUseDeath(true);
+		(*it)->SetDeath();
 		StgObjList.erase(it);
 	}
 }

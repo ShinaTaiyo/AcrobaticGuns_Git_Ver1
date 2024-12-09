@@ -85,30 +85,33 @@ void CObjectXMove::Uninit()
 //===========================================================================================
 void CObjectXMove::Update()
 {
-	//==================================
-    //乗算加速度がONになっていたら
-    //==================================
-	if (m_bUseMultiSpeed == true)
+	if (CScene::GetMode() == CScene::MODE_GAME)
 	{
-		m_Move.x *= m_MultiSpeed.x;
-		m_Move.y *= m_MultiSpeed.y;
-		m_Move.z *= m_MultiSpeed.z;
+		//==================================
+		//乗算加速度がONになっていたら
+		//==================================
+		if (m_bUseMultiSpeed == true)
+		{
+			m_Move.x *= m_MultiSpeed.x;
+			m_Move.y *= m_MultiSpeed.y;
+			m_Move.z *= m_MultiSpeed.z;
+		}
+		//==========================================================
+
+		//==================================
+		//加速がONになっていたら
+		//==================================
+		if (m_bUseAddSpeed == true)
+		{
+			m_Move += m_AddSpeed;
+		}
+		//==========================================================
+
+		GravityProcess();
+
+		UpdatePos();
+
 	}
-	//==========================================================
-
-	//==================================
-	//加速がONになっていたら
-	//==================================
-	if (m_bUseAddSpeed == true)
-	{
-		m_Move += m_AddSpeed;
-	}
-	//==========================================================
-
-	GravityProcess();
-
-	UpdatePos();
-
 	//更新処理
 	CObjectX::Update();
 }
@@ -144,7 +147,6 @@ void CObjectXMove::UpdatePos()
 {
 	if (m_bUseUpdatePos == true)
 	{
-
 		const D3DXVECTOR3& Pos = GetPos();
 
 		//1f前の位置を設定

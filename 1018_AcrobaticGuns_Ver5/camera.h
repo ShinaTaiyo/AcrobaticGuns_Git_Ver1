@@ -80,6 +80,7 @@ public:
 	//==========================================================================================================================================
 private:
 	static const float m_BESIDECAMERALENGTH;      //ビサイドモードのカメラの距離
+	static const float s_fINITIAL_LENGTH;         //最初の距離
 	D3DXVECTOR3 m_PosV;                           //視点!
 	D3DXVECTOR3 m_PosR;                           //注視点!
 	D3DXVECTOR3 m_AddPosR;                        //加算注視点

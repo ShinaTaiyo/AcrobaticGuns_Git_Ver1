@@ -26,6 +26,9 @@ public:
 		BILL_00 = 0,//ƒrƒ‹‚O
 		TREE_00,    //–Ø	
 		BILL_01,    //ƒrƒ‹‚P
+		BILL_02,    //ƒrƒ‹‚Q
+		BILL_03,    //ƒrƒ‹‚R
+		BILL_04,    //ƒrƒ‹‚S
 		MAX
 	};
 

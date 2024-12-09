@@ -138,11 +138,12 @@ bool CWireHead::CollisionSquare()
 			CObject* pNext = pObj->GetNextObject();
 			CObject::OBJECTTYPE ObjType = pObj->GetObjectType();
 			CObject::TYPE type = pObj->GetType();
-			if (ObjType == CObject::OBJECTTYPE::OBJECTTYPE_X && type != CObject::TYPE::WIREHEAD && type != CObject::TYPE::PLAYER && type != CObject::TYPE::ATTACK)
+			if (type == CObject::TYPE::BGMODEL || type == CObject::TYPE::ENEMY)
 			{
 				CObjectX* pObjX = static_cast<CObjectX*>(pObj);
 				if (CCollision::CollisionSquare(GetPos(), GetVtxMax(), GetVtxMin(), pObjX->GetPos(), pObjX->GetVtxMax(), pObjX->GetVtxMin()) == true)
 				{
+					CManager::GetDebugProc()->PrintDebugProc("ワイヤーヘッドの当たり判定成功！\n");
 					return true;
 				}
 			}

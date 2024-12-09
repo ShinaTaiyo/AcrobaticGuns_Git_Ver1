@@ -87,6 +87,8 @@ void CPhaseManager::Draw()
 void CPhaseManager::SetDeath()
 {
 	CObject::SetDeath();
+
+	s_PhaseList.clear();
 }
 //======================================================================================================================
 
@@ -142,7 +144,6 @@ void CPhaseManager::AdvancePhase()
 						pAiModel->SetUseDraw(false);
 						pAiModel->SetUseShadow(false);
 						VecMoveAi.push_back(pAiModel);
-						
 					}
 				}
 
