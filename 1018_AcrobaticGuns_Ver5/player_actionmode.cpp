@@ -60,7 +60,7 @@ void CPlayerMove::MoveProcess(CPlayer* pPlayer)
 	bMove = CCalculation::CaluclationMove(true, AddMove, 10.0f, CCalculation::MOVEAIM_XZ, fRotAim);
 	//CCalculation::CalculationCollectionRot2D(CalRot.y, m_fRotAim, 0.25f);
 
-	pPlayer->SetUseInteria(true);
+	pPlayer->SetUseInteria(true, CObjectXMove::GetNormalInertia());
 	pPlayer->SetUseGravity(true, CObjectXMove::GetNormalGravity());
 
 	//CManager::GetInputJoypad()->GetLStickPress();
@@ -177,14 +177,14 @@ void CPlayerMove_PrepDive::MoveProcess(CPlayer* pPlayer)
 		//ワイヤーの頭を飛ばす
 		pPlayer->GetWire()->GetWireHead()->SetMove(Move);
 		pPlayer->GetWire()->GetWireHead()->ResetCoolTime();//当たるまでのクールタイムをリセット
-		pPlayer->GetWire()->GetWireHead()->SetUseInteria(false);
+		pPlayer->GetWire()->GetWireHead()->SetUseInteria(false, CObjectXMove::GetNormalInertia());
 		pPlayer->GetWire()->GetWireHead()->SetUseGravity(false,1.0f);
 		pPlayer->GetWire()->SetUseDraw(true);
 		pPlayer->GetWire()->GetWireHead()->SetRot(D3DXVECTOR3(D3DX_PI * 0.5f + fPitch,fYaw,0.0f));
 		pPlayer->ChengeMoveMode(DBG_NEW CPlayerMove_Dont());//移動モード「なし」
 		pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_Dont());//攻撃モード「なし」
 		pPlayer->ChengeWireShotMode(DBG_NEW CPlayerWireShot_Do());//ワイヤーショットモード「する」
-		pPlayer->SetUseInteria(false);//慣性を使用しない
+		pPlayer->SetUseInteria(false, CObjectXMove::GetNormalInertia());//慣性を使用しない
 		pPlayer->SetUseGravity(false,CObjectXMove::GetNormalGravity());//重力を使用しない
 		pPlayer->SetRot(pPlayer->GetRot() + D3DXVECTOR3(-0.4f, 0.0f, 0.0f));//向きを前に傾ける
 
@@ -300,14 +300,14 @@ void CPlayerMove_Stuck::MoveProcess(CPlayer* pPlayer)
 		//ワイヤーの頭を飛ばす
 		pPlayer->GetWire()->GetWireHead()->SetMove(Move);
 		pPlayer->GetWire()->GetWireHead()->ResetCoolTime();//当たるまでのクールタイムをリセット
-		pPlayer->GetWire()->GetWireHead()->SetUseInteria(false);
+		pPlayer->GetWire()->GetWireHead()->SetUseInteria(false, CObjectXMove::GetNormalInertia());
 		pPlayer->GetWire()->GetWireHead()->SetUseGravity(false, 1.0f);
 		pPlayer->GetWire()->SetUseDraw(true);
 		pPlayer->GetWire()->GetWireHead()->SetRot(D3DXVECTOR3(D3DX_PI * 0.5f + fPitch, fYaw, 0.0f));
 		pPlayer->ChengeMoveMode(DBG_NEW CPlayerMove_Dont());//移動モード「なし」
 		pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_Dont());//攻撃モード「なし」
 		pPlayer->ChengeWireShotMode(DBG_NEW CPlayerWireShot_Do());//ワイヤーショットモード「する」
-		pPlayer->SetUseInteria(false);//慣性を使用しない
+		pPlayer->SetUseInteria(false, CObjectXMove::GetNormalInertia());//慣性を使用しない
 		pPlayer->SetUseGravity(false, CObjectXMove::GetNormalGravity());//重力を使用しない
 		CCamera* pCamera = CManager::GetCamera();
 		pPlayer->SetMove(Move);
@@ -390,7 +390,7 @@ void CPlayerAttack_Shot::AttackProcess(CPlayer* pPlayer)
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_J) == true || CManager::GetInputJoypad()->GetRT_Repeat(6) == true)
 	{
 		pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::BULLET,CAttack::TARGETTYPE::ENEMY,CAttack::COLLISIONTYPE::SQUARE,5,5,60,ShotPos, pPlayer->GetRot(), Move, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
-		pAttackPlayer->SetUseInteria(false);
+		pAttackPlayer->SetUseInteria(false, CObjectXMove::GetNormalInertia());
 		pAttackPlayer->SetAutoSubLife(true);
 	}
 }

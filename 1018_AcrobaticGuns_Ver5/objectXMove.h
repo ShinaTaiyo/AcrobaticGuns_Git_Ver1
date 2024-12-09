@@ -35,9 +35,8 @@ public:
 	const D3DXVECTOR3& GetMove() const { return m_Move; }                                   //ˆÚ“®—Ê‚ğæ“¾‚·‚é
 
 	//Šµ«
-	void SetUseInteria(bool bUseInteria) { m_bUseInteria = bUseInteria; }                   //Šµ«‚ğ‚©‚¯‚é‚©‚Ç‚¤‚©
+	void SetUseInteria(bool bUseInteria, float fInertia) { m_bUseInteria = bUseInteria; m_fInertia = fInertia; }                   //Šµ«‚ğ‚©‚¯‚é‚©‚Ç‚¤‚©
 	float& GetInertia() { return m_fInertia; }                                              //Šµ«‚ğæ“¾‚·‚é
-	void SetInertia(float fInertia) { m_fInertia = fInertia; }                              //Šµ«‚ğİ’è‚·‚é
 	void SetUndoInertia() { m_fInertia = m_fNORMAL_INERTIA; }                               //Šµ«‚Ì‘å‚«‚³‚ğŒ³‚É–ß‚·
 	bool& GetUseInteria() { return m_bUseInteria; }                                         //Šµ«‚ğŠ|‚¯‚é‚©‚Ç‚¤‚©‚ğæ“¾
 
@@ -71,6 +70,7 @@ public:
 	//Ã“Iƒƒ“ƒoæ“¾
 	//==========================================================
 	static const float GetNormalGravity() { return m_fNORMAL_GRAVITY; }
+	static const float GetNormalInertia() { return m_fNORMAL_INERTIA; }
 	//=================================================================================================================
 protected:
 private:

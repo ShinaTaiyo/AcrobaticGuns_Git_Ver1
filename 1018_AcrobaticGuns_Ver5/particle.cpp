@@ -308,7 +308,7 @@ void CParticle::SummonParticle(TYPE type, int nNum, int nLife, float fWidth, flo
 //チャージするような挙動のパーティクルを出す
 //============================================================================================================
 void CParticle::SummonChargeParticle(TYPE type, int nNum, int nLife, float fInitialSpeed, float fWidth, float fHeight,
-	int nSummonLength, int nRandSpeed, int nDivision, bool bRandumCol, D3DXVECTOR3 SupportPos, D3DXCOLOR col, bool bBreanding)
+	float fSummonLength, int nRandSpeed, int nDivision, bool bRandumCol, D3DXVECTOR3 SupportPos, D3DXCOLOR col, bool bBreanding)
 {
 	float fVXaim = 0.0f;//X方向のベクトル
 	float fVYaim = 0.0f;//Y方向のベクトル
@@ -318,6 +318,7 @@ void CParticle::SummonChargeParticle(TYPE type, int nNum, int nLife, float fInit
 	D3DXVECTOR3 Speed = D3DXVECTOR3(0.0f,0.0f,0.0f);//速さ
 	D3DXVECTOR3 SummonPos = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	CParticle* pParticle = nullptr;
+	int nSummonLength = static_cast<int>(fSummonLength);
 	for (int nCnt = 0; nCnt < nNum; nCnt++)
 	{
 		fSpeed = float(rand() % nRandSpeed) / nDivision + fInitialSpeed;

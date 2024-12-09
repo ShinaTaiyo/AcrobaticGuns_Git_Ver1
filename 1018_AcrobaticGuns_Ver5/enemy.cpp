@@ -35,7 +35,7 @@ int CEnemy::m_nNumEnemy = 0;
 //====================================================================================
 CEnemy::CEnemy(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri, bUseintPri, type, ObjType),
 m_Type(ENEMYTYPE::SHOTWEAK), m_VecMoveAi(), m_MoveAiSavePos(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),m_nCntTime(0),m_nIdxMoveAi(0), m_nPhaseNum(0),m_pEnemyMove(DBG_NEW CEnemyMove_AI()),
-m_fRotMove(0.0f),m_fSensingRange(0.0f),m_fNormalSpeed(0.0f)
+m_fRotMove(0.0f),m_fSensingRange(0.0f),m_fNormalSpeed(0.0f),m_Pattern(),m_bCollisoinDetection(true),m_bActivateCollisionDetection(false)
 {
 	m_nNumEnemy++;//敵総数カウントアップ
 }
@@ -97,9 +97,13 @@ void CEnemy::Update()
 		m_pEnemyMove->Process(this);
 
 		m_nCntTime++;//時間をカウントする
-	}
 
-	CollisionProcess();
+	    CollisionProcess();//当たり判定処理
+
+		AttackProcess();//攻撃処理
+
+		CollisionDetectionProcess();
+	}
 }
 //============================================================================================================================================
 
@@ -551,7 +555,7 @@ void CEnemy::BattleMoveProcess()
 	if (fLengthPlayer > m_fSensingRange)
 	{
 		ChengeMove(DBG_NEW CEnemyMove_AI());
-	}
+	}	
 
 	RayCollision();
 
@@ -668,6 +672,40 @@ void CEnemy::PhaseNumDecision()
 }
 //============================================================================================================================================
 
+
+//====================================================================================
+//攻撃処理
+//====================================================================================
+void CEnemy::AttackProcess()
+{
+
+}
+//============================================================================================================================================
+
+//====================================================================================
+//衝突判定処理
+//====================================================================================
+void CEnemy::CollisionDetectionProcess()
+{
+	D3DXVECTOR3 AimVec = CGame::GetPlayer()->GetPos() - GetPos();
+	float fLength = CCalculation::CalculationLength(GetPos(), CGame::GetPlayer()->GetPos());
+	const D3DXVECTOR3& PlayerPos = CGame::GetPlayer()->GetPos();
+	const D3DXVECTOR3 & PlayerVtxMax = PlayerPos + D3DXVECTOR3(CGame::GetPlayer()->GetVtxMax().x, 0.0f, 0.0f);
+	D3DXVec3Normalize(&AimVec, &AimVec);
+
+	float fPlayerCornarDistance = CCalculation::CalculationLength(PlayerPos,PlayerVtxMax);
+	float fMyCornarDistance = CCalculation::CalculationLength(GetPos(),GetPos() + D3DXVECTOR3(GetVtxMax().x,0.0f,0.0f));
+	float fTotalLength = (fPlayerCornarDistance + fMyCornarDistance);
+	if (fLength < fTotalLength && 
+		GetPos().y + GetVtxMax().y >= CGame::GetPlayer()->GetPos().y + CGame::GetPlayer()->GetVtxMin().y && 
+		GetPos().y + GetVtxMin().y <= CGame::GetPlayer()->GetPos().y + CGame::GetPlayer()->GetVtxMax().y)
+	{
+		SetPos(GetPos() - AimVec * (fTotalLength - fLength));
+	}
+	
+}
+//============================================================================================================================================
+
 //********************************************************************************************************************************************
 //射撃に弱い敵クラス
 //********************************************************************************************************************************************
@@ -679,15 +717,16 @@ const string CShotWeakEnemy::s_aSHOTWEAKENEMY_FILENAME[static_cast<int>(SHOTWEAK
 {
 	"data\\MODEL\\Enemy\\ShotWeak\\noobSlime.x"
 };
-const int CShotWeakEnemy::s_nATTACK_FREQUENCY = 90;//攻撃頻度
-const float CShotWeakEnemy::s_fSENSINGRANGE = 600.0f;
+const float CShotWeakEnemy::s_fATTACKSTART_LENGTH = 450.0f;//攻撃開始距離
+const float CShotWeakEnemy::s_fNORMAL_SENSIINGRANGE = 1050.0f;//通常感知射程
+const int CShotWeakEnemy::s_nATTACK_COOLTIME = 60;//攻撃のクールタイム
 //============================================================================================================================================
 
 //====================================================================================
 //コンストラクタ
 //====================================================================================
 CShotWeakEnemy::CShotWeakEnemy(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CEnemy(nPri,bUseintPri,type,ObjType),
-m_ShotWeakEnemyType(SHOTWEAKENEMYTYPE::NORMAL)
+m_ShotWeakEnemyType(SHOTWEAKENEMYTYPE::NORMAL),m_pMagicSword(nullptr), m_SaveAimPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_nAttackCoolTime(0)
 {
 
 }
@@ -708,7 +747,9 @@ CShotWeakEnemy::~CShotWeakEnemy()
 HRESULT CShotWeakEnemy::Init()
 {
 	CEnemy::Init();
-
+	m_pMagicSword = CAttackEnemy::Create(CAttack::ATTACKTYPE::MAGICSWORD, CAttack::TARGETTYPE::PLAYER, CAttack::COLLISIONTYPE::RECTANGLE_XZ,
+		2, 60, 200, GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(2.0f, 2.0f, 4.0f));
+	m_pMagicSword->SetUseDeath(false);
 	SetEnemyType(CEnemy::ENEMYTYPE::SHOTWEAK);//敵タイプを設定
 	return S_OK;
 }
@@ -732,12 +773,8 @@ void CShotWeakEnemy::Update()
 
 	if (CScene::GetMode() == CScene::MODE_GAME)
 	{
-		if (GetCntTime() % s_nATTACK_FREQUENCY == 0)
-		{
-			D3DXVECTOR3 Aim = CCalculation::Calculation3DVec(GetSenterPos(), CGame::GetPlayer()->GetSenterPos(), 20.0f);
-
-			CAttackEnemy::Create(CAttack::ATTACKTYPE::EXPLOSION,CAttack::TARGETTYPE::PLAYER,CAttack::COLLISIONTYPE::SQUARE, 1, 60, 200, GetSenterPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), Aim, D3DXVECTOR3(2.0f, 2.0f, 2.0f));
-		}
+		m_pMagicSword->SetPos(GetPos());
+		m_pMagicSword->SetRot(m_pMagicSword->GetRot() + D3DXVECTOR3(0.0f, 0.05f, 0.0f));
 	}
 }
 //============================================================================================================================================
@@ -757,6 +794,12 @@ void CShotWeakEnemy::Draw()
 void CShotWeakEnemy::SetDeath()
 {
 	CEnemy::SetDeath();
+
+	if (m_pMagicSword != nullptr)
+	{
+		m_pMagicSword->SetUseDeath(true);
+		m_pMagicSword->SetDeath();
+	}
 }
 //============================================================================================================================================
 
@@ -785,8 +828,9 @@ CShotWeakEnemy* CShotWeakEnemy::Create(SHOTWEAKENEMYTYPE Type, int nLife, int nP
 	pShotWeakEnemy->SetRot(rot);       //向き
 	pShotWeakEnemy->SetScale(Scale);   //拡大率
 	pShotWeakEnemy->SetFormarScale(Scale);//元の拡大率を設定
-	pShotWeakEnemy->SetSensingRange(450.0f);//感知射程
-	pShotWeakEnemy->SetNormalSpeed(5.0f);//通常移動速度
+	pShotWeakEnemy->SetSensingRange(1250.0f);//感知射程
+	pShotWeakEnemy->SetNormalSpeed(10.0f);//通常移動速度
+	pShotWeakEnemy->SetUseInteria(false, GetNormalInertia());
 
 	pShotWeakEnemy->SetSize();//モデルサイズを設定
 	pShotWeakEnemy->SetManagerObjectType(CObject::MANAGEROBJECTTYPE::SHOTWEAKENEMY);           //マネージャーで呼び出す時の種類を設定
@@ -1034,6 +1078,67 @@ void CShotWeakEnemy::BattleMoveProcess()
 }
 //============================================================================================================================================
 
+//====================================================================================
+//攻撃処理
+//====================================================================================
+void CShotWeakEnemy::AttackProcess()
+{
+	float fLength = CCalculation::CalculationLength(GetPos(), CGame::GetPlayer()->GetPos());
+	const bool& bAction = GetAction();
+	const int& nPatternTime = GetPatternTime();
+	const int& nPattern = GetPattern();
+	m_nAttackCoolTime++;//クールタイムをカウントする
+	if (fLength < s_fATTACKSTART_LENGTH && bAction == false && m_nAttackCoolTime > s_nATTACK_COOLTIME)
+	{//攻撃が開始されていなければ
+		ChengeMove(DBG_NEW CEnemyMove_None());
+		SetAction(true);
+	}
+
+	if (bAction == true)
+	{
+		switch (nPattern)
+		{
+		case 0:
+			SetMove(D3DXVECTOR3(0.0f, GetMove().y, 0.0f));
+			if (nPatternTime == 15)
+			{
+				SetPattern(nPattern + 1);
+				SetPatternTime(0);
+				m_SaveAimPos = CGame::GetPlayer()->GetPos();
+			}
+			break;
+		case 1:
+			CParticle::SummonChargeParticle(CParticle::TYPE::TYPE00_NORMAL, 1, 45, 5.0f, 20.0f, 20.0f, GetSize().x, 100, 10, false,
+				GetSenterPos(), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
+
+			if (nPatternTime == 45)
+			{
+				SetUseInteria(true, 0.05f);
+
+				SetMove(CCalculation::Calculation3DVec(GetPos(),m_SaveAimPos, 30.0f));
+				SetPattern(nPattern + 1);
+				SetPatternTime(0);
+			}
+			break;
+		case 2:
+			if (nPatternTime == 60)
+			{
+				SetAction(false);
+				SetUseInteria(true, CObjectXMove::GetNormalInertia());
+				ChengeMove(DBG_NEW CEnemyMove_Battle());
+				SetPattern(0);
+				SetPatternTime(0);
+				m_nAttackCoolTime = 0;
+			}
+			break;
+		default:
+			break;
+		}
+		SetPatternTime(nPatternTime + 1);
+	}
+}
+//============================================================================================================================================
+
 //********************************************************************************************************************************************
 //ダイブに弱い敵クラス
 //********************************************************************************************************************************************
@@ -1045,16 +1150,14 @@ const string CDiveWeakEnemy::s_aDIVEWEAKENEMY_FILENAME[static_cast<int>(CDiveWea
 {
 	"data\\MODEL\\Enemy\\DiveWeak\\angrySlime.x"
 };
-
-//====================================================================================
-//静的メンバ変数宣言
-//====================================================================================
+const int CDiveWeakEnemy::s_nATTACK_FREQUENCY = 90;//攻撃頻度
+const float CDiveWeakEnemy::s_fSENSINGRANGE = 600.0f;
 
 //====================================================================================
 //コンストラクタ
 //====================================================================================
 CDiveWeakEnemy::CDiveWeakEnemy(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CEnemy(nPri, bUseintPri, type, ObjType),
-m_DiveWeakEnemyType(DIVEWEAKENEMYTYPE::NORMAL),m_pMagicSword(nullptr)
+m_DiveWeakEnemyType(DIVEWEAKENEMYTYPE::NORMAL)
 {
 
 }
@@ -1075,10 +1178,6 @@ CDiveWeakEnemy::~CDiveWeakEnemy()
 HRESULT CDiveWeakEnemy::Init()
 {
 	CEnemy::Init();
-
-	m_pMagicSword = CAttackEnemy::Create(CAttack::ATTACKTYPE::MAGICSWORD, CAttack::TARGETTYPE::PLAYER, CAttack::COLLISIONTYPE::RECTANGLE_XZ,
-		2, 60, 200, GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f),D3DXVECTOR3(0.0f,0.0f,0.0f),D3DXVECTOR3(2.0f, 2.0f, 4.0f));
-	m_pMagicSword->SetUseDeath(false);
 	SetEnemyType(CEnemy::ENEMYTYPE::DIVEWEAK);//敵タイプを設定
 	return S_OK;
 }
@@ -1099,9 +1198,6 @@ void CDiveWeakEnemy::Uninit()
 void CDiveWeakEnemy::Update()
 {
 	CEnemy::Update();
-
-	m_pMagicSword->SetPos(GetPos());
-	m_pMagicSword->SetRot(m_pMagicSword->GetRot() + D3DXVECTOR3(0.0f, 0.05f, 0.0f));
 }
 //============================================================================================================================================
 
@@ -1120,12 +1216,6 @@ void CDiveWeakEnemy::Draw()
 void CDiveWeakEnemy::SetDeath()
 {
 	CEnemy::SetDeath();
-
-	if (m_pMagicSword != nullptr)
-	{
-		m_pMagicSword->SetUseDeath(true);
-		m_pMagicSword->SetDeath();
-	}
 }
 //============================================================================================================================================
 
@@ -1153,8 +1243,9 @@ CDiveWeakEnemy* CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE Type, int nLife, int nP
 	pDiveWeakEnemy->SetRot(rot);       //向き
 	pDiveWeakEnemy->SetScale(Scale);   //拡大率
 	pDiveWeakEnemy->SetFormarScale(Scale);//元の拡大率を設定
-	pDiveWeakEnemy->SetSensingRange(1350.0f);//感知射程
-	pDiveWeakEnemy->SetNormalSpeed(15.0f);//通常移動速度
+	pDiveWeakEnemy->SetSensingRange(550.0f);//感知射程
+	pDiveWeakEnemy->SetNormalSpeed(5.0f);//通常移動速度
+	pDiveWeakEnemy->SetUseInteria(false, GetNormalInertia());
 
 	pDiveWeakEnemy->SetSize();//モデルサイズを設定
 	pDiveWeakEnemy->SetAutoSubLife(false);//自動的に体力を減らすかどうか
@@ -1401,6 +1492,23 @@ CObject* CDiveWeakEnemy::ManagerSaveObject()
 void CDiveWeakEnemy::BattleMoveProcess()
 {
 	CEnemy::BattleMoveProcess();
+}
+//============================================================================================================================================
+
+//====================================================================================
+//攻撃処理
+//====================================================================================
+void CDiveWeakEnemy::AttackProcess()
+{
+	if (CScene::GetMode() == CScene::MODE_GAME)
+	{
+		if (GetCntTime() % s_nATTACK_FREQUENCY == 0)
+		{
+			D3DXVECTOR3 Aim = CCalculation::Calculation3DVec(GetSenterPos(), CGame::GetPlayer()->GetSenterPos(), 20.0f);
+
+			CAttackEnemy::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::PLAYER, CAttack::COLLISIONTYPE::SQUARE, 1, 60, 200, GetSenterPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), Aim, D3DXVECTOR3(2.0f, 2.0f, 2.0f));
+		}
+	}
 }
 //============================================================================================================================================
 

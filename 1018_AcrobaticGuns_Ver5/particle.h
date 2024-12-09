@@ -47,7 +47,7 @@ public:
 	void SetGravity(float fGravity);        //重力パーティクルにする　
 	static CParticle * Create(TYPE Type,int nLife, float fWidth, float fHeight,D3DXVECTOR3 pos, D3DXVECTOR3 move, D3DXCOLOR col, bool bBrending);//パーティクルを生成
 	static void SummonParticle(TYPE type,int nNum,int nLife, float fWidth, float fHeight,int nRandSpeed,int nDivision,bool bRandumCol,D3DXVECTOR3 Pos,D3DXCOLOR col, bool bBreanding);//ランダム方向に放出するパーティクルを出す
-	static void SummonChargeParticle(TYPE type, int nNum, int nLife, float fInitialSpeed,float fWidth, float fHeight,int nSummonLength, int nRandSpeed, int nDivision, bool bRandumCol,D3DXVECTOR3 SupportPos, D3DXCOLOR col, bool bBreanding);//チャージするような挙動のパーティクルを出す
+	static void SummonChargeParticle(TYPE type, int nNum, int nLife, float fInitialSpeed,float fWidth, float fHeight,float fSummonLength, int nRandSpeed, int nDivision, bool bRandumCol,D3DXVECTOR3 SupportPos, D3DXCOLOR col, bool bBreanding);//チャージするような挙動のパーティクルを出す
 private:
 	bool m_bBranding;         //アルファブレンディングをするかどうか
 	TYPE m_Type;              //種類

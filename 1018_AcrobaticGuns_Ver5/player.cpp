@@ -144,6 +144,8 @@ void CPlayer::Update()
 
     CManager::GetDebugProc()->PrintDebugProc("プレイヤーの位置：%f %f %f\n", GetPos().x, GetPos().y, GetPos().z);
 
+    CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 60, 5.0f, 5.0f, 100, 10, false, GetPos() + GetVtxMax(), D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f), true);
+
     //m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f) + m_AddPosR;
     //m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -200.0f, 0.0f, cosf(m_Rot.y) * -200.0f);
 }
@@ -269,7 +271,7 @@ void CPlayer::ActionModeChenge()
         else
         {//ダイブ→ショット
             m_NowActionMode = ACTIONMODE::SHOT;
-            SetUseInteria(true);
+            SetUseInteria(true, CObjectXMove::GetNormalInertia());
             SetUseGravity(true, GetNormalGravity());
         }
 

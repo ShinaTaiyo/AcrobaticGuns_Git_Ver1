@@ -88,6 +88,10 @@ public:
 	//通常移動速度
 	void SetNormalSpeed(float fSpeed) { m_fNormalSpeed = fSpeed; }
 	const float& GetNormalSpeed() const { return m_fNormalSpeed; }
+
+	//パターン
+
+
 	//=================================================================================================================
 
 	static int GetNumEnemy() { return m_nNumEnemy; }
@@ -117,6 +121,14 @@ protected:
 	//static list<PhaseSaveInfo>
  //   //===============================================================================================
 
+	struct Pattern
+	{
+		int nPattern;
+		int nSubPattern;
+		int nPatternTime;
+		bool bAction;
+	};
+
 	//================================================
 	//変数宣言
 	//================================================
@@ -126,6 +138,21 @@ protected:
 	//================================================
 	//プロトタイプ宣言
 	//================================================
+	void SetPattern(int nPattern) { m_Pattern.nPattern = nPattern; }
+	const int& GetPattern() const { return m_Pattern.nPattern; }
+
+	void SetSubPattern(int nSubPattern) { m_Pattern.nSubPattern = nSubPattern; }
+	const int& GetSubpattern() const { return m_Pattern.nSubPattern; }
+
+	void SetPatternTime(int nPatternTime) { m_Pattern.nPatternTime = nPatternTime; }
+	const int& GetPatternTime() const { return m_Pattern.nPatternTime; }
+
+	void SetAction(bool bAction) { m_Pattern.bAction = bAction; }
+	const bool& GetAction() const { return m_Pattern.bAction; }
+
+	void SetUseCollisionDetection(bool bUse) { m_bCollisoinDetection = bUse; }
+
+	const bool& GetCollisionDetection() const { return m_bActivateCollisionDetection; }
 	//===============================================================================================
 
 private:
@@ -150,6 +177,10 @@ private:
 	float m_fSensingRange;//感知射程
 	float m_fNormalSpeed; //通常移動速度
 	
+	Pattern m_Pattern;    //パターン
+
+	bool m_bCollisoinDetection;//衝突判定を行うかどうか
+	bool m_bActivateCollisionDetection;//衝突判定発動
 	//===============================================================================================
 
 	//================================================
@@ -158,6 +189,8 @@ private:
 	void CollisionProcess();//当たり判定を行う
 	void SetMoveAiPoint();  //移動AIの配置をする
 	void PhaseNumDecision();//フェーズ番号を設定する
+	virtual void AttackProcess();//攻撃処理
+	void CollisionDetectionProcess();//衝突判定処理
 	//===============================================================================================
 };
 
@@ -197,14 +230,18 @@ private:
 	//静的メンバ
 	//================================================
 	static const string s_aSHOTWEAKENEMY_FILENAME[static_cast<int>(SHOTWEAKENEMYTYPE::MAX)];//敵のモデルファイル名
-	static const int s_nATTACK_FREQUENCY;//攻撃頻度
-	static const float s_fSENSINGRANGE;  //感知射程
+	static const float s_fATTACKSTART_LENGTH;
+	static const float s_fNORMAL_SENSIINGRANGE;
+	static const int s_nATTACK_COOLTIME;//攻撃のクールタイム
 	//===============================================================================================
 
 	//================================================
 	//変数宣言
 	//================================================
 	SHOTWEAKENEMYTYPE m_ShotWeakEnemyType;//敵の種類
+	CAttackEnemy* m_pMagicSword;//魔法剣
+	D3DXVECTOR3 m_SaveAimPos;//目的の位置保存用
+	int m_nAttackCoolTime;//攻撃のクールタイム
 	//===============================================================================================
 
 	//================================================
@@ -213,7 +250,7 @@ private:
 
 	//*移動AI
 	void BattleMoveProcess() override;//バトル移動処理
-
+	void AttackProcess() override;
 	//===============================================================================================
 };
 
@@ -253,13 +290,15 @@ private:
 	//静的メンバ
 	//================================================
 	static const string s_aDIVEWEAKENEMY_FILENAME[static_cast<int>(DIVEWEAKENEMYTYPE::MAX)];//敵のモデルファイル名
+	static const int s_nATTACK_FREQUENCY;//攻撃頻度
+	static const float s_fSENSINGRANGE;  //感知射程
 	//===============================================================================================
 
 	//================================================
 	//変数宣言
 	//================================================
 	DIVEWEAKENEMYTYPE m_DiveWeakEnemyType;//敵の種類
-	CAttackEnemy* m_pMagicSword;//魔法剣
+
 	//===============================================================================================
 
 	//================================================
@@ -268,6 +307,9 @@ private:
 	
 	//*移動AI
 	void BattleMoveProcess() override;//バトル移動処理
+
+	//攻撃処理
+	void AttackProcess() override;
 
 	//===============================================================================================
 };

@@ -254,7 +254,7 @@ CAttackPlayer* CAttackPlayer::Create(ATTACKTYPE AttackType, TARGETTYPE TargetTyp
 	pAttackPlayer->SetMove(move);                 //ˆÚ“®—Ê
 	pAttackPlayer->SetScale(Scale);               //Šg‘å—¦
 	pAttackPlayer->SetAutoSubLife(true);          //‘Ì—Í‚ðŽg—p‚·‚é
-	pAttackPlayer->SetUseInteria(false);
+	pAttackPlayer->SetUseInteria(false, CObjectXMove::GetNormalInertia());
 	pAttackPlayer->SetUseGravity(false,1.0f);
 	//ƒ‚ƒfƒ‹î•ñÝ’è
 	int nIdx = CManager::GetObjectXInfo()->Regist(ATTACK_FILENAME[static_cast<int>(AttackType)]);
@@ -356,7 +356,7 @@ CAttackEnemy* CAttackEnemy::Create(ATTACKTYPE AttackType, TARGETTYPE TargetType,
 	pAttackEnemy->SetRot(rot);                   //Œü‚«
 	pAttackEnemy->SetMove(move);                 //ˆÚ“®—Ê
 	pAttackEnemy->SetScale(Scale);               //Šg‘å—¦
-	pAttackEnemy->SetUseInteria(false);
+	pAttackEnemy->SetUseInteria(false, CObjectXMove::GetNormalInertia());
 	pAttackEnemy->SetUseGravity(false, 1.0f);
 	//ƒ‚ƒfƒ‹î•ñÝ’è
 	int nIdx = CManager::GetObjectXInfo()->Regist(ATTACK_FILENAME[static_cast<int>(AttackType)]);
