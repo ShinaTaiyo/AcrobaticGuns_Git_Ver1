@@ -189,6 +189,9 @@ void CEnemy::SaveInfoTxt(fstream& WritingFile)
 		break;
 	}
 
+	WritingFile << "NORMALSPEED = " << m_fNormalSpeed << endl;
+	WritingFile << "SENSINGRANGE = " << m_fSensingRange << endl;
+
 	//フェーズ番号を設定
 	WritingFile << "PHASENUM = " << m_nPhaseNum << endl;
 
@@ -914,6 +917,9 @@ void CShotWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 	D3DXVECTOR3 MoveAiRot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	D3DXVECTOR3 MoveAiScale = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
+	float fNormalSpeed = 0.0f; //通常速度
+	float fSensingRange = 0.0f;//索敵距離
+
 	while (Buff != "END_SETSHOTWEAKENEMY")
 	{
 		LoadingFile >> Buff;//単語を読み込む
@@ -961,6 +967,16 @@ void CShotWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 		{
 			LoadingFile >> Buff;//イコール
 			LoadingFile >> nPhaseNum;//フェーズ番号
+		}
+		else if (Buff == "NORMALSPEED")
+		{
+			LoadingFile >> Buff;//イコール
+			LoadingFile >> fNormalSpeed;//通常速度
+		}
+		else if (Buff == "SENSINGRANGE")
+		{
+			LoadingFile >> Buff;//イコール
+			LoadingFile >> fSensingRange;
 		}
 		else if (Buff == "SETMOVEAI")
 		{
@@ -1030,12 +1046,14 @@ void CShotWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 	{
 		CShotWeakEnemy* pShotWeakEnemy = CShotWeakEnemy::Create(ShotWeakEnemyType,nLife,nPhaseNum,Pos,Rot,Scale);
 		pShotWeakEnemy->SetVecMoveAiInfo(VecMoveAi);
+		pShotWeakEnemy->SetNormalSpeed(fNormalSpeed);
+		pShotWeakEnemy->SetSensingRange(fSensingRange);
 		listSaveManager.push_back(pShotWeakEnemy);      //vectorに情報を保存する
 
 	}
 	else if (CScene::GetMode() == CScene::MODE_GAME)
 	{
-		CGame::GetPhaseManager()->PushPhaseInfo(Pos, Rot, Scale, nLife, static_cast<int>(EnemyType), nShotWeakEnemyType, nPhaseNum, VecMoveAiInfo);
+		CGame::GetPhaseManager()->PushPhaseInfo(Pos, Rot, Scale, nLife, static_cast<int>(EnemyType), nShotWeakEnemyType, nPhaseNum,fNormalSpeed,fSensingRange, VecMoveAiInfo);
 	}
 
 }
@@ -1330,6 +1348,9 @@ void CDiveWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 	D3DXVECTOR3 MoveAiPos = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	D3DXVECTOR3 MoveAiRot = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	D3DXVECTOR3 MoveAiScale = D3DXVECTOR3(0.0f,0.0f,0.0f);
+
+	float fNormalSpeed = 0.0f; //通常速度
+	float fSensingRange = 0.0f;//索敵距離
 	while (Buff != "END_SETDIVEWEAKENEMY")
 	{
 		LoadingFile >> Buff;//単語を読み込む
@@ -1377,6 +1398,16 @@ void CDiveWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 		{
 			LoadingFile >> Buff;      //イコール
 			LoadingFile >> nPhaseNum; //フェーズ番号
+		}
+		else if (Buff == "NORMALSPEED")
+		{
+			LoadingFile >> Buff;//イコール
+			LoadingFile >> fNormalSpeed;//通常速度
+		}
+		else if (Buff == "SENSINGRANGE")
+		{
+			LoadingFile >> Buff;//イコール
+			LoadingFile >> fSensingRange;
 		}
 		else if (Buff == "SETMOVEAI")
 		{
@@ -1449,11 +1480,13 @@ void CDiveWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 		pDiveWeakEnemy->SetUseDraw(true);
 		pDiveWeakEnemy->SetUseShadow(true);
 		pDiveWeakEnemy->SetVecMoveAiInfo(VecMoveAi);
+		pDiveWeakEnemy->SetNormalSpeed(fNormalSpeed);
+		pDiveWeakEnemy->SetSensingRange(fSensingRange);
 		listSaveManager.push_back(pDiveWeakEnemy);      //vectorに情報を保存する
 	}
 	else if (CScene::GetMode() == CScene::MODE_GAME)
 	{
-		CGame::GetPhaseManager()->PushPhaseInfo(Pos, Rot, Scale, nLife, static_cast<int>(EnemyType), nDiveWeakEnemyType, nPhaseNum,VecMoveAiInfo);
+		CGame::GetPhaseManager()->PushPhaseInfo(Pos, Rot, Scale, nLife, static_cast<int>(EnemyType), nDiveWeakEnemyType, nPhaseNum,fNormalSpeed,fSensingRange,VecMoveAiInfo);
 	}
 }
 //============================================================================================================================================

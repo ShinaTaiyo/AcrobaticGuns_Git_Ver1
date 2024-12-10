@@ -96,7 +96,7 @@ void CPhaseManager::SetDeath()
 //フェーズマネージャーに情報を設定する
 //===============================================================
 void CPhaseManager::PushPhaseInfo(D3DXVECTOR3 Pos, D3DXVECTOR3 Rot, D3DXVECTOR3 Scale,
-	int nLife, int nEnemyType, int nTypeNum, int nPhaseNum, vector<CEnemy::MoveAiInfo> VecMoveAi)
+	int nLife, int nEnemyType, int nTypeNum, int nPhaseNum, float fNormalSpeed, float fSensingRange, vector<CEnemy::MoveAiInfo> VecMoveAi)
 {
 	PhaseSaveInfo Info = {};
 	Info.Pos = Pos;
@@ -107,6 +107,8 @@ void CPhaseManager::PushPhaseInfo(D3DXVECTOR3 Pos, D3DXVECTOR3 Rot, D3DXVECTOR3 
 	Info.nTypeNum = nTypeNum;
 	Info.nPhaseNum = nPhaseNum;
 	Info.VecMoveAi = VecMoveAi;
+	Info.fNormalSpeed = fNormalSpeed;
+	Info.fSensingRange = fSensingRange;
 
 	//フェーズ最大数を超えていたら更新
 	if (nPhaseNum > s_MaxPhase)
@@ -159,6 +161,9 @@ void CPhaseManager::AdvancePhase()
 				default:
 					break;
 				}
+
+				pEnemy->SetNormalSpeed(it.fNormalSpeed);
+				pEnemy->SetSensingRange(it.fSensingRange);
 
 				auto CopyVec = move(VecMoveAi);
 				//移動AIを設定する

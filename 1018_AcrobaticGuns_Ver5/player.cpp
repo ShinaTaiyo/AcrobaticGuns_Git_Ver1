@@ -415,7 +415,6 @@ void CPlayer::CollisionProcess()
                 if (bCollisionY == true)
                 {
                     SetMove(D3DXVECTOR3(GetMove().x, -0.1f, GetMove().z)); 
-                    CManager::GetDebugProc()->PrintDebugProc("æ‚Á‚Ä‚¢‚é\n");
                 }
 
             }

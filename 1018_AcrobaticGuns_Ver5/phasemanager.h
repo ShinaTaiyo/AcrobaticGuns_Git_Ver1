@@ -35,7 +35,7 @@ public:
 	void Draw() override;      //描画処理
 	void SetDeath() override;  //死亡フラグを設定
 	static CPhaseManager * Create();           //生成処理
-	void PushPhaseInfo(D3DXVECTOR3 Pos, D3DXVECTOR3 Rot, D3DXVECTOR3 Scale, int nLife, int nEnemyType, int nTypeNum, int nPhaseNum, vector<CEnemy::MoveAiInfo> VecMoveAi);        //生成処理
+	void PushPhaseInfo(D3DXVECTOR3 Pos, D3DXVECTOR3 Rot, D3DXVECTOR3 Scale, int nLife, int nEnemyType, int nTypeNum, int nPhaseNum,float fNormalSpeed,float fSensingRange, vector<CEnemy::MoveAiInfo> VecMoveAi);        //生成処理
 private:
 	struct PhaseSaveInfo
 	{
@@ -46,7 +46,8 @@ private:
 		int nEnemyType;      //敵タイプ
 		int nTypeNum;        //クラスごとのタイプ
 		int nPhaseNum;       //フェーズ番号を設定
-
+		float fNormalSpeed;  //普通の速度
+		float fSensingRange; //索敵距離
 		vector<CEnemy::MoveAiInfo> VecMoveAi;//移動AIのVector
 	};
 	static list<PhaseSaveInfo>s_PhaseList;  //フェーズ情報のリスト

@@ -224,7 +224,6 @@ void CPlayerMove_Dive::MoveProcess(CPlayer* pPlayer)
 	bool bInput = CManager::GetInputJoypad()->GetRT_Press();
 	pPlayer->SetMove(m_DiveMove);
 	CCamera* pCamera = CManager::GetCamera();
-
 	if (CCalculation::CalculationLength(pPlayer->GetPos(), pWireHead->GetPos()) < 50.0f)
 	{//ダイブ時に判定したら移動モードと攻撃モードを通常に戻す
 		if (bInput == false)
@@ -258,7 +257,7 @@ CPlayerMove_Stuck::CPlayerMove_Stuck(CPlayer* pPlayer) : m_NowPos(pPlayer->GetPo
 	CCamera* pCamera = CManager::GetCamera();
 	CWireHead* pWireHead = pPlayer->GetWire()->GetWireHead();
 	pPlayer->SetPos(pPlayer->GetPos() - pPlayer->GetMove());
-	pCamera->SetRot(pWireHead->GetRot());
+	pCamera->SetRot(pWireHead->GetRot() + D3DXVECTOR3(D3DX_PI,D3DX_PI,0.0f));//カメラの向きを固定したワイヤーヘッドの逆側に！
 }
 //======================================================================================================================================================
 
@@ -286,7 +285,7 @@ void CPlayerMove_Stuck::MoveProcess(CPlayer* pPlayer)
 	CLockon* pLockon = pPlayer->GetLockOn();//ロックオンへのポインタ
 
 	pWireHead->SetPos(pPlayer->GetPos());//ダイブ準備中なのでワイヤーヘッドをプレイヤーの位置に固定
-	pPlayer->SetRot(D3DXVECTOR3(-pCamera->GetRot().x + D3DX_PI,pCamera->GetRot().y,0.0f));//向きをカメラに合わせる
+	//pPlayer->SetRot(D3DXVECTOR3(pCamera->GetRot().x + D3DX_PI,-pCamera->GetRot().y,0.0f));//向きをカメラに合わせる
     //CManager::GetDebugProc()->PrintDebugProc("移動量：%f %f %f\n", Move.x, Move.y, Move.z);
 	if (CManager::GetInputJoypad()->GetRT_Trigger() == true)
 	{//ワイヤー発射移動モードにチェンジ
@@ -309,10 +308,7 @@ void CPlayerMove_Stuck::MoveProcess(CPlayer* pPlayer)
 		pPlayer->ChengeWireShotMode(DBG_NEW CPlayerWireShot_Do());//ワイヤーショットモード「する」
 		pPlayer->SetUseInteria(false, CObjectXMove::GetNormalInertia());//慣性を使用しない
 		pPlayer->SetUseGravity(false, CObjectXMove::GetNormalGravity());//重力を使用しない
-		CCamera* pCamera = CManager::GetCamera();
 		pPlayer->SetMove(Move);
-
-		pCamera->SetCustomMode(false);
 
 		//描画を復活させる
 		pPlayer->GetWire()->GetWireHead()->SetUseDraw(true);
@@ -601,14 +597,26 @@ void CPlayerWireShot_Do::WireShotProcess(CPlayer* pPlayer)
 	CWire* pWire = pPlayer->GetWire();
 	CWireHead* pWireHead = pWire->GetWireHead();
 	//pWireHead->SetRot(CalcRot);
+	CCamera* pCamera = CManager::GetCamera();
+	pPlayer->SetMove(D3DXVECTOR3(0.0f, 0.0f, 0.0f));//ワイヤー発射中は動きを止める
 	if (pWireHead->GetSuccessCollision() == true)
 	{//ワイヤーがどれかのオブジェクトに当たったら
 		pPlayer->ChengeWireShotMode(DBG_NEW CPlayerWireShot_Dont());//ワイヤー発射モード「なし」
 		pPlayer->ChengeEffectMode(DBG_NEW CPlayerEffect_Dive());    //エフェクトモード「ダイブ」
 
+		//==========================
+		//カメラの向きを求める
+		//==========================
+		D3DXVECTOR3 Rot = pWireHead->GetPos() - pPlayer->GetPos();
+		D3DXVec3Normalize(&Rot, &Rot);
+		float fYaw = atan2f(Rot.x, Rot.z);
+		float fPitch = atan2f(Rot.y, sqrtf(powf(Rot.x, 2) + powf(Rot.z, 2)));
+		pCamera->SetRot(D3DXVECTOR3(-fPitch - D3DX_PI * 0.5f,fYaw,0.0f));
+		//==============================================================================================
+
 		pWireHead->SetMove(D3DXVECTOR3(0.0f, 0.0f, 0.0f));//ワイヤーヘッドの移動を止める
 		D3DXVECTOR3 Move = CCalculation::Calculation3DVec(pPlayer->GetPos(), pWireHead->GetPos(),40.0f);
-		CPlayerMove_Dive * pPlayerMove_Dive = DBG_NEW CPlayerMove_Dive();
+		CPlayerMove_Dive * pPlayerMove_Dive = DBG_NEW CPlayerMove_Dive();//ダイブを開始する
 		pPlayerMove_Dive->SetDiveMove(Move);
         pPlayer->ChengeMoveMode(pPlayerMove_Dive);
 		pPlayer->SetMove(Move);
