@@ -51,7 +51,7 @@ public:
 	static bool ExtrusionCollisionSquare(D3DXVECTOR3 & MyPos,bool& bCollisionX,bool & bCollisionY,bool & bCollisionZ,
 		const D3DXVECTOR3 MyMove,const D3DXVECTOR3 MyPosOld,const D3DXVECTOR3 MyVtxMax,const D3DXVECTOR3 MyVtxMin,
 		const D3DXVECTOR3 ComPos,const D3DXVECTOR3 ComVtxMax,const D3DXVECTOR3 ComVtxMin,
-		const bool bCollisionXOld,const bool bCollisionYOld,const bool bCollisionZOld);
+		const bool bCollisionXOld,const bool bCollisionYOld,const bool bCollisionZOld,bool & bIsLanding);
 
 	//XâüÇµèoÇµ
 	static bool ExtrusionCollisionSquareX(D3DXVECTOR3& MyPos,const D3DXVECTOR3 MyMove,const D3DXVECTOR3 MyPosOld,const D3DXVECTOR3 MyVtxMax, const D3DXVECTOR3 MyVtxMin, 
@@ -59,7 +59,7 @@ public:
 
 	//YâüÇµèoÇµ
 	static bool ExtrusionCollisionSquareY(D3DXVECTOR3& MyPos, const D3DXVECTOR3 MyMove, const D3DXVECTOR3 MyPosOld, const D3DXVECTOR3 MyVtxMax, const D3DXVECTOR3 MyVtxMin,
-		const D3DXVECTOR3 ComPos, const D3DXVECTOR3 ComVtxMax, const D3DXVECTOR3 ComVtxMin,const bool bCollisionY);
+		const D3DXVECTOR3 ComPos, const D3DXVECTOR3 ComVtxMax, const D3DXVECTOR3 ComVtxMin,const bool bCollisionY, bool& bIsLanding);
 
 	//ZâüÇµèoÇµ
 	static bool ExtrusionCollisionSquareZ(D3DXVECTOR3& MyPos, const D3DXVECTOR3 MyMove, const D3DXVECTOR3 MyPosOld, const D3DXVECTOR3 MyVtxMax, const D3DXVECTOR3 MyVtxMin,

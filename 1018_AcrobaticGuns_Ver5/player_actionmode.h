@@ -96,7 +96,15 @@ public:
 	void MoveProcess(CPlayer* pPlayer) override;//移動処理
 	void JumpProcess(CPlayer* pPlayer);        //ジャンプ処理
 private:
-	bool m_bIsLanding;
+	//*静的メンバ宣言
+	static constexpr float s_fACCELL_PARAM = 7.0f;
+
+	//*変数宣言
+	bool m_bIsLanding;//地面にいるかどうか
+	bool m_bDodge;//回避しているかどうか
+
+	//*プロトタイプ宣言
+	void DodgeProcess(CPlayer * pPlayer);//回避処理
 };
 
 //ダイブ移動クラス
@@ -227,6 +235,7 @@ public:
 	CPlayerWireShot();//コンストラクタ
 	virtual ~CPlayerWireShot();//デストラクタ
 	virtual void WireShotProcess(CPlayer * pPlayer);//ワイヤー発射処理
+	static void StartWireShotProcess(CPlayer* pPlayer);//ワイヤーの発射を開始する
 };
 
 //発射するクラス
@@ -246,5 +255,4 @@ public:
 	~CPlayerWireShot_Dont() override;//デストラクタ
 	void WireShotProcess(CPlayer* pPlayer) override;//ワイヤー発射処理
 };
-
 #endif

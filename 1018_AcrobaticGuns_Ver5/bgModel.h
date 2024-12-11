@@ -29,6 +29,7 @@ public:
 		BILL_02,    //ビル２
 		BILL_03,    //ビル３
 		BILL_04,    //ビル４
+		CHAIN_00,   //チェーン
 		MAX
 	};
 

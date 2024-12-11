@@ -74,6 +74,12 @@ public:
 	void Update() override;                                               //更新処理
 	void Draw() override;                                                 //描画処理
 	void BindObjectXInfo(LPD3DXMESH pMesh, LPD3DXBUFFER pBuffMat, DWORD dwNumMat, LPDIRECT3DTEXTURE9* pTexture,D3DCOLORVALUE * pDiffuse);//モデル情報を割り当てる
+
+	//==========================================================
+	//静的メンバ宣言
+	//==========================================================
+	static void SetCommonDraw(bool bDraw) { s_bCOMMON_DRAWSHADOW = bDraw; }
+
 	//==========================================================
 	//位置
 	//==========================================================
@@ -199,6 +205,8 @@ public:
 	void SetColor(D3DXCOLOR col, int nColChengeTime,bool bChoose,bool bSetAlpha);
 	//=================================================================================================================
 private:
+	static bool s_bCOMMON_DRAWSHADOW;
+
 	void DrawShadow();                                                       //影を描画する
 
 	//==========================================================

@@ -354,6 +354,9 @@ void CEnemy::ManagerChooseControlInfo()
 
 	PhaseNumDecision();//フェーズ番号の決定を行う
 
+	EditNormalSpeed();//通常移動速度を編集
+
+	EditSensingRange();//索敵範囲を編集
 	CObjectXAlive::ManagerChooseControlInfo();
 }
 //============================================================================================================================================
@@ -384,6 +387,7 @@ void CEnemy::CollisionProcess()
 	bool bCollisionX = false;
 	bool bCollisionY = false;
 	bool bCollisionZ = false;
+	bool bIsLanding = false;
 
 	bool bSuccessCollision = false;//当たり判定が成功したかどうか
 	for (int nCntPri = 0; nCntPri < CObject::m_nMAXPRIORITY; nCntPri++)
@@ -405,11 +409,15 @@ void CEnemy::CollisionProcess()
 				D3DXVECTOR3 ComVtxMin = static_cast<CObjectX*>(pObj)->GetVtxMin();
 
 				bSuccessCollision = CCollision::ExtrusionCollisionSquare(MyPos, bCollisionX, bCollisionY, bCollisionZ, Move, MyPosOld, MyVtxMax, MyVtxMin,
-					ComPos, ComVtxMax, ComVtxMin, bCollisionXOld, bCollisionYOld, bCollisionZOld);
+					ComPos, ComVtxMax, ComVtxMin, bCollisionXOld, bCollisionYOld, bCollisionZOld,bIsLanding);
 
 				if (bCollisionY == true)
 				{
-					SetMove(D3DXVECTOR3(GetMove().x, 0.0f, GetMove().z));
+					if (bIsLanding == true)
+					{
+						SetMove(D3DXVECTOR3(GetMove().x, 0.0f, GetMove().z));
+						SetIsLanding(true);
+					}
 				}
 
 				if (bSuccessCollision == true)
@@ -735,6 +743,85 @@ void CEnemy::CollisionDetectionProcess()
 		SetPos(GetPos() - AimVec * (fTotalLength - fLength));
 	}
 	
+}
+
+//====================================================================================
+//通常移動速度を編集
+//====================================================================================
+void CEnemy::EditNormalSpeed()
+{
+	CInputKeyboard * pInput = CManager::GetInputKeyboard();
+
+	if (pInput->GetPress(DIK_LCONTROL) == true)
+	{//Lコントロールキーを押しながら
+		if (pInput->GetPress(DIK_LSHIFT) == true)
+		{//シフトキーを押しながら・・・
+			if (pInput->GetPress(DIK_5) == true)
+			{
+				m_fNormalSpeed -= 0.1f;
+			}
+		}
+		else if (pInput->GetPress(DIK_5) == true)
+		{
+			m_fNormalSpeed += 0.1f;
+		}
+	}
+	else
+	{//Lコントロールキーを押していない
+		if (pInput->GetPress(DIK_LSHIFT) == true)
+		{//シフトキーを押しながら・・・
+			if (pInput->GetTrigger(DIK_5) == true)
+			{
+				m_fNormalSpeed -= 0.1f;
+			}
+		}
+		else if (pInput->GetTrigger(DIK_5) == true)
+		{
+			m_fNormalSpeed += 0.1f;
+		}
+	}
+
+	CManager::GetDebugProc()->PrintDebugProc("通常移動速度変更（５）：%f\n",m_fNormalSpeed);
+}
+//============================================================================================================================================
+
+//====================================================================================
+//通常移動速度を編集
+//====================================================================================
+void CEnemy::EditSensingRange()
+{
+	CInputKeyboard* pInput = CManager::GetInputKeyboard();
+
+	if (pInput->GetPress(DIK_LCONTROL) == true)
+	{//Lコントロールキーを押しながら
+		if (pInput->GetPress(DIK_LSHIFT) == true)
+		{//シフトキーを押しながら・・・
+			if (pInput->GetPress(DIK_6) == true)
+			{
+				m_fSensingRange -= 0.1f;
+			}
+		}
+		else if (pInput->GetPress(DIK_6) == true)
+		{
+			m_fSensingRange += 0.1f;
+		}
+	}
+	else
+	{//Lコントロールキーを押していない
+		if (pInput->GetPress(DIK_LSHIFT) == true)
+		{//シフトキーを押しながら・・・
+			if (pInput->GetTrigger(DIK_6) == true)
+			{
+				m_fSensingRange -= 0.1f;
+			}
+		}
+		else if (pInput->GetTrigger(DIK_6) == true)
+		{
+			m_fSensingRange += 0.1f;
+		}
+	}
+
+	CManager::GetDebugProc()->PrintDebugProc("索敵範囲変更（６）：%f\n", m_fSensingRange);
 }
 //============================================================================================================================================
 

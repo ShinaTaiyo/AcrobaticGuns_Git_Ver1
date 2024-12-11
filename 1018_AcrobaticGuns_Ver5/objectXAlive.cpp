@@ -19,7 +19,7 @@
 //コンストラクタ
 //============================================================
 CObjectXAlive::CObjectXAlive(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXMove(nPri,bUseintPri,type,ObjType), m_bHitStop(false), m_nHitStopTime(0), m_bAutoSubLife(false), m_nLife(0), m_nMaxLife(0),m_bUseRatioLifeAlpha(false),
-m_bExtrusionCollisionSquareX(false),m_bExtrusionCollisionSquareY(false),m_bExtrusionCollisionSquareZ(false), m_bAutoDeath(true)
+m_bExtrusionCollisionSquareX(false),m_bExtrusionCollisionSquareY(false),m_bExtrusionCollisionSquareZ(false), m_bAutoDeath(true),m_bIsLanding(false)
 {
 
 }

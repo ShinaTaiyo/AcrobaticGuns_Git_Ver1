@@ -43,6 +43,11 @@ public:
 	//Z
 	void SetExtrusionCollisionSquareZ(bool bSuccess) { m_bExtrusionCollisionSquareZ = bSuccess;}
 	const bool &  GetExtrusionCollisionSquareZ() const { return m_bExtrusionCollisionSquareZ; }
+
+	//’n–Ê‚É‚¢‚é‚©‚Ç‚¤‚©
+	void SetIsLanding(bool bLanding) { m_bIsLanding = bLanding;}
+	const bool& GetLanding() const { return m_bIsLanding; }
+
 	//============================================================================================================
 
 	//======================================================
@@ -119,6 +124,10 @@ private:
 	bool m_bExtrusionCollisionSquareX;//X
 	bool m_bExtrusionCollisionSquareY;//Y
 	bool m_bExtrusionCollisionSquareZ;//Z
+
+	//’n–Ê‚É‚¢‚é‚©‚Ç‚¤‚©
+	bool m_bIsLanding;
+
 	//============================================================================================================
 
 	//===================================

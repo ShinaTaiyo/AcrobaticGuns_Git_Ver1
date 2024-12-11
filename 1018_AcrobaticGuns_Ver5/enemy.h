@@ -191,6 +191,10 @@ private:
 	void PhaseNumDecision();//フェーズ番号を設定する
 	virtual void AttackProcess();//攻撃処理
 	void CollisionDetectionProcess();//衝突判定処理
+
+	//*ステータスエディット
+	void EditNormalSpeed();//移動速度
+	void EditSensingRange();//索敵範囲
 	//===============================================================================================
 };
 

@@ -24,6 +24,11 @@
 //===========================================================================================
 
 //================================================
+//静的メンバ宣言
+//================================================
+bool CObjectX::s_bCOMMON_DRAWSHADOW = true;
+
+//================================================
 //コンストラクタ
 //================================================
 CObjectX::CObjectX(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject(nPri,bUseintPri,type,ObjType),
@@ -216,10 +221,10 @@ void CObjectX::Draw()
 	//	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
 	//}
 
-	if (m_ObjectXInfo.Diffuse[0].a > 0.0f && m_Pos.y + m_VtxMax.y >= 0.0f && m_bUseShadow == true)
+	if (m_ObjectXInfo.Diffuse[0].a > 0.0f && m_Pos.y + m_VtxMax.y >= 0.0f && m_bUseShadow == true && s_bCOMMON_DRAWSHADOW == true)
 	{
 		//影の描画
-		DrawShadow();
+		//DrawShadow();
 	}
 	//ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
@@ -597,7 +602,7 @@ void CObjectX::ChengeEditPos()
 {
 	D3DXVECTOR3 Move = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	SetColor(D3DXCOLOR(1.0f,0.0f,0.0f,0.5f),3,true,true);           //色を半透明にする
-
+	CInputKeyboard* pInput = CManager::GetInputKeyboard();
 	//===========================
 	//位置を支点に固定
 	//===========================
@@ -607,15 +612,29 @@ void CObjectX::ChengeEditPos()
 	//===========================
 	//位置を変更
 	//===========================
-	if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
+	if (pInput->GetPress(DIK_LSHIFT) == true)
 	{
-		if (CManager::GetInputKeyboard()->GetPress(DIK_W) == true)
+		if (pInput->GetPress(DIK_LCONTROL))
 		{
-			m_Pos.y += 5.0f;
+			if (pInput->GetTrigger(DIK_W) == true)
+			{
+				m_Pos.y += 0.1f;
+			}
+			else if (pInput->GetTrigger(DIK_S) == true)
+			{
+				m_Pos.y -= 0.1f;
+			}
 		}
-		else if (CManager::GetInputKeyboard()->GetPress(DIK_S) == true)
+		else
 		{
-			m_Pos.y -= 5.0f;
+			if (pInput->GetPress(DIK_W) == true)
+			{
+				m_Pos.y += 5.0f;
+			}
+			else if (pInput->GetPress(DIK_S) == true)
+			{
+				m_Pos.y -= 5.0f;
+			}
 		}
 	}
 	else

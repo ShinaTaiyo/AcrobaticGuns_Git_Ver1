@@ -236,7 +236,8 @@ bool CInputKeyboard::GetRepeat(int nKey)
 //=====================================
 //コンストラクタ（ジョイパッドクラス）
 //=====================================
-CInputJoypad::CInputJoypad() : m_joykeyStatePress(),m_joykeyStateTrigger(),m_fLSitckAimRot(0.0f), m_fRStickAimRot(0.0f), m_nRTTrigger_RepeatCnt(0)
+CInputJoypad::CInputJoypad() : m_joykeyStatePress(),m_joykeyStateTrigger(),m_fLSitckAimRot(0.0f), m_fRStickAimRot(0.0f), m_nRTTrigger_RepeatCnt(0),
+m_nLTTrigger_RepeatCnt(0)
 {
 	//=======================
 	//メモリのクリア
@@ -299,6 +300,10 @@ void CInputJoypad::Update()
 		BYTE OldRTrigger = m_joykeyStatePress.Gamepad.bRightTrigger;
 		m_joykeyStateTrigger.Gamepad.bRightTrigger = ~OldRTrigger & RTTrigger;//トリガー処理（1f前と同じだったら）（絶対に１になる）
 
+		BYTE LTTrigger = joykeyState.Gamepad.bLeftTrigger;
+		BYTE OldLTrigger = m_joykeyStatePress.Gamepad.bLeftTrigger;
+		m_joykeyStateTrigger.Gamepad.bLeftTrigger = ~OldLTrigger & LTTrigger;//トリガー処理（1f前と同じだったら）（絶対に１になる）
+
 		m_joykeyStatePress = joykeyState;//ジョイパッドのプレス情報を保存
 	}
 }
@@ -350,6 +355,48 @@ bool CInputJoypad::GetRT_Repeat(const int nRepeatLoop)
 		if (m_nRTTrigger_RepeatCnt >= nRepeatLoop)
 		{
 			m_nRTTrigger_RepeatCnt = 0;
+			return true;
+		}
+	}
+	return false;
+}
+
+//=====================================
+//トリガー情報の取得（ジョイパッドクラス）
+//=====================================
+bool CInputJoypad::GetLT_Trigger()
+{
+	return  m_joykeyStateTrigger.Gamepad.bLeftTrigger != 0;//0x0004（JOYKEY_LEFT)なら0x01<<2 = 00000111 = 0x0004
+}
+//========================================================================================================================================================
+
+//=====================================
+//プレス情報の取得（ジョイパッドクラス）
+//=====================================
+bool CInputJoypad::GetLT_Press()
+{
+	return m_joykeyStatePress.Gamepad.bLeftTrigger != 0;//0x0004（JOYKEY_LEFT)なら0x01<<2 = 00000111 = 0x0004;
+}
+//========================================================================================================================================================
+
+//=====================================
+//リピート情報の取得（ジョイパッドクラス）
+//=====================================
+bool CInputJoypad::GetLT_Repeat(const int nRepeatLoop)
+{
+	if (GetLT_Press() == true)
+	{
+		if (GetLT_Trigger() == true)
+		{
+			m_nLTTrigger_RepeatCnt = 0;
+			return true;
+		}
+
+		m_nLTTrigger_RepeatCnt++;
+
+		if (m_nLTTrigger_RepeatCnt >= nRepeatLoop)
+		{
+			m_nLTTrigger_RepeatCnt = 0;
 			return true;
 		}
 	}

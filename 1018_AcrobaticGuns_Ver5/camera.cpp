@@ -26,6 +26,7 @@
 //====================================================================
 const float CCamera::m_BESIDECAMERALENGTH = 570.0f;//ビサイドビューのカメラの距離
 const float CCamera::s_fINITIAL_LENGTH = 400.0f;   //カメラとの最初の距離
+const float CCamera::s_fNORMAL_AROUNDROTSPEED = 0.02f;//カメラの通常回転速度
 //====================================================================================================
 
 //====================================================================
@@ -34,7 +35,7 @@ const float CCamera::s_fINITIAL_LENGTH = 400.0f;   //カメラとの最初の距離
 CCamera::CCamera() : m_SupportPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_fLength(s_fINITIAL_LENGTH), m_fTurningRotSpeed(0.0f),m_fTurningSpeedY(0.0f),m_PosV(D3DXVECTOR3(0.0f,0.0f,0.0f)),
 m_PosR(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_VecU(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Rot(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_mtxProjection(),m_mtxView(),m_CameraType(CAMERATYPE_BIRD),m_DifferenceLength(D3DXVECTOR3(0.0f,0.0f,0.0f)),
 m_ZoomSpeed(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_nShakeFrame(0),m_ModeTime(0),m_fShakePower(0.0f),m_fAddLength(0.0f),m_AddPosR(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_AddPosV(D3DXVECTOR3(0.0f,0.0f,0.0f))
-,m_bCustom(false)
+,m_bCustom(false),m_State(CAMERASTATE::NORMAL),m_pCameraState(DBG_NEW CCameraState())
 {
 
 }
@@ -75,7 +76,11 @@ HRESULT CCamera::Init()
 //====================================================================
 void CCamera::Uninit()
 {
-
+	if (m_pCameraState != nullptr)
+	{
+		delete m_pCameraState;
+		m_pCameraState = nullptr;
+	}
 }
 //====================================================================================================
 
@@ -90,7 +95,7 @@ void CCamera::Update()
 	//========================================
 	if (CManager::GetInputKeyboard()->GetPress(DIK_Q))
 	{
-		m_Rot.y -= 0.01f;
+		m_Rot.y -= s_fNORMAL_AROUNDROTSPEED;
 	}
 	if (CManager::GetInputKeyboard()->GetPress(DIK_E))
 	{
@@ -100,17 +105,17 @@ void CCamera::Update()
 		}
 		else
 		{
-			m_Rot.y += 0.01f;
+			m_Rot.y += s_fNORMAL_AROUNDROTSPEED;
 		}
 	}
 
 	if (CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::LB))
 	{
-		m_Rot.y -= 0.01f;
+		m_Rot.y -= s_fNORMAL_AROUNDROTSPEED;
 	}
 	if (CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::RB))
 	{
-		m_Rot.y += 0.01f;
+		m_Rot.y += s_fNORMAL_AROUNDROTSPEED;
 	}
 
 	//===========================
@@ -159,7 +164,7 @@ void CCamera::Update()
 	}
 
 
-	//=========================o==============
+	//========================================
 	//カメラを揺らす
 	//========================================
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_F1) == true)
@@ -167,8 +172,27 @@ void CCamera::Update()
 		SetShake(50, 0.2f);
 	}
 
+	//========================================
+    //後ろを向く
+    //========================================
+	if (CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::Y))
+	{
+		ChengeState(DBG_NEW CCameraState_TurnAround(m_Rot.y + D3DX_PI, 0.15f));
+	}
+
+	m_pCameraState->Process(this);
+
 	//カメラの通常の注視点を設定し続ける
 	NormalCameraMove();
+
+	if (m_PosV.y < 0.0f)
+	{//視点が０以下なら全ての影を描画しない
+		CObjectX::SetCommonDraw(false);
+	}
+	else
+	{
+		CObjectX::SetCommonDraw(true);
+	}
 
 	//=================================================================================================================================
 
@@ -251,6 +275,16 @@ void CCamera::SetShake(int nShakeFrame, float fShakePower)
 //====================================================================================================
 
 //====================================================================
+//カメラの状態を変える
+//====================================================================
+void CCamera::ChengeState(CCameraState* pCameraState)
+{
+	delete m_pCameraState;
+	m_pCameraState = pCameraState;
+}
+//====================================================================================================
+
+//====================================================================
 //普通のカメラの位置を設定し続ける
 //====================================================================
 void CCamera::NormalCameraMove()
@@ -316,4 +350,52 @@ void CCamera::TurningCameraProcess()
 	//m_PosV.x = sinf(m_Rot.y) * m_fLength + m_PosR.x;
 	//m_PosV.z = cosf(m_Rot.y) * m_fLength + m_PosR.z;
 }
-//====================================================================================================
+//===================================================================================================================================================
+
+//※以降ステートクラス
+
+//****************************************************************************************************
+//カメラが後ろを向く状態クラス
+//****************************************************************************************************
+
+//=================================================================
+//コンストラクタ
+//=================================================================
+CCameraState_TurnAround::CCameraState_TurnAround(float fAimRot, float fAdjustTurnSpeed) : m_fAimRot(fAimRot),m_fAdjustTurnSpeed(fAdjustTurnSpeed)
+{
+
+}
+//===================================================================================================================================================
+
+//=================================================================
+//デストラクタ
+//=================================================================
+CCameraState_TurnAround::~CCameraState_TurnAround()
+{
+
+}
+//===================================================================================================================================================
+
+//=================================================================
+//処理
+//=================================================================
+void CCameraState_TurnAround::Process(CCamera* pCamera)
+{
+	const float & fNowRot = pCamera->GetRot().y;
+
+	//向きの差分を求める
+	float fRotDiff = m_fAimRot - fNowRot;
+
+	CManager::GetDebugProc()->PrintDebugProc("カメラの向きの差分:%f\n");
+
+	//加算する向きの量を補正して求める
+	float fAddRot = fRotDiff * m_fAdjustTurnSpeed;
+	pCamera->SetRot(D3DXVECTOR3(pCamera->GetRot().x, pCamera->GetRot().y + fAddRot, pCamera->GetRot().z));
+
+	//差分の絶対値が0.01f以下なら
+	if (fabsf(fRotDiff) < 0.01f)
+	{//カメラ状態を普通に戻す
+		pCamera->ChengeState(DBG_NEW CCameraState());
+	}
+}
+//===================================================================================================================================================

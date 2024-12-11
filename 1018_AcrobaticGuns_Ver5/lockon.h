@@ -45,11 +45,12 @@ public:
 	const D3DXVECTOR3& GetFrontPos() const { return m_FrontPos; }  //手前の位置を取得する
 	const D3DXVECTOR3& GetNearRayColObjPos() const { return m_NearRayColObjPos; }//レイが当たった一番近いオブジェクトの衝突位置を求める
 	const ENDSTATE& GetEndState() const { return m_EndState; }     //ロックオンが画面内のどの端に当たっているかを取得する
+	const bool& GetSuccessRayCollision() const { return m_bRayCollision; }//レイの当たり判定が成功したかどうか
 private:
 	//=======================================
 	//静的メンバ
 	//=======================================
-	static constexpr float m_fNORMAL_LOCKONMOVE = 15.0f;
+	static constexpr float m_fNORMAL_LOCKONMOVE = 20.0f;
 	//==========================================================================================================
 
 	//=======================================
@@ -60,6 +61,7 @@ private:
 	D3DXVECTOR3 m_FrontPos; //手前の位置
 	ENDSTATE m_EndState;    //どの端にいるか
 	D3DXVECTOR3 m_NearRayColObjPos;//一番近いオブジェクトのレイが当たっている位置を求める
+	bool m_bRayCollision;//レイが当たっているかどうか
 	//==========================================================================================================
 
 	//=======================================

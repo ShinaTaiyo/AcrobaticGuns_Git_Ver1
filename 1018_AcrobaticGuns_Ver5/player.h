@@ -58,6 +58,7 @@ public:
 	void ChengeAttackMode(CPlayerAttack* pPlayerAttack);//攻撃モードを変える
 	void ChengeEffectMode(CPlayerEffect* pPlayerEffect);//エフェクトモードを変える
 	void ChengeWireShotMode(CPlayerWireShot* pPlayerWireShot);//ワイヤー発射モードを変える
+	CPlayerWireShot* GetWireShotState() { return m_pWireShot; }//ワイヤー発射状態を取得
 	//===============================================================================================
 private:
 	//================================================

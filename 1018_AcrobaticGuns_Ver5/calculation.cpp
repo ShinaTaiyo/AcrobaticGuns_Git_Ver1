@@ -599,7 +599,7 @@ float CCalculation::DetermineSide3D(const D3DXVECTOR3& origin, const D3DXVECTOR3
 //===========================================================================================================
 
 //=====================================================================
-//方向ベクトルに対して点が左右どちらにいるかを判定する
+//オブジェクトの向きをホーミングさせる
 //=====================================================================
 D3DXVECTOR3 CCalculation::HormingVecRotXZ(float& fRotMove, const D3DXVECTOR3& MyPos, const D3DXVECTOR3& AimPos, float CorrectionRot, float fSpeed)
 {
@@ -633,8 +633,6 @@ D3DXVECTOR3 CCalculation::HormingVecRotXZ(float& fRotMove, const D3DXVECTOR3& My
 	{
 		fRotDiff += D3DX_PI * 2;
 	}
-
-	CManager::GetDebugProc()->PrintDebugProc("向きの差分：%f\n", fRotDiff);
 
 	//==============================================================================================
 	fRotMove += fRotDiff * CorrectionRot;//移動方向（角度補正）

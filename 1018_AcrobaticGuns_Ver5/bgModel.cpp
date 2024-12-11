@@ -26,6 +26,7 @@ const string CBgModel::BGMODEL_FILENAME[static_cast<int>(CBgModel::BGMODELTYPE::
 	"data\\MODEL\\BgModel\\Bill_002.x",
 	"data\\MODEL\\BgModel\\Bill_003.x",
 	"data\\MODEL\\BgModel\\Bill_004.x",
+	"data\\MODEL\\BgModel\\Chain_000.x",
 };
 //======================================================================================================================
 

@@ -34,6 +34,5 @@ public:
 private:
 	static CPlayer* m_pPlayer;                                  //プレイヤー
 	static CStageManager* m_pStageManager;                      //ステージマネージャー
-	static CField* m_pField;                                    //フィールド
 };
 #endif

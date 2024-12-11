@@ -102,7 +102,10 @@ public:
 	bool GetTrigger(JOYKEY key);                                          //トリガー状態獲得
 	bool GetRT_Trigger();                                                 //Rトリガーボタンのトリガー情報
  	bool GetRT_Press();                                                   //Rトリガーボタンのプレス情報
-	bool GetRT_Repeat(const int nRepeatLoop);                                   //Rトリガーボタンのリピート情報
+	bool GetRT_Repeat(const int nRepeatLoop);                             //Rトリガーボタンのリピート情報
+	bool GetLT_Trigger();                                                 //Lトリガーボタンのトリガー情報
+ 	bool GetLT_Press();                                                   //Lトリガーボタンのプレス情報
+	bool GetLT_Repeat(const int nRepeatLoop);                             //Lトリガーボタンのリピート情報
 	bool GetLStickPress(const int nDivisionRot,float fDirectionRot);                          //Lスティックのプレス情報
 	bool GetRStickPress(const int nDivisionRot);                          //Rスティックのプレス情報
 
@@ -116,6 +119,7 @@ private:
 	float m_fRStickAimRot;                //Rスティックの目的の角度を代入する
 
 	int m_nRTTrigger_RepeatCnt;           //Rトリガーのリピートカウント
+	int m_nLTTrigger_RepeatCnt;           //Lトリガーのリピートカウント
 
 };
 #endif

@@ -155,23 +155,12 @@ void CObjectXMove::UpdatePos()
 		//Šµ«‚Ìˆ—
 		if (m_bUseInteria == true)
 		{
-			if (GetType() == CObject::TYPE::ENEMY)
-			{
-				int n = 0;
-			}
 			m_Move.x += (0.0f - m_Move.x) * m_fInertia;
 			m_Move.z += (0.0f - m_Move.z) * m_fInertia;
 		}
 
 		//ˆÊ’u‚Ìİ’è
 		SetPos(Pos + m_Move);
-
-		if (Pos.y <= fabs(GetVtxMin().y) && m_bAdjustPos == true)
-		{
-			SetPos(D3DXVECTOR3(Pos.x, 0.0f + fabs(GetVtxMin().y), Pos.z));
-			m_Move.y = 0.0f;
-		}
-
 	}
 }
 //===============================================================================================================================================================

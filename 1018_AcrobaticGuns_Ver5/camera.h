@@ -14,6 +14,11 @@
 //==========================================================================
 
 //==========================================================================
+//前方宣言
+//==========================================================================
+class CCameraState;
+
+//==========================================================================
 //カメラクラス
 //==========================================================================
 class CCamera
@@ -32,6 +37,16 @@ public:
 		CAMERATYPE_MAX
 	}CAMERATYPE;
 	//=================================================================================================
+
+	//===================================================
+	//カメラ状態列挙型
+	//===================================================
+	enum class CAMERASTATE
+	{
+		NORMAL = 0,
+		TURNAROUND,
+		MAX
+	};
 
 	CCamera();            //コンストラクタ
 	~CCamera();           //デストラクタ
@@ -72,6 +87,8 @@ public:
 
 	void SetCustomMode(bool bActive) { m_bCustom = bActive; }
 
+	void ChengeState(CCameraState * pCameraState);//ステートを変える
+
 	//======================================
 	//マトリックス系
 	//======================================
@@ -79,8 +96,17 @@ public:
 	D3DXMATRIX* GetMtxProjection() { return &m_mtxProjection; }//プロジェクションマトリックスを取得
 	//==========================================================================================================================================
 private:
+	//======================================
+    //静的メンバ宣言
+    //======================================
 	static const float m_BESIDECAMERALENGTH;      //ビサイドモードのカメラの距離
 	static const float s_fINITIAL_LENGTH;         //最初の距離
+	static const float s_fNORMAL_AROUNDROTSPEED;  //カメラの回転速度
+	//==========================================================================================================================================
+
+	//======================================
+	//変数宣言
+	//======================================
 	D3DXVECTOR3 m_PosV;                           //視点!
 	D3DXVECTOR3 m_PosR;                           //注視点!
 	D3DXVECTOR3 m_AddPosR;                        //加算注視点
@@ -92,8 +118,11 @@ private:
 	CAMERATYPE m_CameraType;                      //カメラモードの種類!
 	D3DXVECTOR3 m_DifferenceLength;               //差分!
 	D3DXVECTOR3 m_ZoomSpeed;                      //ズームする速さ!
-	
 	D3DXVECTOR3 m_SupportPos;                     //参考位置!
+
+	CAMERASTATE m_State;                          //状態名
+	CCameraState* m_pCameraState;                 //カメラの状態クラス
+
 	float m_fLength;                              //距離!
 	float m_fAddLength;                           //追加距離!
 	float m_fTurningRotSpeed;                     //旋回速度!
@@ -104,9 +133,34 @@ private:
 	float m_fShakePower;                          //カメラを揺らす力!
 
 	bool m_bCustom;                               //カメラの挙動をカスタムにするかどうか
+	//==========================================================================================================================================
 
+	//======================================
+	//プロトタイプ宣言
+	//======================================
 	void BossDefeatCameraProcess();               //ボスを倒したときのカメラの処理を行う
 	void TurningCameraProcess();                  //旋回のカメラの処理を行う
 	void NormalCameraMove();                      //普通のカメラの注視点を設定し続ける
+	//==========================================================================================================================================
+};
+
+class CCameraState
+{
+public:
+	CCameraState() {};                          //コンストラクタ
+	virtual ~CCameraState() {};                 //デストラクタ
+	virtual void Process(CCamera* pCamera) {};  //処理
+};
+
+//急に後ろを向かせる
+class CCameraState_TurnAround : public CCameraState
+{
+public:
+	CCameraState_TurnAround(float fAimRot,float fAdjustTurnSpeed);//コンストラクタ
+	~CCameraState_TurnAround() override;//デストラクタ
+	void Process(CCamera * pCamera) override;//処理
+private:
+	const float m_fAimRot;          //目的の向き
+	const float m_fAdjustTurnSpeed; //向きを変える速度の補正度
 };
 #endif

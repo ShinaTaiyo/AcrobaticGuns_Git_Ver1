@@ -28,7 +28,8 @@
 //コンストラクタ
 //===============================================================
 CLockon::CLockon(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject2D(nPri,bUseintPri,type,ObjType),
-m_LockOnPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_NowRay(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_FrontPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_EndState(ENDSTATE::NONE),m_NearRayColObjPos(D3DXVECTOR3(0.0f,0.0f,0.0f))
+m_LockOnPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_NowRay(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_FrontPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_EndState(ENDSTATE::NONE),m_NearRayColObjPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),
+m_bRayCollision(false)
 {
 
 }
@@ -141,43 +142,45 @@ void CLockon::MoveProcess()
 {
 	D3DXVECTOR3 Pos = GetPos();
 	const D3DXVECTOR3& CameraRot = CManager::GetCamera()->GetRot();
-
+	CCamera* pCamera = CManager::GetCamera();
 	m_EndState = ENDSTATE::NONE;
 
 	if (CManager::GetInputJoypad()->GetRStickPress(16) == true)
 	{
-		Pos.x += sinf(CManager::GetInputJoypad()->GetRStickAimRot()) * m_fNORMAL_LOCKONMOVE;
-		Pos.y += cosf(CManager::GetInputJoypad()->GetRStickAimRot()) * -m_fNORMAL_LOCKONMOVE;
+		//Pos.x += sinf(CManager::GetInputJoypad()->GetRStickAimRot()) * m_fNORMAL_LOCKONMOVE;
+		//Pos.y += cosf(CManager::GetInputJoypad()->GetRStickAimRot()) * -m_fNORMAL_LOCKONMOVE;
+		CManager::GetCamera()->SetRot(CameraRot + D3DXVECTOR3(cosf(CManager::GetInputJoypad()->GetRStickAimRot() + D3DX_PI) * 0.04f,
+			sinf(CManager::GetInputJoypad()->GetRStickAimRot()) * 0.04f, 0.0f));
 	}
 
-	if (Pos.x + GetWidth() * 0.5f > SCREEN_WIDTH)
-	{//右
-		Pos.x = SCREEN_WIDTH - GetWidth() * 0.5f;
-		m_EndState = ENDSTATE::RIGHTEND;
-		CManager::GetCamera()->SetRot(CameraRot + D3DXVECTOR3(0.0f, 0.01f, 0.0f));
-	}
-	if (Pos.x - GetWidth() * 0.5f < 0.0f)
-	{//左
-		Pos.x = 0.0f + GetWidth() * 0.5f;
-		m_EndState = ENDSTATE::LEFTEND;
-		CManager::GetCamera()->SetRot(CameraRot + D3DXVECTOR3(0.0f, -0.01f, 0.0f));
+	//if (Pos.x + GetWidth() * 0.5f > SCREEN_WIDTH)
+	//{//右
+	//	Pos.x = SCREEN_WIDTH - GetWidth() * 0.5f;
+	//	m_EndState = ENDSTATE::RIGHTEND;
+	//	CManager::GetCamera()->SetRot(CameraRot + D3DXVECTOR3(0.0f, 0.04f, 0.0f));
+	//}
+	//if (Pos.x - GetWidth() * 0.5f < 0.0f)
+	//{//左
+	//	Pos.x = 0.0f + GetWidth() * 0.5f;
+	//	m_EndState = ENDSTATE::LEFTEND;
+	//	CManager::GetCamera()->SetRot(CameraRot + D3DXVECTOR3(0.0f, -0.04f, 0.0f));
 
-	}
+	//}
 
-	if (Pos.y + GetHeight() * 0.5f > SCREEN_HEIGHT)
-	{//上
-		Pos.y = SCREEN_HEIGHT - GetHeight() * 0.5f;
-		m_EndState = ENDSTATE::UPEND;
-		CManager::GetCamera()->SetRot(CameraRot + D3DXVECTOR3(0.01f, 0.0f, 0.0f));
-		//CManager::GetCamera()->SetPosR(CManager::GetCamera()->GetPosR() + D3DXVECTOR3(0.0f, 5.0f, 0.0f));
-	}
-	if (Pos.y - GetHeight() * 0.5f < 0.0f)
-	{//下
-		Pos.y = 0.0f + GetHeight() * 0.5f;
-		m_EndState = ENDSTATE::DOWNEND;
-		CManager::GetCamera()->SetRot(CameraRot + D3DXVECTOR3(-0.01f, 0.0f, 0.0f));
-		//CManager::GetCamera()->SetPosR(CManager::GetCamera()->GetPosR() + D3DXVECTOR3(0.0f, -5.0f, 0.0f));
-	}
+	//if (Pos.y + GetHeight() * 0.5f > SCREEN_HEIGHT)
+	//{//上
+	//	Pos.y = SCREEN_HEIGHT - GetHeight() * 0.5f;
+	//	m_EndState = ENDSTATE::UPEND;
+	//	CManager::GetCamera()->SetRot(CameraRot + D3DXVECTOR3(0.04f, 0.0f, 0.0f));
+	//	//CManager::GetCamera()->SetPosR(CManager::GetCamera()->GetPosR() + D3DXVECTOR3(0.0f, 5.0f, 0.0f));
+	//}
+	//if (Pos.y - GetHeight() * 0.5f < 0.0f)
+	//{//下
+	//	Pos.y = 0.0f + GetHeight() * 0.5f;
+	//	m_EndState = ENDSTATE::DOWNEND;
+	//	CManager::GetCamera()->SetRot(CameraRot + D3DXVECTOR3(-0.04f, 0.0f, 0.0f));
+	//	//CManager::GetCamera()->SetPosR(CManager::GetCamera()->GetPosR() + D3DXVECTOR3(0.0f, -5.0f, 0.0f));
+	//}
 
 
 
@@ -227,14 +230,10 @@ void CLockon::CalcRay()
 //===============================================================
 void CLockon::RayCollisionToObject()
 {
-	bool bCollision = false;//当たり判定
+	//*変数宣言
+	bool bRayCollision = false;//レイが当たったかの状態をリセット
 	vector<D3DXVECTOR3> VecCollisionSuccess;     //当たり判定が成功した位置のvector
 	CPlayer* pPlayer = CGame::GetPlayer();
-
-	D3DXVECTOR3 WireViewDir = CCalculation::RadToVec(pPlayer->GetWire()->GetWireHead()->GetRot());    // プレイヤーの視線方向（X軸方向）
-	D3DXVec3Normalize(&WireViewDir, &WireViewDir);
-	float fovAngle = D3DXToRadian(90.0f);             // 60度をラジアンに変換
-	float maxDistance = 10000.0f;                     // 視距離
 
 	//レイと一致した全てのオブジェクトを求め、中心点をVectorに保存
 	for (int nCntPri = 0; nCntPri < CObject::m_nMAXPRIORITY; nCntPri++)
@@ -250,26 +249,24 @@ void CLockon::RayCollisionToObject()
 			{
 				CObjectX* pObjX = dynamic_cast<CObjectX*>(pObj);
 				//指定したモデルの位置
-				bCollision = CCollision::RayIntersectsAABBCollisionPos(m_FrontPos, m_NowRay, pObjX->GetVtxMin() + pObjX->GetPos(), pObjX->GetVtxMax() + pObjX->GetPos(),
+				bRayCollision = CCollision::RayIntersectsAABBCollisionPos(m_FrontPos, m_NowRay, pObjX->GetVtxMin() + pObjX->GetPos(), pObjX->GetVtxMax() + pObjX->GetPos(),
 					CollisionStartPos);
 
 				// 扇形範囲内かどうかを判定
-				if (bCollision == true)
+				if (bRayCollision == true)
 				{//レイとサイズ/２分の球の当たり判定成功
-					//if (CCalculation::IsObjectInFieldOfView(pPlayer->GetPos(),-WireViewDir, pObjX->GetPos(), fovAngle, maxDistance) == true)
-					//{
-						//カメラの位置が判定オブジェクトのサイズの中に入っていたら
+					//カメラの位置が判定オブジェクトのサイズの中に入っていたら
 					CManager::GetDebugProc()->PrintDebugProc("レイの支点がカメラに被っていない\n");
 					CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 20, 30.0f, 30.0f, 100, 10, false, CollisionStartPos, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f), true);
-					//敵の最大頂点のスクリーン座標を求める
+					//敵の中心のスクリーン座標を求める
 					D3DXVECTOR3 ScreenPos = CCalculation::CalcWorldToScreenNoViewport(pObjX->GetSenterPos(), *CManager::GetCamera()->GetMtxView(), *CManager::GetCamera()->GetMtxProjection(),
 						float(SCREEN_WIDTH), float(SCREEN_HEIGHT));
 
 					float fRot = CCalculation::CalculationRandVecXY();
-						CParticle2D::Create(ScreenPos, D3DXVECTOR3(sinf(fRot) * 10.0f, cosf(fRot) * 10.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), CObject2D::POLYGONTYPE::SENTERROLLING,
-							15, 55.0f, 55.0f, CCalculation::CalRaibowColor());
+					CParticle2D::Create(ScreenPos, D3DXVECTOR3(sinf(fRot) * 10.0f, cosf(fRot) * 10.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), CObject2D::POLYGONTYPE::SENTERROLLING,
+					15, 55.0f, 55.0f, CCalculation::CalRaibowColor());
 
-						VecCollisionSuccess.push_back(CollisionStartPos);//当たり判定が成功したオブジェクトの判定開始位置を保存する
+					VecCollisionSuccess.push_back(CollisionStartPos);//当たり判定が成功したオブジェクトの判定開始位置を保存する
 				}
 			}
 
@@ -301,11 +298,12 @@ void CLockon::RayCollisionToObject()
 				}
 			}
 		}
-
+		m_bRayCollision = true;//レイの当たり判定が成功
 		m_NearRayColObjPos = NearCollisionPos;//レイが当たった一番近いオブジェクトに向かって撃つ
 	}
 	else
 	{//狙っている方向の奥の壁に向かって撃つ
+		m_bRayCollision = false;//レイの当たり判定が失敗
 		m_NearRayColObjPos = m_LockOnPos;//レイが当たったオブジェクトがないので、奥の壁に向かって撃つ
 	}
 	//====================================================================================================================================================================

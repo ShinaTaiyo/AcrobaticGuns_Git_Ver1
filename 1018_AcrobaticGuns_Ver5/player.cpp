@@ -145,7 +145,6 @@ void CPlayer::Update()
     CManager::GetDebugProc()->PrintDebugProc("プレイヤーの位置：%f %f %f\n", GetPos().x, GetPos().y, GetPos().z);
 
     CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 60, 5.0f, 5.0f, 100, 10, false, GetPos() + GetVtxMax(), D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f), true);
-
     //m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f) + m_AddPosR;
     //m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -200.0f, 0.0f, cosf(m_Rot.y) * -200.0f);
 }
@@ -382,6 +381,7 @@ void CPlayer::CollisionProcess()
     bool bCollisionX = false;
     bool bCollisionY = false;
     bool bCollisionZ = false;
+    bool bIsLanding = false;
 
     m_bCollision = false;//判定状態をリセット
     bool bSuccessCollision = false;//当たり判定が成功したかどうか
@@ -404,7 +404,7 @@ void CPlayer::CollisionProcess()
                 D3DXVECTOR3 ComVtxMin = static_cast<CObjectX*>(pObj)->GetVtxMin();
 
                 bSuccessCollision = CCollision::ExtrusionCollisionSquare(MyPos, bCollisionX, bCollisionY, bCollisionZ, Move, MyPosOld, MyVtxMax, MyVtxMin,
-                    ComPos, ComVtxMax, ComVtxMin, bCollisionXOld, bCollisionYOld, bCollisionZOld);
+                    ComPos, ComVtxMax, ComVtxMin, bCollisionXOld, bCollisionYOld, bCollisionZOld, bIsLanding);
 
                 if (bSuccessCollision == true)
                 {
@@ -414,7 +414,11 @@ void CPlayer::CollisionProcess()
 
                 if (bCollisionY == true)
                 {
-                    SetMove(D3DXVECTOR3(GetMove().x, -0.1f, GetMove().z)); 
+                    if (bIsLanding == true)
+                    {
+                        SetMove(D3DXVECTOR3(GetMove().x, -0.1f, GetMove().z));
+                        SetIsLanding(true);
+                    }
                 }
 
             }
