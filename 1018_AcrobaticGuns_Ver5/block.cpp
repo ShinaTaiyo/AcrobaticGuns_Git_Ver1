@@ -25,11 +25,12 @@
 //=========================
 //静的メンバ
 //=========================
-int CBlock::m_nNumFile = CBlock::BLOCKTYPE_MAX;                                              //ファイル数を格納する
+int CBlock::m_nNumFile = static_cast<int>(CBlock::BLOCKTYPE::MAX);                                              //ファイル数を格納する
 const float CBlock::m_fBLOCKCORRECTIONCOLLISION = 3.0f;      //1,2,3,4,5,6,7,8,9,10,11,12,13 
-const char* CBlock::m_BLOCK_FILENAME[CBlock::BLOCKTYPE_MAX] =
+const char* CBlock::m_BLOCK_FILENAME[static_cast<int>(CBlock::BLOCKTYPE::MAX)] =
 { "data\\MODEL\\Block\\Block00_Normal.x",
   "data\\MODEL\\Block\\Block01_Water.x", 
+  "data\\MODEL\\Block\\Renga_000.x", 
 };                                                  //ブロックのXファイルへのポインタ
 //========================================================
 
@@ -37,7 +38,7 @@ const char* CBlock::m_BLOCK_FILENAME[CBlock::BLOCKTYPE_MAX] =
 //コンストラクタ
 //=========================
 CBlock::CBlock(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri,bUseintPri,type,ObjType),
-m_bCollision(false),m_type(BLOCKTYPE00_NORMAL)
+m_bCollision(false),m_type(BLOCKTYPE::NORMAL)
 {
 
 }
@@ -62,7 +63,7 @@ HRESULT CBlock::Init()
 	//===========================
 	CObjectXAlive::Init();
 	//=========================================
-	m_type = BLOCKTYPE00_NORMAL;   //ブロックの種類
+	m_type = BLOCKTYPE::NORMAL;   //ブロックの種類
 	m_bCollision = true;           //当たり判定をするかどうか
 	return S_OK;
 }
@@ -113,7 +114,7 @@ void CBlock::SetDeath()
 //==================================
 //ブロック生成処理
 //==================================
-CBlock* CBlock::Create(BLOCKTYPE type, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale)
+CBlock* CBlock::Create(BLOCKTYPE type, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, bool bSwapVtxXZ)
 {
 	CBlock* pBlock = DBG_NEW CBlock;                                                               //ブロックを生成
 	bool bSuccess = pBlock->CObject::GetCreateSuccess();
@@ -124,6 +125,7 @@ CBlock* CBlock::Create(BLOCKTYPE type, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 r
 		{
 			pBlock->Init();                               //初期化処理
 			pBlock->SetRot(rot);                          //向きを設定
+			pBlock->SetUseSwapVtxXZ(bSwapVtxXZ);          //頂点XZを入れ替える
 			pBlock->SetUseDeath(true);                    //死亡フラグを発動するかどうかを設定する
 			pBlock->m_type = type;                        //ブロックの種類
 			pBlock->SetLife(nLife);                       //ブロックの体力
@@ -146,6 +148,7 @@ CBlock* CBlock::Create(BLOCKTYPE type, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 r
 			pBlock->CObjectX::SetTypeNum((int)(type));                                //オブジェクトXごとのタイプ番号を設定
 			pBlock->SetSize();                                                        //Xオブジェクトのサイズを設定する
 			pBlock->SetManagerObjectType(CObject::MANAGEROBJECTTYPE::BLOCK);           //マネージャーで呼び出す時の種類を設定
+			pBlock->ActiveSwapVtxMaxMin();
 		}
 	}
 	else
@@ -398,13 +401,13 @@ void CBlock::LandingCorrection(D3DXVECTOR3& Pos, CObject* pSaveObj,D3DXVECTOR3 V
 void CBlock::SaveInfoTxt(fstream& WritingFile)
 {
 	WritingFile << "SETBLOCK" << endl;
-	WritingFile << "TYPE = " << m_type;
+	WritingFile << "TYPE = " << static_cast<int>(m_type);
 	switch (m_type)
 	{
-	case BLOCKTYPE00_NORMAL:
+	case BLOCKTYPE::NORMAL:
 		WritingFile << " # NORMALBLOCK" << endl;
 		break;
-	case BLOCKTYPE01_WATER:
+	case BLOCKTYPE::WATER:
 		WritingFile << " # WATERBLOCK" << endl;
 		break;
 	default:
@@ -423,7 +426,7 @@ void CBlock::SaveInfoTxt(fstream& WritingFile)
 CObject* CBlock::ManagerChengeObject(bool bAim)
 {
 	int nNewType = int(m_type);
-	BLOCKTYPE NewType = BLOCKTYPE00_NORMAL;
+	BLOCKTYPE NewType = BLOCKTYPE::NORMAL;
 
 	//=======================================
 	//種類を変える
@@ -436,13 +439,13 @@ CObject* CBlock::ManagerChengeObject(bool bAim)
 	{
 		nNewType--;
 	}
-	if (nNewType >= BLOCKTYPE_MAX)
+	if (nNewType >= static_cast<int>(BLOCKTYPE::MAX))
 	{
-		nNewType = BLOCKTYPE00_NORMAL;
+		nNewType = static_cast<int>(BLOCKTYPE::NORMAL);
 	}
 	if (nNewType < 0)
 	{
-		nNewType = BLOCKTYPE_MAX - 1;
+		nNewType = static_cast<int>(BLOCKTYPE::MAX) - 1;
 	}
 	//======================================================================================
 
@@ -459,7 +462,7 @@ CObject* CBlock::ManagerChengeObject(bool bAim)
 	SetDeath();
 	//======================================================================================
 
-	return CBlock::Create(NewType, GetMaxLife(), GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
+	return CBlock::Create(NewType, GetMaxLife(), GetPos(), GetRot(), GetScale(),GetUseSwapVtxXZ());//生成したオブジェクトを返す
 }
 //=========================================================================================================================
 
@@ -475,6 +478,7 @@ void CBlock::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveManager, 
 	D3DXVECTOR3 Scale = D3DXVECTOR3(0.0f,0.0f,0.0f);//拡大率
 	D3DXVECTOR3 Rot = D3DXVECTOR3(0.0f,0.0f,0.0f); //向き
 	BLOCKTYPE Type = {};//ブロックの種類
+	bool bSwapVtxXZ = false;
 	while (Buff != "END_SETBLOCK")
 	{
 		LoadingFile >> Buff;//単語を読み込む
@@ -520,10 +524,15 @@ void CBlock::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveManager, 
 			LoadingFile >> Scale.y;      //拡大率Y
 			LoadingFile >> Scale.z;      //拡大率Z
 		}
+		else if (Buff == "SWAPVTXXZ")
+		{
+			LoadingFile >> Buff;//イコール
+			LoadingFile >> bSwapVtxXZ;
+		}
 	}
 	Type = BLOCKTYPE(nType);
 
-	listSaveManager.push_back(CBlock::Create(Type, nLife, Pos, Rot, Scale));//vectorに情報を保存する
+	listSaveManager.push_back(CBlock::Create(Type, nLife, Pos, Rot, Scale, bSwapVtxXZ));//vectorに情報を保存する
 }
 //=========================================================================================================================
 
@@ -532,7 +541,7 @@ void CBlock::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveManager, 
 //=======================================================================
 CObject* CBlock::ManagerSaveObject()
 {
-	return CBlock::Create(m_type, GetMaxLife(), GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
+	return CBlock::Create(m_type, GetMaxLife(), GetPos(), GetRot(), GetScale(),GetUseSwapVtxXZ());//生成したオブジェクトを返す
 }
 //=========================================================================================================================
 

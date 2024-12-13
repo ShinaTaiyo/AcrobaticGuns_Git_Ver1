@@ -34,7 +34,7 @@ const char* CStageManager::m_apWORLDMAP_TXT[static_cast<int>(CStageManager::WORL
 	"data\\TEXTFILE\\Map\\BossRushMap.txt",
 };
 
-const string CStageManager::m_aSAVE_FILENAME = "data\\TEXTFILE\\Ver2\\Practice.txt";
+const string CStageManager::m_aSAVE_FILENAME = "data\\TEXTFILE\\Ver2\\Stage01.txt";
 
 //================================
 //コンストラクタ
@@ -617,7 +617,7 @@ void CStageManager::ResetScale()
 //===========================================================
 CStageManagerState_NewObject::CStageManagerState_NewObject() : m_pManagerObject(nullptr)
 {
-	m_pManagerObject = CBlock::Create(CBlock::BLOCKTYPE00_NORMAL, 1, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+	m_pManagerObject = CBlock::Create(CBlock::BLOCKTYPE::NORMAL, 1, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f),false);
 	m_pManagerObject->SetUseDeath(false);
 }
 //=======================================================================================================================
@@ -762,7 +762,7 @@ void CStageManagerState_NewObject::ChengeObject(CStageManager* pStageManager)
 	switch (ManagerObjectType)
 	{
 	case  CObject::MANAGEROBJECTTYPE::BLOCK:
-		m_pManagerObject = CBlock::Create(CBlock::BLOCKTYPE00_NORMAL, 10, pStageManager->GetSavePos(),pStageManager->GetSaveRot(),pStageManager->GetSaveScale());
+		m_pManagerObject = CBlock::Create(CBlock::BLOCKTYPE::NORMAL, 10, pStageManager->GetSavePos(),pStageManager->GetSaveRot(),pStageManager->GetSaveScale(),false);
 		break;
 	case CObject::MANAGEROBJECTTYPE::BGMODEL:
 		m_pManagerObject = CBgModel::Create(CBgModel::BGMODELTYPE::BILL_00, pStageManager->GetSavePos(), pStageManager->GetSaveRot(), pStageManager->GetSaveScale(),false);

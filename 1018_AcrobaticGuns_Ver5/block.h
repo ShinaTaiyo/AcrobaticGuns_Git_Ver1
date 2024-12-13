@@ -31,12 +31,13 @@ public:
 	//===========================
 	//ブロックの種類
 	//===========================
-    typedef enum
+    enum class BLOCKTYPE
 	{
-		BLOCKTYPE00_NORMAL = 0,    //普通ブロック
-		BLOCKTYPE01_WATER,         //水ブロック
-		BLOCKTYPE_MAX
-	}BLOCKTYPE;
+		NORMAL = 0,    //普通ブロック
+		WATER,         //水ブロック
+		RENGA,         //レンガブロック
+		MAX
+	};
 	//======================================================================
 
 	//===========================
@@ -56,7 +57,7 @@ public:
 	void Update() override;   //更新処理
 	void Draw() override;     //描画処理
 	void SetDeath() override; //死亡フラグを設定
-	static CBlock * Create(BLOCKTYPE type, int nLife,D3DXVECTOR3 pos,D3DXVECTOR3 rot,D3DXVECTOR3 scale);//ブロックを生成
+	static CBlock * Create(BLOCKTYPE type, int nLife,D3DXVECTOR3 pos,D3DXVECTOR3 rot,D3DXVECTOR3 scale,bool bSwapVtxXZ);//ブロックを生成
 	BLOCKTYPE GetType();//ブロックの種類を取得する
 	void Collision();                                                                  //当たり判定を行う
 	static void CollisionSquare(CObjectXAlive * pObjX);                                //正方形の当たり判定を行う
@@ -79,7 +80,7 @@ private:
 	//静的メンバ
 	//======================================
 	static const int m_nMAX_FALLBLOCKRESPAWNCNT = 150;
-	static const char* m_BLOCK_FILENAME[BLOCKTYPE_MAX];                            //ブロックのファイルネーム
+	static const char* m_BLOCK_FILENAME[static_cast<int>(BLOCKTYPE::MAX)];                            //ブロックのファイルネーム
 	static const float m_fBLOCKCORRECTIONCOLLISION;                                //判定に余裕を持たせる量
 	static int m_nNumFile;                                                         //ファイル数を格納する
 	//======================================================================================================================

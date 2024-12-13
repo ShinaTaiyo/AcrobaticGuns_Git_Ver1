@@ -157,7 +157,14 @@ public:
 	D3DXVECTOR3 GetSize() { return m_Size; }                                                //Xオブジェクトのサイズを取得
 
     //最大頂点と最小頂点をスワップ
-	void ActiveSwapVtxMaxMin() { swap(m_VtxMax.x, m_VtxMax.z); swap(m_VtxMin.x, m_VtxMin.z); }
+	void ActiveSwapVtxMaxMin()
+	{
+		if (m_bSwapVtxXZ == true)
+		{
+			swap(m_OriginVtxMax.x, m_OriginVtxMax.z);
+			swap(m_OriginVtxMin.x, m_OriginVtxMin.z);
+		}
+	}
 	void SetUseSwapVtxXZ(bool bUse) { m_bSwapVtxXZ = bUse; }
 	const bool& GetUseSwapVtxXZ()const{ return m_bSwapVtxXZ; }
 	//============================================================================================================

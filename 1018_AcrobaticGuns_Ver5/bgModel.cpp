@@ -218,11 +218,6 @@ void CBgModel::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveManager
 		{
 			LoadingFile >> Buff;//ƒCƒR[ƒ‹
 			LoadingFile >> bSwapVtxXZ;
-
-			if (bSwapVtxXZ == true)
-			{
-				int sex = 0;
-			}
 		}
 	}
 	Type = BGMODELTYPE(nType);

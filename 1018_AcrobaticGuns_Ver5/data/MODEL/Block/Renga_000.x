@@ -163,12 +163,12 @@ Mesh {
  4;18,19,6,15;;
  
  MeshMaterialList {
-  2;
+  1;
   6;
-  1,
-  1,
-  1,
-  1,
+  0,
+  0,
+  0,
+  0,
   0,
   0;;
   Material {
@@ -177,16 +177,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Pictures\\フォトショップで作ったやつ保管庫\\fallguys_road_tex001.png";
-   }
-  }
-  Material {
-   0.800000;0.800000;0.800000;1.000000;;
-   5.000000;
-   0.000000;0.000000;0.000000;;
-   0.000000;0.000000;0.000000;;
-   TextureFilename {
-    "data\\TEXTURE\\Block3D\\GrassBlock_Tex.jpg";
+    "data\\TEXTURE\\Block3D\\Renga_000.jpg";
    }
   }
  }

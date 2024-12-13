@@ -138,7 +138,7 @@ bool CWireHead::CollisionSquare()
 			CObject* pNext = pObj->GetNextObject();
 			CObject::OBJECTTYPE ObjType = pObj->GetObjectType();
 			CObject::TYPE type = pObj->GetType();
-			if (type == CObject::TYPE::BGMODEL || type == CObject::TYPE::ENEMY)
+			if (type == CObject::TYPE::BGMODEL || type == CObject::TYPE::ENEMY || type == CObject::TYPE::BLOCK)
 			{
 				CObjectX* pObjX = static_cast<CObjectX*>(pObj);
 				if (CCollision::CollisionSquare(GetPos(), GetVtxMax(), GetVtxMin(), pObjX->GetPos(), pObjX->GetVtxMax(), pObjX->GetVtxMin()) == true)

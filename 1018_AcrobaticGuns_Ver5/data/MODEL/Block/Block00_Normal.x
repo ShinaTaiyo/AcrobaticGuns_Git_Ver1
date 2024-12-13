@@ -177,7 +177,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\RengaBlock_Tex.png";
+    "data\\TEXTURE\\Block3D\\Renga_Tex_001.jpg";
    }
   }
  }

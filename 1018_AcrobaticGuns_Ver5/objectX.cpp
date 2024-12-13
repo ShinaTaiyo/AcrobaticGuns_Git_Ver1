@@ -222,7 +222,6 @@ void CObjectX::Draw()
 	//D3DXMatrixRotationQuaternion(&mtxRot, &quat);
 	//D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
 
-
 	//位置を反映
 	D3DXMatrixTranslation(&mtxTrans, m_Pos.x, m_Pos.y, m_Pos.z);
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
@@ -272,7 +271,6 @@ void CObjectX::Draw()
 		{
 			//色合いの設定
 			pMat[nCntMat].MatD3D.Diffuse = m_ObjectXInfo.Diffuse[nCntMat];
-
 			//マテリアルの設定
 			pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
 
@@ -284,7 +282,7 @@ void CObjectX::Draw()
 		}
 		//================================================================================================================
 	}
-	
+
 	//=======================================
 	//描画の調整を元に戻す
 	//=======================================

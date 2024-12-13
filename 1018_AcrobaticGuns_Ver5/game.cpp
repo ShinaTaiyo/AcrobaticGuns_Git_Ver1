@@ -63,7 +63,7 @@ HRESULT CGame::Init()
 {
 	CScene::Init();//ƒV[ƒ“‰Šú‰»ˆ—
 
-	m_pPlayer = CPlayer::Create(D3DXVECTOR3(0.0f,0.0f,-600.0f),D3DXVECTOR3(0.0f,D3DX_PI,0.0f), D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(1.0f,1.0f,1.0f));
+	m_pPlayer = CPlayer::Create(D3DXVECTOR3(0.0f,100.0f,-600.0f),D3DXVECTOR3(0.0f,D3DX_PI,0.0f), D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(1.0f,1.0f,1.0f));
 	m_pPlayer->SetUseDeath(false);
 	m_pPlayer->SetVecAxis(D3DXVECTOR3(0.0f, 1.0f, 0.0f));
 	//CEnemy::Create(CEnemy::ENEMYTYPE::NORMAL, 100, D3DXVECTOR3(-200.0f, 0.0f, 200.0f), D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(1.0f,1.0f,1.0f) * 2);

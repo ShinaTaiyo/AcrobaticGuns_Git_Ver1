@@ -2,10 +2,10 @@ Metasequoia Document
 Format Text Ver 1.0
 
 Scene {
-	pos 0.0000 0.0000 2400.0000
+	pos -39.1589 -74.3041 2400.0000
 	lookat 0.0000 0.0000 0.0000
-	head -0.0136
-	pich 0.1092
+	head -0.1036
+	pich 0.1636
 	bank 0.0000
 	ortho 0
 	zoom2 3.1250
@@ -18,7 +18,7 @@ Scene {
 	}
 }
 Material 1 {
-	"mat1" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Pictures\2”NSTG\Texture\Fire_Tex_000.jpg")
+	"mat1" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Downloads\Brick01-768x480.jpg")
 }
 Object "obj1" {
 	visible 15
