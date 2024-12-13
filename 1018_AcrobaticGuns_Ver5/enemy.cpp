@@ -411,19 +411,20 @@ void CEnemy::CollisionProcess()
 				bSuccessCollision = CCollision::ExtrusionCollisionSquare(MyPos, bCollisionX, bCollisionY, bCollisionZ, Move, MyPosOld, MyVtxMax, MyVtxMin,
 					ComPos, ComVtxMax, ComVtxMin, bCollisionXOld, bCollisionYOld, bCollisionZOld,bIsLanding);
 
-				if (bCollisionY == true)
-				{
-					if (bIsLanding == true)
-					{
-						SetMove(D3DXVECTOR3(GetMove().x, 0.0f, GetMove().z));
-						SetIsLanding(true);
-					}
-				}
-
 				if (bSuccessCollision == true)
 				{
 					SetPos(MyPos);
 				}
+
+				if (bCollisionY == true)
+				{
+					if (bIsLanding == true)
+					{
+						SetMove(D3DXVECTOR3(GetMove().x,0.0f, GetMove().z));
+						SetIsLanding(true);
+					}
+				}
+
 			}
 
 			//オブジェクトを次に進める
@@ -727,7 +728,8 @@ void CEnemy::AttackProcess()
 //====================================================================================
 void CEnemy::CollisionDetectionProcess()
 {
-	D3DXVECTOR3 AimVec = CGame::GetPlayer()->GetPos() - GetPos();
+	D3DXVECTOR3 AimVec = D3DXVECTOR3(CGame::GetPlayer()->GetPos().x,0.0f,CGame::GetPlayer()->GetPos().z) - 
+		D3DXVECTOR3(GetPos().x,0.0f,GetPos().z);//XZ方向だけのベクトルを取る
 	float fLength = CCalculation::CalculationLength(GetPos(), CGame::GetPlayer()->GetPos());
 	const D3DXVECTOR3& PlayerPos = CGame::GetPlayer()->GetPos();
 	const D3DXVECTOR3 & PlayerVtxMax = PlayerPos + D3DXVECTOR3(CGame::GetPlayer()->GetVtxMax().x, 0.0f, 0.0f);
@@ -798,12 +800,12 @@ void CEnemy::EditSensingRange()
 		{//シフトキーを押しながら・・・
 			if (pInput->GetPress(DIK_6) == true)
 			{
-				m_fSensingRange -= 0.1f;
+				m_fSensingRange -= 10.0f;
 			}
 		}
 		else if (pInput->GetPress(DIK_6) == true)
 		{
-			m_fSensingRange += 0.1f;
+			m_fSensingRange += 10.0f;
 		}
 	}
 	else
@@ -812,12 +814,12 @@ void CEnemy::EditSensingRange()
 		{//シフトキーを押しながら・・・
 			if (pInput->GetTrigger(DIK_6) == true)
 			{
-				m_fSensingRange -= 0.1f;
+				m_fSensingRange -= 10.0f;
 			}
 		}
 		else if (pInput->GetTrigger(DIK_6) == true)
 		{
-			m_fSensingRange += 0.1f;
+			m_fSensingRange += 10.0f;
 		}
 	}
 

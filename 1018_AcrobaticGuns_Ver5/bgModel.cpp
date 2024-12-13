@@ -27,6 +27,10 @@ const string CBgModel::BGMODEL_FILENAME[static_cast<int>(CBgModel::BGMODELTYPE::
 	"data\\MODEL\\BgModel\\Bill_003.x",
 	"data\\MODEL\\BgModel\\Bill_004.x",
 	"data\\MODEL\\BgModel\\Chain_000.x",
+	"data\\MODEL\\BgModel\\House_000.x",
+	"data\\MODEL\\BgModel\\Grass_000.x",
+	"data\\MODEL\\BgModel\\GrassGround_000.x",
+	"data\\MODEL\\BgModel\\Log_000.x",
 };
 //======================================================================================================================
 
@@ -98,7 +102,7 @@ void CBgModel::SetDeath()
 //==================================================================
 //生成処理
 //==================================================================
-CBgModel* CBgModel::Create(BGMODELTYPE bgModelType, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 Scale)
+CBgModel* CBgModel::Create(BGMODELTYPE bgModelType, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 Scale, bool bSwapVtxXZ)
 {
 	CBgModel* pBgModel = DBG_NEW CBgModel();     //生成
 
@@ -108,7 +112,7 @@ CBgModel* CBgModel::Create(BGMODELTYPE bgModelType, D3DXVECTOR3 pos, D3DXVECTOR3
 	pBgModel->SetSupportPos(pos);            //支点となる位置を設定
 	pBgModel->SetRot(rot);                   //向き
 	pBgModel->SetScale(Scale);               //拡大率
-
+	pBgModel->SetUseSwapVtxXZ(bSwapVtxXZ);   //XZをチェンジする
 	//モデル情報設定
 	int nIdx = CManager::GetObjectXInfo()->Regist(BGMODEL_FILENAME[static_cast<int>(bgModelType)]);
 
@@ -121,6 +125,19 @@ CBgModel* CBgModel::Create(BGMODELTYPE bgModelType, D3DXVECTOR3 pos, D3DXVECTOR3
 
 	pBgModel->SetManagerObjectType(CObject::MANAGEROBJECTTYPE::BGMODEL);           //マネージャーで呼び出す時の種類を設定
 	pBgModel->SetSize();//サイズを設定する
+
+	if (bSwapVtxXZ == true)
+	{
+		D3DXVECTOR3 VtxMax = pBgModel->GetOriginVtxMax();
+		D3DXVECTOR3 VtxMin = pBgModel->GetOriginVtxMin();
+
+		VtxMax.x = pBgModel->GetOriginVtxMax().z;
+		VtxMax.z = pBgModel->GetOriginVtxMax().x;
+		VtxMin.x = pBgModel->GetOriginVtxMin().z;
+		VtxMin.z = pBgModel->GetOriginVtxMin().x;
+		pBgModel->SetOriginVtxMax(VtxMax);
+		pBgModel->SetOriginVtxMin(VtxMin);
+	}
 	return pBgModel;
 }
 //======================================================================================================================
@@ -132,7 +149,7 @@ CBgModel* CBgModel::Create(BGMODELTYPE bgModelType, D3DXVECTOR3 pos, D3DXVECTOR3
 void CBgModel::SaveInfoTxt(fstream& WritingFile)
 {
 	WritingFile << "SETBGMODEL" << endl;
-	WritingFile << "TYPE = " << static_cast<int>(m_Type);
+	WritingFile << "TYPE = " << static_cast<int>(m_Type) << endl;
 	switch (m_Type)
 	{
 	case BGMODELTYPE::BILL_00:
@@ -163,6 +180,7 @@ void CBgModel::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveManager
 	D3DXVECTOR3 Scale = D3DXVECTOR3(0.0f,0.0f,0.0f); //拡大率
 	D3DXVECTOR3 Rot = D3DXVECTOR3(0.0f,0.0f,0.0f);   //向き
 	BGMODELTYPE Type = {};            //背景モデルの種類
+	bool bSwapVtxXZ = false;//XZの頂点を
 	while (Buff != "END_SETBGMODEL")
 	{
 		LoadingFile >> Buff;//単語を読み込む
@@ -196,10 +214,20 @@ void CBgModel::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveManager
 			LoadingFile >> Scale.y;      //拡大率Y
 			LoadingFile >> Scale.z;      //拡大率Z
 		}
+		else if (Buff == "SWAPVTXXZ")
+		{
+			LoadingFile >> Buff;//イコール
+			LoadingFile >> bSwapVtxXZ;
+
+			if (bSwapVtxXZ == true)
+			{
+				int sex = 0;
+			}
+		}
 	}
 	Type = BGMODELTYPE(nType);
 
-	listSaveManager.push_back(CBgModel::Create(Type,Pos, Rot, Scale));//vectorに情報を保存する
+	listSaveManager.push_back(CBgModel::Create(Type,Pos, Rot, Scale,bSwapVtxXZ));//vectorに情報を保存する
 
 }
 //======================================================================================================================
@@ -245,7 +273,7 @@ CObject* CBgModel::ManagerChengeObject(bool bAim)
 	SetDeath();
 	//======================================================================================
 
-	return CBgModel::Create(NewType, GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
+	return CBgModel::Create(NewType, GetPos(), GetRot(), GetScale(),GetUseSwapVtxXZ());//生成したオブジェクトを返す
 }
 //======================================================================================================================
 
@@ -254,6 +282,6 @@ CObject* CBgModel::ManagerChengeObject(bool bAim)
 //==================================================================
 CObject* CBgModel::ManagerSaveObject()
 {
-	return CBgModel::Create(m_Type,GetPos(),GetRot(),GetScale());//生成したオブジェクトを返す
+	return CBgModel::Create(m_Type,GetPos(),GetRot(),GetScale(),GetUseSwapVtxXZ());//生成したオブジェクトを返す
 }
 //======================================================================================================================

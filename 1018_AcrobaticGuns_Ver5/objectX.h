@@ -142,15 +142,24 @@ public:
 
 	//最大頂点
 	D3DXVECTOR3 & GetVtxMax() { return m_VtxMax; }                                          //各頂点最大値の取得
+	void SetVtxMax(D3DXVECTOR3 VtxMax) { m_VtxMax = VtxMax; }
 	D3DXVECTOR3 & GetOriginVtxMax() { return m_OriginVtxMax; }                              //元の各頂点最大値の取得
+	void SetOriginVtxMax(D3DXVECTOR3 VtxMax) { m_OriginVtxMax = VtxMax; }                   //元の最大頂点の設定
 
 	//最小頂点
 	D3DXVECTOR3 & GetVtxMin() { return m_VtxMin; }                                          //各頂点最小値の取得
+	void SetVtxMin(D3DXVECTOR3 VtxMin) { m_VtxMin = VtxMin; }
 	D3DXVECTOR3 & GetOriginVtxMin() { return m_OriginVtxMin; }                              //元の各頂点最小値の取得
+	void SetOriginVtxMin(D3DXVECTOR3 VtxMin) { m_OriginVtxMin = VtxMin; }                   //元の最小頂点の設定
 
 	//サイズ
 	void SetSize();                                                                         //サイズを設定する 
 	D3DXVECTOR3 GetSize() { return m_Size; }                                                //Xオブジェクトのサイズを取得
+
+    //最大頂点と最小頂点をスワップ
+	void ActiveSwapVtxMaxMin() { swap(m_VtxMax.x, m_VtxMax.z); swap(m_VtxMin.x, m_VtxMin.z); }
+	void SetUseSwapVtxXZ(bool bUse) { m_bSwapVtxXZ = bUse; }
+	const bool& GetUseSwapVtxXZ()const{ return m_bSwapVtxXZ; }
 	//============================================================================================================
 
 	//==========================================================
@@ -289,6 +298,9 @@ private:
 	//カリングするかどうか
 	bool m_bUseCulling;
 
+	//最大頂点と最小頂点をチェンジするかどうか
+	bool m_bSwapVtxXZ;
+
 	//色
 	int m_nChengeColorTime;                    //色を変える時間!
 	bool m_bColorChenge;                       //色を変えているかどうか!
@@ -317,6 +329,7 @@ private:
 	void ChengeEditScaleY();
 	void ChengeEditScaleZ();
 	void ChengeEditPos();               //位置を移動する
+	void ChengeEditSwapVtxXZ();         //最大頂点と最小頂点を変えるかどうか
 	//=================================================================================================================
 
 };

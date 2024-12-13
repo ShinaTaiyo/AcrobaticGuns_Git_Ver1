@@ -69,7 +69,6 @@ void CPlayerMove::MoveProcess(CPlayer* pPlayer)
 	{
 		pPlayer->SetMove(AddMove + D3DXVECTOR3(0.0f, Move.y, 0.0f));
 	}
-
 }
 //======================================================================================================================================================
 
@@ -352,7 +351,7 @@ void CPlayerAttack_Shot::AttackProcess(CPlayer* pPlayer)
 	D3DXVECTOR3 ShotPos = pPlayer->GetPos() + D3DXVECTOR3(0.0f, pPlayer->GetVtxMax().y, 0.0f);
 	D3DXVECTOR3 Move = CCalculation::Calculation3DVec(ShotPos, pLockon->GetNearRayColObjPos(), 40.0f);
 	CAttackPlayer* pAttackPlayer = nullptr;//プレイヤー攻撃へのポインタ
-	if (CManager::GetInputKeyboard()->GetTrigger(DIK_J) == true || CManager::GetInputJoypad()->GetRT_Repeat(6) == true)
+	if (CManager::GetInputKeyboard()->GetTrigger(DIK_J) == true || CManager::GetInputJoypad()->GetRT_Repeat(4) == true)
 	{
 		pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::BULLET,CAttack::TARGETTYPE::ENEMY,CAttack::COLLISIONTYPE::SQUARE,5,5,60,ShotPos, pPlayer->GetRot(), Move, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 		pAttackPlayer->SetUseInteria(false, CObjectXMove::GetNormalInertia());

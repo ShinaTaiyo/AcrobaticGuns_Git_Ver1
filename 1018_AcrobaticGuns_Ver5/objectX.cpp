@@ -37,7 +37,8 @@ m_bUseAddScaling(false),m_bUseShadow(false),m_nChengeColorTime(0),m_nIndexObject
 m_nTypeNum(0), m_bUseMultiScale(false), m_MultiScale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_bUseCulling(false), m_Pos(D3DXVECTOR3(0.0f,0.0f,0.0f)), m_SupportPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),
 m_PosOld(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Rot(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Scale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_FormarScale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Size(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_VtxMin(D3DXVECTOR3(0.0f,0.0f,0.0f)),
 m_OriginVtxMin(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_VtxMax(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_OriginVtxMax(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_mtxWorld(),m_AddRot(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_SenterPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),
-m_AddScale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_fAxis(0.0f),m_VecAxis(D3DXVECTOR3(0.0f,1.0f,0.0f)),m_pMtxParent(nullptr)
+m_AddScale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_fAxis(0.0f),m_VecAxis(D3DXVECTOR3(0.0f,1.0f,0.0f)),m_pMtxParent(nullptr),
+m_bSwapVtxXZ(false)
 {
 	SetObjectType(CObject::OBJECTTYPE::OBJECTTYPE_X);
 }
@@ -149,13 +150,24 @@ void CObjectX::Update()
 	//==========================================================
 
 	//常に拡大率を参照して最大最小頂点を求める
-	m_VtxMax.x = m_OriginVtxMax.x * m_Scale.x;
-	m_VtxMax.y = m_OriginVtxMax.y * m_Scale.y;
-	m_VtxMax.z = m_OriginVtxMax.z * m_Scale.z;
-	m_VtxMin.x = m_OriginVtxMin.x * m_Scale.x;
-	m_VtxMin.y = m_OriginVtxMin.y * m_Scale.y;
-	m_VtxMin.z = m_OriginVtxMin.z * m_Scale.z;
-
+	if (m_bSwapVtxXZ == false)
+	{
+		m_VtxMax.x = m_OriginVtxMax.x * m_Scale.x;
+		m_VtxMax.y = m_OriginVtxMax.y * m_Scale.y;
+		m_VtxMax.z = m_OriginVtxMax.z * m_Scale.z;
+		m_VtxMin.x = m_OriginVtxMin.x * m_Scale.x;
+		m_VtxMin.y = m_OriginVtxMin.y * m_Scale.y;
+		m_VtxMin.z = m_OriginVtxMin.z * m_Scale.z;
+	}
+	else
+	{
+		m_VtxMax.x = m_OriginVtxMax.x * m_Scale.z;
+		m_VtxMax.y = m_OriginVtxMax.y * m_Scale.y;
+		m_VtxMax.z = m_OriginVtxMax.z * m_Scale.x;
+		m_VtxMin.x = m_OriginVtxMin.x * m_Scale.z;
+		m_VtxMin.y = m_OriginVtxMin.y * m_Scale.y;
+		m_VtxMin.z = m_OriginVtxMin.z * m_Scale.x;
+	}
 	m_Size = m_VtxMax - m_VtxMin;
 
 	if (m_bColorChenge == true)
@@ -491,14 +503,14 @@ void CObjectX::ChengeEditScaleX()
 	{//Lコントロールキーを押しながら
 		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
 		{//シフトキーを押しながら・・・
-			if (CManager::GetInputKeyboard()->GetPress(DIK_R) == true)
+			if (CManager::GetInputKeyboard()->GetTrigger(DIK_R) == true)
 			{
-				Scale.x -= 0.1f;
+				Scale.x -= 10.0f;
 			}
 		}
-		else if (CManager::GetInputKeyboard()->GetPress(DIK_R) == true)
+		else if (CManager::GetInputKeyboard()->GetTrigger(DIK_R) == true)
 		{
-			Scale.x += 0.1f;
+			Scale.x += 10.0f;
 		}
 	}
 	else
@@ -530,14 +542,14 @@ void CObjectX::ChengeEditScaleY()
 	{//Lコントロールキーを押しながら
 		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
 		{//シフトキーを押しながら・・・
-			if (CManager::GetInputKeyboard()->GetPress(DIK_T) == true)
+			if (CManager::GetInputKeyboard()->GetTrigger(DIK_T) == true)
 			{
-				Scale.y -= 0.1f;
+				Scale.y -= 10.0f;
 			}
 		}
-		else if (CManager::GetInputKeyboard()->GetPress(DIK_T) == true)
+		else if (CManager::GetInputKeyboard()->GetTrigger(DIK_T) == true)
 		{
-			Scale.y += 0.1f;
+			Scale.y += 10.0f;
 		}
 	}
 	else
@@ -567,14 +579,14 @@ void CObjectX::ChengeEditScaleZ()
 	{//Lコントロールキーを押しながら
 		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
 		{//シフトキーを押しながら・・・
-			if (CManager::GetInputKeyboard()->GetPress(DIK_Y) == true)
+			if (CManager::GetInputKeyboard()->GetTrigger(DIK_Y) == true)
 			{
-				Scale.z -= 0.1f;
+				Scale.z -= 10.0f;
 			}
 		}
-		else if (CManager::GetInputKeyboard()->GetPress(DIK_Y) == true)
+		else if (CManager::GetInputKeyboard()->GetTrigger(DIK_Y) == true)
 		{
-			Scale.z += 0.1f;
+			Scale.z += 10.0f;
 		}
 	}
 	else
@@ -652,6 +664,22 @@ void CObjectX::ChengeEditPos()
 //================================================================================================================================================
 
 //============================================================================
+//最大頂点と最小頂点を入れ替えるかどうか
+//============================================================================
+void CObjectX::ChengeEditSwapVtxXZ()
+{
+	CInputKeyboard* pInputKeyBoard = CManager::GetInputKeyboard();
+
+	if (pInputKeyBoard->GetTrigger(DIK_7))
+	{
+		m_bSwapVtxXZ = m_bSwapVtxXZ ? false : true;
+	}
+
+	CManager::GetDebugProc()->PrintDebugProc("頂点のXZを入れ替えるかどうか（７）：%d\n", m_bSwapVtxXZ);
+}
+//================================================================================================================================================
+
+//============================================================================
 //ステージマネージャーが情報を操作する
 //============================================================================
 void CObjectX::ManagerChooseControlInfo()
@@ -659,6 +687,8 @@ void CObjectX::ManagerChooseControlInfo()
 	ChengeEditPos();//位置を変える
 
 	ChengeEditScale();//拡大率を変える
+
+	ChengeEditSwapVtxXZ();
 
 	CManager::GetCamera()->SetPosR(m_Pos);//カメラの注視点を現在の位置に設定
 }
@@ -678,6 +708,8 @@ void CObjectX::SaveInfoTxt(fstream & WritingFile)
 	WritingFile << "SCALE = " << fixed << setprecision(3) << m_Scale.x << " " <<
 		fixed << setprecision(3) << m_Scale.y << " " <<
 		fixed << setprecision(3) << m_Scale.z << " " << endl;//拡大率
+
+	WritingFile << "SWAPVTXXZ = " << m_bSwapVtxXZ << endl;
 }
 //================================================================================================================================================
 

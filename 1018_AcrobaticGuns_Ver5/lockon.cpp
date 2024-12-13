@@ -181,9 +181,6 @@ void CLockon::MoveProcess()
 	//	CManager::GetCamera()->SetRot(CameraRot + D3DXVECTOR3(-0.04f, 0.0f, 0.0f));
 	//	//CManager::GetCamera()->SetPosR(CManager::GetCamera()->GetPosR() + D3DXVECTOR3(0.0f, -5.0f, 0.0f));
 	//}
-
-
-
 	SetPos(Pos);
 }
 //==============================================================================================================
@@ -220,7 +217,7 @@ void CLockon::CalcRay()
 		CManager::GetCamera()->GetMtxView(), CManager::GetCamera()->GetMtxProjection());//奥
 	//============================================================================================================================
 
-	m_NowRay = FarPos - m_FrontPos;//ベクトルを求める
+	m_NowRay = FarPos - m_FrontPos;//ベクトルを求めるy
 	D3DXVec3Normalize(&m_NowRay, &m_NowRay);//正規化
 }
 //==============================================================================================================

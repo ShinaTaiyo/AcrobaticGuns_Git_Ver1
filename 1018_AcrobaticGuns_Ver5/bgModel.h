@@ -30,6 +30,10 @@ public:
 		BILL_03,    //ビル３
 		BILL_04,    //ビル４
 		CHAIN_00,   //チェーン
+		HOUSE_00,   //家０
+		GRASS_00,   //草
+		GRASSGROUND_00,//草地面
+		LOG_00,     //丸太
 		MAX
 	};
 
@@ -40,7 +44,7 @@ public:
 	void Update() override;     //更新処理
 	void Draw() override;       //描画処理
 	void SetDeath() override;   //死亡フラグを設定
-	static CBgModel* Create(BGMODELTYPE bgModelType,D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 Scale);//生成処理
+	static CBgModel* Create(BGMODELTYPE bgModelType,D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 Scale,bool bSwapVtxXZ);//生成処理
 
 	//==========================================================
 	//エディタ関係

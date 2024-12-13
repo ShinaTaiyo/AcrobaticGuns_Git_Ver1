@@ -621,6 +621,7 @@ bool CCollision::RayIntersectsAABBCollisionPos(const D3DXVECTOR3& origin, const 
 		return false;
 	}
 
+	//＊それぞれの軸の距離を求め、minやmaxにその単位ベクトルの方向なら、どれくらいの距離を進めば到達できるかを求める。
 	float tmin = (min.x - origin.x) / direction.x;
 	float tmax = (max.x - origin.x) / direction.x;
 
@@ -649,29 +650,6 @@ bool CCollision::RayIntersectsAABBCollisionPos(const D3DXVECTOR3& origin, const 
 	if (tzmax < tmax) tmax = tzmax;
 
 	t = tmin;
-
-	//D3DXVECTOR3 vertices[8] = {
-	//   min,
-	//   {max.x, min.y, min.z},
-	//   {min.x, max.y, min.z},
-	//   {min.x, min.y, max.z},
-	//   {max.x, max.y, min.z},
-	//   {max.x, min.y, max.z},
-	//   {min.x, max.y, max.z},
-	//   max
-	//};
-
-	//for (int i = 0; i < 8; i++) {
-	//	D3DXVECTOR4 transformed;
-	//	D3DXVec3Transform(&transformed, &vertices[i],CManager::GetCamera()->GetMtxProjection());
-
-	//	// 視錐台外なら無視
-	//	if (transformed.x < -transformed.w || transformed.x > transformed.w ||
-	//		transformed.y < -transformed.w || transformed.y > transformed.w ||
-	//		transformed.z < 0.0f || transformed.z > transformed.w) {
-	//		return false;
-	//	}
-	//}
 
 	if (t < 0.0f) return false;
 
