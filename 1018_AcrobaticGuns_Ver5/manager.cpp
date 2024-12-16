@@ -41,6 +41,7 @@ CScene* CManager::m_pScene = nullptr;
 CSceneFade* CManager::m_pSceneFade = nullptr;
 CText* CManager::m_pText = nullptr;
 CDebugProc* CManager::m_pDebugProc = nullptr;
+CInputMouse* CManager::m_pInputMouse = nullptr;
 //===================================================
 
 //=======================
@@ -86,6 +87,13 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//============================
 	m_pInputJoypad = DBG_NEW CInputJoypad;
 	m_pInputJoypad->Init(hInstance, hWnd);
+	//======================================================
+
+	//===================================
+	//マウス入力情報の設定
+	//===================================
+	m_pInputMouse = DBG_NEW CInputMouse;
+	m_pInputMouse->Init(hInstance, hWnd);
 	//======================================================
 
 	//============================
@@ -206,6 +214,17 @@ void CManager::Uninit()
 		m_pInputJoypad = nullptr;
 	}
 	//===============================================
+	
+	//================================
+	//マウス入力情報の開放
+	//================================
+	if (m_pInputMouse != nullptr)
+	{
+		m_pInputMouse->Uninit();
+		delete m_pInputMouse;
+		m_pInputMouse = nullptr;
+	}
+	//===============================================
 
 	//================================
 	//サウンドの開放
@@ -308,6 +327,7 @@ void CManager::Update()
 	m_pRenderer->Update();     //レンダラー
 	m_pInputKeyboard->Update();//キー入力
 	m_pInputJoypad->Update();  //ジョイパッド入力
+	m_pInputMouse->Update();   //マウス入力
 	m_pCamera->Update();       //カメラ
 	m_pLight->Update();        //ライト
 #ifdef _DEBUG

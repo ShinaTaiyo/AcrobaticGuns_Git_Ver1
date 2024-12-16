@@ -582,3 +582,200 @@ bool CInputJoypad::GetRT_Trigger()
 	return  m_joykeyStateTrigger.Gamepad.bRightTrigger != 0;//0x0004（JOYKEY_LEFT)なら0x01<<2 = 00000111 = 0x0004
 }
 //================================================================
+
+//****************************************************************************
+//マウスクラス
+//****************************************************************************
+
+//======================================
+//コンストラクタ
+//======================================
+CInputMouse::CInputMouse() : m_CursorPosOld(D3DXVECTOR2(0.0f,0.0f)), m_bLeftClickTriggerFlag(false),m_nLeftClickRepeatCnt(0),m_bRightClickTriggerFlag(false),
+m_bCursorSenterWarp(false)
+{
+
+}
+//================================================================
+
+//======================================
+//デストラクタ
+//======================================
+CInputMouse::~CInputMouse()
+{
+
+}
+//================================================================
+
+//======================================
+//初期化処理
+//======================================
+HRESULT CInputMouse::Init(HINSTANCE hInstance, HWND hWnd)
+{
+	return S_OK;
+}
+//================================================================
+
+//======================================
+//終了処理
+//======================================
+void CInputMouse::Uninit()
+{
+
+}
+//================================================================
+
+//======================================
+//更新処理
+//======================================
+void CInputMouse::Update()
+{
+
+}
+//================================================================
+
+//======================================
+//カーソルの位置を取得
+//======================================
+D3DXVECTOR2 CInputMouse::GetMousePos()
+{
+	POINT MousePoint;
+	memset(&MousePoint, 0, sizeof(POINT));
+	GetCursorPos(&MousePoint);//スクリーン座標を取得
+	HWND hwnd = FindWindow(nullptr, "AcrobaticGuns");//exeのウインドウを取得
+
+	ScreenToClient(hwnd, &MousePoint);//現在のカーソルの位置をウインドウの位置に変換
+	D3DXVECTOR2 CursorPos;
+	CursorPos.x = static_cast<float>(MousePoint.x);//float型にキャストした位置を代入
+	CursorPos.y = static_cast<float>(MousePoint.y);//float型にキャストした位置を代入
+
+	m_bCursorSenterWarp = false;//端にいった場合に中心に移動する処理の前で毎回初期化
+
+	if (CursorPos.x > SCREEN_WIDTH || CursorPos.x < 0.0f)
+	{//カーソルを中心に移動
+		CursorPos.x = SCREEN_WIDTH / 2;
+		CursorPos.y = SCREEN_HEIGHT / 2;
+		SetCursorPos(static_cast<int>(CursorPos.x),static_cast<int>(CursorPos.y));
+		m_bCursorSenterWarp = true;
+	}
+	if (CursorPos.y > SCREEN_HEIGHT || CursorPos.y < 0.0f)
+	{//カーソルを中心に移動
+		CursorPos.x = SCREEN_WIDTH / 2;
+		CursorPos.y = SCREEN_HEIGHT / 2;
+		SetCursorPos(static_cast<int>(CursorPos.x), static_cast<int>(CursorPos.y));
+		m_bCursorSenterWarp = true;
+	}
+
+	//デバッグ表示
+	CManager::GetDebugProc()->PrintDebugProc("カーソルの位置：%f %f\n", CursorPos.x, CursorPos.y);
+	return CursorPos;
+}
+//================================================================
+
+//======================================
+//カーソルが動いた角度を取得
+//======================================
+bool CInputMouse::GetMouseMoveAngle(float& fAngle)
+{
+	//現在のカーソルの位置を取得
+	D3DXVECTOR2 CursorPos = GetMousePos();
+	CursorPos.x = static_cast<float>(CursorPos.x);
+	CursorPos.y = static_cast<float>(CursorPos.y);
+	CManager::GetDebugProc()->PrintDebugProc("カーソルの位置：%f %f\n", CursorPos.x, CursorPos.y);
+	
+	bool bSuccess = true;
+	if (m_CursorPosOld == CursorPos)
+	{//位置が1f前と同じなら失敗
+		bSuccess = false;
+	}
+
+	if (m_bCursorSenterWarp == false)
+	{
+		fAngle = atan2f(CursorPos.x - m_CursorPosOld.x, CursorPos.y - m_CursorPosOld.y);
+	}
+	else
+	{//このフレームではカーソルの位置が瞬時に中心に移動しているので、ベクトルの方向を一致させるために逆にする
+		fAngle = -atan2f(CursorPos.x - m_CursorPosOld.x, CursorPos.y - m_CursorPosOld.y);
+	}
+	//1f前の位置を更新
+	m_CursorPosOld = CursorPos;
+	return bSuccess;
+}
+//================================================================
+
+//======================================
+//クリックしたかどうかを取得(Press)
+//======================================
+bool CInputMouse::GetMouseLeftClickPress()
+{
+	if (GetAsyncKeyState(VK_LBUTTON) & 0x8000)
+	{
+		return true;
+	}
+	return false;
+}
+//================================================================
+
+//======================================
+//クリックしたかどうかを取得(Trigger)
+//======================================
+bool CInputMouse::GetMouseLeftClickTrigger()
+{
+	//トリガーフラグがtrueなら発動。次ボタンを話すまではtrueにならない！
+	if (GetAsyncKeyState(VK_LBUTTON) & 0x8000)
+	{
+		if (m_bLeftClickTriggerFlag == true)
+		{
+		    m_bLeftClickTriggerFlag = false;
+			return true;
+		}
+		m_bLeftClickTriggerFlag = false;
+		CManager::GetDebugProc()->PrintDebugProc("右クリックしてる\n");
+	}
+	else
+	{
+		m_bLeftClickTriggerFlag = true;
+		CManager::GetDebugProc()->PrintDebugProc("右クリックしてない\n");
+	}
+	return false;
+}
+
+//======================================
+//クリックしたかどうかを取得(Repeat)
+//======================================
+bool CInputMouse::GetMouseLeftClickRepeat(int nRepeat)
+{
+	if (GetAsyncKeyState(VK_LBUTTON) & 0x8000)
+	{
+		m_nLeftClickRepeatCnt++;
+		if (m_nLeftClickRepeatCnt == nRepeat)
+		{
+			m_nLeftClickRepeatCnt = 0;
+			return true;
+		}
+	}
+	return false;
+}
+//================================================================
+
+//======================================
+//右クリックしたかどうかを取得
+//======================================
+bool CInputMouse::GetMouseRightClickTrigger()
+{
+	//トリガーフラグがtrueなら発動。次ボタンを話すまではtrueにならない！
+	if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)
+	{
+		if (m_bRightClickTriggerFlag == true)
+		{
+			m_bRightClickTriggerFlag = false;
+			return true;
+		}
+		m_bRightClickTriggerFlag = false;
+	}
+	else
+	{
+		m_bRightClickTriggerFlag = true;
+	}
+	return false;
+}
+//================================================================

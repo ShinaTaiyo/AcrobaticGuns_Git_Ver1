@@ -97,7 +97,6 @@ private:
 	static const int m_nMAX_WORD = 126;
 	static const char* m_apWORLDMAP_TXT[static_cast<int>(WORLDTYPE::MAX)];
 	static const string m_aSAVE_FILENAME;//•Û‘¶‚·‚éƒtƒ@ƒCƒ‹–¼
-
 	//*•Ï”
 
 	//====================

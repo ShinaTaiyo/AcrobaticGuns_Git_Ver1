@@ -34,7 +34,7 @@ const char* CStageManager::m_apWORLDMAP_TXT[static_cast<int>(CStageManager::WORL
 	"data\\TEXTFILE\\Map\\BossRushMap.txt",
 };
 
-const string CStageManager::m_aSAVE_FILENAME = "data\\TEXTFILE\\Ver2\\Stage01.txt";
+const string CStageManager::m_aSAVE_FILENAME = "data\\TEXTFILE\\Ver2\\Stage02.txt";
 
 //================================
 //コンストラクタ

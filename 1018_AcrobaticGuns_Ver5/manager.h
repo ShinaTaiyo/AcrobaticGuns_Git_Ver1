@@ -29,6 +29,7 @@ class CObjectXInfo;     //オブジェクトXクラスを前方宣言
 class CSceneFade;            //フェードクラスを前方宣言
 class CText;            //テキストクラスを前方宣言
 class CDebugProc;       //デバッグプロシージャクラスを前方宣言
+class CInputMouse;      //マウス
 //==========================================
 
 //==========================================
@@ -55,6 +56,7 @@ public:
 	static CScene* GetScene() { return m_pScene; }                      //シーンクラスを取得する
 	static CText* GetText() { return m_pText; }                         //テキストクラスを取得する
 	static CDebugProc* GetDebugProc() { return m_pDebugProc; }          //デバッグプロシージャクラスを取得する
+	static CInputMouse* GetInputMouse() { return m_pInputMouse; }       //マウス入力情報を取得する
 	static void SetMode(CScene::MODE mode);                             //モードを設定する
 private:
 	static CRenderer* m_pRenderer;                                      //レンダラー
@@ -69,6 +71,7 @@ private:
 	static CSceneFade* m_pSceneFade;                                              //フェード情報	
 	static CText* m_pText;                                              //テキスト情報
 	static CDebugProc* m_pDebugProc;                                    //デバッグプロシージャ情報
+	static CInputMouse* m_pInputMouse;                                  //マウス情報
 }; 
 //=======================================================================================
 

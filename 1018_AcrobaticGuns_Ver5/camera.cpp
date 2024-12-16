@@ -133,6 +133,23 @@ void CCamera::Update()
 		m_AddPosR.y += 5.0f;
 	}
 
+	//=================================================
+	//ゲームパッド、又はマウスでカメラの向きを変える
+	//=================================================
+	if (CManager::GetInputJoypad()->GetRStickPress(16) == true)
+	{
+		//Pos.x += sinf(CManager::GetInputJoypad()->GetRStickAimRot()) * m_fNORMAL_LOCKONMOVE;
+		//Pos.y += cosf(CManager::GetInputJoypad()->GetRStickAimRot()) * -m_fNORMAL_LOCKONMOVE;
+		CManager::GetCamera()->SetRot(m_Rot + D3DXVECTOR3(cosf(CManager::GetInputJoypad()->GetRStickAimRot() + D3DX_PI) * 0.04f,
+			sinf(CManager::GetInputJoypad()->GetRStickAimRot()) * 0.04f, 0.0f));
+	}
+	float fAngle = 0.0f;
+	if (CManager::GetInputMouse()->GetMouseMoveAngle(fAngle))
+	{
+		CManager::GetCamera()->SetRot(m_Rot + D3DXVECTOR3(cosf(fAngle) * 0.06f,
+			sinf(fAngle) * 0.06f, 0.0f));
+	}
+
 	//===========================
     //Cボタンを押していたら
     //===========================
@@ -290,6 +307,7 @@ void CCamera::ChengeState(CCameraState* pCameraState)
 void CCamera::NormalCameraMove()
 {
 	CObject* pManagerObject = nullptr;
+	D3DXVECTOR3 RotVec = CCalculation::RadToVec(m_Rot);
 		switch (m_CameraType)
 		{
 		case CAMERATYPE_BIRD:
@@ -300,7 +318,6 @@ void CCamera::NormalCameraMove()
 				{
 					if (m_bCustom == false)
 					{
-						D3DXVECTOR3 RotVec = CCalculation::RadToVec(m_Rot);
 						CManager::GetDebugProc()->PrintDebugProc("カメラの向き：%f %f %f\n", m_Rot.x, m_Rot.y, m_Rot.z);
 						m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f) + m_AddPosR;
 						m_PosV = m_PosR + RotVec * 200.0f;
@@ -311,8 +328,8 @@ void CCamera::NormalCameraMove()
 				break;
 			case CScene::MODE_EDIT:
 				m_PosR += m_AddPosR;
-			    m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -m_fLength, m_fLength, cosf(m_Rot.y) * -m_fLength) + m_AddPosV;
-			    break;
+				m_PosV = m_PosR + RotVec * m_fLength;
+				break;
 			default:
 				break;
 			}

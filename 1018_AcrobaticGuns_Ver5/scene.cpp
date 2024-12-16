@@ -92,7 +92,7 @@ CScene* CScene::Create(MODE mode)
 		pScene = DBG_NEW CTitle();
 		break;
 	case MODE_GAME:
-		pScene = DBG_NEW CGame();
+		pScene = DBG_NEW CGame(false);
 		break;
 	case MODE_RESULT:
 		pScene = DBG_NEW CResult();

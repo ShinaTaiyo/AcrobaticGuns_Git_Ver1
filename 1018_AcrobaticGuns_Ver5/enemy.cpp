@@ -18,6 +18,7 @@
 #include "particle.h"
 #include "phasemanager.h"
 #include "input.h"
+#include "camera.h"
 #include "attack.h"
 //============================================================================================================================================
 
@@ -451,7 +452,7 @@ void CEnemy::SetMoveAiPoint()
 	bool bMoveY = false;
 	float fAddPosY = 0.0f;
 	auto Input = CManager::GetInputKeyboard();
-
+	float fCameraRot = CManager::GetCamera()->GetRot().y;
 	if (Input->GetPress(DIK_LSHIFT))
 	{
 		if (Input->GetPress(DIK_I))
@@ -495,7 +496,7 @@ void CEnemy::SetMoveAiPoint()
 	if (bMove == true)
 	{
 		float fRot = atan2f(fX, fZ);
-		m_MoveAiSavePos += D3DXVECTOR3(sinf(fRot) * 5.0f, 0.0f, cosf(fRot) * 5.0f);
+		m_MoveAiSavePos += D3DXVECTOR3(sinf(fCameraRot + fRot) * 5.0f, 0.0f, cosf(fCameraRot + fRot) * 5.0f);
 	}
 
 	if (bMoveY == true)
@@ -557,7 +558,7 @@ void CEnemy::AIMoveProcess()
 			float fRot = atan2f((*it)->GetPos().x - GetPos().x, (*it)->GetPos().z - GetPos().z);
 			SetMove(D3DXVECTOR3(sinf(fRot) * m_fNormalSpeed, GetMove().y, cosf(fRot) * m_fNormalSpeed));
 
-			if (fLength < 20.0f)
+			if (fLength < 30.0f)
 			{
 				m_nIdxMoveAi++;//目的地を次の位置に変更
 			}
@@ -869,7 +870,7 @@ HRESULT CShotWeakEnemy::Init()
 {
 	CEnemy::Init();
 	m_pMagicSword = CAttackEnemy::Create(CAttack::ATTACKTYPE::MAGICSWORD, CAttack::TARGETTYPE::PLAYER, CAttack::COLLISIONTYPE::RECTANGLE_XZ,
-		2, 60, 200, GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(2.0f, 2.0f, 4.0f));
+		2, 60, 200, GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 	m_pMagicSword->SetUseDeath(false);
 	SetEnemyType(CEnemy::ENEMYTYPE::SHOTWEAK);//敵タイプを設定
 	return S_OK;
@@ -952,6 +953,7 @@ CShotWeakEnemy* CShotWeakEnemy::Create(SHOTWEAKENEMYTYPE Type, int nLife, int nP
 	pShotWeakEnemy->SetSensingRange(1250.0f);//感知射程
 	pShotWeakEnemy->SetNormalSpeed(10.0f);//通常移動速度
 	pShotWeakEnemy->SetUseInteria(false, GetNormalInertia());
+	pShotWeakEnemy->m_pMagicSword->SetScale(Scale * 0.5f);
 
 	pShotWeakEnemy->SetSize();//モデルサイズを設定
 	pShotWeakEnemy->SetManagerObjectType(CObject::MANAGEROBJECTTYPE::SHOTWEAKENEMY);           //マネージャーで呼び出す時の種類を設定
@@ -1632,7 +1634,7 @@ CObject* CDiveWeakEnemy::ManagerSaveObject()
 {
 	auto& Vec = GetVecAiModelInfo();
 	auto Vec2 = move(Vec);
-	CDiveWeakEnemy * pDiveWeakEnemy = CDiveWeakEnemy::Create(m_DiveWeakEnemyType, GetLife(),GetPhaseNum(),GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
+	CDiveWeakEnemy * pDiveWeakEnemy = CDiveWeakEnemy::Create(m_DiveWeakEnemyType, GetMaxLife(),GetPhaseNum(),GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
 	pDiveWeakEnemy->SetVecMoveAiInfo(Vec2);
 	return pDiveWeakEnemy;//生成したオブジェクトを返す
 }
@@ -1658,7 +1660,7 @@ void CDiveWeakEnemy::AttackProcess()
 		{
 			D3DXVECTOR3 Aim = CCalculation::Calculation3DVec(GetSenterPos(), CGame::GetPlayer()->GetSenterPos(), 20.0f);
 
-			CAttackEnemy::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::PLAYER, CAttack::COLLISIONTYPE::SQUARE, 1, 60, 200, GetSenterPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), Aim, D3DXVECTOR3(2.0f, 2.0f, 2.0f));
+			CAttackEnemy::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::PLAYER, CAttack::COLLISIONTYPE::SQUARE, 1, 60, 200, GetSenterPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), Aim,GetScale() * 0.5f);
 		}
 	}
 }

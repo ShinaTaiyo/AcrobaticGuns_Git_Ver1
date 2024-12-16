@@ -26,19 +26,21 @@
 class CGame : public CScene
 {
 public:
-	CGame();                                                               //コンストラクタ
+	CGame(bool bUseGamePad);                                                               //コンストラクタ
 	~CGame() override;                                                     //デストラクタ
 	HRESULT Init() override;                                               //初期化処理
 	void Uninit() override;                                                //終了処理
 	void Update() override;                                                //更新処理
 	static CPlayer* GetPlayer() { return m_pPlayer; }                      //プレイヤーを取得する
 	static CPhaseManager* GetPhaseManager() { return m_pPhaseManager; }    //フェーズマネージャーを取得する
+	static bool GetUseGamePad() { return s_bUseGamePad; }                    
 private:
 	static CPlayer* m_pPlayer;                                             //プレイヤー
 	static CStageManager* m_pStageManager;                                 //ステージマネージャー
 	static CPhaseManager* m_pPhaseManager;                                 //フェーズマネージャー
 	CBgModel* m_pBgModel;                                                  //背景モデル
 	static int s_nPhaseNum;                                                //フェーズ番号
+	static bool s_bUseGamePad;                                             //ゲームパッドを使用するかどうか
 	bool bStartFade;
 };
 #endif

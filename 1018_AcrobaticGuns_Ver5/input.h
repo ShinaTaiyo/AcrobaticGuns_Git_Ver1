@@ -18,7 +18,7 @@
 //マクロ定義
 //======================
 #define MAX_KEY (256)//キーの最大数
-
+#define EXPORT extern "C" _declspec(dllexport)
 //==========================================
 //入力規定クラス(DirectInputの管理)
 //==========================================
@@ -121,5 +121,32 @@ private:
 	int m_nRTTrigger_RepeatCnt;           //Rトリガーのリピートカウント
 	int m_nLTTrigger_RepeatCnt;           //Lトリガーのリピートカウント
 
+};
+
+//==========================================
+//マウスクラス
+//==========================================
+class CInputMouse : public CInput
+{
+public:
+	CInputMouse();//コンストラクタ
+	~CInputMouse();//デストラクタ
+	HRESULT Init(HINSTANCE hInstance, HWND hWnd) override;//初期化処理
+	void Uninit() override;//終了処理
+	void Update() override;//更新処理
+	D3DXVECTOR2 GetMousePos();//カーソルの位置を取得
+	bool GetMouseMoveAngle(float & fAngle);//マウスが動いた角度を取得
+	bool GetMouseLeftClickPress();//クリックしたかどうか
+	bool GetMouseLeftClickTrigger();//トリガー
+	bool GetMouseLeftClickRepeat(int nRepeat);//リピート入力
+
+	bool GetMouseRightClickTrigger();//右クリックトリガー入力
+private:
+	D3DXVECTOR2 m_CursorPosOld;//1f前のカーソルの位置
+	bool m_bLeftClickTriggerFlag;//左クリックのトリガーフラグ
+	int m_nLeftClickRepeatCnt;   //左クリックのリピートカウント
+
+	bool m_bRightClickTriggerFlag;//右クリックトリガーフラグ
+	bool m_bCursorSenterWarp;     //カーソルが中心にワープしたかどうか
 };
 #endif

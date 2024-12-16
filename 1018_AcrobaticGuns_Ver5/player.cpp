@@ -69,14 +69,15 @@ HRESULT CPlayer::Init()
     SetUseGravity(true,1.0f);  //重力を使用する
 
     m_pLockOn = CLockon::Create(D3DXVECTOR3(SCREEN_WIDTH / 2,SCREEN_HEIGHT / 2,0.0f), CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, D3DXCOLOR(1.0f,1.0f,1.0f,1.0f));
-    m_pLockOn->SetUseDeath(true);
+    m_pLockOn->SetUseDeath(false);
     m_pLockOn->SetPolygonRotSpeed(0.01f);
 
     m_pMeshOrbit = CMeshOrbit::Create(CMeshOrbit::MESHORBITTYPE::DEATHENAGA);
-    m_pMeshOrbit->SetUseDeath(true);
+    m_pMeshOrbit->SetUseDeath(false);
 
     m_pModeDisp = CUi::Create(CUi::UITYPE::ACTIONMODE_GUN, CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, 1, false, D3DXVECTOR3(50.0f, 50.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
         D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+    m_pModeDisp->SetUseDeath(false);
 
     m_pWire = CWire::Create(CWire::WIRETYPE::NORMAL, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 15.0f, 20.0f, 4, 5);
     m_pWire->SetUseDeath(false);
@@ -144,7 +145,6 @@ void CPlayer::Update()
 
     CManager::GetDebugProc()->PrintDebugProc("プレイヤーの位置：%f %f %f\n", GetPos().x, GetPos().y, GetPos().z);
 
-    CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 60, 5.0f, 5.0f, 100, 10, false, GetPos() + GetVtxMax(), D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f), true);
     //m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f) + m_AddPosR;
     //m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -200.0f, 0.0f, cosf(m_Rot.y) * -200.0f);
 }
@@ -253,7 +253,7 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
 //========================================================
 void CPlayer::ActionModeChenge()
 {
-    if (CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::X) == true)
+    if (CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::X) || CManager::GetInputMouse()->GetMouseRightClickTrigger())
     {
         if (m_pModeDisp != nullptr)
         {
@@ -383,6 +383,8 @@ void CPlayer::CollisionProcess()
     bool bCollisionZ = false;
     bool bIsLanding = false;
 
+    SetIsLanding(false);
+
     m_bCollision = false;//判定状態をリセット
     bool bSuccessCollision = false;//当たり判定が成功したかどうか
     for (int nCntPri = 0; nCntPri < CObject::m_nMAXPRIORITY; nCntPri++)
@@ -428,7 +430,6 @@ void CPlayer::CollisionProcess()
         }
 
     }
-
     SetExtrusionCollisionSquareX(bCollisionX);
     SetExtrusionCollisionSquareY(bCollisionY);
     SetExtrusionCollisionSquareZ(bCollisionZ);

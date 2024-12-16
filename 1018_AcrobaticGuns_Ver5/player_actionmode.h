@@ -85,6 +85,19 @@ public:
 	CPlayerMove();                             //コンストラクタ
 	virtual ~CPlayerMove();                    //デストラクタ
 	virtual void MoveProcess(CPlayer* pPlayer);//移動処理
+	void JumpProcess(CPlayer* pPlayer);         //ジャンプ処理
+	void DodgeProcess(CPlayer* pPlayer);//回避処理
+	const bool& GetDodge() const { return m_bDodge; }
+	void SetDodge(bool bDodge) { m_bDodge = bDodge; }
+	const bool& GetLanding() const { return m_bIsLanding; }
+	void SetLanding(bool bLanding) { m_bIsLanding = bLanding; }
+private:
+	//*静的メンバ宣言
+	static constexpr float s_fACCELL_PARAM = 7.0f;
+
+	//*変数宣言
+	bool m_bIsLanding;//地面にいるかどうか
+	bool m_bDodge;//回避しているかどうか
 };
 
 //通常移動クラス
@@ -94,17 +107,7 @@ public:
 	CPlayerMove_Normal();                    //コンストラクタ
 	~CPlayerMove_Normal() override;                   //デストラクタ
 	void MoveProcess(CPlayer* pPlayer) override;//移動処理
-	void JumpProcess(CPlayer* pPlayer);        //ジャンプ処理
-private:
-	//*静的メンバ宣言
-	static constexpr float s_fACCELL_PARAM = 7.0f;
 
-	//*変数宣言
-	bool m_bIsLanding;//地面にいるかどうか
-	bool m_bDodge;//回避しているかどうか
-
-	//*プロトタイプ宣言
-	void DodgeProcess(CPlayer * pPlayer);//回避処理
 };
 
 //ダイブ移動クラス

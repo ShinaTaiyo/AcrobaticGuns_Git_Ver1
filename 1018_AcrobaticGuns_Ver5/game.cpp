@@ -32,17 +32,19 @@ CPlayer* CGame::m_pPlayer = nullptr;
 CStageManager* CGame::m_pStageManager = nullptr;
 CPhaseManager* CGame::m_pPhaseManager = nullptr;
 int CGame::s_nPhaseNum = 0;
+bool CGame::s_bUseGamePad = false;
 //=========================================================================================================================
 
 //=============================================================
 //コンストラクタ
 //=============================================================
-CGame::CGame() : m_pBgModel(nullptr)
+CGame::CGame(bool bUseGamePad) : m_pBgModel(nullptr)
 {
 	m_pPlayer = nullptr;
 	m_pStageManager = nullptr;
 	m_pPhaseManager = nullptr;
 	s_nPhaseNum = 0;
+	s_bUseGamePad = bUseGamePad;
 	bStartFade = false;
 }
 //=========================================================================================================================

@@ -529,6 +529,7 @@ bool CCollision::ExtrusionCollisionSquareY(D3DXVECTOR3& MyPos, const D3DXVECTOR3
 		float fPosY = fabsf(MyVtxMin.y);
 		MyPos.y = ComPos.y + ComVtxMax.y + fPosY + 0.1f;
 		bIsLanding = true;
+		CManager::GetDebugProc()->PrintDebugProc("è„Ç…ÇÃÇ¡ÇΩ\n");
 		return true;
 	}
 	//â∫

@@ -33,7 +33,7 @@
 //=====================================================================================================
 //コンストラクタ
 //=====================================================================================================
-CPlayerMove::CPlayerMove()
+CPlayerMove::CPlayerMove() : m_bIsLanding(false), m_bDodge(false)
 {
 
 }
@@ -53,23 +53,65 @@ CPlayerMove::~CPlayerMove()
 //=====================================================================================================
 void CPlayerMove::MoveProcess(CPlayer* pPlayer)
 {
-	const D3DXVECTOR3& Move = pPlayer->GetMove();
-	D3DXVECTOR3 AddMove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	bool bMove = false;//移動しているかどうか
-	float fRotAim = 0.0f;
+	if (m_bDodge == false)
+	{//回避中なら絶対に通常移動はさせない
+		const D3DXVECTOR3& Move = pPlayer->GetMove();
+		D3DXVECTOR3 AddMove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		bool bMove = false;//移動しているかどうか
+		float fRotAim = 0.0f;
 
-	bMove = CCalculation::CaluclationMove(true, AddMove, 10.0f, CCalculation::MOVEAIM_XZ, fRotAim);
-	//CCalculation::CalculationCollectionRot2D(CalRot.y, m_fRotAim, 0.25f);
+		bMove = CCalculation::CaluclationMove(false, AddMove, 10.0f, CCalculation::MOVEAIM_XZ, fRotAim);
+		//CCalculation::CalculationCollectionRot2D(CalRot.y, m_fRotAim, 0.25f);
 
-	pPlayer->SetUseInteria(true, CObjectXMove::GetNormalInertia());
-	pPlayer->SetUseGravity(true, CObjectXMove::GetNormalGravity());
+		pPlayer->SetUseInteria(true, CObjectXMove::GetNormalInertia());
+		pPlayer->SetUseGravity(true, CObjectXMove::GetNormalGravity());
 
-	//CManager::GetInputJoypad()->GetLStickPress();
-	if (bMove == true)
-	{
-		pPlayer->SetMove(AddMove + D3DXVECTOR3(0.0f, Move.y, 0.0f));
+		//CManager::GetInputJoypad()->GetLStickPress();
+		if (bMove == true)
+		{
+			pPlayer->SetMove(AddMove + D3DXVECTOR3(0.0f, Move.y, 0.0f));
+		}
 	}
 }
+//======================================================================================================================================================
+
+//=====================================================================================================
+//ジャンプ処理
+//=====================================================================================================
+void CPlayerMove::JumpProcess(CPlayer* pPlayer)
+{
+	if (pPlayer->GetLanding())
+	{//地面にいるならジャンプ
+		pPlayer->SetUseGravity(true, 1.0f);
+		if (CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::A) || CManager::GetInputKeyboard()->GetTrigger(DIK_SPACE))
+		{
+			pPlayer->SetMove(D3DXVECTOR3(pPlayer->GetMove().x, 20.0f, pPlayer->GetMove().z));
+		}
+	}
+}
+//======================================================================================================================================================
+
+//=====================================================================================================
+//回避処理
+//=====================================================================================================
+void CPlayerMove::DodgeProcess(CPlayer* pPlayer)
+{
+	CInputJoypad* pInput = CManager::GetInputJoypad();
+	if ((pInput->GetLT_Trigger() || CManager::GetInputKeyboard()->GetTrigger(DIK_LSHIFT)) && m_bDodge == false)
+	{
+		m_bDodge = true;
+		pPlayer->SetMove(D3DXVECTOR3(pPlayer->GetMove().x * s_fACCELL_PARAM, pPlayer->GetMove().y, pPlayer->GetMove().z * s_fACCELL_PARAM));
+		pPlayer->SetUseInteria(true, 0.1f);
+	}
+	float fAverageSpeed = (fabsf(pPlayer->GetMove().x) + fabsf(pPlayer->GetMove().z)) / 2;
+
+	if (fAverageSpeed < 0.51f && m_bDodge == true)
+	{
+		m_bDodge = false;
+		pPlayer->SetUseInteria(true, CObjectXMove::GetNormalInertia());
+	}
+}
+
 //======================================================================================================================================================
 
 //******************************************************************************************************************************************************
@@ -79,7 +121,7 @@ void CPlayerMove::MoveProcess(CPlayer* pPlayer)
 //=====================================================================================================
 //コンストラクタ
 //=====================================================================================================
-CPlayerMove_Normal::CPlayerMove_Normal() : m_bIsLanding(false),m_bDodge(false)
+CPlayerMove_Normal::CPlayerMove_Normal()
 {
 
 }
@@ -98,53 +140,14 @@ CPlayerMove_Normal::~CPlayerMove_Normal()
 //=====================================================================================================
 void CPlayerMove_Normal::MoveProcess(CPlayer* pPlayer)
 {
-	if (m_bDodge == false)
-	{
-		CPlayerMove::MoveProcess(pPlayer);
-	}
-	DodgeProcess(pPlayer);
+	CPlayerMove::MoveProcess(pPlayer);
 
-	JumpProcess(pPlayer);
+	CPlayerMove::DodgeProcess(pPlayer);
+
+	CPlayerMove::JumpProcess(pPlayer);
 }
 //======================================================================================================================================================
 
-//=====================================================================================================
-//ジャンプ処理
-//=====================================================================================================
-void CPlayerMove_Normal::JumpProcess(CPlayer* pPlayer)
-{
-	if (m_bIsLanding == true || pPlayer->GetExtrusionCollisionSquareY() == true)
-	{
-		pPlayer->SetUseGravity(true,1.0f);
-		if (CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::A) == true)
-		{
-			pPlayer->SetMove(D3DXVECTOR3(pPlayer->GetMove().x, 20.0f, pPlayer->GetMove().z));
-		}
-	}
-}
-//======================================================================================================================================================
-
-//=====================================================================================================
-//回避処理
-//=====================================================================================================
-void CPlayerMove_Normal::DodgeProcess(CPlayer* pPlayer)
-{
-	CInputJoypad* pInput = CManager::GetInputJoypad();
-	if (pInput->GetLT_Trigger() == true && m_bDodge == false)
-	{
-		m_bDodge = true;
-		pPlayer->SetMove(D3DXVECTOR3(pPlayer->GetMove().x * s_fACCELL_PARAM, pPlayer->GetMove().y, pPlayer->GetMove().z * s_fACCELL_PARAM));
-		pPlayer->SetUseInteria(true, 0.1f);
-	}
-	float fAverageSpeed = (fabsf(pPlayer->GetMove().x) + fabsf(pPlayer->GetMove().z)) / 2;
-
-	if (fAverageSpeed < 0.51f && m_bDodge == true)
-	{
-		m_bDodge = false;
-		pPlayer->SetUseInteria(true,CObjectXMove::GetNormalInertia());
-	}
-}
-//======================================================================================================================================================
 
 //******************************************************************************************************************************************************
 //プレイヤーダイブ移動クラス
@@ -174,13 +177,19 @@ CPlayerMove_PrepDive::~CPlayerMove_PrepDive()
 void CPlayerMove_PrepDive::MoveProcess(CPlayer* pPlayer)
 {
 	CPlayerMove::MoveProcess(pPlayer);//通常移動
+
+	CPlayerMove::DodgeProcess(pPlayer);//回避移動
+
+	CPlayerMove::JumpProcess(pPlayer);//ジャンプ移動
+
 	CWire* pWire = pPlayer->GetWire();
 	CWireHead* pWireHead = pPlayer->GetWire()->GetWireHead();
 	CLockon* pLockon = pPlayer->GetLockOn();//ロックオンへのポインタ
 	pWireHead->SetPos(pPlayer->GetPos());//ダイブ準備中なのでワイヤーヘッドをプレイヤーの位置に固定
 
 	//CManager::GetDebugProc()->PrintDebugProc("移動量：%f %f %f\n", Move.x, Move.y, Move.z);
-	if (CManager::GetInputJoypad()->GetRT_Trigger() == true && pLockon->GetSuccessRayCollision() == true)
+	if (CManager::GetInputJoypad()->GetRT_Trigger() && pLockon->GetSuccessRayCollision() ||
+		CManager::GetInputMouse()->GetMouseLeftClickTrigger())
 	{//ワイヤー発射移動モードにチェンジ
 		CPlayerWireShot::StartWireShotProcess(pPlayer);
 	}
@@ -351,7 +360,8 @@ void CPlayerAttack_Shot::AttackProcess(CPlayer* pPlayer)
 	D3DXVECTOR3 ShotPos = pPlayer->GetPos() + D3DXVECTOR3(0.0f, pPlayer->GetVtxMax().y, 0.0f);
 	D3DXVECTOR3 Move = CCalculation::Calculation3DVec(ShotPos, pLockon->GetNearRayColObjPos(), 40.0f);
 	CAttackPlayer* pAttackPlayer = nullptr;//プレイヤー攻撃へのポインタ
-	if (CManager::GetInputKeyboard()->GetTrigger(DIK_J) == true || CManager::GetInputJoypad()->GetRT_Repeat(4) == true)
+	if (CManager::GetInputKeyboard()->GetTrigger(DIK_J) == true || CManager::GetInputJoypad()->GetRT_Repeat(4) == true ||
+		CManager::GetInputMouse()->GetMouseLeftClickRepeat(4) == true)
 	{
 		pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::BULLET,CAttack::TARGETTYPE::ENEMY,CAttack::COLLISIONTYPE::SQUARE,5,5,60,ShotPos, pPlayer->GetRot(), Move, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 		pAttackPlayer->SetUseInteria(false, CObjectXMove::GetNormalInertia());
@@ -418,7 +428,7 @@ CPlayerAttack_Dive::~CPlayerAttack_Dive()
 //=====================================================================================================
 void CPlayerAttack_Dive::AttackProcess(CPlayer* pPlayer)
 {
-	CAttackPlayer* pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::EXPLOSION,CAttack::TARGETTYPE::ENEMY,CAttack::COLLISIONTYPE::SQUARE,1,0,120, pPlayer->GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.1f, 0.1f, 0.1f),
+	CAttackPlayer* pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::EXPLOSION,CAttack::TARGETTYPE::ENEMY,CAttack::COLLISIONTYPE::SQUARE,2,0,120, pPlayer->GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.1f, 0.1f, 0.1f),
 		D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 
 	pAttackPlayer->SetUseAddScale(D3DXVECTOR3(0.4f, 0.4f, 0.4f), true);

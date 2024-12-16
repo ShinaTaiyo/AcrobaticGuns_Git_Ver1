@@ -31,6 +31,7 @@ const char* CBlock::m_BLOCK_FILENAME[static_cast<int>(CBlock::BLOCKTYPE::MAX)] =
 { "data\\MODEL\\Block\\Block00_Normal.x",
   "data\\MODEL\\Block\\Block01_Water.x", 
   "data\\MODEL\\Block\\Renga_000.x", 
+  "data\\MODEL\\Block\\BlackBlock_000.x", 
 };                                                  //ブロックのXファイルへのポインタ
 //========================================================
 
