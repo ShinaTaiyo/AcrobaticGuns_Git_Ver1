@@ -43,7 +43,8 @@ CPlayer::CPlayer(CPlayerMove* pPlayerMove, CPlayerAttack* pPlayerAttack, CPlayer
     int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri, bUseintPri, type, ObjType)
     , m_pMove(pPlayerMove), m_pAttack(pPlayerAttack), m_pEffect(pPlayerEffect), m_pWireShot(pPlayerWireShot),
     m_pMeshOrbit(nullptr),
-    m_fRotAim(0.0f), m_pLockOn(nullptr), m_NowActionMode(ACTIONMODE::SHOT), m_pModeDisp(nullptr), m_bCollision(false),m_pWire(nullptr)
+    m_fRotAim(0.0f), m_pLockOn(nullptr), m_NowActionMode(ACTIONMODE::SHOT), m_pModeDisp(nullptr), m_bCollision(false),m_pWire(nullptr),
+    m_pHpGauge(nullptr)
 {
    
 }
@@ -197,6 +198,13 @@ void CPlayer::SetDeath()
             m_pWire->SetDeath();
             m_pWire = nullptr;
         }
+
+        if (m_pHpGauge != nullptr)
+        {
+            m_pHpGauge->SetUseDeath(true);
+            m_pHpGauge->SetDeath();
+            m_pHpGauge = nullptr;
+        }
     }
     CObject::SetDeath();
 }
@@ -240,6 +248,8 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
             //‘Ì—Í
             pPlayer->SetLife(s_nNORMAL_MAXLIFE);
             pPlayer->SetMaxLife(s_nNORMAL_MAXLIFE);
+            pPlayer->m_pHpGauge = CGauge::Create(CGauge::GAUGETYPE::PLAYERHP, s_nNORMAL_MAXLIFE, 600.0f, 50.0f, D3DXVECTOR3(50.0f, SCREEN_HEIGHT - 50.0f, 0.0f));
+            pPlayer->m_pHpGauge->SetUseDeath(false);
         }
     }
     else
@@ -459,6 +469,17 @@ void CPlayer::CollisionBlock()
 void CPlayer::JumpProcess()
 {
     //
+}
+//==========================================================================================================
+
+//========================================================
+//ƒ_ƒ[ƒW‚ð—^‚¦‚é
+//========================================================
+void CPlayer::SetDamage(int nDamage, int nHitStopTime)
+{
+    CObjectXAlive::SetDamage(nDamage, nHitStopTime);
+
+    m_pHpGauge->SetParam(GetLife());
 }
 //==========================================================================================================
 

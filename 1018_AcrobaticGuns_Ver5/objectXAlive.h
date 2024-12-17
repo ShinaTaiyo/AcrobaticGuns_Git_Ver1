@@ -74,7 +74,7 @@ public:
 	void SetUseRatioLifeAlpha(bool bUse) { m_bUseRatioLifeAlpha = bUse; }
 
 	//ダメージを与える
-	void SetDamage(int nDamage, int nHitStopTime);          //ダメージを与える
+	virtual void SetDamage(int nDamage, int nHitStopTime);          //ダメージを与える
 
 	//回復する
 	void SetHeal(int nHeal, D3DXCOLOR col, float fWidth, float fHeight);                  //回復量を与える

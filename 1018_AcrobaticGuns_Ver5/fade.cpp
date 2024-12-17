@@ -290,7 +290,9 @@ void CSceneFade::SetSceneFade(FADEMODE FadeMode, CScene::MODE mode)
 {
 	if (GetStartFade() == false)
 	{//フェードが開始していなければ
+		SetStartFade(true);
 		SetFadeMode(FadeMode);
+
 		m_NextMode = mode;    //次のモード
 		switch (FadeMode)
 		{

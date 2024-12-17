@@ -18,6 +18,7 @@
 #include "ui.h"
 #include "player_actionmode.h"
 #include "wire.h"
+#include "gauge.h"
 //==========================================
 
 //===========================================
@@ -26,7 +27,7 @@
 class CPlayer : public CObjectXAlive
 {
 public:
-	CPlayer(CPlayerMove * pPlayerMove,CPlayerAttack * pPlayerAttack,CPlayerEffect * pPlayerEffect,CPlayerWireShot * pPlayer,
+	CPlayer(CPlayerMove* pPlayerMove, CPlayerAttack* pPlayerAttack, CPlayerEffect* pPlayerEffect, CPlayerWireShot* pPlayer,
 		int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::PLAYER, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_X);                  //コンストラクタ
 	~CPlayer();                 //デストラクタ
 	HRESULT Init() override;    //初期化処理
@@ -34,7 +35,7 @@ public:
 	void Update() override;     //更新処理
 	void Draw() override;       //描画処理
 	void SetDeath() override;   //死亡フラグを設定
-	static CPlayer * Create(D3DXVECTOR3 pos,D3DXVECTOR3 rot,D3DXVECTOR3 move,D3DXVECTOR3 Scale);
+	static CPlayer* Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale);
 	CLockon* GetLockOn() { return m_pLockOn; }//ロックオンのインスタンスを取得
 
 	//================================================
@@ -43,7 +44,7 @@ public:
 	void SetSuccessCollision(bool bSuccess) { m_bCollision = bSuccess; }//当たり判定が成功したかどうかを設定
 	const bool& GetCollisionSuccess() const { return m_bCollision; }//当たり判定が成功したかどうかを取得
 	//===============================================================================================
-	
+
 	//================================================
 	//メッシュ
 	//================================================
@@ -73,8 +74,8 @@ private:
 	//===============================================================================================
 
 	//================================================
-    //静的メンバ
-    //================================================
+	//静的メンバ
+	//================================================
 	static constexpr float m_fNORMALATTACK_SPEED = 10.0f;//通常攻撃の移動量を設定
 	static const int s_nNORMAL_MAXLIFE;//プレイヤーの通常最大体力
 	//===============================================================================================
@@ -86,12 +87,13 @@ private:
 	bool m_bCollision;                  //当たり判定が成功したかどうか
 
 	//他クラスインスタンス
-	CLockon* m_pLockOn;                 //ロックオンカーソルへのポインタ
+	CLockon* m_pLockOn;                 //ロックオンカーソル
 	ACTIONMODE m_NowActionMode;         //現在のアクションモード
-	CUi * m_pModeDisp;                  //モード表示UI
+	CUi* m_pModeDisp;                  //モード表示UI
 	CMeshOrbit* m_pMeshOrbit;           //軌跡
 	CWire* m_pWire;                     //ワイヤー
-	
+	CGauge* m_pHpGauge;                 //体力ゲージ
+
 	//行動状態
 	CPlayerMove* m_pMove;               //移動処理
 	CPlayerAttack* m_pAttack;           //攻撃処理
@@ -129,6 +131,11 @@ private:
 	//=============================
 	void JumpProcess();     //ジャンプ処理
 	//===============================================================================================
+
+	//=============================
+	//体力系
+	//=============================
+	void SetDamage(int nDamage, int nHitStopTime) override; //ダメージを与える};
 };
 
 #endif
