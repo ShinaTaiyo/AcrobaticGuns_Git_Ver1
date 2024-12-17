@@ -114,7 +114,13 @@ CParticle2D* CParticle2D::Create(D3DXVECTOR3 pos, D3DXVECTOR3 Move, D3DXVECTOR3 
 			pParticle2D->CObject::SetType(CObject::TYPE::PARTICLE2D);                                             //オブジェクトの種類を決める
 			pParticle2D->SetTextureIndex(CManager::GetTexture()->Regist("data\\TEXTURE\\shadow000.jpg"));        //テクスチャを割り当てる
 			pParticle2D->BindTexture(CManager::GetTexture()->GetAddress(pParticle2D->GetTextureIndex()));        //テクスチャを設定する
-			pParticle2D->SetInfo(1, 1, fWidth, fHeight, col, PolygonType, false);                          //ポリゴン情報を設定する
+			pParticle2D->SetAnimInfo(1, 1,false);                          //ポリゴン情報を設定する
+			pParticle2D->SetWidth(fWidth);
+			pParticle2D->SetMaxWidth(fWidth);
+			pParticle2D->SetColor(col, false, 1.0f);
+			pParticle2D->SetHeight(fHeight);
+			pParticle2D->SetMaxHeight(fHeight);
+			pParticle2D->SetPolygonType(PolygonType);
 		}
 	}
 	else

@@ -888,9 +888,13 @@ CShotWeakEnemy::~CShotWeakEnemy()
 HRESULT CShotWeakEnemy::Init()
 {
 	CEnemy::Init();
+
+	float fRatioRot = static_cast<float>(rand() % 200 - 100) / 100;
+	float fRotSpeed = static_cast<float>(rand() % 40 - 20) / 100;
 	m_pMagicSword = CAttackEnemy::Create(CAttack::ATTACKTYPE::MAGICSWORD, CAttack::TARGETTYPE::PLAYER, CAttack::COLLISIONTYPE::RECTANGLE_XZ,
-		2, 60, 200, GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+		1, 60, 200, GetPos(), D3DXVECTOR3(0.0f,D3DX_PI * fRatioRot, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 	m_pMagicSword->SetUseDeath(false);
+	m_pMagicSword->SetUseAddRot(true,D3DXVECTOR3(0.0f,fRotSpeed, 0.0f));
 	SetEnemyType(CEnemy::ENEMYTYPE::SHOTWEAK);//“Gƒ^ƒCƒv‚ðÝ’è
 	return S_OK;
 }
@@ -915,7 +919,6 @@ void CShotWeakEnemy::Update()
 	if (CScene::GetMode() == CScene::MODE_GAME)
 	{
 		m_pMagicSword->SetPos(GetPos());
-		m_pMagicSword->SetRot(m_pMagicSword->GetRot() + D3DXVECTOR3(0.0f, 0.05f, 0.0f));
 	}
 }
 //============================================================================================================================================

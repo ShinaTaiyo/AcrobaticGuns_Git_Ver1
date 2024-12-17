@@ -158,7 +158,7 @@ CFade* CFade::Create()
 		{
 			pFade->Init();                                                                                                        //初期化処理
 			pFade->SetUseDeath(false);                                                   //死亡フラグを発動するかどうかを設定する
-			pFade->SetInfo(1, 1, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, D3DXCOLOR(0.0f,0.0f, 0.0f,1.0f), CObject2D::POLYGONTYPE::NORMAL,false);//ポリゴン情報を設定
+			pFade->CObject2D::SetAnimInfo(1, 1, true);//ポリゴンとテクスチャ情報を設定
 			pFade->SetPos(D3DXVECTOR3(SCREEN_WIDTH / 2,SCREEN_HEIGHT / 2,0.0f));                                                                                        //中心に位置を設定
 			pFade->m_nMaxFadeCnt = 45;                                                                                           //フェードカウント最大値
 			pFade->CObject::SetType(CObject::TYPE::FADE);                                                                          //オブジェクトの種類を決める
@@ -267,10 +267,16 @@ CSceneFade* CSceneFade::Create()
 		{
 			pSceneFade->Init();                                                                                                        //初期化処理
 			pSceneFade->SetUseDeath(false);                                                   //死亡フラグを発動するかどうかを設定する
-			pSceneFade->SetInfo(1, 1, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f), CObject2D::POLYGONTYPE::NORMAL, false);//ポリゴン情報を設定
 			pSceneFade->SetPos(D3DXVECTOR3(SCREEN_WIDTH / 2,SCREEN_HEIGHT / 2,0.0f));                                                                                        //中心に位置を設定
 			pSceneFade->SetMaxFadeCnt(45);                                                                                           //フェードカウント最大値
 			pSceneFade->CObject::SetType(CObject::TYPE::FADE);                                                                          //オブジェクトの種類を決める
+			pSceneFade->SetAnimInfo(1,1,  false);//ポリゴン情報を設定
+			pSceneFade->SetWidth(SCREEN_WIDTH / 2);
+			pSceneFade->SetMaxWidth(SCREEN_WIDTH / 2);
+			pSceneFade->SetHeight(SCREEN_WIDTH / 2);
+			pSceneFade->SetColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f), false, 1.0f);
+			pSceneFade->SetMaxHeight(SCREEN_WIDTH / 2);
+			pSceneFade->SetPolygonType(CObject2D::POLYGONTYPE::NORMAL);
 		}
 	}
 	else
@@ -388,7 +394,12 @@ CDirectionFade* CDirectionFade::Create()
 		{
 			pDirectionFade->Init();                                                                                                        //初期化処理
 			pDirectionFade->SetUseDeath(false);                                                   //死亡フラグを発動するかどうかを設定する
-			pDirectionFade->SetInfo(1, 1, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f), CObject2D::POLYGONTYPE::NORMAL, false);//ポリゴン情報を設定
+			pDirectionFade->SetAnimInfo(1, 1, false);//ポリゴン情報を設定
+			pDirectionFade->SetWidth(SCREEN_WIDTH / 2);
+			pDirectionFade->SetMaxWidth(SCREEN_WIDTH / 2);
+			pDirectionFade->SetHeight(SCREEN_WIDTH / 2);
+			pDirectionFade->SetMaxHeight(SCREEN_WIDTH / 2);
+			pDirectionFade->SetPolygonType(CObject2D::POLYGONTYPE::NORMAL);
 			pDirectionFade->SetPos(D3DXVECTOR3(SCREEN_WIDTH / 2,SCREEN_HEIGHT / 2,0.0f));                                                                                        //中心に位置を設定
 			pDirectionFade->SetMaxFadeCnt(45);                                                                                           //フェードカウント最大値
 			pDirectionFade->CObject::SetType(CObject::TYPE::FADE);                                                                          //オブジェクトの種類を決める

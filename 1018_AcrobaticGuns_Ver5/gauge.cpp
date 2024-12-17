@@ -16,7 +16,7 @@
 //コンストラクタ
 //===================================================================
 CGauge::CGauge(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject2D(nPri,bUseintPri,type,ObjType),
-m_nParam(0),m_nParamOld(0),m_type(GAUGETYPE::PLAYERHP),m_nMaxParam(0)
+m_nParam(0),m_nParamOld(0),m_type(GAUGETYPE::PLAYERHP),m_nMaxParam(0),m_fShakePower(0.0f),m_nShakeTime(0)
 {
 
 }
@@ -65,6 +65,19 @@ void CGauge::Update()
 	}
 
 	fRatio = (float)(m_nParam) / (float)(m_nMaxParam);
+
+	//シェイクさせる
+	if (m_nShakeTime > 0)
+	{
+		float fRatioRot = static_cast<float>(rand() % 100 + 1) / 100;
+		SetPos(GetSupportPos() + D3DXVECTOR3(sinf((D3DX_PI * 2) * fRatioRot) * m_fShakePower, cosf((D3DX_PI * 2) * fRatioRot) * m_fShakePower, 0.0f));
+		m_nShakeTime--;
+
+		if (m_nShakeTime == 0)
+		{
+			SetPos(GetSupportPos());
+		}
+	}
 
 	SetWidth(fMaxWidth * fRatio);
 
@@ -127,7 +140,14 @@ CGauge * CGauge::Create(GAUGETYPE type, int nParam, float fWidth, float fHeight,
 	pGauge->m_nParam = nParam;                                                                      //パラメータ
 	pGauge->m_nMaxParam = nParam;                                                                   //最大パラメータ
 	pGauge->SetPos(pos);
-	pGauge->SetInfo(0, 0, fWidth, fHeight, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f), CObject2D::POLYGONTYPE::LEFT, false);
+	pGauge->SetSupportPos(pos);
+	pGauge->SetWidth(fWidth);
+	pGauge->SetMaxWidth(fWidth);
+	pGauge->SetHeight(fHeight);
+	pGauge->SetMaxHeight(fHeight);
+	pGauge->SetAnim(0);
+	pGauge->SetColor(D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f), false, 1.0f);
+	pGauge->SetAnimInfo(1, 1, false);
 	return pGauge;
 }
 //==================================================================================================================================

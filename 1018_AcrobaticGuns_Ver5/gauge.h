@@ -48,12 +48,20 @@ public:
 	void SetMaxParam(int nParam) { m_nMaxParam = nParam; }//最大パラメータを設定
 	void SetGaugeType(GAUGETYPE type) { m_type = type; }
 	static CGauge* Create(GAUGETYPE type, int nParam, float fWidth, float fHeight, D3DXVECTOR3 pos);//ゲージを生成
+
+	//====================================
+	//オプション
+	//====================================
+	void SetShake(float fPower, int nTime) { m_fShakePower = fPower; m_nShakeTime = nTime;}
 protected:
 private:
 	int m_nParam;               //ゲージで表記する現在のパラメータ
 	int m_nParamOld;            //一つ前のパラメータ
 	GAUGETYPE m_type;           //ゲージの種類
 	int m_nMaxParam;            //ゲージで表記するパラメータの最大値
+
+	float m_fShakePower;        //シェイクさせる力
+	int m_nShakeTime;           //シェイクさせる時間
 };
 //=======================================================================================================================
 #endif

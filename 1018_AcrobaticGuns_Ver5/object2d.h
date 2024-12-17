@@ -90,24 +90,28 @@ public:
 	void SetMove(D3DXVECTOR3 move) { m_Move = move; }
 
 	POLYGONTYPE GetPolygonType() { return m_PolygonType; }//ポリゴンの種類を取得する
-
+	void SetPolygonType(POLYGONTYPE Type) { m_PolygonType = Type; }
 	//===============
 	//サイズ系
 	//===============
 	void SetScale(D3DXVECTOR2 Scale) { m_Scale = Scale; }
 	void SetUseScale(bool bUse) { m_bUseScale = bUse; }//拡大率を使用するかどうか
+	void SetUseAddScale(D3DXVECTOR2 AddScale, bool bUse) { m_AddScale = AddScale; m_bUseAddScale = bUse; }
+	const D3DXVECTOR2& GetAddScale() const { return m_AddScale; }
 	D3DXVECTOR2& GetScale() { return m_Scale; }//拡大率
 	//=======================================================================================================
 
 	//===============
-	//設定系
+	//座標系
 	//===============
 	void SetPos(D3DXVECTOR3 pos) { m_pos = pos;}                            //位置を設定
 	void SetSupportPos(D3DXVECTOR3 pos) { m_SupportPos = pos; }             //召喚位置を設定
 	void SetWidth(float fWidth) { m_fWidth = fWidth; }                      //横幅を設定
+	void SetMaxWidth(float fWidth) { m_fMaxWidth = fWidth; }                //最大横幅を設定
 	void SetHeight(float fHeight) { m_fHeight = fHeight; }                  //高さを設定
+	void SetMaxHeight(float fHeight) { m_fMaxHeight = fHeight; }            //最大高さを設定
 	void SetColor(D3DXCOLOR col, bool bAlphaOnly,float fAlpha);             //色を設定
-	void SetInfo(int nMaxAnimationPattern, int nAnimationChange,float fWidth,float fHeight,D3DXCOLOR col,POLYGONTYPE PolygonType,bool bAnim);//アニメーション関係の設定
+	void SetAnimInfo(int nMaxAnimationPattern, int nAnimationChange,bool bAnim);//アニメーション関係の設定
 	void SetAnim(int nAnim) { m_nAnimaionPattern = nAnim; }   //アニメーション番号を設定
 	void SetTextureIndex(int nIdx) { m_nTextureIndex = nIdx; }//テクスチャ番号をセットする
 	int GetTextureIndex() { return m_nTextureIndex; }         //テクスチャ番号を取得する
@@ -179,7 +183,9 @@ private:
 	//サイズ系
 	//================================
 	D3DXVECTOR2 m_Scale;     //拡大率!
+	D3DXVECTOR2 m_AddScale;  //加算する拡大率
 	bool m_bUseScale;        //拡大率を使用するかどうか!
+	bool m_bUseAddScale;     //拡大率の加算をするかどうか
 	void ScaleProcess();     //拡大率の処理
 	//==============================================================================================================================================================
 

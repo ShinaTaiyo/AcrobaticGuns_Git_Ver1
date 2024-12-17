@@ -116,7 +116,13 @@ CUi* CUi::Create(UITYPE type, CObject2D::POLYGONTYPE PolygonType, float fWidth, 
 			pUi->SetPos(Pos);//位置
 			pUi->SetSupportPos(Pos);//支点となる位置
 			pUi->SetUseScale(true);//拡大率を使用する
-			pUi->CObject2D::SetInfo(1, 1, fWidth, fHeight, col, PolygonType, true);//ポリゴンとテクスチャ情報を設定
+			pUi->CObject2D::SetAnimInfo(1, 1,true);//ポリゴンとテクスチャ情報を設定
+			pUi->SetWidth(fWidth);
+			pUi->SetMaxWidth(fWidth);
+			pUi->SetHeight(fHeight);
+			pUi->SetMaxHeight(fHeight);
+			pUi->SetPolygonType(PolygonType);
+			pUi->SetColor(col,false,1.0f);
 			pUi->SetUseDeath(true);                 //死亡フラグを発動するかどうかを設定する
 			pUi->SetTextureIndex(pTextureClass->Regist(UI_FILENAME[int(type)]));
 			pUi->CObject2D::BindTexture(pTextureClass->GetAddress(pUi->GetTextureIndex()));
@@ -243,7 +249,13 @@ CUiEffect* CUiEffect::Create(UITYPE type, CObject2D::POLYGONTYPE PolygonType, fl
 			pUiEffect->SetSupportPos(Pos);//支点となる位置
 			pUiEffect->SetUseLifeRatioColor(true);//体力に応じて色合いを変える
 			pUiEffect->SetUseScale(true);//拡大率を使用する
-			pUiEffect->CObject2D::SetInfo(1, 1, fWidth, fHeight, col, PolygonType, true);//ポリゴンとテクスチャ情報を設定
+			pUiEffect->CObject2D::SetAnimInfo(1, 1,false);//ポリゴンとテクスチャ情報を設定
+			pUiEffect->SetWidth(fWidth);
+			pUiEffect->SetMaxWidth(fWidth);
+			pUiEffect->SetHeight(fHeight);
+			pUiEffect->SetMaxHeight(fHeight);
+			pUiEffect->SetPolygonType(PolygonType);
+			pUiEffect->SetColor(col, false, 1.0f);
 			pUiEffect->SetUseDeath(true);                 //死亡フラグを発動するかどうかを設定する
 			pUiEffect->SetTextureIndex(pTextureClass->Regist(UI_FILENAME[int(type)]));
 			pUiEffect->CObject2D::BindTexture(pTextureClass->GetAddress(pUiEffect->GetTextureIndex()));

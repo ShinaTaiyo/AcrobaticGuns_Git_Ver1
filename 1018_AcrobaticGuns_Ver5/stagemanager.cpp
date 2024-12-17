@@ -85,21 +85,6 @@ HRESULT CStageManager::Init()
 
 	m_pState = DBG_NEW CStageManagerState_NewObject();
 
-	//===========================
-	//オブジェクトリスト
-	//===========================
-	//m_VecObjList = {};//オブジェクトのVector型のリスト
-	//=======================================================================================
-
-	////===========================
-	////オブジェクトX初期化処理
-	////===========================
-	//if (CScene::GetMode() == CScene::MODE_EDIT)
-	//{
-	//	m_pManagerObject = CBlock::Create(CBlock::BLOCKTYPE00_NORMAL, 1, D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(1.0f,1.0f,1.0f));
-	//	m_pManagerObject->SetUseDeath(false);//死亡フラグをオフにする
-	//}
-	////=======================================================================================
 	CObject::Init();
 
 	SetUseDeath(false);

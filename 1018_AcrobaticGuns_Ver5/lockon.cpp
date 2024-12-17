@@ -118,7 +118,12 @@ CLockon* CLockon::Create(D3DXVECTOR3 Pos, CObject2D::POLYGONTYPE PolygonType, fl
 	pLockOn->Init();//初期化処理
 	pLockOn->SetPos(Pos);//位置設定
 	pLockOn->SetSupportPos(Pos);//支点位置設定
-	pLockOn->SetInfo(1, 1, fWidth, fHeight, col,PolygonType,false);//情報設定（必ず）
+	pLockOn->SetAnimInfo(1, 1,false);//情報設定（必ず）
+	pLockOn->SetPolygonType(PolygonType);
+	pLockOn->SetWidth(fWidth);
+	pLockOn->SetMaxWidth(fWidth);
+	pLockOn->SetHeight(fHeight);
+	pLockOn->SetMaxHeight(fHeight);
 
 	//テクスチャ設定
 	pLockOn->SetTextureIndex(pTexture->Regist("data\\TEXTURE\\LockOn\\Target_000.png"));

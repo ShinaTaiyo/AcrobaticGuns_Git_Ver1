@@ -480,6 +480,16 @@ void CPlayer::SetDamage(int nDamage, int nHitStopTime)
     CObjectXAlive::SetDamage(nDamage, nHitStopTime);
 
     m_pHpGauge->SetParam(GetLife());
+    m_pHpGauge->SetShake(5.0f * nDamage, 30);
+
+    CGauge* pGauge = CGauge::Create(CGauge::GAUGETYPE::PLAYERHP, m_pHpGauge->GetParam(), m_pHpGauge->GetWidth(), m_pHpGauge->GetHeight(), m_pHpGauge->GetPos());
+    pGauge->SetUseLife(true, 10, 10);
+    pGauge->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), false, 1.0f);
+    pGauge->SetUseLifeRatioColor(true);
+    pGauge->SetUseDeath(true);
+    pGauge->SetUseAddScale(D3DXVECTOR2(0.1f, 0.1f), true);
+    pGauge->SetUseScale(true);
+    pGauge->SetScale(D3DXVECTOR2(1.0f, 1.0f));
 }
 //==========================================================================================================
 

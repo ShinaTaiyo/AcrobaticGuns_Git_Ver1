@@ -30,7 +30,7 @@ m_nLife(0),m_nMaxLife(0),m_fRatioLife(0.0f),m_bUseLifeRatioColor(false),m_bUseDr
 m_bUseFloating(false),m_bUseLife(false),m_bUseScale(false),m_fAngle(0.0f),m_fAnimationSplit(0.0f),m_fFloatingAddSpeed(0.0f),m_fFloatingLimitSpeed(0.0f),m_fFloatingRot(0.0f),
 m_fFloatingSpeed(0.0f),m_fHeight(0.0f),m_fLength(0.0f),m_fMaxHeight(0.0f),m_fMaxWidth(0.0f),m_fPolygonRotSpeed(0.0f),m_fWidth(0.0f),m_nAnimaionPattern(0),m_nAnimationChange(0),
 m_nAnimationCnt(0),m_nMaxAnimationPattern(0),m_nTextureIndex(0),m_pos(D3DXVECTOR3(0.0f,0.0f,0.0f)), m_Move(D3DXVECTOR3(0.0f,0.0f,0.0f)), m_SupportPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_col(D3DXVECTOR3(0.0f,0.0f,0.0f)),
-m_pVtxBuff(nullptr),m_pTexture(nullptr),m_Scale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_rot(D3DXVECTOR3(0.0f,0.0f,0.0f))
+m_pVtxBuff(nullptr),m_pTexture(nullptr),m_Scale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_rot(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_AddScale(D3DXVECTOR2(0.0f,0.0f)),m_bUseAddScale(false)
 {
 	m_pTexture = nullptr;
 	m_pVtxBuff = nullptr;
@@ -371,17 +371,12 @@ void CObject2D::SetColor(D3DXCOLOR col, bool bAlphaOnly, float fAlpha)
 //=====================================
 //２Ｄオブジェクトの情報を設定
 //=====================================
-void CObject2D::SetInfo(int nMaxAnimationPattern, int nAnimationChange, float fWidth, float fHeight, D3DXCOLOR col, POLYGONTYPE PolygonType, bool bAnim)
+void CObject2D::SetAnimInfo(int nMaxAnimationPattern, int nAnimationChange, bool bAnim)
 {
+
 	m_nMaxAnimationPattern = nMaxAnimationPattern;             //アニメーションのパターンの最大数
 	m_nAnimationChange = nAnimationChange;                     //アニメーションの座標を変えるフレーム数
-	m_fAnimationSplit = (float)(1.0f / m_nMaxAnimationPattern);//１分割当たりのアニメーション範囲
-	m_fWidth = fWidth;                                         //横幅
-	m_fMaxWidth = fWidth;                                      //最大横幅
-	m_fHeight = fHeight;                                       //立幅
-	m_fMaxHeight = fHeight;                                    //最大高さ
-	m_PolygonType = PolygonType;                               //ポリゴンの出し方の種類を決める
-	m_col = col;                                               //色の設定
+	m_fAnimationSplit = 1.0f / m_nMaxAnimationPattern;//１分割当たりのアニメーション範囲
 	m_bAnimFlag = bAnim;                                       //使用状態
 }
 //================================================================================
@@ -391,6 +386,11 @@ void CObject2D::SetInfo(int nMaxAnimationPattern, int nAnimationChange, float fW
 //======================================================
 void CObject2D::ScaleProcess()
 {
+	if (m_bUseAddScale == true)
+	{
+		m_Scale += m_AddScale;//拡大率を加算する
+	}
+
 	if (m_bUseScale == true)
 	{//拡大率を使用するかどうか
 		m_fWidth = m_fMaxWidth * m_Scale.x;
