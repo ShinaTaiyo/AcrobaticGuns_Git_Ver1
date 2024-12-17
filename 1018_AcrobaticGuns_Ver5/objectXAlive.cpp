@@ -222,6 +222,6 @@ void CObjectXAlive::EditLife()
 		}
 	}
 
-	CManager::GetDebugProc()->PrintDebugProc("ç≈ëÂëÃóÕ(1)ÅF%d\n", m_nMaxLife);
+	CManager::GetDebugProc()->PrintDebugProc("ç≈ëÂëÃóÕ(3)ÅF%d\n", m_nMaxLife);
 }
 //================================================================================================================================================

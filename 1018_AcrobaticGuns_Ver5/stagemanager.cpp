@@ -29,7 +29,7 @@
 //================================
 const string CStageManager::m_aWORLDMAP_TXT[static_cast<int>(CStageManager::WORLDTYPE::MAX)] =
 {
-	"data\\TEXTFILE\\Ver2\\Stage01.txt",
+	"data\\TEXTFILE\\Ver2\\Stage03.txt",
 	"data\\TEXTFILE\\Ver2\\Stage02.txt",
 	"data\\TEXTFILE\\Ver2\\Stage03.txt",
 };
@@ -300,12 +300,11 @@ void CStageManager::SaveMapTxt(int nMapNum)
 	string Writing_Buff;    //文字列
 	CObject::TYPE Type = {};//オブジェクト種類
 
-	WritingFile.open(m_aSAVE_FILENAME, ios::out);//読み取りモードでファイルを開く	
-
+	WritingFile.open(m_aWORLDMAP_TXT[nMapNum], ios::out);//読み取りモードでファイルを開く	
 	//プレイヤーのスポーンポイントを設定する
-	WritingFile << "PLAYER_SAPWNPOINT = " << "POS = " << fixed << setprecision(3) <<m_SpawnPoint.x << " " <<
+	WritingFile << "PLAYER_SAPWNPOINT = " << fixed << setprecision(3) <<m_SpawnPoint.x << " " <<
 		fixed << setprecision(3) << m_SpawnPoint.y << " " <<
-		fixed << setprecision(3) << m_SpawnPoint.z << " " << endl;
+		fixed << setprecision(3) << m_SpawnPoint.z << " " << endl << endl;
 	
 	//ファイルに情報を保存する
 	for (list<CObject*>::iterator it = m_StgObjList.begin(); it != m_StgObjList.end();++it)
@@ -464,7 +463,7 @@ void CStageManager::MapChenge()
 	{
 		SaveMapTxt(m_nMapIndex);//現在のマップ情報をセーブする
 		m_nMapIndex++;
-		if (m_nMapIndex >= m_nMapNum)
+		if (m_nMapIndex >= static_cast<int>(WORLDTYPE::MAX))
 		{
 			m_nMapIndex = 0;
 		}
@@ -477,7 +476,7 @@ void CStageManager::MapChenge()
 		m_nMapIndex--;
 		if (m_nMapIndex < 0)
 		{
-			m_nMapIndex = m_nMapNum - 1;
+			m_nMapIndex = static_cast<int>(WORLDTYPE::MAX) - 1;
 		}
 		LoadMapTxt(m_nMapIndex);//番号のマップを読み込む
 	}

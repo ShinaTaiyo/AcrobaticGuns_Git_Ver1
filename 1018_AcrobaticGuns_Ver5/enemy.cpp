@@ -1212,7 +1212,7 @@ CObject* CShotWeakEnemy::ManagerChengeObject(bool bAim)
 	SetDeath();
 	//======================================================================================
 
-	return CShotWeakEnemy::Create(NewType, GetLife(), GetPhaseNum(), GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
+	return CShotWeakEnemy::Create(NewType, GetMaxLife(), GetPhaseNum(), GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
 }
 //============================================================================================================================================
 
@@ -1223,8 +1223,10 @@ CObject* CShotWeakEnemy::ManagerSaveObject()
 {
 	auto& Vec = GetVecAiModelInfo();
 	auto Vec2 = move(Vec);
-	CShotWeakEnemy * pShotWeakEnemy = CShotWeakEnemy::Create(m_ShotWeakEnemyType, GetLife(),GetPhaseNum(),GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
+	CShotWeakEnemy * pShotWeakEnemy = CShotWeakEnemy::Create(m_ShotWeakEnemyType, GetMaxLife(),GetPhaseNum(),GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
 	pShotWeakEnemy->SetVecMoveAiInfo(Vec2);
+	pShotWeakEnemy->SetNormalSpeed(GetNormalSpeed());//現在の敵の通常速度を保存する
+	pShotWeakEnemy->SetSensingRange(GetSensingRange());//現在の敵の索敵範囲を保存する
 	return pShotWeakEnemy;
 }
 //============================================================================================================================================
@@ -1656,6 +1658,8 @@ CObject* CDiveWeakEnemy::ManagerSaveObject()
 	auto& Vec = GetVecAiModelInfo();
 	auto Vec2 = move(Vec);
 	CDiveWeakEnemy * pDiveWeakEnemy = CDiveWeakEnemy::Create(m_DiveWeakEnemyType, GetMaxLife(),GetPhaseNum(),GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
+	pDiveWeakEnemy->SetSensingRange(GetSensingRange());//現在の敵の索敵範囲を保存する
+	pDiveWeakEnemy->SetNormalSpeed(GetNormalSpeed());//現在の敵の通常速度を保存する
 	pDiveWeakEnemy->SetVecMoveAiInfo(Vec2);
 	return pDiveWeakEnemy;//生成したオブジェクトを返す
 }
