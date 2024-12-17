@@ -64,11 +64,6 @@ HRESULT CGame::Init()
 {
 	CScene::Init();//シーン初期化処理
 
-	m_pPlayer = CPlayer::Create(D3DXVECTOR3(0.0f,100.0f,-600.0f),D3DXVECTOR3(0.0f,D3DX_PI,0.0f), D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(1.0f,1.0f,1.0f));
-	m_pPlayer->SetUseDeath(false);
-	m_pPlayer->SetVecAxis(D3DXVECTOR3(0.0f, 1.0f, 0.0f));
-	//CEnemy::Create(CEnemy::ENEMYTYPE::NORMAL, 100, D3DXVECTOR3(-200.0f, 0.0f, 200.0f), D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(1.0f,1.0f,1.0f) * 2);
-
 	CBg3D::Create(CBg3D::BG3DTYPE::GLASS, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1200.0f, 1200.0f, 1200.0f));
 
 	m_pPhaseManager = CPhaseManager::Create();//フェーズマネージャーを生成
@@ -78,6 +73,10 @@ HRESULT CGame::Init()
 	m_pStageManager->SetUseDeath(false);
 
 	m_pStageManager->LoadMapTxt(0);
+
+	m_pPlayer = CPlayer::Create(m_pStageManager->GetSpawnPoint(), D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+	m_pPlayer->SetUseDeath(false);
+	m_pPlayer->SetVecAxis(D3DXVECTOR3(0.0f, 1.0f, 0.0f));
 	return S_OK;
 }
 //=========================================================================================================================

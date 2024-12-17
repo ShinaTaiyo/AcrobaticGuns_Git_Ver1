@@ -29,7 +29,7 @@
 //================================
 const string CStageManager::m_aWORLDMAP_TXT[static_cast<int>(CStageManager::WORLDTYPE::MAX)] =
 {
-	"data\\TEXTFILE\\Ver2\\Stage03.txt",
+	"data\\TEXTFILE\\Ver2\\Stage01.txt",
 	"data\\TEXTFILE\\Ver2\\Stage02.txt",
 	"data\\TEXTFILE\\Ver2\\Stage03.txt",
 };
@@ -223,7 +223,14 @@ void CStageManager::LoadMapTxt(int nMapNum)
 	{
 		ReadingFile >> Reading_Buff;
 
-		if (Reading_Buff == "SETBLOCK")
+		if (Reading_Buff == "PLAYER_SPAWNPOINT")
+		{
+			ReadingFile >> Reading_Buff;//イコール
+			ReadingFile >> m_SpawnPoint.x;
+			ReadingFile >> m_SpawnPoint.y;
+			ReadingFile >> m_SpawnPoint.z;
+		}
+		else if (Reading_Buff == "SETBLOCK")
 		{
 			CBlock::LoadInfoTxt(ReadingFile, m_StgObjList, Reading_Buff);
 		}
@@ -302,7 +309,7 @@ void CStageManager::SaveMapTxt(int nMapNum)
 
 	WritingFile.open(m_aWORLDMAP_TXT[nMapNum], ios::out);//読み取りモードでファイルを開く	
 	//プレイヤーのスポーンポイントを設定する
-	WritingFile << "PLAYER_SAPWNPOINT = " << fixed << setprecision(3) <<m_SpawnPoint.x << " " <<
+	WritingFile << "PLAYER_SPAWNPOINT = " << fixed << setprecision(3) <<m_SpawnPoint.x << " " <<
 		fixed << setprecision(3) << m_SpawnPoint.y << " " <<
 		fixed << setprecision(3) << m_SpawnPoint.z << " " << endl << endl;
 	
@@ -548,6 +555,7 @@ void CStageManager::DispInfo()
 	CManager::GetDebugProc()->PrintDebugProc("現在のステージマネージャー管理オブジェクトの数：%d\n", m_StgObjList.size());
 	CManager::GetDebugProc()->PrintDebugProc("現在のマップ番号(F2、F3で変更）：%d\n", m_nMapIndex);
 	CManager::GetDebugProc()->PrintDebugProc("現在のマップモード（F4）：%s\n",&aMapModeString[0]);
+	CManager::GetDebugProc()->PrintDebugProc("スポーンポイント（P）：%f %f %f\n",m_SpawnPoint.x,m_SpawnPoint.y,m_SpawnPoint.z);
 	CManager::GetDebugProc()->PrintDebugProc("ステート変更 : 8\n");
 	CManager::GetDebugProc()->PrintDebugProc("：末尾のオブジェクトを消去：BACKSPACE\n");
 	CManager::GetDebugProc()->PrintDebugProc("//=================================\n");
@@ -649,6 +657,14 @@ void CStageManagerState_NewObject::Process(CStageManager* pStageManager)
 	if (m_pManagerObject != nullptr)
 	{
 		m_pManagerObject->ManagerChooseControlInfo();
+
+		if (m_pManagerObject->GetObjectType() == CObject::OBJECTTYPE::OBJECTTYPE_X)
+		{
+			if (CManager::GetInputKeyboard()->GetTrigger(DIK_P) == true)
+			{
+				pStageManager->SetSpawnPoint(static_cast<CObjectX*>(m_pManagerObject)->GetPos());
+			}
+		}
 
 		//現在のブロックの種類を変更する
 		TypeChenge(pStageManager);

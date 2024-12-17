@@ -66,6 +66,9 @@ public:
 	int GetMapIndex() { return m_nMapIndex; }   //現在のマップ番号を取得する
 	void MapChenge();                            //マップを変更する
 
+	void SetSpawnPoint(D3DXVECTOR3 Pos) { m_SpawnPoint = Pos; }//スポーン位置を設定する
+	const D3DXVECTOR3& GetSpawnPoint() const { return m_SpawnPoint; }//スポーン位置を取得する
+
 	list <CObject*> & GetStgObjList() { return m_StgObjList; }//管理オブジェクトリストを取得する
 	const D3DXVECTOR3& GetSavePos() const { return m_SavePos; }
 	void SetSavePos(D3DXVECTOR3 Pos) { m_SavePos = Pos; }

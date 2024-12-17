@@ -200,6 +200,7 @@ void CPhaseManager::AdvancePhase()
 		if (s_nNowStage != static_cast<int>(CStageManager::WORLDTYPE::MAX))
 		{
 			CGame::GetStageManager()->LoadMapTxt(s_nNowStage);//次のステージをロードする
+			CGame::GetPlayer()->SetPos(CGame::GetStageManager()->GetSpawnPoint());
 		}
 		else
 		{
