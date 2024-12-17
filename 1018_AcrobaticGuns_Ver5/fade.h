@@ -45,11 +45,13 @@ protected:
 	int& GetFadeCnt() { return m_nFadeCnt; }
 	void SetMaxFadeCnt(int nMaxFadeCnt) { m_nMaxFadeCnt = nMaxFadeCnt; }
 	int& GetMaxFadeCnt() { return m_nMaxFadeCnt; }
-	void SetFadeMode(FADEMODE mode) { m_FadeMode = mode; }
+	void SetFadeMode(FADEMODE mode) { m_FadeMode = mode;}
+	const bool GetStartFade() const { return m_bStartFade; }
 private:
 	int m_nFadeCnt;                   //フェードをする時のカウント!
 	int m_nMaxFadeCnt;                //フェードカウント最大値!
 	float m_fAlpha;                   //フェードのアルファ値!
+	bool m_bStartFade;                //フェードを開始するフラグ
 	FADEMODE m_FadeMode;              //フェードのモード!
 };
 //====================================================================================================================

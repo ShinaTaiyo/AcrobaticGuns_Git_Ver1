@@ -29,7 +29,7 @@ public:
 	const bool& GetSuccessCollision() const { return m_bCollision; }
 	void ResetCoolTime() { m_nCoolTime = s_nMAX_COOLTIME; m_bCollision = false; }
 private:
-	static constexpr int s_nMAX_COOLTIME = 3;
+	static constexpr int s_nMAX_COOLTIME = 1;
 
 	bool CollisionSquare();//³•ûŒ`‚Ì“–‚½‚è”»’è‚ğs‚¤
 	bool m_bCollision;//“–‚½‚è”»’è‚ª¬Œ÷‚µ‚½‚©‚Ç‚¤‚©

@@ -9,6 +9,8 @@
 //インクルード
 //======================================================
 #include "fade.h"
+#include "debugproc.h"
+#include "manager.h"
 #include "scene.h"
 //========================================================================================================
 
@@ -16,7 +18,7 @@
 //コンストラクタ
 //======================================================
 CFade::CFade(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject2D(nPri,bUseintPri,type,ObjType),
-m_FadeMode(FADEMODE_NONE),m_fAlpha(0.0f),m_nFadeCnt(0),m_nMaxFadeCnt(0)
+m_FadeMode(FADEMODE_NONE),m_fAlpha(0.0f),m_nFadeCnt(0),m_nMaxFadeCnt(0), m_bStartFade(false)
 {
 
 }
@@ -82,6 +84,7 @@ void CFade::Update()
 		if (m_nFadeCnt <= 0)
 		{
 			m_nFadeCnt = 0;
+			m_bStartFade = false;
 		}
 
 		fRatio = (float)(m_nFadeCnt) / (float)(m_nMaxFadeCnt);
@@ -90,6 +93,8 @@ void CFade::Update()
 	default:
 		break;
 	}
+
+	CManager::GetDebugProc()->PrintDebugProc("フェードを開始するかどうか：%d\n", m_bStartFade);
 
 	if (bModeChenge == false)
 	{
@@ -283,19 +288,21 @@ CSceneFade* CSceneFade::Create()
 //======================================================
 void CSceneFade::SetSceneFade(FADEMODE FadeMode, CScene::MODE mode)
 {
-	//m_FadeMode = FadeMode;//フェードモードの設定
-	SetFadeMode(FadeMode);
-	m_NextMode = mode;    //次のモード
-	switch (FadeMode)
-	{
-	case FADEMODE_IN:
-		SetFadeCnt(0);
-		break;
-	case FADEMODE_OUT:
-		SetFadeCnt(GetMaxFadeCnt());
-		break;
-	default:
-		break;
+	if (GetStartFade() == false)
+	{//フェードが開始していなければ
+		SetFadeMode(FadeMode);
+		m_NextMode = mode;    //次のモード
+		switch (FadeMode)
+		{
+		case FADEMODE_IN:
+			SetFadeCnt(0);
+			break;
+		case FADEMODE_OUT:
+			SetFadeCnt(GetMaxFadeCnt());
+			break;
+		default:
+			break;
+		}
 	}
 }
 //========================================================================================================

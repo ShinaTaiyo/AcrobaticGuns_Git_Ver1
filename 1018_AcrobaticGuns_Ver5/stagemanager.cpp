@@ -27,14 +27,14 @@
 //================================
 //静的メンバ宣言
 //================================
-const char* CStageManager::m_apWORLDMAP_TXT[static_cast<int>(CStageManager::WORLDTYPE::MAX)] =
+const string CStageManager::m_aWORLDMAP_TXT[static_cast<int>(CStageManager::WORLDTYPE::MAX)] =
 {
-	"data\\TEXTFILE\\Map\\EasyMap.txt",
-	"data\\TEXTFILE\\Map\\NormalMap.txt",
-	"data\\TEXTFILE\\Map\\BossRushMap.txt",
+	"data\\TEXTFILE\\Ver2\\Stage01.txt",
+	"data\\TEXTFILE\\Ver2\\Stage02.txt",
+	"data\\TEXTFILE\\Ver2\\Stage03.txt",
 };
 
-const string CStageManager::m_aSAVE_FILENAME = "data\\TEXTFILE\\Ver2\\Stage02.txt";
+const string CStageManager::m_aSAVE_FILENAME = "data\\TEXTFILE\\Ver2\\Stage03.txt";
 
 //================================
 //コンストラクタ
@@ -43,7 +43,7 @@ CStageManager::CStageManager(int nPri, bool bUseintPri, CObject::TYPE type, CObj
 m_nWorldIndex(0),m_pBg3D(nullptr), m_StgObjList(),m_SaveScale(D3DXVECTOR3(1.0f,1.0f,1.0f)),m_SavePos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_SaveRot(D3DXVECTOR3(0.0f,0.0f,0.0f)),
 m_SaveBeforeChoosePos(D3DXVECTOR3(0.0f,0.0f,0.0f)), m_nMapIndex(0), m_nMapNum(0), m_pChooseObject(nullptr),
 m_ManagerMode(MANAGERMODE::ALREADYSTAGE),m_bChooseObject(false),m_bMakeMapMode(false),m_bUseSizeMove(false),
-m_StgObjIt(),m_pState(nullptr),m_NowState(STATE::NEWOBJECT)
+m_StgObjIt(),m_pState(nullptr),m_NowState(STATE::NEWOBJECT),m_SpawnPoint(D3DXVECTOR3(0.0f,0.0f,0.0f))
 {
 
 }
@@ -102,7 +102,11 @@ HRESULT CStageManager::Init()
 	////=======================================================================================
 	CObject::Init();
 
-	LoadMapTxt(0);
+	SetUseDeath(false);
+	if (CScene::GetMode() == CScene::MODE_EDIT)
+	{
+		LoadMapTxt(0);
+	}
 	return S_OK;
 }
 //==========================================================
@@ -176,14 +180,16 @@ void CStageManager::Draw()
 //======================================================
 void CStageManager::SetDeath()
 {
-	m_StgObjList.clear();//vectorの中身をクリア
-
-	if (m_pState != nullptr)
+	if (GetUseDeath() == true)
 	{
-		delete m_pState;
-		m_pState = nullptr;
-	}
+		m_StgObjList.clear();//vectorの中身をクリア
 
+		if (m_pState != nullptr)
+		{
+			delete m_pState;
+			m_pState = nullptr;
+		}
+	}
 	CObject::SetDeath();
 }
 //============================================================================================================
@@ -193,6 +199,7 @@ void CStageManager::SetDeath()
 //============================================
 void CStageManager::LoadMapTxt(int nMapNum)
 {
+	ReleaseAll();
 
 	//vectorに保存した情報をリセットする
 	m_StgObjList.clear();
@@ -200,7 +207,17 @@ void CStageManager::LoadMapTxt(int nMapNum)
 	fstream ReadingFile;//読み取り用ファイル
 	string Reading_Buff;//読み取り用ファイルの文字列
 
-	ReadingFile.open(m_aSAVE_FILENAME, ios::in);//読み取りモードで開く
+	//マップ番号が最大値や最低値を上回った場合
+	if (nMapNum < 0)
+	{
+		nMapNum = static_cast<int>(WORLDTYPE::MAX) - 1;
+	}
+	if (nMapNum >= static_cast<int>(WORLDTYPE::MAX))
+	{
+		nMapNum = 0;
+	}
+
+	ReadingFile.open(m_aWORLDMAP_TXT[nMapNum], ios::in);//読み取りモードで開く
 
 	while (!ReadingFile.eof())
 	{
@@ -222,6 +239,11 @@ void CStageManager::LoadMapTxt(int nMapNum)
 		{
 			CDiveWeakEnemy::LoadInfoTxt(ReadingFile, m_StgObjList, Reading_Buff);
 		}
+	}
+
+	if (CScene::GetMode() == CScene::MODE_GAME)
+	{
+		m_StgObjList.clear();
 	}
 
 	ReadingFile.close();//ファイルを閉じる
@@ -280,6 +302,11 @@ void CStageManager::SaveMapTxt(int nMapNum)
 
 	WritingFile.open(m_aSAVE_FILENAME, ios::out);//読み取りモードでファイルを開く	
 
+	//プレイヤーのスポーンポイントを設定する
+	WritingFile << "PLAYER_SAPWNPOINT = " << "POS = " << fixed << setprecision(3) <<m_SpawnPoint.x << " " <<
+		fixed << setprecision(3) << m_SpawnPoint.y << " " <<
+		fixed << setprecision(3) << m_SpawnPoint.z << " " << endl;
+	
 	//ファイルに情報を保存する
 	for (list<CObject*>::iterator it = m_StgObjList.begin(); it != m_StgObjList.end();++it)
 	{//末尾まで繰り返す
@@ -433,27 +460,6 @@ void CStageManager::SaveMapBin()
 //==========================================================
 void CStageManager::MapChenge()
 {
-	//===============================================================
-    //モードを変える
-    //===============================================================
-	if (CManager::GetInputKeyboard()->GetTrigger(DIK_F4) == true)
-	{
-	     SaveMapTxt(m_nMapIndex);//現在のマップを保存する
-
-		if (m_ManagerMode == MANAGERMODE::ALREADYSTAGE)
-		{
-			m_ManagerMode = MANAGERMODE::NEWSTAGE;
-		}
-		else
-		{
-			m_ManagerMode = MANAGERMODE::ALREADYSTAGE;
-		}
-
-
-		LoadMapTxt(m_nMapIndex);
-	}
-	//=======================================================================================================
-
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_F3) == true && m_ManagerMode == MANAGERMODE::ALREADYSTAGE)
 	{
 		SaveMapTxt(m_nMapIndex);//現在のマップ情報をセーブする
@@ -541,7 +547,6 @@ void CStageManager::DispInfo()
 	CManager::GetDebugProc()->PrintDebugProc("//マップエディタの情報\n");
 	CManager::GetDebugProc()->PrintDebugProc("//=================================\n");
 	CManager::GetDebugProc()->PrintDebugProc("現在のステージマネージャー管理オブジェクトの数：%d\n", m_StgObjList.size());
-	CManager::GetDebugProc()->PrintDebugProc("現在のワールド：%s\n",&m_apWORLDMAP_TXT[m_nWorldIndex][0]);
 	CManager::GetDebugProc()->PrintDebugProc("現在のマップ番号(F2、F3で変更）：%d\n", m_nMapIndex);
 	CManager::GetDebugProc()->PrintDebugProc("現在のマップモード（F4）：%s\n",&aMapModeString[0]);
 	CManager::GetDebugProc()->PrintDebugProc("ステート変更 : 8\n");

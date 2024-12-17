@@ -33,7 +33,7 @@
 //====================================================
 //静的メンバ宣言
 //====================================================
-
+const int CPlayer::s_nNORMAL_MAXLIFE = 100;
 //==========================================================================================================
 
 //====================================================
@@ -144,9 +144,12 @@ void CPlayer::Update()
     m_pWireShot->WireShotProcess(this);//ワイヤー発射状態処理
 
     CManager::GetDebugProc()->PrintDebugProc("プレイヤーの位置：%f %f %f\n", GetPos().x, GetPos().y, GetPos().z);
+    CManager::GetDebugProc()->PrintDebugProc("プレイヤーの体力：%d\n",GetLife());
 
-    //m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f) + m_AddPosR;
-    //m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -200.0f, 0.0f, cosf(m_Rot.y) * -200.0f);
+    if (GetLife() < 1)
+    {
+        CManager::GetSceneFade()->SetSceneFade(CFade::FADEMODE_IN, CScene::MODE_RESULT);
+    }
 }
 //==========================================================================================================
 
@@ -164,35 +167,37 @@ void CPlayer::Draw()
 //====================================================
 void CPlayer::SetDeath()
 {
-    //ロックオン
-    if (m_pLockOn != nullptr)
+    if (GetUseDeath() == true)
     {
-        m_pLockOn->SetUseDeath(true);
-        m_pLockOn->SetDeath();
-        m_pLockOn = nullptr;
-    }
+        //ロックオン
+        if (m_pLockOn != nullptr)
+        {
+            m_pLockOn->SetUseDeath(true);
+            m_pLockOn->SetDeath();
+            m_pLockOn = nullptr;
+        }
 
-    if (m_pModeDisp != nullptr)
-    {
-        m_pModeDisp->SetUseDeath(true);
-        m_pModeDisp->SetDeath();
-        m_pModeDisp = nullptr;
-    }
+        if (m_pModeDisp != nullptr)
+        {
+            m_pModeDisp->SetUseDeath(true);
+            m_pModeDisp->SetDeath();
+            m_pModeDisp = nullptr;
+        }
 
-    if (m_pMeshOrbit != nullptr)
-    {
-        m_pMeshOrbit->SetUseDeath(true);
-        m_pMeshOrbit->SetDeath();
-        m_pMeshOrbit = nullptr;
-    }
+        if (m_pMeshOrbit != nullptr)
+        {
+            m_pMeshOrbit->SetUseDeath(true);
+            m_pMeshOrbit->SetDeath();
+            m_pMeshOrbit = nullptr;
+        }
 
-    if (m_pWire != nullptr)
-    {
-        m_pWire->SetUseDeath(true);
-        m_pWire->SetDeath();
-        m_pWire = nullptr;
+        if (m_pWire != nullptr)
+        {
+            m_pWire->SetUseDeath(true);
+            m_pWire->SetDeath();
+            m_pWire = nullptr;
+        }
     }
-
     CObject::SetDeath();
 }
 //===========================================================================================================
@@ -221,7 +226,7 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
                 CManager::GetObjectXInfo()->GetBuffMat(nIdx),
                 CManager::GetObjectXInfo()->GetdwNumMat(nIdx),
                 CManager::GetObjectXInfo()->GetTexture(nIdx),
-                CManager::GetObjectXInfo()->GetColorValue(nIdx));           
+                CManager::GetObjectXInfo()->GetColorValue(nIdx));
             //モデル情報を割り当てる
             pPlayer->SetSize();
             pPlayer->SetPos(pos);                                                            //位置の設定
@@ -229,13 +234,12 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
             pPlayer->SetSupportPos(pos);                                                     //設置位置
             pPlayer->SetRot(rot);                                                            //向きの設定
             pPlayer->SetScale(Scale);                                                        //拡大率の設定
-            pPlayer->SetFormarScale(Scale);                                                               //元の拡大率を設定する
-            pPlayer->SetAutoDeath(false);
-            //カメラ初期設定（プレイヤー基準なのでプレイヤーから設定）
-            //CCamera* pCamera = CManager::GetCamera();
-            //pCamera->SetPosR(pPlayer->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f));
-            //pCamera->SetPosV(pCamera->GetPosR() + D3DXVECTOR3(sinf(pPlayer->GetRot().y) * 200.0f, 0.0f, cosf(pPlayer->GetRot().y) * 200.0f));
+            pPlayer->SetFormarScale(Scale);                                                  //元の拡大率を設定する
+            pPlayer->SetAutoDeath(false);                                                    //死亡フラグを自動で発動するかどうか
 
+            //体力
+            pPlayer->SetLife(s_nNORMAL_MAXLIFE);
+            pPlayer->SetMaxLife(s_nNORMAL_MAXLIFE);
         }
     }
     else
@@ -294,10 +298,14 @@ void CPlayer::ActionModeChenge()
             ChengeWireShotMode(DBG_NEW CPlayerWireShot_Dont);//ワイヤー発射状態をオフにする
             m_pModeDisp = CUi::Create(CUi::UITYPE::ACTIONMODE_DIVE, CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, 1, false, D3DXVECTOR3(50.0f, 50.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
                 D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+            m_pWire->SetUseDraw(false);
+            m_pWire->GetWireHead()->SetUseDraw(false);
             break;
         default:
             break;
         }
+
+        m_pModeDisp->SetUseDeath(false);//死亡フラグを発動させない
 
 
     }

@@ -105,17 +105,18 @@ void CDamage::Draw()
 //========================================================================
 void CDamage::SetDeath()
 {
-
-	for (int nCnt = 0; nCnt < m_nMAX_DAMAGEDIGIT; nCnt++)
+	if (GetUseDeath() == true)
 	{
-		if (m_pNumber3D[nCnt] != nullptr)
+		for (int nCnt = 0; nCnt < m_nMAX_DAMAGEDIGIT; nCnt++)
 		{
-			m_pNumber3D[nCnt]->SetUseDeath(true);
-			m_pNumber3D[nCnt]->SetDeath();
-			m_pNumber3D[nCnt] = nullptr;
+			if (m_pNumber3D[nCnt] != nullptr)
+			{
+				m_pNumber3D[nCnt]->SetUseDeath(true);
+				m_pNumber3D[nCnt]->SetDeath();
+				m_pNumber3D[nCnt] = nullptr;
+			}
 		}
 	}
-
 	CObject::SetDeath();
 }
 //=============================================================================================================================

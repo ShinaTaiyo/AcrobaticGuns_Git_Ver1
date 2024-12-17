@@ -199,6 +199,20 @@ void CCamera::Update()
 
 	m_pCameraState->Process(this);
 
+	//========================================
+	//カメラの向きを補正する
+	//========================================
+	if (m_Rot.x < -D3DX_PI + 0.01f)
+	{
+		m_Rot.x = -D3DX_PI + 0.01f;
+	}
+	if (m_Rot.x > -0.01f)
+	{
+		m_Rot.x = -0.01f;
+	}
+
+	CManager::GetDebugProc()->PrintDebugProc("カメラの向き：%f %f %f\n", m_Rot.x, m_Rot.y, m_Rot.z);
+
 	//カメラの通常の注視点を設定し続ける
 	NormalCameraMove();
 
@@ -210,6 +224,8 @@ void CCamera::Update()
 	{
 		CObjectX::SetCommonDraw(true);
 	}
+
+
 
 	//=================================================================================================================================
 

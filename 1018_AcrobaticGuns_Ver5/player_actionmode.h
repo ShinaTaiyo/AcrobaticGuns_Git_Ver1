@@ -119,6 +119,7 @@ public:
 	void MoveProcess(CPlayer* pPlayer) override;//移動処理
 	void SetDiveMove(D3DXVECTOR3 Move) { m_DiveMove = Move; }//ダイブ時の移動量を設定
 private:
+	static const float s_fCOLLISIONDIVEMOVELENGTH;//ダイブ移動がワイヤーヘッドと当たる距離
 	D3DXVECTOR3 m_DiveMove;//ダイブの移動量
 };
 
@@ -175,6 +176,8 @@ public:
 	CPlayerAttack_Shot();//コンストラクタ
 	~CPlayerAttack_Shot() override;//デストラクタ
 	void AttackProcess(CPlayer* pPlayer) override;//攻撃処理
+private:
+	static const float s_fNORMAL_SHOTSPEED;//通常の射撃速度
 };
 
 //ダイブクラス

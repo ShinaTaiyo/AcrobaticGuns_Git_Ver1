@@ -108,9 +108,6 @@ void CWire::Update()
 	D3DXVec3Normalize(&RotMove, &RotMove);
 	VERTEX_3D* pVtx;
 	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBufferPointer();
-
-	//CParticle::SummonParticle(CParticle::TYPE::TYPE00_NORMAL,1,30,30.0f,30.0f,100,10,false,m_pPlayer->GetPos(),D3DXCOLOR(1.0f,1.0f,0.0f,1.0f),true);
-
 	//頂点バッファをロックし、頂点情報へのポインタを取得
 	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
@@ -202,7 +199,6 @@ void CWire::Draw()
 		D3DXVECTOR3 PosZero = D3DXVECTOR3(0.0f, 0.0f, 0.0f);//ワールド座標代入処理で使用する
 		D3DXVECTOR3 WireHeadRot = m_pWireHead->GetRot();//ワイヤーヘッドの向き
 		D3DXVECTOR3 WireHeadPos = m_pWireHead->GetPos();//ワイヤーヘッドの位置
-		CManager::GetDebugProc()->PrintDebugProc("ワイヤーヘッド向き：%f %f %f\n", WireHeadRot.x,WireHeadRot.y,WireHeadRot.z);
 		int Size = m_VecMtxCircle.size();
 
 		for (int nCnt = 0; nCnt < Size; nCnt++)
@@ -232,8 +228,6 @@ void CWire::Draw()
 
 			//ワールド座標を代入
 			D3DXVec3TransformCoord(&m_VecMtxCircle[nCnt].Pos, &PosZero, &m_VecMtxCircle[nCnt].WorldMtx);
-
-			CManager::GetDebugProc()->PrintDebugProc("頂点%d：%f %f %f\n", nCnt, m_VecMtxCircle[nCnt].Pos.x, m_VecMtxCircle[nCnt].Pos.y, m_VecMtxCircle[nCnt].Pos.z);
 		}
 	}
 	//=======================================================================================================================

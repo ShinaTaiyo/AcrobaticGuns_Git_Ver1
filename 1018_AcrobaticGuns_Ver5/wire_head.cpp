@@ -65,8 +65,8 @@ void CWireHead::Update()
 	CManager::GetDebugProc()->PrintDebugProc("ワイヤーヘッドの位置：%f %f %f\n", GetPos().x, GetPos().y, GetPos().z);
 
 	if (m_nCoolTime == 0)
-	{
-		m_bCollision = CollisionSquare();
+	{//０距離で当たらないようにするためにクールタイムを設定（０除算回避）
+	    m_bCollision = CollisionSquare();
 	}
 	else
 	{

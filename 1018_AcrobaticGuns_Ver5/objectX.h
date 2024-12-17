@@ -207,6 +207,7 @@ public:
 	
 	//‰e
 	void SetUseShadow(bool bUse) { m_bUseShadow = bUse; }
+	const bool& GetUseDraw() const { return m_bUseDraw; }
 
 	//•`‰æ‚·‚é‚©‚Ç‚¤‚©
 	void SetUseDraw(bool bUse) { m_bUseDraw = bUse; }

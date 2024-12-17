@@ -411,6 +411,12 @@ void CBlock::SaveInfoTxt(fstream& WritingFile)
 	case BLOCKTYPE::WATER:
 		WritingFile << " # WATERBLOCK" << endl;
 		break;
+	case BLOCKTYPE::RENGA:
+		WritingFile << " # RENGABLOCK" << endl;
+		break;
+	case BLOCKTYPE::BLACK:
+		WritingFile << " # BLACKBLOCK" << endl;
+		break;
 	default:
 		break;
 	}

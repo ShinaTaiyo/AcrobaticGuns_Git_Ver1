@@ -60,7 +60,7 @@ void CPlayerMove::MoveProcess(CPlayer* pPlayer)
 		bool bMove = false;//移動しているかどうか
 		float fRotAim = 0.0f;
 
-		bMove = CCalculation::CaluclationMove(false, AddMove, 10.0f, CCalculation::MOVEAIM_XZ, fRotAim);
+		bMove = CCalculation::CaluclationMove(true, AddMove, 10.0f, CCalculation::MOVEAIM_XZ, fRotAim);
 		//CCalculation::CalculationCollectionRot2D(CalRot.y, m_fRotAim, 0.25f);
 
 		pPlayer->SetUseInteria(true, CObjectXMove::GetNormalInertia());
@@ -201,6 +201,11 @@ void CPlayerMove_PrepDive::MoveProcess(CPlayer* pPlayer)
 //******************************************************************************************************************************************************
 
 //=====================================================================================================
+//静的メンバ宣言
+//=====================================================================================================
+const float CPlayerMove_Dive::s_fCOLLISIONDIVEMOVELENGTH = 120.0f;//プレイヤーが発射したワイヤーヘッドと当たる距離
+
+//=====================================================================================================
 //コンストラクタ
 //=====================================================================================================
 CPlayerMove_Dive::CPlayerMove_Dive() : m_DiveMove(D3DXVECTOR3(0.0f,0.0f,0.0f))
@@ -225,9 +230,13 @@ void CPlayerMove_Dive::MoveProcess(CPlayer* pPlayer)
 {
 	CWireHead* pWireHead = pPlayer->GetWire()->GetWireHead();
 	bool bInput = CManager::GetInputJoypad()->GetRT_Press();
+	if (CManager::GetInputJoypad()->GetRT_Press() || CManager::GetInputMouse()->GetMouseLeftClickPress())
+	{
+		bInput = true;
+	}
 	pPlayer->SetMove(m_DiveMove);
 	CCamera* pCamera = CManager::GetCamera();
-	if (CCalculation::CalculationLength(pPlayer->GetPos(), pWireHead->GetPos()) < 50.0f)
+	if (CCalculation::CalculationLength(pPlayer->GetPos(), pWireHead->GetPos()) < s_fCOLLISIONDIVEMOVELENGTH)
 	{//ダイブ時に判定したら移動モードと攻撃モードを通常に戻す
 		if (bInput == false)
 		{//攻撃→射撃モード
@@ -290,7 +299,7 @@ void CPlayerMove_Stuck::MoveProcess(CPlayer* pPlayer)
 	pWireHead->SetPos(pPlayer->GetPos());//ダイブ準備中なのでワイヤーヘッドをプレイヤーの位置に固定
 	//pPlayer->SetRot(D3DXVECTOR3(pCamera->GetRot().x + D3DX_PI,-pCamera->GetRot().y,0.0f));//向きをカメラに合わせる
     CManager::GetDebugProc()->PrintDebugProc("ロックオンのレイが当たっているかどうか：%d\n",pLockon->GetSuccessRayCollision());
-	if (CManager::GetInputJoypad()->GetRT_Trigger() == true && pLockon->GetSuccessRayCollision() == true)
+	if ((CManager::GetInputJoypad()->GetRT_Trigger() || CManager::GetInputMouse()->GetMouseLeftClickTrigger()) && pLockon->GetSuccessRayCollision() == true)
 	{//ワイヤー発射移動モードにチェンジ
 		CPlayerWireShot::StartWireShotProcess(pPlayer);
 	}
@@ -334,6 +343,11 @@ void CPlayerMove_Dont::MoveProcess(CPlayer* pPlayer)
 //******************************************************************************************************************************************************
 
 //=====================================================================================================
+//静的メンバ宣言
+//=====================================================================================================
+const float CPlayerAttack_Shot::s_fNORMAL_SHOTSPEED = 50.0f;
+
+//=====================================================================================================
 //コンストラクタ
 //=====================================================================================================
 CPlayerAttack_Shot::CPlayerAttack_Shot()
@@ -358,7 +372,7 @@ void CPlayerAttack_Shot::AttackProcess(CPlayer* pPlayer)
 {
 	CLockon* pLockon = pPlayer->GetLockOn();
 	D3DXVECTOR3 ShotPos = pPlayer->GetPos() + D3DXVECTOR3(0.0f, pPlayer->GetVtxMax().y, 0.0f);
-	D3DXVECTOR3 Move = CCalculation::Calculation3DVec(ShotPos, pLockon->GetNearRayColObjPos(), 40.0f);
+	D3DXVECTOR3 Move = CCalculation::Calculation3DVec(ShotPos, pLockon->GetNearRayColObjPos(), s_fNORMAL_SHOTSPEED);
 	CAttackPlayer* pAttackPlayer = nullptr;//プレイヤー攻撃へのポインタ
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_J) == true || CManager::GetInputJoypad()->GetRT_Repeat(4) == true ||
 		CManager::GetInputMouse()->GetMouseLeftClickRepeat(4) == true)
@@ -549,7 +563,7 @@ void CPlayerWireShot::WireShotProcess(CPlayer* pPlayer)
 //=====================================================================================================
 void CPlayerWireShot::StartWireShotProcess(CPlayer* pPlayer)
 {
-	D3DXVECTOR3 Move = CCalculation::Calculation3DVec(pPlayer->GetPos(), pPlayer->GetLockOn()->GetNearRayColObjPos(), 40.0f);
+	D3DXVECTOR3 Move = CCalculation::Calculation3DVec(pPlayer->GetPos(), pPlayer->GetLockOn()->GetNearRayColObjPos(), 60.0f);
 	D3DXVECTOR3 Rot = pPlayer->GetLockOn()->GetNearRayColObjPos() - pPlayer->GetPos();
 	D3DXVec3Normalize(&Rot, &Rot);
 	float fYaw = atan2f(Rot.x, Rot.z);

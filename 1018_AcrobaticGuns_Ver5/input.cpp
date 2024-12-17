@@ -649,22 +649,28 @@ D3DXVECTOR2 CInputMouse::GetMousePos()
 	CursorPos.y = static_cast<float>(MousePoint.y);//float型にキャストした位置を代入
 
 	m_bCursorSenterWarp = false;//端にいった場合に中心に移動する処理の前で毎回初期化
-
-	if (CursorPos.x > SCREEN_WIDTH || CursorPos.x < 0.0f)
-	{//カーソルを中心に移動
-		CursorPos.x = SCREEN_WIDTH / 2;
-		CursorPos.y = SCREEN_HEIGHT / 2;
-		SetCursorPos(static_cast<int>(CursorPos.x),static_cast<int>(CursorPos.y));
-		m_bCursorSenterWarp = true;
+	if (CScene::GetMode() != CScene::MODE_TITLE)
+	{
+		if (CManager::GetInputKeyboard()->GetPress(DIK_LCONTROL) == false)
+		{//タイトル画面でウインドウの位置を調整できるようにするため
+			if (CursorPos.x > SCREEN_WIDTH || CursorPos.x < 0.0f)
+			{//カーソルを中心に移動
+				CursorPos.x = SCREEN_WIDTH / 2;
+				CursorPos.y = SCREEN_HEIGHT / 2;
+				ScreenToClient(hwnd, &MousePoint);//現在のカーソルの位置をウインドウの位置に変換
+				SetCursorPos(static_cast<int>(CursorPos.x), static_cast<int>(CursorPos.y));
+				m_bCursorSenterWarp = true;
+			}
+			if (CursorPos.y > SCREEN_HEIGHT || CursorPos.y < 0.0f)
+			{//カーソルを中心に移動
+				CursorPos.x = SCREEN_WIDTH / 2;
+				CursorPos.y = SCREEN_HEIGHT / 2;
+				ScreenToClient(hwnd, &MousePoint);//現在のカーソルの位置をウインドウの位置に変換
+				SetCursorPos(static_cast<int>(CursorPos.x), static_cast<int>(CursorPos.y));
+				m_bCursorSenterWarp = true;
+			}
+		}
 	}
-	if (CursorPos.y > SCREEN_HEIGHT || CursorPos.y < 0.0f)
-	{//カーソルを中心に移動
-		CursorPos.x = SCREEN_WIDTH / 2;
-		CursorPos.y = SCREEN_HEIGHT / 2;
-		SetCursorPos(static_cast<int>(CursorPos.x), static_cast<int>(CursorPos.y));
-		m_bCursorSenterWarp = true;
-	}
-
 	//デバッグ表示
 	CManager::GetDebugProc()->PrintDebugProc("カーソルの位置：%f %f\n", CursorPos.x, CursorPos.y);
 	return CursorPos;

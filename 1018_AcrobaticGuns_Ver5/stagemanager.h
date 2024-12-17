@@ -45,9 +45,9 @@ public:
 
 	enum class WORLDTYPE
 	{
-		EASY = 0,
-		NORMAL,
-		BOSSRUSH,
+		STAGE01 = 0,
+		STAGE02,
+		STAGE03,
 		MAX
 	};
 
@@ -95,7 +95,7 @@ private:
 
 	static const int m_nMAX_MAP = 20;
 	static const int m_nMAX_WORD = 126;
-	static const char* m_apWORLDMAP_TXT[static_cast<int>(WORLDTYPE::MAX)];
+	static const string m_aWORLDMAP_TXT[static_cast<int>(WORLDTYPE::MAX)];
 	static const string m_aSAVE_FILENAME;//保存するファイル名
 	//*変数
 
@@ -107,6 +107,7 @@ private:
 	D3DXVECTOR3 m_SaveScale;                    //拡大率
 	D3DXVECTOR3 m_SaveBeforeChoosePos;          //選択処理をする前のする位置
 	MANAGERMODE m_ManagerMode;                  //現在のステージマネーシャーのモード
+	D3DXVECTOR3 m_SpawnPoint;                   //スポーンポイント
 	//========================================================================================
 
 	//====================

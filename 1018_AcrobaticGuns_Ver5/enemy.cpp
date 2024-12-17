@@ -105,6 +105,18 @@ void CEnemy::Update()
 
 		CollisionDetectionProcess();
 	}
+
+	if (CScene::GetMode() == CScene::MODE_EDIT)
+	{
+		for (auto it : m_VecMoveAi)
+		{
+			if (it->GetUseDraw())
+			{
+				it->SetUseDraw(false);
+			}
+		}
+	}
+
 }
 //============================================================================================================================================
 
@@ -129,14 +141,15 @@ void CEnemy::SetDeath()
 {
 	CObjectXAlive::SetDeath();
 
-	for (auto pObj : m_VecMoveAi)
+	if (GetUseDeath() == true)
 	{
-		pObj->SetUseDeath(true);
-		pObj->SetDeath();
+		for (auto pObj : m_VecMoveAi)
+		{
+			pObj->SetUseDeath(true);
+			pObj->SetDeath();
+		}
+		m_VecMoveAi.clear();
 	}
-
-	m_VecMoveAi.clear();
-	m_VecMoveAi.shrink_to_fit();
 }
 //============================================================================================================================================
 
@@ -351,6 +364,12 @@ CObject* CEnemy::ManagerSaveObject()
 //====================================================================================
 void CEnemy::ManagerChooseControlInfo()
 {
+	//ステージマネージャーに選択されている時だけ表示する
+	for (auto it : m_VecMoveAi)
+	{
+		it->SetUseDraw(true);
+	}
+
 	SetMoveAiPoint();//移動AIの設定を行う
 
 	PhaseNumDecision();//フェーズ番号の決定を行う
@@ -916,11 +935,13 @@ void CShotWeakEnemy::Draw()
 void CShotWeakEnemy::SetDeath()
 {
 	CEnemy::SetDeath();
-
-	if (m_pMagicSword != nullptr)
+	if (GetUseDeath() == true)
 	{
-		m_pMagicSword->SetUseDeath(true);
-		m_pMagicSword->SetDeath();
+		if (m_pMagicSword != nullptr)
+		{
+			m_pMagicSword->SetUseDeath(true);
+			m_pMagicSword->SetDeath();
+		}
 	}
 }
 //============================================================================================================================================
@@ -1108,8 +1129,8 @@ void CShotWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 							if (CScene::GetMode() == CScene::MODE_EDIT)
 							{
 								CAIModel* pAiModel = CAIModel::Create(CAIModel::AIMODELTYPE::MOVEPOINT, MoveAiPos, MoveAiRot, MoveAiScale, nullptr);
-								pAiModel->SetUseDraw(true);
-								pAiModel->SetUseShadow(true);
+								pAiModel->SetUseDraw(false);
+								pAiModel->SetUseShadow(false);
 								VecMoveAi.push_back(pAiModel);
 							}
 							else if (CScene::GetMode() == CScene::MODE_GAME)
@@ -1289,7 +1310,7 @@ const string CDiveWeakEnemy::s_aDIVEWEAKENEMY_FILENAME[static_cast<int>(CDiveWea
 {
 	"data\\MODEL\\Enemy\\DiveWeak\\angrySlime.x"
 };
-const int CDiveWeakEnemy::s_nATTACK_FREQUENCY = 90;//攻撃頻度
+const int CDiveWeakEnemy::s_nATTACK_FREQUENCY = 105;//攻撃頻度
 const float CDiveWeakEnemy::s_fSENSINGRANGE = 600.0f;
 const float CDiveWeakEnemy::s_fNORMAL_SPEED = 3.0f;
 //====================================================================================

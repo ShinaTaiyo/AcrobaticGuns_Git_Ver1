@@ -54,6 +54,7 @@ private:
 	static int s_MaxPhase;                  //フェーズの最大数
 	static int s_nNowPhase;                 //現在のフェーズ番号
 	static bool s_bStartFade;               //フェードを開始する
+	static int s_nNowStage;                 //現在のステージ番号
 	void AdvancePhase();//次のフェーズに移行する処理
 };
 #endif

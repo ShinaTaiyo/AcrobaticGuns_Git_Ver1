@@ -11,6 +11,8 @@
 #include "phasemanager.h"
 #include "aimodel.h"
 #include "manager.h"
+#include "stagemanager.h"
+#include "game.h"
 #include "fade.h"
 //======================================================================================================================
 
@@ -20,6 +22,7 @@
 list<CPhaseManager::PhaseSaveInfo> CPhaseManager::s_PhaseList = {};
 int CPhaseManager::s_nNowPhase = 0;
 int CPhaseManager::s_MaxPhase = 0;
+int CPhaseManager::s_nNowStage = 0;
 bool CPhaseManager::s_bStartFade = false;
 //======================================================================================================================
 
@@ -30,6 +33,7 @@ CPhaseManager::CPhaseManager(int nPri, bool bUseintPri, CObject::TYPE type, CObj
 {
 	s_nNowPhase = 0;
 	s_MaxPhase = 0;
+	s_nNowStage = 0;
 	s_bStartFade = false;
 }
 //======================================================================================================================
@@ -86,9 +90,18 @@ void CPhaseManager::Draw()
 //===============================================================
 void CPhaseManager::SetDeath()
 {
+	if (GetUseDeath() == true)
+	{
+		for (auto it : s_PhaseList)
+		{
+			for (const auto it2 : it.VecMoveAi)
+			{
+				
+			}
+		}
+		s_PhaseList.clear();
+	}
 	CObject::SetDeath();
-
-	s_PhaseList.clear();
 }
 //======================================================================================================================
 
@@ -177,8 +190,21 @@ void CPhaseManager::AdvancePhase()
 
 	if (CEnemy::GetNumEnemy() <= 0 && s_nNowPhase == s_MaxPhase + 1 && s_bStartFade == false)
 	{
-		s_bStartFade = true;
-		CManager::GetSceneFade()->SetSceneFade(CFade::FADEMODE_IN, CScene::MODE_RESULT);
+		
+		//CManager::GetSceneFade()->SetSceneFade(CFade::FADEMODE_IN, CScene::MODE_RESULT);
+
+		s_PhaseList.clear();//ステージをクリアしたのでリセット
+		s_nNowPhase = 0;    //ステージをクリアしたのでリセット
+		s_nNowStage++;      //ステージ番号を次に進める
+
+		if (s_nNowStage != static_cast<int>(CStageManager::WORLDTYPE::MAX))
+		{
+			CGame::GetStageManager()->LoadMapTxt(s_nNowStage);//次のステージをロードする
+		}
+		else
+		{
+			CManager::GetSceneFade()->SetSceneFade(CFade::FADEMODE_IN, CScene::MODE_RESULT);
+		}
 	}
 }
 //======================================================================================================================
