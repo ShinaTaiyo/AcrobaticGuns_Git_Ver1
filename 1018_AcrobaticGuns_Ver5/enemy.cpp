@@ -1411,6 +1411,7 @@ CDiveWeakEnemy* CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE Type, int nLife, int nP
 	pDiveWeakEnemy->SetSensingRange(550.0f);//感知射程
 	pDiveWeakEnemy->SetNormalSpeed(s_fNORMAL_SPEED);//通常移動速度
 	pDiveWeakEnemy->SetUseInteria(false, GetNormalInertia());
+	pDiveWeakEnemy->SetCntTime(rand() % 100 + 1);
 
 	pDiveWeakEnemy->SetSize();//モデルサイズを設定
 	pDiveWeakEnemy->SetAutoSubLife(false);//自動的に体力を減らすかどうか

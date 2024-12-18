@@ -308,12 +308,13 @@ void CPlayer::ActionModeChenge()
             ChengeWireShotMode(DBG_NEW CPlayerWireShot_Dont);//ワイヤー発射状態をオフにする
             m_pModeDisp = CUi::Create(CUi::UITYPE::ACTIONMODE_DIVE, CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, 1, false, D3DXVECTOR3(50.0f, 50.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
                 D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-            m_pWire->SetUseDraw(false);
-            m_pWire->GetWireHead()->SetUseDraw(false);
             break;
         default:
             break;
         }
+
+        m_pWire->SetUseDraw(false);
+        m_pWire->GetWireHead()->SetUseDraw(false);
 
         m_pModeDisp->SetUseDeath(false);//死亡フラグを発動させない
 

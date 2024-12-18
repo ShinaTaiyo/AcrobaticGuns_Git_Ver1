@@ -35,7 +35,9 @@ public:
 	void Update() override;      //更新処理
 	void Draw() override;        //描画処理
 	void SetDeath() override;    //死亡フラグを設定
-	static CDamage* Create(int nDamage,D3DXVECTOR3 Pos,D3DXCOLOR col,float fWidth,float fHeight);//生成処理
+	static CDamage* Create(int nDamage,D3DXVECTOR3 Pos,D3DXCOLOR col,float fWidth,float fHeight,bool bExeggration);//生成処理
+
+	void SetExeggration(bool bUse) { m_bExeggration = bUse; }
 private:
 	static const int m_nMAX_DAMAGEDIGIT = 3;//ダメージの最大桁数
 	static const int m_nMAX_JUMPCNT = 4;    //ダメージ表記をジャンプさせる最大数
@@ -48,6 +50,8 @@ private:
 	int m_nJumpCnt;//ダメージ表記をジャンプさせるカウント
 	int m_nDamage;//ダメージ
 	int m_nDigit;//桁数
+
+	bool m_bExeggration;
 };
 
 #endif

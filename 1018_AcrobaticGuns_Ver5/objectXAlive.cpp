@@ -127,7 +127,7 @@ void CObjectXAlive::SetDamage(int nDamage, int nHitStopTime)
 	{//ヒットストップ状態じゃなければ
 		m_bHitStop = true;              //ヒットストップ状態にする
 		m_nHitStopTime = nHitStopTime;  //ヒットストップ時間
-		CDamage::Create(nDamage,GetSenterPos(), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), 30.0f + nDamage * 1.0f, 30.0f + nDamage * 1.0f);
+		CDamage::Create(nDamage,GetSenterPos(), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), 30.0f + nDamage * 1.0f, 30.0f + nDamage * 1.0f,true);
 		for (int nCnt = 0; nCnt < 3; nCnt++)
 		{
 			D3DXVECTOR3 Pos = CObjectX::GetPos();//位置を取得

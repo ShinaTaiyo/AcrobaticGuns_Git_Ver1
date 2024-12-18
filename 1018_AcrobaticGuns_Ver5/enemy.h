@@ -80,7 +80,7 @@ public:
 	//バトル関係
 	//==========================================================
 	const int GetCntTime() const { return m_nCntTime; }
-
+	void SetCntTime(int nTime) { m_nCntTime = nTime; }//時間を設定（タイミングをずらすなどができる）
 	//感知射程
 	void SetSensingRange(float fRange) { m_fSensingRange = fRange; }
 	const float & GetSensingRange() const { return m_fSensingRange; }

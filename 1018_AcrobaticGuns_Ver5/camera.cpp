@@ -19,13 +19,16 @@
 #include "debugproc.h"
 #include "edit.h"
 #include "calculation.h"
+#include "collision.h"
+#include "object.h"
+#include "objectX.h"
 //====================================================================================================
 
 //====================================================================
 //静的メンバ宣言
 //====================================================================
 const float CCamera::m_BESIDECAMERALENGTH = 570.0f;//ビサイドビューのカメラの距離
-const float CCamera::s_fINITIAL_LENGTH = 400.0f;   //カメラとの最初の距離
+const float CCamera::s_fINITIAL_LENGTH = 200.0f;   //カメラとの最初の距離
 const float CCamera::s_fNORMAL_AROUNDROTSPEED = 0.02f;//カメラの通常回転速度
 //====================================================================================================
 
@@ -225,6 +228,8 @@ void CCamera::Update()
 		CObjectX::SetCommonDraw(true);
 	}
 
+	MakeTransparent();//カメラと中止点と重なったオブジェクトを透明にする処理
+
 
 
 	//=================================================================================================================================
@@ -336,7 +341,7 @@ void CCamera::NormalCameraMove()
 					{
 						CManager::GetDebugProc()->PrintDebugProc("カメラの向き：%f %f %f\n", m_Rot.x, m_Rot.y, m_Rot.z);
 						m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f) + m_AddPosR;
-						m_PosV = m_PosR + RotVec * 200.0f;
+						m_PosV = m_PosR + RotVec * m_fLength;
 						//m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -250.0f, 0.0f, cosf(m_Rot.y) * -250.0f); + m_AddPosV;
 					}
 					//CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 30, 30.0f, 30.0f, 100, 10, false, m_PosR, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
@@ -353,6 +358,42 @@ void CCamera::NormalCameraMove()
 		default:
 			break;
 		}
+}
+//====================================================================================================
+
+//====================================================================
+//すごく近いオブジェクトを透明にする処理
+//====================================================================
+void CCamera::MakeTransparent()
+{
+	D3DXVECTOR3 Ray = m_PosR - m_PosV;
+	D3DXVec3Normalize(&Ray, &Ray);
+	D3DXVECTOR3 RayCollisionPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	float fLength = 0.0f;//レイが当たった場所の距離
+	for (int nCntPri = 0; nCntPri < CObject::m_nMAXPRIORITY; nCntPri++)
+	{
+		CObject* pObj = CObject::GetTopObject(nCntPri);
+
+		while (pObj != nullptr)
+		{
+			CObject* pNext = pObj->GetNextObject();
+			if (pObj->GetObjectType() == CObject::OBJECTTYPE::OBJECTTYPE_X && pObj->GetType() != CObject::TYPE::PLAYER && pObj->GetType() != CObject::TYPE::ENEMY)
+			{
+				CObjectX* pObjX = static_cast<CObjectX*>(pObj);//オブジェクトXの機能を使う
+				if (CCollision::RayIntersectsAABBCollisionPos(m_PosV, Ray, pObjX->GetPos() + pObjX->GetVtxMin(), pObjX->GetPos() + pObjX->GetVtxMax(), RayCollisionPos))
+				{
+					fLength = CCalculation::CalculationLength(m_PosV,RayCollisionPos);
+
+					if (m_fLength > fLength)
+					{//カメラの距離よりもオブジェクトとレイが当たった位置が近い場合は透明にする
+						pObjX->SetColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.5f), 3, true, true);
+					}
+				}
+			}
+
+			pObj = pNext;//リストを進める
+		}
+	}
 }
 //====================================================================================================
 

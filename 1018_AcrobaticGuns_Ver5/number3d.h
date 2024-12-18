@@ -34,7 +34,14 @@ public:
 	void SetDeath() override;//死亡フラグを設定
 	static CNumber3D * Create(float fWidth, float fHeight, D3DXVECTOR3 pos, D3DXVECTOR3 move,D3DXCOLOR col);//バレットを生成
 
+	//===============================
+	//オプションフラグ
+	//===============================
+	void SetExaggeration(bool bUse) { m_bExaggeration = bUse; }
+	const bool& GetExaggeration() const { return m_bExaggeration; }
+	//==============================================================
 private:
+	bool m_bExaggeration;//誇張フラグ
 };
 
 #endif

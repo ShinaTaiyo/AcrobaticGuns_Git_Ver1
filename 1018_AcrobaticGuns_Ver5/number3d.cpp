@@ -25,7 +25,8 @@
 //=========================
 //コンストラクタ
 //=========================
-CNumber3D::CNumber3D(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CBillboard(nPri,bUseintPri,type,ObjType)
+CNumber3D::CNumber3D(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CBillboard(nPri,bUseintPri,type,ObjType),
+m_bExaggeration(false)
 {
 
 }
@@ -49,9 +50,7 @@ HRESULT CNumber3D::Init()
 	//ビルボード初期化
 	//===========================
 	CBillboard::Init();
-
 	//=========================================
-
 	return S_OK;
 }
 //=================================================
@@ -70,6 +69,13 @@ void CNumber3D::Uninit()
 //=========================
 void CNumber3D::Update()
 {
+	if (m_bExaggeration == true)
+	{
+		CNumber3D* pNumber3D = CNumber3D::Create(GetWidth(), GetHeight(), GetPos(), GetMove(), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+		pNumber3D->SetUseAddScale(true, D3DXVECTOR3(0.3f, 0.3f, 0.3f));
+		m_bExaggeration = false;
+	}
+
 	//========================================
 	//ビルボードの更新処理
 	//========================================
@@ -119,7 +125,7 @@ CNumber3D* CNumber3D::Create(float fWidth, float fHeight, D3DXVECTOR3 pos, D3DXV
 		{
 			pNumber3D->Init();  //初期化処理
 			pNumber3D->SetUseDeath(false);                                                                     //死亡フラグを発動するかどうかを設定する
-			pNumber3D->SetTextureIndex(pTextureClass->Regist("data\\TEXTURE\\Number.png"));
+			pNumber3D->SetTextureIndex(pTextureClass->Regist("data\\TEXTURE\\Number_000.png"));
 			pNumber3D->CBillboard::bindTexture(pTextureClass->GetAddress(pNumber3D->GetTextureIndex()));//テクスチャをセットする　
 			pNumber3D->CBillboard::SetPos(pos);                                                         //オブジェクト２Ｄの位置を設定
 			pNumber3D->SetSupportPos(pos);                                                                 //召喚位置を設定

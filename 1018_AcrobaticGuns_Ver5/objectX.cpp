@@ -344,7 +344,6 @@ void CObjectX::SetColor(D3DXCOLOR col, int nColChengeTime, bool bChoose, bool bS
 {
 	m_bColorChenge = true;
 	m_nChengeColorTime = nColChengeTime;
-
 	if (bChoose == true)
 	{
 		if (bSetAlpha == false)

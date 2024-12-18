@@ -89,6 +89,8 @@ public:
 
 	void ChengeState(CCameraState * pCameraState);//ステートを変える
 
+	const float& GetPosRToPosVLength() const { return m_fLength; }//中止点と視点の距離を取得する
+
 	//======================================
 	//マトリックス系
 	//======================================
@@ -141,6 +143,7 @@ private:
 	void BossDefeatCameraProcess();               //ボスを倒したときのカメラの処理を行う
 	void TurningCameraProcess();                  //旋回のカメラの処理を行う
 	void NormalCameraMove();                      //普通のカメラの注視点を設定し続ける
+	void MakeTransparent();                       //すごく近いオブジェクトを透明にする処理
 	//==========================================================================================================================================
 };
 

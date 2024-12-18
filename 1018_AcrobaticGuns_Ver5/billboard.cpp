@@ -26,14 +26,14 @@
 //コンストラクタ
 //==================================================
 CBillboard::CBillboard(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject(nPri, bUseintPri, type, ObjType) ,
-m_bAnimFlag(false),m_bDraw(false),m_bMultiplication(false),m_bScaling(false),
+m_bAnimFlag(false),m_bDraw(false),m_bMultiplication(false),
 m_bUseAddSpeed(false),m_bUseCurve(false),m_bUseGravity(false),m_bUseHorming(false),m_bUseLengthCurve(false),m_bUsePolygonRot(false),
-m_fAddCurveLength(0.0f),m_fAddGravity(0.0f),m_fAddRot(0.0f),m_fAddScale(0.0f),m_fAddSpeed(0.0f),m_fAnimationSplit(0.0f),m_fCurveSpeed(0.0f),m_fFormarHeight(0.0f),
-m_fFormarWidth(0.0f),m_fGravity(0.0f),m_fGravityPower(0.0f),m_fHeight(0.0f),m_fPolygonRotPower(0.0f),m_fRotMove(0.0f),m_fScale(0.0f),m_fSpeed(0.0f),m_fStartRot(0.0f),
+m_fAddCurveLength(0.0f),m_fAddGravity(0.0f),m_fAddRot(0.0f),m_fAddSpeed(0.0f),m_fAnimationSplit(0.0f),m_fCurveSpeed(0.0f),m_fFormarHeight(0.0f),
+m_fFormarWidth(0.0f),m_fGravity(0.0f),m_fGravityPower(0.0f),m_fHeight(0.0f),m_fPolygonRotPower(0.0f),m_fRotMove(0.0f),m_fStartRot(0.0f),
 m_fSupportCurveLength(0.0f),m_fWidth(0.0f),m_nMaxAnimationPattern(0),m_nAnimationChange(0),m_nAnimationCnt(0),m_nCntTime(0),m_nLife(0),m_nMaxLife(0),
 m_nTextureIndex(0),m_nAnimaionPattern(0), m_nCntBlinkingFrame(0), m_nMaxBlinkingFrame(0), m_bBlinkingAim(false), m_bUseBlinking(false), 
 m_fLimitBlinkingRatio(0.0f),m_Pos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_PosOld(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_SupportPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Move(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Rot(D3DXVECTOR3(0.0f,0.0f,0.0f)), m_mtxWorld(),
-m_Col(D3DXCOLOR(1.0f,1.0f,1.0f,1.0f))
+m_Col(D3DXCOLOR(1.0f,1.0f,1.0f,1.0f)),m_Scale(D3DXVECTOR3(1.0f,1.0f,1.0f)),m_fSpeed(0.0f),m_bUseAddScale(false)
 {
 	m_pTexture = nullptr;
 	m_pVtxBuff = nullptr;
@@ -66,7 +66,6 @@ HRESULT CBillboard::Init(void)
 	m_mtxWorld = {};                          //マトリックスワールド
 
 	m_bDraw = true;                           //基本的には描画する
-	m_fScale = 1.0f;                          //拡大率
 
 	//============================================
 	//頂点バッファの生成
@@ -147,28 +146,6 @@ void CBillboard::Update(void)
 	m_nCntTime++;        //出現してからの時間をカウントする
 	m_nLife--;           //体力を減らし続ける
 
-	//================================
-    //拡大がONになっていたら
-    //================================
-	if (m_bScaling == true)
-	{
-		m_fScale += m_fAddScale;//拡大率を増やす
-		m_fWidth = m_fFormarWidth * m_fScale;
-		m_fHeight = m_fFormarHeight * m_fScale;
-	}
-	//=====================================================
-
-	//========================================
-	//カーブがONだったら
-	//========================================
-	if (m_bUseCurve == true)
-	{
-		m_fAddRot += m_fCurveSpeed;
-		m_Pos.x += sinf(m_fAddRot + m_fStartRot) * m_fSpeed;
-		m_Pos.y += cosf(m_fAddRot + m_fStartRot) * m_fSpeed;
-	}
-	//=============================================================================================
-
 	//========================================
 	//支点を軸にカーブがONだったら
 	//========================================
@@ -181,11 +158,14 @@ void CBillboard::Update(void)
 	}
 	//=============================================================================================
 
-	//================================
-	//エフェクトがONになっていたら
-	//================================
-
-	//==============================================================================================
+	//========================================
+	//加算拡大率がONになっていたら
+	//========================================
+	if (m_bUseAddScale == true)
+	{
+		m_Scale += m_AddScale;
+	}
+	//=============================================================================================
 
 	//========================================
 	//重力がONになっていたら
@@ -303,7 +283,7 @@ void CBillboard::Update(void)
 //==================================================
 void CBillboard::Draw(void)
 {
-	D3DXMATRIX mtxTrans,mtxRot;//計算用マトリックス
+	D3DXMATRIX mtxTrans,mtxRot,mtxScale;//計算用マトリックス
 	D3DXMATRIX mtxParent = {};
 	D3DXMATRIX mtxView;//ビューマトリックス取得用
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();
@@ -322,6 +302,12 @@ void CBillboard::Draw(void)
 	m_mtxWorld._42 = 0.0f;
 	m_mtxWorld._43 = 0.0f;
 
+	if (m_bUseAddScale == true)
+	{
+		//拡大率を設定
+		D3DXMatrixScaling(&mtxScale, m_Scale.x, m_Scale.y, m_Scale.z);
+		D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxScale);
+	}
 	//位置を反映
 	D3DXMatrixTranslation(&mtxTrans, GetPos().x, GetPos().y, GetPos().z);
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
@@ -476,28 +462,6 @@ void CBillboard::SetAnimInfo(int nMaxAnimationPattern, int nAnimationChange, D3D
 	m_Col = col;                                               //色合い
 	m_bAnimFlag = bAnim;                                       //アニメーションをするかどうか
 	m_fAnimationSplit = (float)(1.0f / m_nMaxAnimationPattern);//１分割当たりのアニメーション範囲
-}
-//================================================================================================================
-
-//===============================================================
-//拡縮の設定
-//===============================================================
-void CBillboard::SetScaling(float fAddScale)
-{
-	m_bScaling = true;//拡縮をするかどうか
-	m_fAddScale = fAddScale;//拡縮量
-}
-//================================================================================================================
-
-//===============================================================
-//カーブを設定
-//===============================================================
-void CBillboard::SetUseCurve(float fRot, float fSpeed, float fCurveSpeed)
-{
-	m_bUseCurve = true;
-	m_fSpeed = fSpeed;
-	m_fStartRot = fRot;
-	m_fCurveSpeed = fCurveSpeed;
 }
 //================================================================================================================
 

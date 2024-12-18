@@ -37,6 +37,9 @@ public:
 
 	bool CollisionSquare(D3DXVECTOR3 pos,D3DXVECTOR3 VtxMax,D3DXVECTOR3 VtxMin);//正方形の当たり判定を取る
 
+	//================================================
+	//座標関係
+	//================================================
 	D3DXVECTOR3 & GetPos() { return m_Pos; }                                    //位置を取得する
 	D3DXVECTOR3& GetPosOld() { return m_PosOld; }                               //1f前の位置を取得
 	void SetPos(D3DXVECTOR3 pos) { m_Pos = pos; }                               //位置を設定する
@@ -44,12 +47,24 @@ public:
 	D3DXVECTOR3& GetSupportPos() { return m_SupportPos; }                       //召喚位置を取得する
 	void SetMove(D3DXVECTOR3 Move) { m_Move = Move; }                           //移動量を設定する
 	D3DXVECTOR3& GetMove() { return m_Move; }                                   //移動量を取得する
+	//=======================================================================================================
+
+	//================================================
+	//サイズ関係
+	//================================================
 	float &GetWidth() { return m_fWidth; }                                      //横幅を取得する
 	float &GetHeight() { return m_fHeight; }                                    //高さを取得する
 	float& GetFormarWidth() { return m_fFormarWidth; }                          //元の横幅を取得する
 	float& GetFormarHeight() { return m_fFormarHeight; }                        //元の高さを取得する
 	void SetSize(float fWidth, float fHeight);                                  //サイズを設定する
 	void SetFormarSize(float fFormarWidth, float fFormarHeight);                //元の大きさを設定する
+	void SetScale(D3DXVECTOR3 Scale) { m_Scale = Scale; }                       //拡大率を設定
+	const D3DXVECTOR3& GetScale() const { return m_Scale; }                     //拡大率を取得
+	void SetUseAddScale(bool bUse, D3DXVECTOR3 AddScale) { m_AddScale = AddScale; m_bUseAddScale = bUse; }            //加算拡大率
+	const D3DXVECTOR3& GetAddScale() const { return m_AddScale; }               //加算拡大率を取得
+	//=======================================================================================================
+
+
 	void SetColor(D3DXCOLOR col);                                               //色合いを設定する
 	D3DXCOLOR GetColor() { return m_Col; }                                      //色を取得する
 	void SetTextureIndex(int nIdx) { m_nTextureIndex = nIdx; }//テクスチャ番号をセットする
@@ -60,7 +75,6 @@ public:
 	LPDIRECT3DVERTEXBUFFER9& GetVtxBuff() { return m_pVtxBuff; }//頂点バッファを取得する
 	LPDIRECT3DTEXTURE9& GetTexture() { return m_pTexture; }     //テクスチャを取得する
 
-	void SetScaling(float fAddScale);//拡大をするかどうか
 	void SetUseGravity(float fGravity); //重力を設定
 	void SetAddGravity(float fAddGravity) { m_fAddGravity = fAddGravity; };//加算する重力を設定
 	void SetUseHorming(float fSpeed);   //ホーミングを設定
@@ -69,7 +83,6 @@ public:
 	//====================================================
 	//カーブ関係
 	//====================================================
-	void SetUseCurve(float fRot, float fSpeed, float fCurveSpeed);//カーブをするかどうか
 	void SetUseLengthCurve(bool bUse, float fStartRot, float fCurveSpeed, float fAddCurveLength,float fSupportLength);
     //====================================================================================================================
 
@@ -107,38 +120,50 @@ private:
 
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;                                         //頂点バッファへのポインタ!
 	LPDIRECT3DTEXTURE9 m_pTexture;                                              //テクスチャへのポインタ!
+
+	//=======================================================
+	//座標系
+	//=======================================================
 	D3DXVECTOR3 m_Pos;                                                          //位置!
 	D3DXVECTOR3 m_PosOld;                                                       //1f前の位置!
 	D3DXVECTOR3 m_SupportPos;                                                   //召喚位置を設定!
 	D3DXVECTOR3 m_Move;                                                         //移動量!
 	D3DXVECTOR3 m_Rot;                                                          //向き!
+	float m_fSpeed;
+    //==========================================================================================
+
 	D3DXMATRIX m_mtxWorld;                                                      //ワールド変換行列!
 	D3DXCOLOR m_Col;                                                            //色合い!
+
+	//=======================================================
+	//サイズ関係
+	//=======================================================
 	float m_fWidth;                                                             //横幅!
 	float m_fFormarWidth;                                                       //元の横幅!
 	float m_fHeight;                                                            //高さ!
 	float m_fFormarHeight;                                                      //元の高さ!
 	int m_nLife;                                                                //体力!
 	int m_nMaxLife;                                                             //最大体力!
+	D3DXVECTOR3 m_Scale;                                                        //拡大率
+
+	D3DXVECTOR3 m_AddScale;                                                     //加算拡大率
+	bool m_bUseAddScale;                                                        //加算拡大率を使用するかどうか
+	//==========================================================================================
 
    
-
+	//=======================================================
+	//アニメーション関係
+	//=======================================================
 	float m_fAnimationSplit;                                                    //アニメーション１分割当たりの値!
 	int m_nAnimaionPattern;                                                     //アニメーションパターン!
 	int m_nAnimationCnt;                                                        //アニメーションカウント!
 	int m_nMaxAnimationPattern;                                                 //アニメーションパターンの最大数!
 	int m_nAnimationChange;                                                     //アニメーションを変えるカウント数!
 	bool m_bAnimFlag;                                                           //アニメーションをするかどうか!
-
 	int m_nTextureIndex;                                                        //テクスチャ番号!
-
-	bool m_bScaling;        //拡縮をするかどうか  !
-	float m_fAddScale;      //拡大量を設定!
-	float m_fScale;         //拡大率!
-
-	float m_fSpeed;          //早さ!
-
 	int m_nCntTime;          //出現してからの時間をカウントする!
+	//==========================================================================================
+
 	//========================================
 	//カーブ系
 	//========================================

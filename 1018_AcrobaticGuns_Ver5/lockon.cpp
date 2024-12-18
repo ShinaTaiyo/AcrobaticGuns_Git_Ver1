@@ -213,6 +213,11 @@ void CLockon::RayCollisionToObject()
 				bRayCollision = CCollision::RayIntersectsAABBCollisionPos(m_FrontPos, m_NowRay, pObjX->GetVtxMin() + pObjX->GetPos(), pObjX->GetVtxMax() + pObjX->GetPos(),
 					CollisionStartPos);
 
+				if (CCalculation::CalculationLength(m_FrontPos, CollisionStartPos) < CManager::GetCamera()->GetPosRToPosVLength())
+				{//当たった距離がカメラの注視点と視点の距離よりも近ければ
+					bRayCollision = false;//当たらなかったことにする
+				}
+
 				// 扇形範囲内かどうかを判定
 				if (bRayCollision == true)
 				{//レイとサイズ/２分の球の当たり判定成功

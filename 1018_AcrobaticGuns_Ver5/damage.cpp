@@ -20,7 +20,7 @@
 //コンストラクタ
 //========================================================================
 CDamage::CDamage() : m_nDamage(0),m_pNumber3D(),m_Pos(D3DXVECTOR3(0.0f,0.0f,0.0f)),
-m_nDigit(0),m_nJumpCnt(m_nMAX_JUMPCNT),m_JumpMove(D3DXVECTOR3(0.0f,10.0f,0.0f))
+m_nDigit(0),m_nJumpCnt(m_nMAX_JUMPCNT),m_JumpMove(D3DXVECTOR3(0.0f,10.0f,0.0f)),m_bExeggration(false)
 {
 
 }
@@ -124,7 +124,7 @@ void CDamage::SetDeath()
 //========================================================================
 //生成処理
 //========================================================================
-CDamage* CDamage::Create(int nDamage, D3DXVECTOR3 Pos, D3DXCOLOR col, float fWidth, float fHeight)
+CDamage* CDamage::Create(int nDamage, D3DXVECTOR3 Pos, D3DXCOLOR col, float fWidth, float fHeight, bool bExeggration)
 {
 	CDamage* pDamage = DBG_NEW CDamage;                           //弾を生成 
 	bool bSuccess = pDamage->CObject::GetCreateSuccess();         //生成が成功したかどうかを取得する
@@ -149,6 +149,21 @@ CDamage* CDamage::Create(int nDamage, D3DXVECTOR3 Pos, D3DXCOLOR col, float fWid
 				pDamage->m_pNumber3D[nCnt]->SetUseGravity(-0.5f);
 			}
 			pDamage->DamageDispProcess();
+			pDamage->m_bExeggration = bExeggration;
+
+			if (bExeggration == true)
+			{//誇張する
+				for (int nCnt = 0; nCnt < m_nMAX_DAMAGEDIGIT; nCnt++)
+				{
+					CNumber3D * pNumber3D_2 = CNumber3D::Create(fWidth, fHeight, pDamage->m_pNumber3D[nCnt]->GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+						D3DXCOLOR(1.0f,0.0f,0.0f,1.0f));
+					pNumber3D_2->SetUseDeath(true);
+					pNumber3D_2->SetUseAddScale(true, D3DXVECTOR3(0.4f, 0.4f, 0.4f));
+					pNumber3D_2->SetLife(45);
+					pNumber3D_2->SetMaxLife(45);
+
+				}
+			}
 		}
 	}
 	else
