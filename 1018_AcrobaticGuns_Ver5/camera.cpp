@@ -29,7 +29,6 @@
 //====================================================================
 const float CCamera::m_BESIDECAMERALENGTH = 570.0f;//ビサイドビューのカメラの距離
 const float CCamera::s_fINITIAL_LENGTH = 200.0f;   //カメラとの最初の距離
-const float CCamera::s_fNORMAL_AROUNDROTSPEED = 0.02f;//カメラの通常回転速度
 //====================================================================================================
 
 //====================================================================
@@ -38,7 +37,7 @@ const float CCamera::s_fNORMAL_AROUNDROTSPEED = 0.02f;//カメラの通常回転速度
 CCamera::CCamera() : m_SupportPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_fLength(s_fINITIAL_LENGTH), m_fTurningRotSpeed(0.0f),m_fTurningSpeedY(0.0f),m_PosV(D3DXVECTOR3(0.0f,0.0f,0.0f)),
 m_PosR(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_VecU(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Rot(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_mtxProjection(),m_mtxView(),m_CameraType(CAMERATYPE_BIRD),m_DifferenceLength(D3DXVECTOR3(0.0f,0.0f,0.0f)),
 m_ZoomSpeed(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_nShakeFrame(0),m_ModeTime(0),m_fShakePower(0.0f),m_fAddLength(0.0f),m_AddPosR(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_AddPosV(D3DXVECTOR3(0.0f,0.0f,0.0f))
-,m_bCustom(false),m_State(CAMERASTATE::NORMAL),m_pCameraState(DBG_NEW CCameraState())
+,m_bCustom(false),m_State(CAMERASTATE::NORMAL),m_pCameraState(DBG_NEW CCameraState_Normal())
 {
 
 }
@@ -93,110 +92,6 @@ void CCamera::Uninit()
 //====================================================================
 void CCamera::Update()
 {
-	//========================================
-	//カメラの向きを変える
-	//========================================
-	if (CManager::GetInputKeyboard()->GetPress(DIK_Q))
-	{
-		m_Rot.y -= s_fNORMAL_AROUNDROTSPEED;
-	}
-	if (CManager::GetInputKeyboard()->GetPress(DIK_E))
-	{
-		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT))
-		{
-			m_Rot.y = 0.0f;
-		}
-		else
-		{
-			m_Rot.y += s_fNORMAL_AROUNDROTSPEED;
-		}
-	}
-
-	if (CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::LB))
-	{
-		m_Rot.y -= s_fNORMAL_AROUNDROTSPEED;
-	}
-	if (CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::RB))
-	{
-		m_Rot.y += s_fNORMAL_AROUNDROTSPEED;
-	}
-
-	//===========================
-	//Xボタンを押していたら
-	//===========================
-	if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
-	{//シフトキーを押しながら・・・
-		if (CManager::GetInputKeyboard()->GetPress(DIK_X) == true)
-		{
-			m_AddPosR.y -= 5.0f;
-		}
-	}
-	else if (CManager::GetInputKeyboard()->GetPress(DIK_X) == true)
-	{
-		m_AddPosR.y += 5.0f;
-	}
-
-	//=================================================
-	//ゲームパッド、又はマウスでカメラの向きを変える
-	//=================================================
-	if (CManager::GetInputJoypad()->GetRStickPress(16) == true)
-	{
-		CManager::GetCamera()->SetRot(m_Rot + D3DXVECTOR3(cosf(CManager::GetInputJoypad()->GetRStickAimRot() + D3DX_PI) * 0.04f,
-			sinf(CManager::GetInputJoypad()->GetRStickAimRot()) * 0.04f, 0.0f));
-	}
-	float fAngle = 0.0f;
-	if (CManager::GetInputMouse()->GetMouseMoveAngle(fAngle))
-	{
-		CManager::GetCamera()->SetRot(m_Rot + D3DXVECTOR3(cosf(fAngle) * 0.06f,
-			sinf(fAngle) * 0.06f, 0.0f));
-	}
-
-	//===========================
-    //Cボタンを押していたら
-    //===========================
-	if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
-	{//シフトキーを押しながら・・・
-		if (CManager::GetInputKeyboard()->GetPress(DIK_C) == true)
-		{
-			m_AddPosV.y -= 5.0f;
-		}
-	}
-	else if (CManager::GetInputKeyboard()->GetPress(DIK_C) == true)
-	{
-		m_AddPosV.y += 5.0f;
-	}
-
-	//===========================
-    //Vボタンを押していたら
-    //===========================
-	if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
-	{//シフトキーを押しながら・・・
-		if (CManager::GetInputKeyboard()->GetPress(DIK_V) == true)
-		{
-			m_fLength -= 5.0f;
-		}
-	}
-	else if (CManager::GetInputKeyboard()->GetPress(DIK_V) == true)
-	{
-		m_fLength += 5.0f;
-	}
-
-
-	//========================================
-	//カメラを揺らす
-	//========================================
-	if (CManager::GetInputKeyboard()->GetTrigger(DIK_F1) == true)
-	{
-		SetShake(50, 0.2f);
-	}
-
-	//========================================
-    //後ろを向く
-    //========================================
-	if (CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::Y))
-	{
-		ChengeState(DBG_NEW CCameraState_TurnAround(m_Rot + D3DXVECTOR3(0.0f,D3DX_PI,0.0f), 0.15f));
-	}
 
 	m_pCameraState->Process(this);
 
@@ -343,7 +238,6 @@ void CCamera::NormalCameraMove()
 						m_PosV = m_PosR + RotVec * m_fLength;
 						//m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -250.0f, 0.0f, cosf(m_Rot.y) * -250.0f); + m_AddPosV;
 					}
-					//CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 30, 30.0f, 30.0f, 100, 10, false, m_PosR, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
 				}
 				break;
 			case CScene::MODE_EDIT:
@@ -475,7 +369,149 @@ void CCameraState_TurnAround::Process(CCamera* pCamera)
 	//差分の絶対値が0.01f以下なら
 	if (fabsf(fAddRotX) < 0.005f && fabsf(fAddRotY) < 0.005f)//YawとPitchの向き加算量が0.01f以下になったらステートを戻す
 	{
-		pCamera->ChengeState(DBG_NEW CCameraState());
+		pCamera->ChengeState(DBG_NEW CCameraState_Normal());
 	}
+}
+//===================================================================================================================================================
+
+//****************************************************************************************************
+//普通の状態
+//****************************************************************************************************
+
+//=================================================================
+//静的メンバ宣言
+//=================================================================
+const float CCameraState_Normal::s_fNORMAL_AROUNDROTSPEED = 0.02f;//カメラの通常回転速度
+//===================================================================================================================================================
+
+
+//=================================================================
+//コンストラクタ
+//=================================================================
+CCameraState_Normal::CCameraState_Normal()
+{
+
+}
+//===================================================================================================================================================
+
+//=================================================================
+//デストラクタ
+//=================================================================
+CCameraState_Normal::~CCameraState_Normal()
+{
+
+}
+//===================================================================================================================================================
+
+//=================================================================
+//処理
+//=================================================================
+void CCameraState_Normal::Process(CCamera* pCamera)
+{
+	//========================================
+    //カメラの向きを変える
+    //========================================
+	if (CManager::GetInputKeyboard()->GetPress(DIK_Q))
+	{
+		pCamera->SetRot(pCamera->GetRot() + D3DXVECTOR3(0.0f, -s_fNORMAL_AROUNDROTSPEED, 0.0f));
+	}
+	if (CManager::GetInputKeyboard()->GetPress(DIK_E))
+	{
+		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT))
+		{
+			pCamera->SetRot(D3DXVECTOR3(pCamera->GetRot().x,0.0f,pCamera->GetRot().z));
+		}
+		else
+		{
+			pCamera->SetRot(pCamera->GetRot() + D3DXVECTOR3(0.0f, s_fNORMAL_AROUNDROTSPEED, 0.0f));
+		}
+	}
+
+	if (CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::LB))
+	{
+		pCamera->SetRot(pCamera->GetRot() + D3DXVECTOR3(0.0f, -s_fNORMAL_AROUNDROTSPEED, 0.0f));
+	}
+	if (CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::RB))
+	{
+		pCamera->SetRot(pCamera->GetRot() + D3DXVECTOR3(0.0f, s_fNORMAL_AROUNDROTSPEED, 0.0f));
+	}
+
+	//===========================
+	//Xボタンを押していたら
+	//===========================
+	if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
+	{//シフトキーを押しながら・・・
+		if (CManager::GetInputKeyboard()->GetPress(DIK_X) == true)
+		{
+			pCamera->SetAddPosR(pCamera->GetAddPosR() + D3DXVECTOR3(0.0f, -5.0f, 0.0f));
+		}
+	}
+	else if (CManager::GetInputKeyboard()->GetPress(DIK_X) == true)
+	{
+		pCamera->SetAddPosR(pCamera->GetAddPosR() + D3DXVECTOR3(0.0f, 5.0f, 0.0f));
+	}
+
+	//=================================================
+	//ゲームパッド、又はマウスでカメラの向きを変える
+	//=================================================
+	if (CManager::GetInputJoypad()->GetRStickPress(16) == true)
+	{
+		CManager::GetCamera()->SetRot(pCamera->GetRot() + D3DXVECTOR3(cosf(CManager::GetInputJoypad()->GetRStickAimRot() + D3DX_PI) * 0.04f,
+			sinf(CManager::GetInputJoypad()->GetRStickAimRot()) * 0.04f, 0.0f));
+	}
+	float fAngle = 0.0f;
+	if (CManager::GetInputMouse()->GetMouseMoveAngle(fAngle))
+	{
+		CManager::GetCamera()->SetRot(pCamera->GetRot() + D3DXVECTOR3(cosf(fAngle) * 0.06f,
+			sinf(fAngle) * 0.06f, 0.0f));
+	}
+
+	//===========================
+	//Cボタンを押していたら
+	//===========================
+	if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
+	{//シフトキーを押しながら・・・
+		if (CManager::GetInputKeyboard()->GetPress(DIK_C) == true)
+		{
+			pCamera->SetAddPosV(pCamera->GetAddPosV() + D3DXVECTOR3(0.0f, -5.0f, 0.0f));
+		}
+	}
+	else if (CManager::GetInputKeyboard()->GetPress(DIK_C) == true)
+	{
+		pCamera->SetAddPosV(pCamera->GetAddPosV() + D3DXVECTOR3(0.0f, 5.0f, 0.0f));
+	}
+
+	//===========================
+	//Vボタンを押していたら
+	//===========================
+	if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
+	{//シフトキーを押しながら・・・
+		if (CManager::GetInputKeyboard()->GetPress(DIK_V) == true)
+		{
+			pCamera->SetAddLength(pCamera->GetLength() - 5.0f);
+		}
+	}
+	else if (CManager::GetInputKeyboard()->GetPress(DIK_V) == true)
+	{
+		pCamera->SetAddLength(pCamera->GetLength() + 5.0f);
+	}
+
+
+	//========================================
+	//カメラを揺らす
+	//========================================
+	if (CManager::GetInputKeyboard()->GetTrigger(DIK_F1) == true)
+	{
+		pCamera->SetShake(50, 0.2f);
+	}
+
+	//========================================
+	//後ろを向く
+	//========================================
+	if (CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::Y))
+	{
+		pCamera->ChengeState(DBG_NEW CCameraState_TurnAround(pCamera->GetRot() + D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), 0.15f));
+	}
+
 }
 //===================================================================================================================================================

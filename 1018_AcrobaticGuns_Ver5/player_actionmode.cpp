@@ -271,7 +271,23 @@ CPlayerMove_Stuck::CPlayerMove_Stuck(CPlayer* pPlayer) : m_NowPos(pPlayer->GetPo
 	CWireHead* pWireHead = pPlayer->GetWire()->GetWireHead();
 	pPlayer->SetPos(pPlayer->GetPos() - pPlayer->GetMove());
 	//pCamera->SetRot(D3DXVECTOR3(-pWireHead->GetRot().x,pWireHead->GetRot().y + D3DX_PI,0.0f));//カメラの向きを固定したワイヤーヘッドの逆側に！
-	pCamera->ChengeState(DBG_NEW CCameraState_TurnAround(D3DXVECTOR3(-pWireHead->GetRot().x, pWireHead->GetRot().y + D3DX_PI, 0.0f), 0.1f));
+
+	//==========================
+	//カメラの向きを求める
+	//==========================
+	D3DXVECTOR3 ComRot = pWireHead->GetPos() - pPlayer->GetPos();
+	D3DXVec3Normalize(&ComRot, &ComRot);
+	float fYaw = atan2f(ComRot.x, ComRot.z);
+	float fPitch = atan2f(ComRot.y, sqrtf(powf(ComRot.x, 2) + powf(ComRot.z, 2)));
+	D3DXVECTOR3 ResultRot = D3DXVECTOR3(-fPitch - D3DX_PI * 0.5f, fYaw, 0.0f);//カメラの向きを調整する（前方向を基準にする）
+
+	if (pCamera->GetRot().x > ResultRot.x - 0.5f && pCamera->GetRot().x < ResultRot.x + 0.5f &&
+		pCamera->GetRot().y > ResultRot.y - 0.5f && pCamera->GetRot().y < ResultRot.y + 0.5f)
+	{//現在のカメラの向きが目的の向きに近かったらダイブ先に合わせる
+		//CParticle::SummonParticle(CParticle::TYPE::TYPE00_NORMAL, 10, 60, 30.0f, 30.0f, 100, 10, false, pPlayer->GetSenterPos(), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
+		pCamera->ChengeState(DBG_NEW CCameraState_TurnAround(D3DXVECTOR3(-pWireHead->GetRot().x, pWireHead->GetRot().y + D3DX_PI, 0.0f), 0.15f));
+	}
+	//==============================================================================================
 }
 //======================================================================================================================================================
 

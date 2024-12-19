@@ -63,7 +63,11 @@ public:
 	void SetCameraType(CAMERATYPE type) { m_CameraType = type; m_ModeTime = 0; }//カメラタイプを設定する
 	void SetPosV(D3DXVECTOR3 PosV) { m_PosV = PosV; }//視点を設定
 	D3DXVECTOR3& GetPosV() { return m_PosV; }      //視点を取得
+	void SetAddPosV(D3DXVECTOR3 AddPosV) { m_AddPosV = AddPosV; }
+	const D3DXVECTOR3& GetAddPosV() const { return m_AddPosV; }
 	D3DXVECTOR3& GetPosR() { return m_PosR; }      //注視点を取得
+	const D3DXVECTOR3& GetAddPosR() const { return m_AddPosR; }
+	void SetAddPosR(D3DXVECTOR3 AddPosR) { m_AddPosR = AddPosR; }
 	void SetTurningInfo(float fLength, float fRotSpeed, D3DXVECTOR3 PosR,float fPosVY,float fTurningSpeedY,float fAddLength)
 	{
 		m_fLength = fLength;            //注視点との距離
@@ -103,7 +107,6 @@ private:
     //======================================
 	static const float m_BESIDECAMERALENGTH;      //ビサイドモードのカメラの距離
 	static const float s_fINITIAL_LENGTH;         //最初の距離
-	static const float s_fNORMAL_AROUNDROTSPEED;  //カメラの回転速度
 	//==========================================================================================================================================
 
 	//======================================
@@ -155,6 +158,17 @@ public:
 	virtual void Process(CCamera* pCamera) {};  //処理
 };
 
+//普通の上チア
+class CCameraState_Normal : public CCameraState
+{
+public:
+	CCameraState_Normal();//コンストラクタ
+	~CCameraState_Normal();//デストラクタ
+	void Process(CCamera* pCamera);//処理
+private:
+	static const float s_fNORMAL_AROUNDROTSPEED;  //カメラの回転速度
+};
+
 //狙った向きを向かせる
 class CCameraState_TurnAround : public CCameraState
 {
@@ -163,6 +177,7 @@ public:
 	~CCameraState_TurnAround() override;//デストラクタ
 	void Process(CCamera * pCamera) override;//処理
 private:
+
 	const D3DXVECTOR3 m_AimRot;     //目的の向き
 	const float m_fAdjustTurnSpeed; //向きを変える速度の補正度
 };
