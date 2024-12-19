@@ -141,8 +141,6 @@ void CCamera::Update()
 	//=================================================
 	if (CManager::GetInputJoypad()->GetRStickPress(16) == true)
 	{
-		//Pos.x += sinf(CManager::GetInputJoypad()->GetRStickAimRot()) * m_fNORMAL_LOCKONMOVE;
-		//Pos.y += cosf(CManager::GetInputJoypad()->GetRStickAimRot()) * -m_fNORMAL_LOCKONMOVE;
 		CManager::GetCamera()->SetRot(m_Rot + D3DXVECTOR3(cosf(CManager::GetInputJoypad()->GetRStickAimRot() + D3DX_PI) * 0.04f,
 			sinf(CManager::GetInputJoypad()->GetRStickAimRot()) * 0.04f, 0.0f));
 	}
@@ -213,6 +211,8 @@ void CCamera::Update()
 	{
 		m_Rot.x = -0.01f;
 	}
+
+	m_Rot.y = CCalculation::CorrectionRot(m_Rot.y);
 
 	CManager::GetDebugProc()->PrintDebugProc("カメラの向き：%f %f %f\n", m_Rot.x, m_Rot.y, m_Rot.z);
 
@@ -339,7 +339,6 @@ void CCamera::NormalCameraMove()
 				{
 					if (m_bCustom == false)
 					{
-						CManager::GetDebugProc()->PrintDebugProc("カメラの向き：%f %f %f\n", m_Rot.x, m_Rot.y, m_Rot.z);
 						m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f) + m_AddPosR;
 						m_PosV = m_PosR + RotVec * m_fLength;
 						//m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -250.0f, 0.0f, cosf(m_Rot.y) * -250.0f); + m_AddPosV;
@@ -461,16 +460,20 @@ void CCameraState_TurnAround::Process(CCamera* pCamera)
 	float fRotDiffX = m_AimRot.x - NowRot.x;
 	float fRotDiffY = m_AimRot.y - NowRot.y;
 
+	fRotDiffX = CCalculation::CorrectionRot(fRotDiffX);
+	fRotDiffY = CCalculation::CorrectionRot(fRotDiffY);
+
 	CManager::GetDebugProc()->PrintDebugProc("カメラの向きの差分:%f\n");
 
 	//加算する向きの量を補正して求める
 	float fAddRotX = fRotDiffX * m_fAdjustTurnSpeed;
 	float fAddRotY = fRotDiffY * m_fAdjustTurnSpeed;
-
+	fAddRotX = CCalculation::CorrectionRot(fAddRotX);
+	fAddRotY = CCalculation::CorrectionRot(fAddRotY);
 	pCamera->SetRot(D3DXVECTOR3(pCamera->GetRot().x + fAddRotX, pCamera->GetRot().y + fAddRotY, pCamera->GetRot().z));
 
 	//差分の絶対値が0.01f以下なら
-	if (fabsf(fAddRotX) < 0.01f && fabsf(fAddRotY) < 0.01f)//YawとPitchの向き加算量が0.01f以下になったらステートを戻す
+	if (fabsf(fAddRotX) < 0.005f && fabsf(fAddRotY) < 0.005f)//YawとPitchの向き加算量が0.01f以下になったらステートを戻す
 	{
 		pCamera->ChengeState(DBG_NEW CCameraState());
 	}

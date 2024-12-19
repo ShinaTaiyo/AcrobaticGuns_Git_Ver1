@@ -624,7 +624,6 @@ void CPlayerWireShot_Do::WireShotProcess(CPlayer* pPlayer)
 	//*変数宣言
 	CWire* pWire = pPlayer->GetWire();
 	CWireHead* pWireHead = pWire->GetWireHead();
-	CCamera* pCamera = CManager::GetCamera();
 
 	FrightenedEnemy(pPlayer);//この処理の途中で狙った敵は怯える
 
@@ -633,16 +632,8 @@ void CPlayerWireShot_Do::WireShotProcess(CPlayer* pPlayer)
 	{//ワイヤーがどれかのオブジェクトに当たったら
 		pPlayer->ChengeWireShotMode(DBG_NEW CPlayerWireShot_Dont());//ワイヤー発射モード「なし」
 		pPlayer->ChengeEffectMode(DBG_NEW CPlayerEffect_Dive());    //エフェクトモード「ダイブ」
-
-		//==========================
-		//カメラの向きを求める
-		//==========================
-		D3DXVECTOR3 Rot = pWireHead->GetPos() - pPlayer->GetPos();
-		D3DXVec3Normalize(&Rot, &Rot);
-		float fYaw = atan2f(Rot.x, Rot.z);
-		float fPitch = atan2f(Rot.y, sqrtf(powf(Rot.x, 2) + powf(Rot.z, 2)));
-		pCamera->SetRot(D3DXVECTOR3(-fPitch - D3DX_PI * 0.5f,fYaw,0.0f));
-		//==============================================================================================
+		
+		DecisionCameraRot(pPlayer);//カメラの向きを決める
 
 		pWireHead->SetMove(D3DXVECTOR3(0.0f, 0.0f, 0.0f));//ワイヤーヘッドの移動を止める
 		D3DXVECTOR3 Move = CCalculation::Calculation3DVec(pPlayer->GetPos(), pWireHead->GetPos(),40.0f);
@@ -680,6 +671,35 @@ void CPlayerWireShot_Do::FrightenedEnemy(CPlayer* pPlayer)
 		}
 		pObj = pNext;//リストを次に進める
 	}
+}
+//======================================================================================================================================================
+
+//=====================================================================================================
+//カメラの向きを決める処理
+//=====================================================================================================
+void CPlayerWireShot_Do::DecisionCameraRot(CPlayer* pPlayer)
+{
+	CWire* pWire = pPlayer->GetWire();
+	CWireHead* pWireHead = pWire->GetWireHead();
+	CCamera* pCamera = CManager::GetCamera();
+
+	//==========================
+    //カメラの向きを求める
+    //==========================
+	D3DXVECTOR3 ComRot = pWireHead->GetPos() - pPlayer->GetPos();
+	D3DXVec3Normalize(&ComRot, &ComRot);
+	float fYaw = atan2f(ComRot.x, ComRot.z);
+	float fPitch = atan2f(ComRot.y, sqrtf(powf(ComRot.x, 2) + powf(ComRot.z, 2)));
+	D3DXVECTOR3 ResultRot = D3DXVECTOR3(-fPitch - D3DX_PI * 0.5f, fYaw, 0.0f);//カメラの向きを調整する（前方向を基準にする）
+
+	if (pCamera->GetRot().x > ResultRot.x - 0.5f && pCamera->GetRot().x < ResultRot.x + 0.5f &&
+		pCamera->GetRot().y > ResultRot.y - 0.5f && pCamera->GetRot().y < ResultRot.y + 0.5f)
+	{//現在のカメラの向きが目的の向きに近かったらダイブ先に合わせる
+		//CParticle::SummonParticle(CParticle::TYPE::TYPE00_NORMAL, 10, 60, 30.0f, 30.0f, 100, 10, false, pPlayer->GetSenterPos(), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
+		pCamera->ChengeState(DBG_NEW CCameraState_TurnAround(D3DXVECTOR3(-fPitch - D3DX_PI * 0.5f, fYaw, 0.0f), 0.1f));
+	}
+	//==============================================================================================
+
 }
 //======================================================================================================================================================
 

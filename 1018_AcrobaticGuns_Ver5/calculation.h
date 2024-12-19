@@ -121,6 +121,9 @@ public:
 	//目的の位置への角度をホーミング式に求める
 	static D3DXVECTOR3 HormingVecRotXZ(float& fRotMove, const D3DXVECTOR3& MyPos, const D3DXVECTOR3& AimPos, float CorrectionRot,float fSpeed);
 
+	//角度ラジアンの補正を行う
+	static float CorrectionRot(float fRot);
+
 	//================================================
 	//YawとPitchを求め、目的の位置への角度を求める
 	//================================================
