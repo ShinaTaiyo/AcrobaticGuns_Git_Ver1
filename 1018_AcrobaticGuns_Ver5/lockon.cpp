@@ -221,14 +221,13 @@ void CLockon::RayCollisionToObject()
 				// 扇形範囲内かどうかを判定
 				if (bRayCollision == true)
 				{//レイとサイズ/２分の球の当たり判定成功
-					//カメラの位置が判定オブジェクトのサイズの中に入っていたら
-					CManager::GetDebugProc()->PrintDebugProc("レイの支点がカメラに被っていない\n");
 					CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 20, 30.0f, 30.0f, 100, 10, false, CollisionStartPos, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f), true);
 					//敵の中心のスクリーン座標を求める
 					D3DXVECTOR3 ScreenPos = CCalculation::CalcWorldToScreenNoViewport(pObjX->GetSenterPos(), *CManager::GetCamera()->GetMtxView(), *CManager::GetCamera()->GetMtxProjection(),
 						float(SCREEN_WIDTH), float(SCREEN_HEIGHT));
 					VecCollisionSuccess.push_back(CollisionStartPos);//当たり判定が成功したオブジェクトの判定開始位置を保存する
 				}
+
 			}
 
 			pObj = pNext;//オブジェクトを次に進める

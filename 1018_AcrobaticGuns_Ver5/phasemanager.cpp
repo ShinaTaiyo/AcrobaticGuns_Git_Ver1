@@ -92,13 +92,6 @@ void CPhaseManager::SetDeath()
 {
 	if (GetUseDeath() == true)
 	{
-		for (auto it : s_PhaseList)
-		{
-			for (const auto it2 : it.VecMoveAi)
-			{
-				
-			}
-		}
 		s_PhaseList.clear();
 	}
 	CObject::SetDeath();
@@ -184,9 +177,9 @@ void CPhaseManager::AdvancePhase()
 			}
 
 		}
-		CGame::GetEventManager()->ChengeEvent(DBG_NEW CNowEvent_NextPhase());//フェーズ移行イベントを呼ぶ
-
 		s_nNowPhase++;
+		CGame::GetEventManager()->ChengeEvent(DBG_NEW CNowEvent_NextPhase(s_nNowPhase,80.0f,80.0f));//フェーズ移行イベントを呼ぶ
+
 	}
 
 	if (CEnemy::GetNumEnemy() <= 0 && s_nNowPhase == s_MaxPhase + 1 && s_bStartFade == false)

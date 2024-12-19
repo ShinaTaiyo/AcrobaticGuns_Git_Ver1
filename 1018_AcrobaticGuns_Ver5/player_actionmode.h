@@ -251,6 +251,8 @@ public:
 	CPlayerWireShot_Do();//コンストラクタ
 	~CPlayerWireShot_Do() override;//デストラクタ
 	void WireShotProcess(CPlayer* pPlayer) override;//ワイヤー発射処理
+private:
+	void FrightenedEnemy(CPlayer* pPlayer);//敵を怯えさせる処理
 };
 
 //発射しないクラス

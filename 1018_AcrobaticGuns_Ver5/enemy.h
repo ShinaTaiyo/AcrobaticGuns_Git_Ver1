@@ -52,6 +52,8 @@ public:
 	void SetDeath() override;   //死亡フラグを設定
 	//static CEnemy* Create(ENEMYTYPE Type,int nLife,D3DXVECTOR3 pos, D3DXVECTOR3 rot,D3DXVECTOR3 Scale);
 
+	const ENEMYTYPE& GetEnemyType() const { return m_Type; }
+
 	//==========================================================
     //エディタ関係
     //==========================================================
@@ -70,7 +72,7 @@ public:
 	//==========================================================
 	void SetVecMoveAiInfo(vector<CAIModel*>& vec);
 	vector<CAIModel*>& GetVecAiModelInfo() { return m_VecMoveAi; }
-	void AIMoveProcess();//AI移動処理
+	virtual void AIMoveProcess();//AI移動処理
 	virtual void BattleMoveProcess();//バトル移動処理
 	void ChengeMove(CEnemyMove* pEnemyMove);//移動状態を変える
 	void RayCollision();                               //レイがオブジェクトに当たっているかどうか
@@ -310,11 +312,15 @@ private:
 	//プロトタイプ宣言
 	//================================================
 	
-	//*移動AI
+	//*攻撃移動
 	void BattleMoveProcess() override;//バトル移動処理
 
 	//攻撃処理
 	void AttackProcess() override;
+
+	//AI移動
+	void AIMoveProcess() override;
+
 
 	//===============================================================================================
 };
@@ -352,6 +358,18 @@ public:
 	CEnemyMove_Battle();//コンストラクタ
 	~CEnemyMove_Battle() override;//デストラクタ
 	void Process(CEnemy* pEnemy) override;
+};
+
+//移動タイプ：怯え
+class CEnemyMove_Frightened : public CEnemyMove
+{
+public:
+	CEnemyMove_Frightened(CEnemy * pEnemy,D3DXVECTOR3 StopPos,int nStateTime);//コンストラクタ
+	~CEnemyMove_Frightened();//デストラクタ
+	void Process(CEnemy* pEnemy) override;//処理
+private:
+	D3DXVECTOR3 m_StopPos;//止める位置
+	int m_nStateTime;     //怯え状態になる時間を設定
 };
 
 //移動タイプ：なし

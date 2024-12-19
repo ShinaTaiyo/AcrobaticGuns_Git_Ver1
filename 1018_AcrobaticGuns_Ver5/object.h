@@ -42,6 +42,7 @@ public:
 		EFFECT,          //エフェクト
 		PARTICLE,        //パーティクル
 		UI3D,            //UI3D
+		NUMBER,          //数字
 		NUMBER3D,        //数字3D
 	    PARTICLE2D,      //パーティクル２D
 		LOCKON,          //ロックオン
@@ -50,6 +51,7 @@ public:
 		PHASEINFO,       //フェーズ情報
 		STAGEMANAGER,    //ステージマネージャー
 		PHASEMANAGER,    //フェーズマネージャー
+		EVENTMANAGER,    //イベントマネージャー
 		BG,              //背景
 		FADE,            //フェード
 		MAX

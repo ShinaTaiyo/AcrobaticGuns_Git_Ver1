@@ -13,12 +13,41 @@
 //======================
 #include "main.h"
 #include "object2d.h"
+#include "number.h"
 //==========================================
 
 //======================
 //前方宣言
 //======================
 class CObject2D;
+class CUi;
+
+//==========================================
+//UIステート
+//==========================================
+class CUiState
+{
+public:
+	CUiState();                 //コンストラクタ
+	virtual ~CUiState();        //デストラクタ
+	virtual void Process(CUi* pUi);//処理         
+};
+//=======================================================================================
+
+//==========================================
+//UIステート：数字保持
+//==========================================
+class CUiState_Numeric : public CUiState
+{
+public:
+	CUiState_Numeric(CUi* pUi, int nValue, float fWidth, float fHeight);//コンストラクタ
+	~CUiState_Numeric() override;//デストラクタ
+	void Process(CUi* pUi) override;//処理
+private:
+	vector<CNumber*> m_VecNum;//数字のベクター
+	int m_nValue;              //値
+};
+//=======================================================================================
 
 //==========================================
 //UIクラス
@@ -54,6 +83,7 @@ public:
 	void SetUiType(UITYPE type);
 	void SetUseUiEffect(bool bUse, int nSetEffectLife, D3DXCOLOR col) { m_bUseUiEffect = bUse; m_nSetUiEffectLife = nSetEffectLife; m_SetUiEffectColor = col; }
 	UITYPE GetUiType() { return m_Type; }//UIの種類を取得
+	void SetNumericState(int nValue, float fWidth, float fHeight);//数字状態を設定する
 protected:
 	static const string UI_FILENAME[int(UITYPE::MAX)];//UIのテクスチャファイル名
 private:
@@ -63,6 +93,7 @@ private:
 
 	D3DXCOLOR m_SetUiEffectColor;  //UIで出すエフェクトの色合い設定用
 	int m_nSetUiEffectLife;        //UIのエフェクトの体力設定用
+	CUiState* m_pUiState;          //UIの状態
 };
 //=======================================================================================
 
@@ -83,5 +114,4 @@ public:
 private:
 };
 //=======================================================================================
-
 #endif

@@ -29,7 +29,7 @@ m_nCntBlinkingFrame(0),m_nMaxBlinkingFrame(0),m_bBlinkingAim(false),m_fLimitBlin
 m_nLife(0),m_nMaxLife(0),m_fRatioLife(0.0f),m_bUseLifeRatioColor(false),m_bUseDraw(true),m_PolygonType(POLYGONTYPE::NORMAL),m_bAnimFlag(false),m_bUse(false),m_bUseBlinking(false),
 m_bUseFloating(false),m_bUseLife(false),m_bUseScale(false),m_fAngle(0.0f),m_fAnimationSplit(0.0f),m_fFloatingAddSpeed(0.0f),m_fFloatingLimitSpeed(0.0f),m_fFloatingRot(0.0f),
 m_fFloatingSpeed(0.0f),m_fHeight(0.0f),m_fLength(0.0f),m_fMaxHeight(0.0f),m_fMaxWidth(0.0f),m_fPolygonRotSpeed(0.0f),m_fWidth(0.0f),m_nAnimaionPattern(0),m_nAnimationChange(0),
-m_nAnimationCnt(0),m_nMaxAnimationPattern(0),m_nTextureIndex(0),m_pos(D3DXVECTOR3(0.0f,0.0f,0.0f)), m_Move(D3DXVECTOR3(0.0f,0.0f,0.0f)), m_SupportPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_col(D3DXVECTOR3(0.0f,0.0f,0.0f)),
+m_nAnimationCnt(0),m_nMaxAnimationPattern(0),m_nTextureIndex(0),m_pos(D3DXVECTOR3(0.0f,0.0f,0.0f)), m_Move(D3DXVECTOR3(0.0f,0.0f,0.0f)), m_SupportPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_col(D3DXCOLOR(1.0f,1.0f,1.0f,1.0f)),
 m_pVtxBuff(nullptr),m_pTexture(nullptr),m_Scale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_rot(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_AddScale(D3DXVECTOR2(0.0f,0.0f)),m_bUseAddScale(false)
 {
 	m_pTexture = nullptr;

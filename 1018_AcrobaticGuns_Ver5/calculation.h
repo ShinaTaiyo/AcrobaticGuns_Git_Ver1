@@ -96,6 +96,9 @@ public:
 	//桁数を計算する
 	static int CalculationDigit(int nNum);
 
+	//指定した桁数を取得する
+	static int getDigit(int number, int position);
+
 	//ベクトルを計算する
 	static D3DXVECTOR3 CalcVec(D3DXVECTOR3 MyPos, D3DXVECTOR3 AimPos,bool bNormalize);
 

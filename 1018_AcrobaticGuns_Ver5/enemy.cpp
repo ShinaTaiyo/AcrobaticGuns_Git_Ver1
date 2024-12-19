@@ -1683,13 +1683,24 @@ void CDiveWeakEnemy::BattleMoveProcess()
 //====================================================================================
 void CDiveWeakEnemy::AttackProcess()
 {
+
+}
+//============================================================================================================================================
+
+//====================================================================================
+//AI移動処理
+//====================================================================================
+void CDiveWeakEnemy::AIMoveProcess()
+{
 	if (CScene::GetMode() == CScene::MODE_GAME)
 	{
+		CEnemy::AIMoveProcess();
+
 		if (GetCntTime() % s_nATTACK_FREQUENCY == 0)
 		{
 			D3DXVECTOR3 Aim = CCalculation::Calculation3DVec(GetSenterPos(), CGame::GetPlayer()->GetSenterPos(), 20.0f);
 
-			CAttackEnemy::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::PLAYER, CAttack::COLLISIONTYPE::SQUARE, 1, 60, 200, GetSenterPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), Aim,GetScale() * 0.5f);
+			CAttackEnemy::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::PLAYER, CAttack::COLLISIONTYPE::SQUARE, 1, 60, 200, GetSenterPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), Aim, GetScale() * 0.5f);
 		}
 	}
 }
@@ -1816,5 +1827,46 @@ CEnemyMove_None::~CEnemyMove_None()
 void CEnemyMove_None::Process(CEnemy* pEnemy)
 {
 
+}
+//============================================================================================================================================
+
+//************************************************************************************
+//怯え移動クラス
+//************************************************************************************
+
+//====================================================================================
+//コンストラクタ
+//====================================================================================
+CEnemyMove_Frightened::CEnemyMove_Frightened(CEnemy* pEnemy, D3DXVECTOR3 StopPos, int nStateTime) : m_StopPos(StopPos),m_nStateTime(nStateTime)
+{
+
+}
+//============================================================================================================================================
+
+//====================================================================================
+//デストラクタ
+//====================================================================================
+CEnemyMove_Frightened::~CEnemyMove_Frightened()
+{
+
+}
+//============================================================================================================================================
+
+//====================================================================================
+//処理
+//====================================================================================
+void CEnemyMove_Frightened::Process(CEnemy* pEnemy)
+{
+	float fX = static_cast<float>(rand() % 30 - 15);
+	float fY = static_cast<float>(rand() % 30 - 15);
+	float fZ = static_cast<float>(rand() % 30 - 15);
+	pEnemy->SetPos(m_StopPos + D3DXVECTOR3(fX, fY, fZ));//震えさせる
+
+	m_nStateTime--;
+
+	if (m_nStateTime < 1)
+	{
+		pEnemy->ChengeMove(DBG_NEW CEnemyMove_AI());//AI移動処理に戻す
+	}
 }
 //============================================================================================================================================

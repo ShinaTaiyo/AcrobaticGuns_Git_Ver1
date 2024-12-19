@@ -15,6 +15,7 @@
 #include "manager.h"
 #include "collision.h"
 #include "effect.h"
+#include "enemy.h"
 #include "meshorbit.h"
 #include "attack.h"
 #include "input.h"
@@ -624,6 +625,8 @@ void CPlayerWireShot_Do::WireShotProcess(CPlayer* pPlayer)
 	CWireHead* pWireHead = pWire->GetWireHead();
 	CCamera* pCamera = CManager::GetCamera();
 
+	FrightenedEnemy(pPlayer);//この処理の途中で狙った敵は怯える
+
 	pPlayer->SetMove(D3DXVECTOR3(0.0f, 0.0f, 0.0f));//ワイヤー発射中は動きを止める
 	if (pWireHead->GetSuccessCollision() == true)
 	{//ワイヤーがどれかのオブジェクトに当たったら
@@ -648,6 +651,33 @@ void CPlayerWireShot_Do::WireShotProcess(CPlayer* pPlayer)
 		pPlayer->SetMove(Move);
         //pPlayerMove_Dive->SetDiveMove(Move);//ダイブの移動量を設定する
         pPlayer->SetSuccessCollision(false);//判定状態を確定解除   
+	}
+}
+//======================================================================================================================================================
+
+//=====================================================================================================
+//敵を怯えさせる処理
+//=====================================================================================================
+void CPlayerWireShot_Do::FrightenedEnemy(CPlayer* pPlayer)
+{
+	CObject* pObj = CObject::GetTopObject(static_cast<int>(CObject::TYPE::ENEMY));
+
+ 	const D3DXVECTOR3 & FrontPos = pPlayer->GetLockOn()->GetFrontPos();
+	const D3DXVECTOR3& Ray = pPlayer->GetLockOn()->GetNowRay();
+	D3DXVECTOR3 CollisionPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	while (pObj != nullptr)
+	{
+		CObject* pNext = pObj->GetNextObject();
+
+		CEnemy* pEnemy = static_cast<CEnemy*>(pObj);
+		if (pEnemy->GetEnemyType() == CEnemy::ENEMYTYPE::DIVEWEAK)
+		{//ダイブに弱い敵だけ処理をする6
+			if (CCollision::RayIntersectsAABBCollisionPos(FrontPos, Ray, pEnemy->GetPos() + pEnemy->GetVtxMin(), pEnemy->GetPos() + pEnemy->GetVtxMax(), CollisionPos))
+			{
+				pEnemy->ChengeMove(DBG_NEW CEnemyMove_Frightened(pEnemy, pEnemy->GetPos(),90));//1秒間怯え状態にする
+			}
+		}
+		pObj = pNext;//リストを次に進める
 	}
 }
 //======================================================================================================================================================

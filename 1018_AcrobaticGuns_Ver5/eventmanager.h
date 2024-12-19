@@ -39,7 +39,7 @@ public:
 class CNowEvent_NextPhase : public CNowEvent
 {
 public:
-	CNowEvent_NextPhase();//コンストラクタ
+	CNowEvent_NextPhase(int nPhaseNum,float fValueWidth,float fValueHeight);//コンストラクタ
 	~CNowEvent_NextPhase() override;//デストラクタ
 	void Process(CEventManager* pEventManager) override;//処理
 private:
@@ -79,7 +79,7 @@ public:
 		void ResetPattern();     //パターンをリセットする
 	};
 	//=========================================================================================
-	CEventManager(CNowEvent * pNowEvent);
+	CEventManager(CNowEvent * pNowEvent, int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::EVENTMANAGER, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_NONE);
 	~CEventManager();        //デストラクタ
 	HRESULT Init() override;          //初期化処理
 	void Uninit() override;           //終了処理
@@ -88,6 +88,7 @@ public:
 	void SetDeath() override;         //死亡フラグ設定処理
 
 	void ChengeEvent(CNowEvent* pNowEvent);//イベントを変える
+	void SetNextPhaseEvent(int nNowPhase,float fValueWidth,float fValueHeight);
 
 	static CEventManager* Create(CNowEvent * pNowEvent);//生成処理
 	EventProgressInfo & GetEventProgressInfo(){ return m_EventProgressInfo; }

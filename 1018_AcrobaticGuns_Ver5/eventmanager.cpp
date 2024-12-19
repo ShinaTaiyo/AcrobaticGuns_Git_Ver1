@@ -24,7 +24,7 @@
 //=====================================================================
 //コンストラクタ
 //=====================================================================
-CEventManager::CEventManager(CNowEvent* pNowEvent) : m_pNowEvent(pNowEvent), m_EventProgressInfo({})
+CEventManager::CEventManager(CNowEvent* pNowEvent, int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject(nPri,bUseintPri,type,ObjType),m_pNowEvent(pNowEvent), m_EventProgressInfo({})
 {
 
 }
@@ -160,11 +160,12 @@ void CEventManager::EventProgressInfo::ResetPattern()
 //=====================================================================
 //コンストラクタ
 //=====================================================================
-CNowEvent_NextPhase::CNowEvent_NextPhase() : m_PhaseText(nullptr)
+CNowEvent_NextPhase::CNowEvent_NextPhase(int nPhaseNum, float fValueWidth, float fValueHeight) : m_PhaseText(nullptr)
 {
 	m_PhaseText = CUi::Create(CUi::UITYPE::PHASETEXT, CObject2D::POLYGONTYPE::SENTERROLLING, 200.0f, 100.0f, 100, false,
 		D3DXVECTOR3(SCREEN_WIDTH , SCREEN_HEIGHT / 2, 0.0f), D3DXVECTOR3(sinf(D3DX_PI * -0.5f) * 10.0f, cosf(D3DX_PI * -0.5f) * 10.0f, 0.0f),
 		D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));//左に文字を飛ばす
+	m_PhaseText->SetNumericState(nPhaseNum, fValueWidth, fValueHeight);//数字状態にする
 	m_PhaseText->SetUseDeath(false);//死亡フラグをオフにする
 }
 //======================================================================================================================================

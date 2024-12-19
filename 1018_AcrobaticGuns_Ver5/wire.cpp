@@ -118,8 +118,6 @@ void CWire::Update()
 		float fRatioY = 0.0f;
 		D3DXVECTOR3 LastSenterPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		D3DXVECTOR3 MeasureNor = D3DXVECTOR3(0.0f, 0.0f, 0.0f);//法線計算用
-		//D3DXVECTOR3 Rot = m_pWireHead->GetRot();
-		//D3DXVec3Normalize(&Rot, &Rot);
 		for (int nCntVtxY = 0; nCntVtxY < nNumDivisionY; nCntVtxY++)
 		{//Y方向のUVはそのまま使う
 			fRatioY = (1.0f / (nNumDivisionY - 1)) * nCntVtxY;

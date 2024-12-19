@@ -13,6 +13,7 @@
 #include "renderer.h"
 #include "manager.h"
 #include "sound.h"
+#include "calculation.h"
 //===================================================================================================
 
 //====================================================
@@ -31,7 +32,8 @@ const string CUi::UI_FILENAME[int(CUi::UITYPE::MAX)] =
 //コンストラクタ
 //====================================================
 CUi::CUi(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject2D(nPri,bUseintPri,type,ObjType),
-m_MoveType(UIMOVETYPE_NORMAL),m_Type(UITYPE::LOCKON),m_bUseUiEffect(false),m_nSetUiEffectLife(0),m_SetUiEffectColor(D3DXCOLOR(1.0f,1.0f,1.0f,1.0f))
+m_MoveType(UIMOVETYPE_NORMAL),m_Type(UITYPE::LOCKON),m_bUseUiEffect(false),m_nSetUiEffectLife(0),m_SetUiEffectColor(D3DXCOLOR(1.0f,1.0f,1.0f,1.0f)),
+m_pUiState(DBG_NEW CUiState())
 {
 
 }
@@ -76,6 +78,11 @@ void CUi::Update()
 	{
 		CUiEffect::Create(m_Type, GetPolygonType(), GetWidth(), GetHeight(), m_nSetUiEffectLife, GetPos(), D3DXVECTOR3(0.0f,0.0f,0.0f), GetRot(), m_SetUiEffectColor);
 	}
+
+	if (m_pUiState != nullptr)
+	{
+		m_pUiState->Process(this);
+	}
 }
 //===================================================================================================
 
@@ -93,6 +100,14 @@ void CUi::Draw()
 //====================================================
 void CUi::SetDeath()
 {
+	if (GetUseDeath() == true)
+	{
+		if (m_pUiState != nullptr)
+		{
+			delete m_pUiState;
+			m_pUiState = nullptr;
+		}
+	}
 	CObject::SetDeath();
 }
 //===================================================================================================
@@ -151,6 +166,21 @@ void CUi::SetUiType(UITYPE type)
     SetTextureIndex(pTextureClass->Regist(UI_FILENAME[int(type)]));
     CObject2D::BindTexture(pTextureClass->GetAddress(GetTextureIndex()));
 
+}
+//===================================================================================================
+
+//====================================================
+//数字状態に設定する
+//====================================================
+void CUi::SetNumericState(int nValue, float fWidth, float fHeight)
+{
+	if (m_pUiState != nullptr)
+	{
+		delete m_pUiState;
+		m_pUiState = nullptr;
+
+		m_pUiState = DBG_NEW CUiState_Numeric(this, nValue, fWidth, fHeight);
+	}
 }
 //===================================================================================================
 
@@ -271,5 +301,93 @@ CUiEffect* CUiEffect::Create(UITYPE type, CObject2D::POLYGONTYPE PolygonType, fl
 	}
 
 	return pUiEffect;
+}
+//===================================================================================================
+
+//****************************************************
+//UIステートクラス
+//****************************************************
+
+//====================================================
+//コンストラクタ
+//====================================================
+CUiState::CUiState()
+{
+
+}
+//===================================================================================================
+
+//====================================================
+//デストラクタ
+//====================================================
+CUiState::~CUiState()
+{
+
+}
+//===================================================================================================
+
+//====================================================
+//処理
+//====================================================
+void CUiState::Process(CUi* pUi)
+{
+
+}
+//===================================================================================================
+
+//****************************************************
+//UIステート_数字
+//****************************************************
+
+//====================================================
+//コンストラクタ
+//====================================================
+CUiState_Numeric::CUiState_Numeric(CUi* pUi, int nValue, float fWidth, float fHeight) : m_nValue(nValue)
+{
+	int nDigit = CCalculation::CalculationDigit(m_nValue);
+    	
+	for (int nCnt = 0; nCnt < nDigit; nCnt++)
+	{
+		CNumber* pNumber = CNumber::Create(pUi->GetPos(), fWidth, fHeight);
+		int nNum = CCalculation::getDigit(m_nValue, nCnt);
+		pNumber->SetAnim(nNum);//指定した桁の数値を取得する
+		pNumber->SetUseDeath(false);//死亡フラグを発動させない
+		m_VecNum.push_back(pNumber);//Vectorに保存
+	}
+}
+//===================================================================================================
+
+//====================================================
+//デストラクタ
+//====================================================
+CUiState_Numeric::~CUiState_Numeric()
+{
+	for (auto it : m_VecNum)
+	{
+		if (it != nullptr)
+		{
+			it->SetUseDeath(true);
+			it->SetDeath();
+			it = nullptr;
+		}
+	}
+
+	m_VecNum.clear();
+	m_VecNum.shrink_to_fit();
+}
+//===================================================================================================
+
+//====================================================
+//処理
+//====================================================
+void CUiState_Numeric::Process(CUi* pUi)
+{
+
+	int nSize = m_VecNum.size();
+	int nCnt = 0;
+	for (auto it = m_VecNum.begin();it != m_VecNum.end();it++,nCnt++)
+	{//数字を横に並べ続ける
+		(*it)->SetPos(pUi->GetPos() + D3DXVECTOR3(pUi->GetWidth() / 2 + (*it)->GetWidth() / 2 + (*it)->GetWidth() * nCnt, 0.0f, 0.0f));
+	}
 }
 //===================================================================================================
