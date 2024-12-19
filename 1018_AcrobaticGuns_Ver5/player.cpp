@@ -19,6 +19,7 @@
 #include "objectXInfo.h"
 #include "calculation.h"
 #include "fade.h"
+#include "text.h"
 #include "game.h"
 #include "block.h"
 #include "enemy.h"
@@ -160,6 +161,8 @@ void CPlayer::Update()
 void CPlayer::Draw()
 {
     CObjectXAlive::Draw();
+    //CManager::GetText()->DrawSet(D3DXVECTOR3(SCREEN_WIDTH - 350.0f, SCREEN_HEIGHT / 2, 0.0f), 30, CText::FONT_KEIFONT, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f),
+    //    "操作方法\n移動：左スティック\n視点：左スティック\n射撃、ダイブ：Rトリガー\nダッシュ：Lトリガー\nジャンプ：A\nモード切替：X");
 }
 //==========================================================================================================
 

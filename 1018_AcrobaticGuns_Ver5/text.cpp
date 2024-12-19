@@ -72,8 +72,8 @@ void CText::Init(void)
 		}
 		else
 		{
-			// フォント読込エラー処理
-			//MessageBox(NULL, "フォント読込失敗", "", MB_OK);
+			//フォント読込エラー処理
+			MessageBox(NULL, "フォント読込失敗", "", MB_OK);
 		}
 	}
 }

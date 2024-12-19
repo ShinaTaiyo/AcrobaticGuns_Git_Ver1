@@ -155,15 +155,15 @@ public:
 	virtual void Process(CCamera* pCamera) {};  //処理
 };
 
-//急に後ろを向かせる
+//狙った向きを向かせる
 class CCameraState_TurnAround : public CCameraState
 {
 public:
-	CCameraState_TurnAround(float fAimRot,float fAdjustTurnSpeed);//コンストラクタ
+	CCameraState_TurnAround(D3DXVECTOR3 AimRot,float fAdjustTurnSpeed);//コンストラクタ
 	~CCameraState_TurnAround() override;//デストラクタ
 	void Process(CCamera * pCamera) override;//処理
 private:
-	const float m_fAimRot;          //目的の向き
+	const D3DXVECTOR3 m_AimRot;     //目的の向き
 	const float m_fAdjustTurnSpeed; //向きを変える速度の補正度
 };
 #endif

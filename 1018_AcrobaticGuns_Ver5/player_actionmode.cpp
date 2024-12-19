@@ -270,7 +270,8 @@ CPlayerMove_Stuck::CPlayerMove_Stuck(CPlayer* pPlayer) : m_NowPos(pPlayer->GetPo
 	CCamera* pCamera = CManager::GetCamera();
 	CWireHead* pWireHead = pPlayer->GetWire()->GetWireHead();
 	pPlayer->SetPos(pPlayer->GetPos() - pPlayer->GetMove());
-	pCamera->SetRot(D3DXVECTOR3(-pWireHead->GetRot().x,pWireHead->GetRot().y + D3DX_PI,0.0f));//カメラの向きを固定したワイヤーヘッドの逆側に！
+	//pCamera->SetRot(D3DXVECTOR3(-pWireHead->GetRot().x,pWireHead->GetRot().y + D3DX_PI,0.0f));//カメラの向きを固定したワイヤーヘッドの逆側に！
+	pCamera->ChengeState(DBG_NEW CCameraState_TurnAround(D3DXVECTOR3(-pWireHead->GetRot().x, pWireHead->GetRot().y + D3DX_PI, 0.0f), 0.1f));
 }
 //======================================================================================================================================================
 

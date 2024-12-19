@@ -197,7 +197,7 @@ void CCamera::Update()
     //========================================
 	if (CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::Y))
 	{
-		ChengeState(DBG_NEW CCameraState_TurnAround(m_Rot.y + D3DX_PI, 0.15f));
+		ChengeState(DBG_NEW CCameraState_TurnAround(m_Rot + D3DXVECTOR3(0.0f,D3DX_PI,0.0f), 0.15f));
 	}
 
 	m_pCameraState->Process(this);
@@ -435,7 +435,7 @@ void CCamera::TurningCameraProcess()
 //=================================================================
 //コンストラクタ
 //=================================================================
-CCameraState_TurnAround::CCameraState_TurnAround(float fAimRot, float fAdjustTurnSpeed) : m_fAimRot(fAimRot),m_fAdjustTurnSpeed(fAdjustTurnSpeed)
+CCameraState_TurnAround::CCameraState_TurnAround(D3DXVECTOR3 AimRot, float fAdjustTurnSpeed) : m_AimRot(AimRot),m_fAdjustTurnSpeed(fAdjustTurnSpeed)
 {
 
 }
@@ -455,20 +455,23 @@ CCameraState_TurnAround::~CCameraState_TurnAround()
 //=================================================================
 void CCameraState_TurnAround::Process(CCamera* pCamera)
 {
-	const float & fNowRot = pCamera->GetRot().y;
+	const D3DXVECTOR3 & NowRot = pCamera->GetRot();
 
 	//向きの差分を求める
-	float fRotDiff = m_fAimRot - fNowRot;
+	float fRotDiffX = m_AimRot.x - NowRot.x;
+	float fRotDiffY = m_AimRot.y - NowRot.y;
 
 	CManager::GetDebugProc()->PrintDebugProc("カメラの向きの差分:%f\n");
 
 	//加算する向きの量を補正して求める
-	float fAddRot = fRotDiff * m_fAdjustTurnSpeed;
-	pCamera->SetRot(D3DXVECTOR3(pCamera->GetRot().x, pCamera->GetRot().y + fAddRot, pCamera->GetRot().z));
+	float fAddRotX = fRotDiffX * m_fAdjustTurnSpeed;
+	float fAddRotY = fRotDiffY * m_fAdjustTurnSpeed;
+
+	pCamera->SetRot(D3DXVECTOR3(pCamera->GetRot().x + fAddRotX, pCamera->GetRot().y + fAddRotY, pCamera->GetRot().z));
 
 	//差分の絶対値が0.01f以下なら
-	if (fabsf(fRotDiff) < 0.01f)
-	{//カメラ状態を普通に戻す
+	if (fabsf(fAddRotX) < 0.01f && fabsf(fAddRotY) < 0.01f)//YawとPitchの向き加算量が0.01f以下になったらステートを戻す
+	{
 		pCamera->ChengeState(DBG_NEW CCameraState());
 	}
 }
