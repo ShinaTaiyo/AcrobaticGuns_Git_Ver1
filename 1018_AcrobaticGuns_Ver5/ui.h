@@ -32,6 +32,7 @@ public:
 		ACTIONMODEWINDOW,//アクションモードウインドウ
 	    ACTIONMODE_GUN,  //ショットモードUI
 		ACTIONMODE_DIVE, //ダイブモードUI
+		PHASETEXT,       //フェーズ文字
 		MAX
 	};
 

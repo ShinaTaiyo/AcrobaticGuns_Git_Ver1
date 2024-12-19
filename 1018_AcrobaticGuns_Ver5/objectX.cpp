@@ -38,7 +38,7 @@ m_nTypeNum(0), m_bUseMultiScale(false), m_MultiScale(D3DXVECTOR3(0.0f,0.0f,0.0f)
 m_PosOld(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Rot(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Scale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_FormarScale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Size(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_VtxMin(D3DXVECTOR3(0.0f,0.0f,0.0f)),
 m_OriginVtxMin(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_VtxMax(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_OriginVtxMax(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_mtxWorld(),m_AddRot(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_SenterPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),
 m_AddScale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_fAxis(0.0f),m_VecAxis(D3DXVECTOR3(0.0f,1.0f,0.0f)),m_pMtxParent(nullptr),
-m_bSwapVtxXZ(false)
+m_bSwapVtxXZ(false),m_Color(1.0f,1.0f,1.0f,1.0f)
 {
 	SetObjectType(CObject::OBJECTTYPE::OBJECTTYPE_X);
 }
@@ -226,17 +226,6 @@ void CObjectX::Draw()
 	D3DXMatrixTranslation(&mtxTrans, m_Pos.x, m_Pos.y, m_Pos.z);
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
 
-	//if (m_pMtxParent != nullptr)
-	//{
-	//	D3DXMatrixTranslation(&mtxTrans,m_pMtxParent->_41,m_pMtxParent->_42,m_pMtxParent->_43);
-	//	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
-	//}
-
-	if (m_ObjectXInfo.Diffuse[0].a > 0.0f && m_Pos.y + m_VtxMax.y >= 0.0f && m_bUseShadow == true && s_bCOMMON_DRAWSHADOW == true)
-	{
-		//影の描画
-		//DrawShadow();
-	}
 	//ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
 	//=======================================
@@ -247,11 +236,16 @@ void CObjectX::Draw()
 	pDevice->SetRenderState(D3DRS_ALPHAREF,50);
 	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
 
-	////Zバッファに書き込まない（重なり方に違和感がなくなる）
-    //pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 
 	//法線の長さを１にする。（スケールなどを使った時は、必ず使う。)
 	pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);
+
+	if (m_Color.a < 1.0f)
+	{
+		//Zバッファに書き込まない
+		pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+	}
+
 	if (m_bUseCulling == true)
 	{
 		//両面を描画する
@@ -293,7 +287,7 @@ void CObjectX::Draw()
 	pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, FALSE);
 
 	//Zバッファに書き込む
-    //pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+    pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 
 	//片面だけ描画する
 	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
@@ -344,6 +338,7 @@ void CObjectX::SetColor(D3DXCOLOR col, int nColChengeTime, bool bChoose, bool bS
 {
 	m_bColorChenge = true;
 	m_nChengeColorTime = nColChengeTime;
+	m_Color = col;
 	if (bChoose == true)
 	{
 		if (bSetAlpha == false)
@@ -388,6 +383,7 @@ void CObjectX::CalculateSenterPos()
 //================================================
 void CObjectX::SetFormarColor()
 {
+	m_Color = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	for (int nCnt = 0; nCnt < (int)(m_ObjectXInfo.dwNumMat); nCnt++)
 	{
 		m_ObjectXInfo.Diffuse[nCnt] = m_ObjectXInfo.FormarDiffuse[nCnt];

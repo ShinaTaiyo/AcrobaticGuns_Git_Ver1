@@ -20,11 +20,11 @@
 class CUi3D : public CBillboard
 {
 public:
-	typedef enum
+	enum class UI3DTYPE
 	{
-		UI3DTYPE_LOCKON = 0,
-		UI3DTYPE_MAX
-	}UI3DTYPE;
+		LOCKON = 0,
+		MAX
+	};
 
 	CUi3D(int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::UI3D, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_BILLBOARD);                                                                 //コンストラクタ
 	~CUi3D();                                                                //デストラクタ
@@ -34,7 +34,7 @@ public:
 	void Draw(void) override;                                                //描画処理
 	static CUi3D* Create(UI3DTYPE type,D3DXVECTOR3 Pos,D3DXVECTOR3 Move,int nLife,float fWidth,float fHeight); //生成処理
 protected:
-	static const string m_UI3D_FILENAME[UI3DTYPE_MAX];
+	static const string m_UI3D_FILENAME[static_cast<int>(UI3DTYPE::MAX)];
 	void SetUi3DType(UI3DTYPE type) { m_Type = type; }                           //種類を設定
 	UI3DTYPE GetUi3DType() { return m_Type; }                                    //種類を取得
 private:

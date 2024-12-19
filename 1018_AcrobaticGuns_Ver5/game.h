@@ -18,6 +18,7 @@
 #include "player.h"
 #include "main.h"
 #include "phasemanager.h"
+#include "eventmanager.h"
 //===============================================================================
 
 //========================================
@@ -35,10 +36,12 @@ public:
 	static CPhaseManager* GetPhaseManager() { return m_pPhaseManager; }    //フェーズマネージャーを取得する
 	static bool GetUseGamePad() { return s_bUseGamePad; }                    
 	static CStageManager* GetStageManager() { return m_pStageManager; }    //ステージマネージャーを取得する
+	static CEventManager* GetEventManager() { return m_pEventManager; }    //イベントマネージャーを取得する
 private:
 	static CPlayer* m_pPlayer;                                             //プレイヤー
 	static CStageManager* m_pStageManager;                                 //ステージマネージャー
 	static CPhaseManager* m_pPhaseManager;                                 //フェーズマネージャー
+	static CEventManager* m_pEventManager;                                 //イベントマネージャー
 	CBgModel* m_pBgModel;                                                  //背景モデル
 	static int s_nPhaseNum;                                                //フェーズ番号
 	static bool s_bUseGamePad;                                             //ゲームパッドを使用するかどうか

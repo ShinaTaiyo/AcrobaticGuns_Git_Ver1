@@ -16,7 +16,7 @@
 //=======================================================
 //ëOï˚êÈåæ
 //=======================================================
-const string CUi3D::m_UI3D_FILENAME[CUi3D::UI3DTYPE_MAX] =
+const string CUi3D::m_UI3D_FILENAME[static_cast<int>(CUi3D::UI3DTYPE::MAX)] =
 {
 	"data\\TEXTURE\\UI3D\\Target_000.png",
 };
@@ -87,7 +87,7 @@ CUi3D* CUi3D::Create(UI3DTYPE type, D3DXVECTOR3 Pos, D3DXVECTOR3 Move, int nLife
 	pUi3D->Init();
 	pUi3D->SetType(CObject::TYPE::UI3D);
 	pUi3D->SetMove(Move);
-	pUi3D->SetTextureIndex(pTexture->Regist(m_UI3D_FILENAME[type]));
+	pUi3D->SetTextureIndex(pTexture->Regist(m_UI3D_FILENAME[static_cast<int>(type)]));
 	pUi3D->bindTexture(pTexture->GetAddress(pUi3D->GetTextureIndex()));
 
 	pUi3D->SetLife(nLife);

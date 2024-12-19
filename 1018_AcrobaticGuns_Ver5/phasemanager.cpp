@@ -184,7 +184,8 @@ void CPhaseManager::AdvancePhase()
 			}
 
 		}
-		
+		CGame::GetEventManager()->ChengeEvent(DBG_NEW CNowEvent_NextPhase());//フェーズ移行イベントを呼ぶ
+
 		s_nNowPhase++;
 	}
 

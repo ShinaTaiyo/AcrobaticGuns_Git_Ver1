@@ -29,12 +29,12 @@ public:
 		NONE,            //タイプなし
 		BG3D,            //3D背景
 		FIELD,           //床
-		PLAYER,          //プレイヤー
-		ENEMY,           //敵
 		BLOCK,           //ブロック
 		BGMODEL,         //背景モデル
 		WIREHEAD,        //ワイヤー頭
 		WIRE,            //ワイヤー
+		PLAYER,          //プレイヤー
+		ENEMY,           //敵
 		BULLET,          //弾
 		ATTACK,          //攻撃
 		MESHORBIT,       //軌跡メッシュ
