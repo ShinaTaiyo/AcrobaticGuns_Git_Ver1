@@ -20,6 +20,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <iostream>
+#include "collision.h"
+#include "particle.h"
 #include <algorithm>
 //===========================================================================================
 
@@ -205,6 +207,11 @@ void CObjectX::Draw()
 
 	//現在のマテリアルを取得
 	pDevice->GetMaterial(&matDef);
+
+	if (m_bUseShadow == true && s_bCOMMON_DRAWSHADOW == true)
+	{
+		DrawShadow();
+	}
 
 	//ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
@@ -728,6 +735,11 @@ void CObjectX::DrawShadow()
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice(); //デバイスへのポインタと取得
 	D3DMATERIAL9 matDef;                                              //現在のマテリアル保存用
 
+	D3DXVECTOR3 RayCollisionPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	D3DXVECTOR3 CalcRayCollisionPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+	float fResultNearLength = 0.0f;
+
     //影のマトリックスを初期化
 	D3DXMatrixIdentity(&mtxShadow);
 
@@ -750,8 +762,45 @@ void CObjectX::DrawShadow()
 	//D3DXMatrixRotationYawPitchRoll(&mtxRot,m_Rot.y, m_Rot.x, m_Rot.z);
 	//D3DXMatrixMultiply(&mtxShadow, &mtxShadow, &mtxRot);
 
+	int nCntColRay = 0;//レイが当たった回数をカウントする
+	for (int nCntPri = 0; nCntPri < CObject::m_nMAXPRIORITY; nCntPri++)
+	{
+		CObject* pObj = CObject::GetTopObject(nCntPri);
+
+		while (pObj != nullptr)
+		{
+			CObject* pNext = pObj->GetNextObject();
+
+			if (pObj->GetType() == CObject::TYPE::BLOCK || pObj->GetType() == CObject::TYPE::BGMODEL)
+			{
+				CObjectX* pObjX = static_cast<CObjectX*>(pObj);
+				if (CCollision::RayIntersectsAABBCollisionPos(m_Pos + D3DXVECTOR3(0.0f,0.1f,0.0f), D3DXVECTOR3(0.0f, -1.0f, 0.0f), 
+					pObjX->GetPos() + pObjX->GetVtxMin(),pObjX->GetPos() + pObjX->GetVtxMax(), CalcRayCollisionPos))
+				{
+					float fLength = sqrtf(powf(CalcRayCollisionPos.y - m_Pos.y,2));//レイが当たった位置のY軸の距離を取る
+					nCntColRay++;
+					if (nCntColRay == 1)
+					{//最初の当たったオブジェクトなので、無条件で距離とレイが当たった位置を記録する
+						fResultNearLength = fLength;
+						RayCollisionPos = CalcRayCollisionPos;
+					}
+					else
+					{
+						if (fResultNearLength > fLength)
+						{//レイが当たったオブジェクトの中で一番近いので、距離とレイが当たった位置を更新する
+							fResultNearLength = fLength;
+							RayCollisionPos = CalcRayCollisionPos;
+						}
+					}
+				}
+			}
+
+			pObj = pNext;//リストを次に進める
+		}
+	}
+
 	//位置を反映
-	D3DXMatrixTranslation(&mtxTrans, m_Pos.x,1.0f, m_Pos.z);
+	D3DXMatrixTranslation(&mtxTrans,m_Pos.x,RayCollisionPos.y, m_Pos.z);
 	D3DXMatrixMultiply(&mtxShadow, &mtxShadow, &mtxTrans);
 
 	//ワールドマトリックスの設定

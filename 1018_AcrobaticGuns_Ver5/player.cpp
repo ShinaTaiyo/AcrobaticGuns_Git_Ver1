@@ -247,7 +247,7 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
             pPlayer->SetScale(Scale);                                                        //Šg‘å—¦‚ÌÝ’è
             pPlayer->SetFormarScale(Scale);                                                  //Œ³‚ÌŠg‘å—¦‚ðÝ’è‚·‚é
             pPlayer->SetAutoDeath(false);                                                    //Ž€–Sƒtƒ‰ƒO‚ðŽ©“®‚Å”­“®‚·‚é‚©‚Ç‚¤‚©
-
+            pPlayer->SetUseShadow(true);
             //‘Ì—Í
             pPlayer->SetLife(s_nNORMAL_MAXLIFE);
             pPlayer->SetMaxLife(s_nNORMAL_MAXLIFE);

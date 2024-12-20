@@ -133,6 +133,7 @@ CBlock* CBlock::Create(BLOCKTYPE type, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 r
 			pBlock->SetMaxLife(nLife);                    //ブロックの体力
 			pBlock->SetAutoSubLife(false);                //自動的に体力を減らすかどうか
 			pBlock->SetSupportPos(pos);                   //設置位置
+			pBlock->SetUseShadow(false);
 			pBlock->CObjectX::SetPos(pos);                //オブジェクトXの位置を設定
 			pBlock->SetPosOld(pos);                       //1f前の位置を設定
 			pBlock->CObject::SetType(CObject::TYPE::BLOCK);//オブジェクトの種類を決める

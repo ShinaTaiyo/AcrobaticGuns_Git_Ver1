@@ -611,9 +611,10 @@ bool CCollision::RayIntersectsAABB(const D3DXVECTOR3& rayOrigin, const D3DXVECTO
 //================================================================
 //レイとAABBの当たり判定、判定箇所も求める
 //================================================================
-bool CCollision::RayIntersectsAABBCollisionPos(const D3DXVECTOR3& origin, const D3DXVECTOR3& direction, const D3DXVECTOR3& min, const D3DXVECTOR3& max,
+bool CCollision::RayIntersectsAABBCollisionPos(const D3DXVECTOR3& origin,const D3DXVECTOR3& direction, const D3DXVECTOR3& min, const D3DXVECTOR3& max,
 	D3DXVECTOR3& CollisionPos)
 {
+	D3DXVECTOR3 CopyDirection = direction;
 
 	if (origin.x >= min.x && origin.x <= max.x &&
 		origin.y >= min.y && origin.y <= max.y &&
@@ -622,16 +623,29 @@ bool CCollision::RayIntersectsAABBCollisionPos(const D3DXVECTOR3& origin, const 
 		return false;
 	}
 
+	if (CopyDirection.x == 0.0f)
+	{
+		CopyDirection.x = 0.001f;//０除算を回避
+	}
+	if (CopyDirection.y == 0.0f)
+	{
+		CopyDirection.y = 0.001f;//０除算を回避
+	}
+	if (CopyDirection.z == 0.0f)
+	{
+		CopyDirection.z = 0.001f;//０除算を回避
+	}
+
 	//＊それぞれの軸の距離を求め、minやmaxにその単位ベクトルの方向なら、どれくらいの距離を進めば到達できるかを求める。
-	float tmin = (min.x - origin.x) / direction.x;
-	float tmax = (max.x - origin.x) / direction.x;
+	float tmin = (min.x - origin.x) / CopyDirection.x;
+	float tmax = (max.x - origin.x) / CopyDirection.x;
 
 	float t = 0.0f;
 
 	if (tmin > tmax) std::swap(tmin, tmax);
 
-	float tymin = (min.y - origin.y) / direction.y;
-	float tymax = (max.y - origin.y) / direction.y;
+	float tymin = (min.y - origin.y) / CopyDirection.y;
+	float tymax = (max.y - origin.y) / CopyDirection.y;
 
 	if (tymin > tymax) std::swap(tymin, tymax);
 
@@ -640,8 +654,8 @@ bool CCollision::RayIntersectsAABBCollisionPos(const D3DXVECTOR3& origin, const 
 	if (tymin > tmin) tmin = tymin;
 	if (tymax < tmax) tmax = tymax;
 
-	float tzmin = (min.z - origin.z) / direction.z;
-	float tzmax = (max.z - origin.z) / direction.z;
+	float tzmin = (min.z - origin.z) / CopyDirection.z;
+	float tzmax = (max.z - origin.z) / CopyDirection.z;
 
 	if (tzmin > tzmax) std::swap(tzmin, tzmax);
 
@@ -655,9 +669,9 @@ bool CCollision::RayIntersectsAABBCollisionPos(const D3DXVECTOR3& origin, const 
 	if (t < 0.0f) return false;
 
 	//衝突したことが確定したので、衝突位置を求める（tには、レイがAABBとの衝突点の最小距離が入っている）
-	CollisionPos = D3DXVECTOR3(origin.x + direction.x * t,
-		origin.y + direction.y * t,
-		origin.z + direction.z * t);
+	CollisionPos = D3DXVECTOR3(origin.x + CopyDirection.x * t,
+		origin.y + CopyDirection.y * t,
+		origin.z + CopyDirection.z * t);
 	return true;
 }
 //====================================================================================================================

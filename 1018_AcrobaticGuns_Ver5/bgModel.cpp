@@ -113,6 +113,7 @@ CBgModel* CBgModel::Create(BGMODELTYPE bgModelType, D3DXVECTOR3 pos, D3DXVECTOR3
 	pBgModel->SetRot(rot);                   //向き
 	pBgModel->SetScale(Scale);               //拡大率
 	pBgModel->SetUseSwapVtxXZ(bSwapVtxXZ);   //XZをチェンジする
+	pBgModel->SetUseShadow(false);
 	//モデル情報設定
 	int nIdx = CManager::GetObjectXInfo()->Regist(BGMODEL_FILENAME[static_cast<int>(bgModelType)]);
 
