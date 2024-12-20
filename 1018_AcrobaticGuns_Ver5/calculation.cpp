@@ -183,11 +183,11 @@ bool CCalculation::CaluclationMove(bool bUseStick, D3DXVECTOR3& Move, float fSpe
 		//ƒJƒƒ‰‚ðŠî€‚ÉŒü‚«‚ðŒˆ‚ß‚é
 		if (bUseStick == true)
 		{
-			fRot = fCameraRot + CManager::GetInputJoypad()->GetLStickAimRot() + D3DX_PI;
+			fRot = fCameraRot + CManager::GetInputJoypad()->GetLStickAimRot();
 		}
 		else
 		{
-			fRot = atan2f(fMoveX, fMoveZ) + fCameraRot + D3DX_PI;
+			fRot = atan2f(fMoveX, fMoveZ) + fCameraRot;
 		}
 		switch (MoveAim)
 		{
@@ -196,8 +196,8 @@ bool CCalculation::CaluclationMove(bool bUseStick, D3DXVECTOR3& Move, float fSpe
 			Move.y = cosf(fRot) * fSpeed;
 			break;
 		case MOVEAIM_XZ:
-			Move.x = sinf(fRot - D3DX_PI) * fSpeed;
-			Move.z = cosf(fRot - D3DX_PI) * fSpeed;
+			Move.x = sinf(fRot) * fSpeed;
+			Move.z = cosf(fRot) * fSpeed;
 			break;
 		case MOVEAIM_ZY:
 			Move.z = sinf(fRot) * fSpeed;

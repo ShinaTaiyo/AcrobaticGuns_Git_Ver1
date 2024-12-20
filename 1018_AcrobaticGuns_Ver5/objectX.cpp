@@ -224,11 +224,6 @@ void CObjectX::Draw()
 	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_Rot.y, m_Rot.x, m_Rot.z);
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
 
-	////クォータニオン生成
-	//D3DXQuaternionRotationAxis(&quat, &m_VecAxis,m_fAxis);
-	//D3DXMatrixRotationQuaternion(&mtxRot, &quat);
-	//D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
-
 	//位置を反映
 	D3DXMatrixTranslation(&mtxTrans, m_Pos.x, m_Pos.y, m_Pos.z);
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);

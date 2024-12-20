@@ -57,7 +57,7 @@ CCamera::~CCamera()
 //====================================================================
 HRESULT CCamera::Init()
 {
-	m_PosV = D3DXVECTOR3(0.0f, 200.0f,-400.0f);     //支点
+	m_PosV = D3DXVECTOR3(0.0f, 200.0f,-350.0f);     //支点
 	m_PosR = D3DXVECTOR3(0.0f,0.0f,0.0f);                          //注視点
 	m_VecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);         //上方向ベクトル（法線）
 	m_Rot = D3DXVECTOR3(-D3DX_PI * 0.5f,0.0f,0.0f);                           //向き
@@ -110,6 +110,8 @@ void CCamera::Update()
 	m_Rot.y = CCalculation::CorrectionRot(m_Rot.y);
 
 	CManager::GetDebugProc()->PrintDebugProc("カメラの向き：%f %f %f\n", m_Rot.x, m_Rot.y, m_Rot.z);
+	CManager::GetDebugProc()->PrintDebugProc("カメラの視点：%f %f %f\n", m_PosV.x, m_PosV.y, m_PosV.z);
+	CManager::GetDebugProc()->PrintDebugProc("カメラの注視点：%f %f %f\n", m_PosR.x, m_PosR.y, m_PosR.z);
 
 	//カメラの通常の注視点を設定し続ける
 	NormalCameraMove();
@@ -232,7 +234,7 @@ void CCamera::NormalCameraMove()
 				{
 					if (m_bCustom == false)
 					{
-						m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f) + m_AddPosR;
+						m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(sinf(m_Rot.y + D3DX_PI * 0.5f) * 30.0f, 60.0f,cosf(m_Rot.y + D3DX_PI * 0.5f) * 30.0f) + m_AddPosR;
 						m_PosV = m_PosR + RotVec * m_fLength;
 						//m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -250.0f, 0.0f, cosf(m_Rot.y) * -250.0f); + m_AddPosV;
 					}
