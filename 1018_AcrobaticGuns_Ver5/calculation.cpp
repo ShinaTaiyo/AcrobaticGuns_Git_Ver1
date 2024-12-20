@@ -207,6 +207,43 @@ bool CCalculation::CaluclationMove(bool bUseStick, D3DXVECTOR3& Move, float fSpe
 			break;
 		}
 	}
+	//float fCameraRot = CManager::GetCamera()->GetRot().y;
+	//float fMoveX = 0.0f;                                            //X•ûŒü‚ÌˆÚ“®—Ê
+	//float fMoveZ = 0.0f;                                            //Z•ûŒü‚ÌˆÚ“®—Ê
+	//bool bMove = true;                                             //ˆÚ“®‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚© 
+
+	//if (CManager::GetInputKeyboard()->GetPress(DIK_W) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::UP) == true)
+	//{
+	//	fMoveZ = 1.0f;
+	//}
+	//else if (CManager::GetInputKeyboard()->GetPress(DIK_S) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::DOWN) == true)
+	//{
+	//	fMoveZ = -1.0f;
+	//}
+	//if (CManager::GetInputKeyboard()->GetPress(DIK_D) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::RIGHT) == true)
+	//{
+	//	fMoveX = 1.0f;
+	//}
+	//else if (CManager::GetInputKeyboard()->GetPress(DIK_A) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::LEFT) == true)
+	//{
+	//	fMoveX = -1.0f;
+	//}
+
+	//if (fMoveX != 0.0f || fMoveZ != 0.0f)
+	//{
+	//	bMove = true;//ˆÚ“®ó‘Ô
+	//}
+	//else
+	//{
+	//	bMove = false;//‘Ò‹@ó‘Ô
+	//}
+	//if (bMove == true)
+	//{//ˆÚ“®ó‘Ô‚È‚ç
+	//	//ƒJƒƒ‰‚ğŠî€‚ÉŒü‚«‚ğŒˆ‚ß‚é
+	//	fRot = atan2f(fMoveZ, fMoveX) + fCameraRot;
+	//	Move.x = cosf(fRot) * fSpeed;
+	//	Move.z = sinf(fRot) * fSpeed;
+	//}
 
 	return bMove;
 }

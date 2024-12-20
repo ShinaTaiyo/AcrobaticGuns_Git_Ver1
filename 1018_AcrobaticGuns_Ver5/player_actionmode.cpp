@@ -396,7 +396,7 @@ void CPlayerAttack_Shot::AttackProcess(CPlayer* pPlayer)
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_J) == true || CManager::GetInputJoypad()->GetRT_Repeat(4) == true ||
 		CManager::GetInputMouse()->GetMouseLeftClickRepeat(4) == true)
 	{
-		pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::BULLET,CAttack::TARGETTYPE::ENEMY,CAttack::COLLISIONTYPE::SQUARE,5,5,60,ShotPos, pPlayer->GetRot(), Move, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+		pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::BULLET,CAttack::TARGETTYPE::ENEMY,CAttack::COLLISIONTYPE::SQUARE,3,0,45,ShotPos, pPlayer->GetRot(), Move, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 		pAttackPlayer->SetUseInteria(false, CObjectXMove::GetNormalInertia());
 		pAttackPlayer->SetAutoSubLife(true);
 	}
