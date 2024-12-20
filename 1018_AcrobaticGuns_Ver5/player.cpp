@@ -45,7 +45,7 @@ CPlayer::CPlayer(CPlayerMove* pPlayerMove, CPlayerAttack* pPlayerAttack, CPlayer
     , m_pMove(pPlayerMove), m_pAttack(pPlayerAttack), m_pEffect(pPlayerEffect), m_pWireShot(pPlayerWireShot),
     m_pMeshOrbit(nullptr),
     m_fRotAim(0.0f), m_pLockOn(nullptr), m_NowActionMode(ACTIONMODE::SHOT), m_pModeDisp(nullptr), m_bCollision(false),m_pWire(nullptr),
-    m_pHpGauge(nullptr)
+    m_pHpGauge(nullptr),m_pAbnormalState(DBG_NEW CPlayerAbnormalState())
 {
    
 }
@@ -119,6 +119,13 @@ void CPlayer::Uninit()
         delete m_pWireShot;
         m_pWireShot = nullptr;
     }
+
+    if (m_pAbnormalState != nullptr)
+    {
+        delete m_pAbnormalState;
+        m_pAbnormalState = nullptr;
+    }
+
 }
 //==========================================================================================================
 
@@ -128,6 +135,8 @@ void CPlayer::Uninit()
 void CPlayer::Update()
 {
     m_pMove->MoveProcess(this);//現在のアクションモードの移動処理を実行
+
+    m_pAbnormalState->Process(this);//状態異常の処理を実行
 
     AdjustRot();//向き調整処理
 
@@ -477,6 +486,18 @@ void CPlayer::JumpProcess()
 //==========================================================================================================
 
 //========================================================
+//状態異常を変える
+//========================================================
+void CPlayer::ChengeAbnormalState(CPlayerAbnormalState* pAbnormalState)
+{
+    if (m_pAbnormalState != nullptr)
+    {
+        delete m_pAbnormalState;
+        m_pAbnormalState = pAbnormalState;
+    }
+}
+
+//========================================================
 //ダメージを与える
 //========================================================
 void CPlayer::SetDamage(int nDamage, int nHitStopTime)
@@ -530,6 +551,77 @@ void CPlayer::AdjustPos()
     if (ScreenPos.x > SCREEN_WIDTH || ScreenPos.x < 0.0f)
     {
         SetPos(GetPosOld());
+    }
+}
+//==========================================================================================================
+
+//*******************************************************
+//状態異常ステート：スーパークラス
+//*******************************************************
+
+//=======================================================
+//コンストラクタ
+//=======================================================
+CPlayerAbnormalState::CPlayerAbnormalState()
+{
+
+}
+//==========================================================================================================
+
+//=======================================================
+//デストラクタ
+//=======================================================
+CPlayerAbnormalState::~CPlayerAbnormalState()
+{
+
+}
+//==========================================================================================================
+
+//=======================================================
+//処理
+//=======================================================
+void CPlayerAbnormalState::Process(CPlayer* pPlayer)
+{
+
+}
+//==========================================================================================================
+
+//*******************************************************
+//状態異常ステート：ノックバック
+//*******************************************************
+
+//=======================================================
+//コンストラクタ
+//=======================================================
+CPlayerAbnormalState_KnockBack::CPlayerAbnormalState_KnockBack(CPlayer* pPlayer, D3DXVECTOR3 KnockBackMove, float fInertia) : m_KnockBackMove(KnockBackMove),m_fInertia(fInertia)
+{
+
+}
+//==========================================================================================================
+
+//=======================================================
+//デストラクタ
+//=======================================================
+CPlayerAbnormalState_KnockBack::~CPlayerAbnormalState_KnockBack()
+{
+
+}
+//==========================================================================================================
+
+//=======================================================
+//処理
+//=======================================================
+void CPlayerAbnormalState_KnockBack::Process(CPlayer* pPlayer)
+{
+    m_KnockBackMove.x += (0.0f - m_KnockBackMove.x) * m_fInertia;
+    m_KnockBackMove.y += (0.0f - m_KnockBackMove.y) * m_fInertia;
+    m_KnockBackMove.z += (0.0f - m_KnockBackMove.z) * m_fInertia;
+
+    pPlayer->SetAddMove(m_KnockBackMove);
+
+    if (fabsf(m_KnockBackMove.x) < 0.01f && fabsf(m_KnockBackMove.y) < 0.01f && fabsf(m_KnockBackMove.z) < 0.01f)
+    {
+        pPlayer->ChengeAbnormalState(DBG_NEW CPlayerAbnormalState());
     }
 }
 //==========================================================================================================

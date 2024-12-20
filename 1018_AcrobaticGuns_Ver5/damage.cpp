@@ -1,6 +1,6 @@
 //=============================================================================================================================
 //
-//９月８日：ダメージを実装する[damage.cpp]
+//１２月２０日：敵の攻撃の調整をする[damage.cpp]
 //Author:ShinaTaiyo
 //
 //=============================================================================================================================
@@ -14,13 +14,15 @@
 #include "renderer.h"
 #include "sound.h"
 #include "number3d.h"
+#include "camera.h"
 //=============================================================================================================================
 
 //========================================================================
 //コンストラクタ
 //========================================================================
 CDamage::CDamage() : m_nDamage(0),m_pNumber3D(),m_Pos(D3DXVECTOR3(0.0f,0.0f,0.0f)),
-m_nDigit(0),m_nJumpCnt(m_nMAX_JUMPCNT),m_JumpMove(D3DXVECTOR3(0.0f,10.0f,0.0f)),m_bExeggration(false)
+m_nDigit(0),m_nJumpCnt(m_nMAX_JUMPCNT),m_JumpMove(D3DXVECTOR3(0.0f,10.0f,0.0f)),m_bExeggration(false),m_fWidth(0.0f),
+m_fHeight(0.0f)
 {
 
 }
@@ -129,6 +131,8 @@ CDamage* CDamage::Create(int nDamage, D3DXVECTOR3 Pos, D3DXCOLOR col, float fWid
 	CDamage* pDamage = DBG_NEW CDamage;                           //弾を生成 
 	bool bSuccess = pDamage->CObject::GetCreateSuccess();         //生成が成功したかどうかを取得する
 	float fHalfWidth = fWidth * 0.5f;
+	pDamage->m_fWidth = fHalfWidth;
+	pDamage->m_fHeight = fHeight;
 	if (bSuccess == true)
 	{//生成が成功したら
 		if (pDamage != nullptr)
@@ -145,25 +149,26 @@ CDamage* CDamage::Create(int nDamage, D3DXVECTOR3 Pos, D3DXCOLOR col, float fWid
 			pDamage->CObject::SetType(CObject::TYPE::NONE);                                                  //オブジェクトの種類を決める
 			for (int nCnt = 0; nCnt < m_nMAX_DAMAGEDIGIT; nCnt++)
 			{
-				pDamage->m_pNumber3D[nCnt] = CNumber3D::Create(fWidth, fHeight, D3DXVECTOR3(Pos.x + fHalfWidth - fHalfWidth * nCnt, Pos.y + fHeight,Pos.z),D3DXVECTOR3(0.0f,12.0f,0.0f), col);
+				pDamage->m_pNumber3D[nCnt] = CNumber3D::Create(fWidth, fHeight, D3DXVECTOR3(Pos.x + sinf(CManager::GetCamera()->GetRot().y) * (fHalfWidth) * nCnt, Pos.y + fHeight,
+					Pos.z + cosf(CManager::GetCamera()->GetRot().y) * (fHalfWidth) * nCnt),D3DXVECTOR3(0.0f,12.0f,0.0f), col);
 				pDamage->m_pNumber3D[nCnt]->SetUseGravity(-0.5f);
 			}
 			pDamage->DamageDispProcess();
 			pDamage->m_bExeggration = bExeggration;
 
-			if (bExeggration == true)
-			{//誇張する
-				for (int nCnt = 0; nCnt < m_nMAX_DAMAGEDIGIT; nCnt++)
-				{
-					CNumber3D * pNumber3D_2 = CNumber3D::Create(fWidth, fHeight, pDamage->m_pNumber3D[nCnt]->GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-						D3DXCOLOR(1.0f,0.0f,0.0f,1.0f));
-					pNumber3D_2->SetUseDeath(true);
-					pNumber3D_2->SetUseAddScale(true, D3DXVECTOR3(0.4f, 0.4f, 0.4f));
-					pNumber3D_2->SetLife(45);
-					pNumber3D_2->SetMaxLife(45);
+			//if (bExeggration == true)
+			//{//誇張する
+			//	for (int nCnt = 0; nCnt < m_nMAX_DAMAGEDIGIT; nCnt++)
+			//	{
+			//		CNumber3D * pNumber3D_2 = CNumber3D::Create(fWidth, fHeight, pDamage->m_pNumber3D[nCnt]->GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+			//			D3DXCOLOR(1.0f,0.0f,0.0f,1.0f));
+			//		pNumber3D_2->SetUseDeath(true);
+			//		pNumber3D_2->SetUseAddScale(true, D3DXVECTOR3(0.4f, 0.4f, 0.4f));
+			//		pNumber3D_2->SetLife(45);
+			//		pNumber3D_2->SetMaxLife(45);
 
-				}
-			}
+			//	}
+			//}
 		}
 	}
 	else

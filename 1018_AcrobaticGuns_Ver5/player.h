@@ -21,6 +21,12 @@
 #include "gauge.h"
 //==========================================
 
+//======================
+//前方宣言
+//======================
+class CPlayerAbnormalState;
+class CPlayerAbnormalState_KnockBack;
+
 //===========================================
 //プレイヤー3Dクラス
 //===========================================
@@ -61,6 +67,18 @@ public:
 	void ChengeWireShotMode(CPlayerWireShot* pPlayerWireShot);//ワイヤー発射モードを変える
 	CPlayerWireShot* GetWireShotState() { return m_pWireShot; }//ワイヤー発射状態を取得
 	//===============================================================================================
+
+	//================================================
+	//状態異常チェンジ
+	//================================================
+	void ChengeAbnormalState(CPlayerAbnormalState* pAbnormalState);//状態異常を変える
+	//===============================================================================================
+
+	//=============================
+	//体力系
+	//=============================
+	void SetDamage(int nDamage, int nHitStopTime) override; //ダメージを与える
+	//===============================================================================================
 private:
 	//================================================
 	//アクションモード列挙型
@@ -99,6 +117,10 @@ private:
 	CPlayerAttack* m_pAttack;           //攻撃処理
 	CPlayerEffect* m_pEffect;           //エフェクト処理
 	CPlayerWireShot* m_pWireShot;       //ワイヤーショット状態
+
+	//状態異常ステート
+	CPlayerAbnormalState* m_pAbnormalState;   //状態異常
+
 	//===============================================================================================
 
 
@@ -131,11 +153,32 @@ private:
 	//=============================
 	void JumpProcess();     //ジャンプ処理
 	//===============================================================================================
-
-	//=============================
-	//体力系
-	//=============================
-	void SetDamage(int nDamage, int nHitStopTime) override; //ダメージを与える};
 };
 
+//===================================================
+//状態異常ステート
+//===================================================
+class CPlayerAbnormalState
+{
+public:
+	CPlayerAbnormalState();//コンストラクタ
+	virtual ~CPlayerAbnormalState();//デストラクタ
+	virtual void Process(CPlayer * pPlayer);//処理
+};
+//===============================================================================================
+
+//===================================================
+//状態異常：ぶっ飛ばし
+//===================================================
+class CPlayerAbnormalState_KnockBack : public CPlayerAbnormalState
+{
+public:
+	CPlayerAbnormalState_KnockBack(CPlayer * pPlayer,D3DXVECTOR3 KnockBackMove,float fInertia);//コンストラクタ
+	~CPlayerAbnormalState_KnockBack() override;//デストラクタ
+	void Process(CPlayer* pPlayer) override;//処理
+private:
+	D3DXVECTOR3 m_KnockBackMove;//ノックバックする移動量
+	float m_fInertia;           //減衰度
+};
+//===============================================================================================
 #endif

@@ -434,13 +434,13 @@ bool CInputJoypad::GetLStickPress(const int nDivisionRot,float fDirectionRot)
 	float fRangeRotA = 0.0f;
 	float fRangeRotB = 0.0f;
 	for (int nCnt = 0; nCnt < nDivisionRot; nCnt++)
-	{
+	{//-3.14 ～　3.14の間に固定する、分割したラジアンの範囲を決め、その範囲の間に合ったらその値を返す
 		fRangeRotA = fDivRot * nCnt - D3DX_PI - fDivRot * 0.5f + fDirectionRot;
 		fRangeRotB = fDivRot * (nCnt + 1) - D3DX_PI - fDivRot * 0.5f + fDirectionRot;
 
 		if (fAimRot >= fRangeRotA && fAimRot <= fRangeRotB)
 		{
-			fAimRot = fDivRot * nCnt - D3DX_PI + fDirectionRot;
+			fAimRot = fDivRot * nCnt - D3DX_PI + fDirectionRot;//最後の値は補正値
 			bSuccessDivision = true;
 			break;
 		}
@@ -480,12 +480,6 @@ bool CInputJoypad::GetLStickPress(const int nDivisionRot,float fDirectionRot)
 		normalizedMagnitude = 0.0;
 		bActive = false;
 	}
-
-	//CManager::GetDebugProc()->PrintDebugProc("LX：%f\n", normalizedLX);
-	//CManager::GetDebugProc()->PrintDebugProc("LY：%f\n", normalizedLY);
-	//CManager::GetDebugProc()->PrintDebugProc("if文判定：%d\n", bActive);
-	//CManager::GetDebugProc()->PrintDebugProc("スティックの角度：%f\n", m_fLSitckAimRot);
-
 	return bActive;
 }
 //===============================================================

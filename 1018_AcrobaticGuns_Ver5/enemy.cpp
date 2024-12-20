@@ -15,6 +15,7 @@
 #include "calculation.h"
 #include "debugproc.h"
 #include "collision.h"
+#include "damage.h"
 #include "particle.h"
 #include "phasemanager.h"
 #include "input.h"
@@ -892,7 +893,7 @@ HRESULT CShotWeakEnemy::Init()
 	float fRatioRot = static_cast<float>(rand() % 200 - 100) / 100;
 	float fRotSpeed = static_cast<float>(rand() % 40 - 20) / 100;
 	m_pMagicSword = CAttackEnemy::Create(CAttack::ATTACKTYPE::MAGICSWORD, CAttack::TARGETTYPE::PLAYER, CAttack::COLLISIONTYPE::RECTANGLE_XZ,
-		1, 60, 200, GetPos(), D3DXVECTOR3(0.0f,D3DX_PI * fRatioRot, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+		false,false,1, 60, 200, GetPos(), D3DXVECTOR3(0.0f,D3DX_PI * fRatioRot, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 	m_pMagicSword->SetUseDeath(false);
 	m_pMagicSword->SetUseAddRot(true,D3DXVECTOR3(0.0f,fRotSpeed, 0.0f));
 	SetEnemyType(CEnemy::ENEMYTYPE::SHOTWEAK);//敵タイプを設定
@@ -919,6 +920,8 @@ void CShotWeakEnemy::Update()
 	if (CScene::GetMode() == CScene::MODE_GAME)
 	{
 		m_pMagicSword->SetPos(GetPos());
+
+		SwordCollision();//剣の当たり判定を行う
 	}
 }
 //============================================================================================================================================
@@ -1300,6 +1303,24 @@ void CShotWeakEnemy::AttackProcess()
 			break;
 		}
 		SetPatternTime(nPatternTime + 1);
+	}
+}
+//============================================================================================================================================
+
+//====================================================================================
+//剣の当たり判定を行う
+//====================================================================================
+void CShotWeakEnemy::SwordCollision()
+{
+	if (CCollision::RectAngleCollisionXZ(m_pMagicSword,CGame::GetPlayer()))
+	{
+		D3DXVECTOR3 Aim = D3DXVECTOR3(CGame::GetPlayer()->GetPos().x,300.0f,CGame::GetPlayer()->GetPos().z) - D3DXVECTOR3(GetPos().x, 0.0f, GetPos().z);
+
+		CGame::GetPlayer()->SetDamage(5, 45);
+
+		D3DXVec3Normalize(&Aim, &Aim);
+
+		CGame::GetPlayer()->ChengeAbnormalState(DBG_NEW CPlayerAbnormalState_KnockBack(CGame::GetPlayer(), Aim * 100.0f, 0.1f));
 	}
 }
 //============================================================================================================================================
@@ -1698,9 +1719,9 @@ void CDiveWeakEnemy::AIMoveProcess()
 
 		if (GetCntTime() % s_nATTACK_FREQUENCY == 0)
 		{
-			D3DXVECTOR3 Aim = CCalculation::Calculation3DVec(GetSenterPos(), CGame::GetPlayer()->GetSenterPos(), 20.0f);
+			D3DXVECTOR3 Aim = CCalculation::Calculation3DVec(GetPos() + D3DXVECTOR3(0.0f,GetVtxMax().y + GetVtxMax().y / 2,0.0f), CGame::GetPlayer()->GetSenterPos(), 20.0f);
 
-			CAttackEnemy::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::PLAYER, CAttack::COLLISIONTYPE::SQUARE, 1, 60, 200, GetSenterPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), Aim, GetScale() * 0.5f);
+			CAttackEnemy::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::PLAYER, CAttack::COLLISIONTYPE::SQUARE,true,true, 1, 60, 200, GetPos() + D3DXVECTOR3(0.0f, GetVtxMax().y, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), Aim, GetScale() * 0.5f);
 		}
 	}
 }

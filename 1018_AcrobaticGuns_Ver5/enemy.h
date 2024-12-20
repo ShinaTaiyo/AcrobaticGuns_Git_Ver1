@@ -257,6 +257,7 @@ private:
 	//*ˆÚ“®AI
 	void BattleMoveProcess() override;//ƒoƒgƒ‹ˆÚ“®ˆ—
 	void AttackProcess() override;
+	void SwordCollision();//Œ•‚Ì“–‚½‚è”»’è‚ğs‚¤
 	//===============================================================================================
 };
 

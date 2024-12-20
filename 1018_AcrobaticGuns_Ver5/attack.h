@@ -71,6 +71,15 @@ public:
 	void SetTargetType(TARGETTYPE Type) { m_TargetType = Type; }
 	const TARGETTYPE GetTargetType() const { return m_TargetType; }
 
+	//生きているオブジェクト以外にも当たるかどうかを設定
+	void SetHitOtherThanLibing(bool bHit) { m_bHitOtherThanLiving = bHit; }
+	const bool& GetHitOtherThanLibing() const { return m_bHitOtherThanLiving; }
+
+	//当たり判定を攻撃クラスに任せるかどうか
+	void SetAutoCollision(bool bAuto) { m_bAutoCollision = bAuto; }
+	const bool& GetAutoCollision() { return m_bAutoCollision; }
+
+
 protected:
 	void SetAttackType(ATTACKTYPE AttackType) { m_Type = AttackType;}//攻撃の種類を設定する
 	const ATTACKTYPE & GetAttackType() const { return m_Type; }      //攻撃の種類を取得する
@@ -83,6 +92,9 @@ private:
 	int m_nPower;     //攻撃力
 
 	bool m_bCollisionRelease;//衝突時に消すかどうか
+
+	bool m_bHitOtherThanLiving;//生きているオブジェクト以外にも当たるかどうか
+	bool m_bAutoCollision;     //当たり判定を攻撃クラスに任せるかどうか
 
 	HitStop m_HitStop;//ヒットストップ
 	ATTACKTYPE m_Type;//タイプ
@@ -112,7 +124,7 @@ public:
 	void Update() override;           //更新処理
 	void Draw() override;             //描画処理
 	void SetDeath() override;         //死亡フラグを設定
-	static CAttackPlayer* Create(ATTACKTYPE AttackType,TARGETTYPE TargetType,COLLISIONTYPE CollisionType,int nPower,int nSetHitStopTime,int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale);//生成処理
+	static CAttackPlayer* Create(ATTACKTYPE AttackType,TARGETTYPE TargetType,COLLISIONTYPE CollisionType,bool bHitOtherThanLiving,bool bAutoCollision,int nPower,int nSetHitStopTime,int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale);//生成処理
 private:
 };
 //==================================================================================================================================================
@@ -130,7 +142,7 @@ public:
 	void Update() override;           //更新処理
 	void Draw() override;             //描画処理
 	void SetDeath() override;         //死亡フラグを設定
-	static CAttackEnemy* Create(ATTACKTYPE AttackType, TARGETTYPE TargetType, COLLISIONTYPE CollisionType, int nPower, int nSetHitStopTime, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale);//生成処理
+	static CAttackEnemy* Create(ATTACKTYPE AttackType, TARGETTYPE TargetType, COLLISIONTYPE CollisionType,bool bHitOtherThanLiving,bool bAutoCollision, int nPower, int nSetHitStopTime, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale);//生成処理
 private:
 
 };

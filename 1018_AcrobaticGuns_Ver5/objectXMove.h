@@ -34,6 +34,9 @@ public:
 	void SetMove(D3DXVECTOR3 move) { m_Move = move; }                                       //ˆÚ“®—Ê‚ğİ’è‚·‚é
 	const D3DXVECTOR3& GetMove() const { return m_Move; }                                   //ˆÚ“®—Ê‚ğæ“¾‚·‚é
 
+	void SetAddMove(D3DXVECTOR3 Move) { m_AddMove = Move; }//‰ÁZˆÚ“®—Ê‚ğİ’è
+	const D3DXVECTOR3& GetAddMove() const { return m_AddMove; }//‰ÁZˆÚ“®—Ê‚ğæ“¾
+
 	//Šµ«
 	void SetUseInteria(bool bUseInteria, float fInertia) { m_bUseInteria = bUseInteria; m_fInertia = fInertia; }                   //Šµ«‚ğ‚©‚¯‚é‚©‚Ç‚¤‚©
 	float& GetInertia() { return m_fInertia; }                                              //Šµ«‚ğæ“¾‚·‚é
@@ -90,6 +93,7 @@ private:
 
 	//ˆÚ“®—Ê
 	D3DXVECTOR3 m_Move;                             //ˆÚ“®—Ê!
+	D3DXVECTOR3 m_AddMove;                          //‰ÁZˆÚ“®—Ê
 	//Šµ«
 	float m_fInertia;                               //Šµ«!
 	bool m_bUseInteria;                             //Šµ«‚ğ‚©‚¯‚é‚©‚Ç‚¤‚©!

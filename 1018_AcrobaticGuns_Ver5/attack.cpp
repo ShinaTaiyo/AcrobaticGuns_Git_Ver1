@@ -14,6 +14,8 @@
 #include "enemy.h"
 #include "player.h"
 #include "objectXInfo.h"
+#include "block.h"
+#include "bgModel.h"
 #include "collision.h"
 //======================================================================================================================
 
@@ -33,7 +35,7 @@ const string CAttack::ATTACK_FILENAME[static_cast<int>(CAttack::ATTACKTYPE::MAX)
 //==================================================================
 CAttack::CAttack(int nPower, int nSetHitStopTime, int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri, bUseintPri, type, ObjType),
 m_Type(ATTACKTYPE::BULLET), m_nPower(nPower), m_HitStop({0,nSetHitStopTime}),m_bCollisionRelease(true),m_CollisionType(CAttack::COLLISIONTYPE::NONE),
-m_TargetType(CAttack::TARGETTYPE::NONE)
+m_TargetType(CAttack::TARGETTYPE::NONE),m_bHitOtherThanLiving(false),m_bAutoCollision(true)
 {
 
 }
@@ -76,7 +78,40 @@ void CAttack::Update()
 {
 	CObjectXAlive::Update();
 
-	Collision();
+	if (m_bAutoCollision == true)
+	{
+		Collision();
+	}
+	bool bCollision = false;
+
+	if (m_bHitOtherThanLiving == true)
+	{
+		for (int nCntPri = 0; nCntPri < m_nMAXPRIORITY; nCntPri++)
+		{
+			CObject* pObj = GetTopObject(nCntPri);
+			while (pObj != nullptr)
+			{
+				bool bNowCollision = false;
+				CObject* pNext = pObj->GetNextObject();
+
+				if (pObj->GetType() == CObject::TYPE::BGMODEL || pObj->GetType() == CObject::TYPE::BLOCK)
+				{
+					CObjectX* pObjX = static_cast<CObjectX*>(pObj);
+
+					if (CCollision::CollisionSquare(GetPos(), GetVtxMax(), GetVtxMin(), pObjX->GetPos(), pObjX->GetVtxMax(), pObjX->GetVtxMin()))
+					{
+						bCollision = true;
+					}
+				}
+
+				pObj = pNext;
+			}
+		}
+	}
+	if (bCollision == true && GetCollisionRelease() == true)
+	{
+		SetDeath();
+	}
 }
 //======================================================================================================================
 
@@ -122,6 +157,7 @@ void CAttack::Collision()
 				CObjectXAlive* pObjX = static_cast<CObjectXAlive*>(pObj);
 				CollisionProcess(bCollision, bNowCollision, pObjX);
 			}
+
 			pObj = pNext;
 		}
 	}
@@ -237,7 +273,8 @@ void CAttackPlayer::SetDeath()
 //==================================================================
 //¶¬ˆ—
 //==================================================================
-CAttackPlayer* CAttackPlayer::Create(ATTACKTYPE AttackType, TARGETTYPE TargetType, COLLISIONTYPE CollisionType, int nPower, int nSetHitStopTime, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale)
+CAttackPlayer* CAttackPlayer::Create(ATTACKTYPE AttackType, TARGETTYPE TargetType, COLLISIONTYPE CollisionType,
+	bool bHitOtherThanLiving, bool bAutoCollision, int nPower, int nSetHitStopTime, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale)
 {
 	CAttackPlayer* pAttackPlayer = nullptr;       //¶¬
 	pAttackPlayer = DBG_NEW CAttackPlayer(nPower,nSetHitStopTime);//¶¬
@@ -256,6 +293,8 @@ CAttackPlayer* CAttackPlayer::Create(ATTACKTYPE AttackType, TARGETTYPE TargetTyp
 	pAttackPlayer->SetAutoSubLife(true);          //‘Ì—Í‚ðŽg—p‚·‚é
 	pAttackPlayer->SetUseInteria(false, CObjectXMove::GetNormalInertia());
 	pAttackPlayer->SetUseGravity(false,1.0f);
+	pAttackPlayer->SetHitOtherThanLibing(bHitOtherThanLiving);
+	pAttackPlayer->SetAutoCollision(bAutoCollision);//UŒ‚‚Ì“–‚½‚è”»’è‚ðUŒ‚ƒNƒ‰ƒX‚É”C‚¹‚é‚©‚Ç‚¤‚©
 	//ƒ‚ƒfƒ‹î•ñÝ’è
 	int nIdx = CManager::GetObjectXInfo()->Regist(ATTACK_FILENAME[static_cast<int>(AttackType)]);
 
@@ -340,7 +379,8 @@ void CAttackEnemy::SetDeath()
 //==================================================================
 //“G‚ÌUŒ‚‚ð¶¬
 //==================================================================
-CAttackEnemy* CAttackEnemy::Create(ATTACKTYPE AttackType, TARGETTYPE TargetType, COLLISIONTYPE CollisionType, int nPower, int nSetHitStopTime, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale)
+CAttackEnemy* CAttackEnemy::Create(ATTACKTYPE AttackType, TARGETTYPE TargetType, COLLISIONTYPE CollisionType,
+	bool bHitOtherThanLiving, bool bAutoCollision, int nPower, int nSetHitStopTime, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale)
 {
 	CAttackEnemy* pAttackEnemy = DBG_NEW CAttackEnemy(nPower, nSetHitStopTime);
 
@@ -358,6 +398,8 @@ CAttackEnemy* CAttackEnemy::Create(ATTACKTYPE AttackType, TARGETTYPE TargetType,
 	pAttackEnemy->SetScale(Scale);               //Šg‘å—¦
 	pAttackEnemy->SetUseInteria(false, CObjectXMove::GetNormalInertia());
 	pAttackEnemy->SetUseGravity(false, 1.0f);
+	pAttackEnemy->SetHitOtherThanLibing(bHitOtherThanLiving);
+	pAttackEnemy->SetAutoCollision(bAutoCollision);//UŒ‚ƒNƒ‰ƒX‚É”»’è‚ð”C‚¹‚é‚©‚Ç‚¤‚©
 	//ƒ‚ƒfƒ‹î•ñÝ’è
 	int nIdx = CManager::GetObjectXInfo()->Regist(ATTACK_FILENAME[static_cast<int>(AttackType)]);
 

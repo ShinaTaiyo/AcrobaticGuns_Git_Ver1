@@ -51,6 +51,9 @@ private:
 	int m_nDamage;//ƒ_ƒ[ƒW
 	int m_nDigit;//Œ…”
 
+	float m_fWidth;
+	float m_fHeight;
+
 	bool m_bExeggration;
 };
 
