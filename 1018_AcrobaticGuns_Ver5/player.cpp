@@ -47,7 +47,7 @@ CPlayer::CPlayer(CPlayerMove* pPlayerMove, CPlayerAttack* pPlayerAttack, CPlayer
     m_fRotAim(0.0f), m_pLockOn(nullptr), m_NowActionMode(ACTIONMODE::SHOT), m_pModeDisp(nullptr), m_bCollision(false),m_pWire(nullptr),
     m_pHpGauge(nullptr),m_pAbnormalState(DBG_NEW CPlayerAbnormalState())
 {
-   
+
 }
 //==========================================================================================================
 
@@ -80,6 +80,10 @@ HRESULT CPlayer::Init()
     m_pModeDisp = CUi::Create(CUi::UITYPE::ACTIONMODE_GUN, CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, 1, false, D3DXVECTOR3(50.0f, 50.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
         D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
     m_pModeDisp->SetUseDeath(false);
+
+    //m_pDiveGauge = CGauge::Create(CGauge::GAUGETYPE::DIVE, 20, 200.0f, 50.0f, D3DXVECTOR3(SCREEN_WIDTH - 250.0f, 200.0f, 0.0f));
+    //m_pDiveGauge->SetColor(D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f), false, 1.0f);
+    //m_pDiveGauge->SetUseDeath(false);
 
     m_pWire = CWire::Create(CWire::WIRETYPE::NORMAL, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 15.0f, 20.0f, 4, 5);
     m_pWire->SetUseDeath(false);
@@ -217,6 +221,13 @@ void CPlayer::SetDeath()
             m_pHpGauge->SetDeath();
             m_pHpGauge = nullptr;
         }
+
+        //if (m_pDiveGauge != nullptr)
+        //{
+        //    m_pDiveGauge->SetUseDeath(true);
+        //    m_pDiveGauge->SetDeath();
+        //    m_pDiveGauge = nullptr;
+        //}
     }
     CObject::SetDeath();
 }
@@ -304,7 +315,6 @@ void CPlayer::ActionModeChenge()
         switch (m_NowActionMode)
         {
         case ACTIONMODE::SHOT://発射モード
-            //m_pActionMode = DBG_NEW CPlayerShot;
             ChengeMoveMode(DBG_NEW CPlayerMove_Normal()); //通常移動モードにする
             ChengeAttackMode(DBG_NEW CPlayerAttack_Shot()); //攻撃可能モードにする
             ChengeEffectMode(DBG_NEW CPlayerEffect_None()); //エフェクトなしモードにする
@@ -313,7 +323,6 @@ void CPlayer::ActionModeChenge()
                 D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
             break;
         case ACTIONMODE::DIVE://ダイブモード
-            //m_pActionMode = DBG_NEW CPlayerDive;
             ChengeMoveMode(DBG_NEW CPlayerMove_PrepDive());//ダイブ準備モードにする
             ChengeAttackMode(DBG_NEW CPlayerAttack_Dont);  //攻撃不能モードにする
             ChengeEffectMode(DBG_NEW CPlayerEffect_None()); //エフェクトなしモードにする
@@ -443,13 +452,14 @@ void CPlayer::CollisionProcess()
                 {
                     SetPos(MyPos);
                     m_bCollision = true;
+                    SetSuccessCollision(true);
                 }
 
                 if (bCollisionY == true)
                 {
                     if (bIsLanding == true)
                     {
-                        SetMove(D3DXVECTOR3(GetMove().x, -0.1f, GetMove().z));
+                        SetMove(D3DXVECTOR3(GetMove().x,0.0f, GetMove().z));
                         SetIsLanding(true);
                     }
                 }
@@ -461,6 +471,7 @@ void CPlayer::CollisionProcess()
         }
 
     }
+
     SetExtrusionCollisionSquareX(bCollisionX);
     SetExtrusionCollisionSquareY(bCollisionY);
     SetExtrusionCollisionSquareZ(bCollisionZ);

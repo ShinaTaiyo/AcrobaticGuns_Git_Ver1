@@ -489,7 +489,7 @@ bool CCollision::ExtrusionCollisionSquareX(D3DXVECTOR3& MyPos, const D3DXVECTOR3
 	const D3DXVECTOR3 ComPos, const D3DXVECTOR3 ComVtxMax, const D3DXVECTOR3 ComVtxMin, const bool bCollisionX)
 {
 	if (MyPos.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
-		&& MyPosOld.x + MyVtxMax.x <= ComPos.x + ComVtxMin.x
+		&& MyPosOld.x + MyVtxMax.x - MyMove.x <= ComPos.x + ComVtxMin.x
 		&& MyPos.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
 		&& MyPos.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
 		&& MyPos.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
@@ -499,7 +499,7 @@ bool CCollision::ExtrusionCollisionSquareX(D3DXVECTOR3& MyPos, const D3DXVECTOR3
 		return true;
 	}
 	else if (MyPos.x + MyVtxMin.x < ComPos.x + ComVtxMax.x
-		&& MyPosOld.x + MyVtxMin.x >= ComPos.x + ComVtxMax.x
+		&& MyPosOld.x + MyVtxMin.x - MyMove.x >= ComPos.x + ComVtxMax.x
 		&& MyPos.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
 		&& MyPos.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
 		&& MyPos.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
@@ -529,7 +529,6 @@ bool CCollision::ExtrusionCollisionSquareY(D3DXVECTOR3& MyPos, const D3DXVECTOR3
 		float fPosY = fabsf(MyVtxMin.y);
 		MyPos.y = ComPos.y + ComVtxMax.y + fPosY + 0.1f;
 		bIsLanding = true;
-		CManager::GetDebugProc()->PrintDebugProc("ã‚É‚Ì‚Á‚½\n");
 		return true;
 	}
 	//‰º
@@ -555,7 +554,7 @@ bool CCollision::ExtrusionCollisionSquareZ(D3DXVECTOR3& MyPos, const D3DXVECTOR3
 	const D3DXVECTOR3 ComPos, const D3DXVECTOR3 ComVtxMax, const D3DXVECTOR3 ComVtxMin, const bool bCollisionZ)
 {
 	if (MyPos.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
-		&& MyPosOld.z + MyVtxMax.z <= ComPos.z + ComVtxMin.z
+		&& MyPosOld.z + MyVtxMax.z - MyMove.z <= ComPos.z + ComVtxMin.z
 		&& MyPos.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
 		&& MyPos.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
 		&& MyPos.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
@@ -565,7 +564,7 @@ bool CCollision::ExtrusionCollisionSquareZ(D3DXVECTOR3& MyPos, const D3DXVECTOR3
 		return true;
 	}
 	else if (MyPos.z + MyVtxMin.z < ComPos.z + ComVtxMax.z
-		&& MyPosOld.z + MyVtxMin.z >= ComPos.z + ComVtxMax.z
+		&& MyPosOld.z + MyVtxMin.z - MyMove.z >= ComPos.z + ComVtxMax.z
 		&& MyPos.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
 		&& MyPos.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
 		&& MyPos.x + MyVtxMax.x > ComPos.x + ComVtxMin.x

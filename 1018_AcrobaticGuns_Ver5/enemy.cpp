@@ -610,7 +610,7 @@ void CEnemy::BattleMoveProcess()
 	D3DXVec3Normalize(&Aim, &Aim);
 	float fRot = atan2f(Aim.x,Aim.z);
 
-	D3DXVECTOR3 Move = CCalculation::HormingVecRotXZ(m_fRotMove, GetPos(), CGame::GetPlayer()->GetPos(), 0.1f, m_fNormalSpeed);
+	D3DXVECTOR3 Move = CCalculation::HormingVecRotXZ(m_fRotMove, GetPos(), CGame::GetPlayer()->GetSenterPos(), 0.1f, m_fNormalSpeed);
 	SetRot(D3DXVECTOR3(GetRot().x, m_fRotMove + D3DX_PI, GetRot().z));
 	SetMove(D3DXVECTOR3(Move.x, GetMove().y,Move.z));
 	CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 30, 20.0f, 20.0f, 100, 10, false, Pos, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);

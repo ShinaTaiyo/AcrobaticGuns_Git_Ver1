@@ -232,11 +232,14 @@ void CPlayerMove_Dive::MoveProcess(CPlayer* pPlayer)
 {
 	CWireHead* pWireHead = pPlayer->GetWire()->GetWireHead();
 	bool bInput = CManager::GetInputJoypad()->GetRT_Press();
+
+
+
 	if (CManager::GetInputJoypad()->GetRT_Press() || CManager::GetInputMouse()->GetMouseLeftClickPress())
 	{
 		bInput = true;
 	}
-	pPlayer->SetMove(m_DiveMove);
+	pPlayer->SetMove(CCalculation::Calculation3DVec(pPlayer->GetPos(),pWireHead->GetPos(), 40.0f));//目的地に達するまで狙い続ける
 	CCamera* pCamera = CManager::GetCamera();
 	if (CCalculation::CalculationLength(pPlayer->GetPos(), pWireHead->GetPos()) < s_fCOLLISIONDIVEMOVELENGTH)
 	{//ダイブ時に判定したら移動モードと攻撃モードを通常に戻す
@@ -645,7 +648,7 @@ void CPlayerWireShot_Do::WireShotProcess(CPlayer* pPlayer)
 	FrightenedEnemy(pPlayer);//この処理の途中で狙った敵は怯える
 
 	pPlayer->SetMove(D3DXVECTOR3(0.0f, 0.0f, 0.0f));//ワイヤー発射中は動きを止める
-	if (pWireHead->GetSuccessCollision() == true)
+	if (pWireHead->GetSuccessCollision())
 	{//ワイヤーがどれかのオブジェクトに当たったら
 		pPlayer->ChengeWireShotMode(DBG_NEW CPlayerWireShot_Dont());//ワイヤー発射モード「なし」
 		pPlayer->ChengeEffectMode(DBG_NEW CPlayerEffect_Dive());    //エフェクトモード「ダイブ」

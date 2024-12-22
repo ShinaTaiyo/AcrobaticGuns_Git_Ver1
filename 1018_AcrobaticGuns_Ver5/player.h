@@ -107,10 +107,11 @@ private:
 	//他クラスインスタンス
 	CLockon* m_pLockOn;                 //ロックオンカーソル
 	ACTIONMODE m_NowActionMode;         //現在のアクションモード
-	CUi* m_pModeDisp;                  //モード表示UI
+	CUi* m_pModeDisp;                   //モード表示UI
 	CMeshOrbit* m_pMeshOrbit;           //軌跡
 	CWire* m_pWire;                     //ワイヤー
 	CGauge* m_pHpGauge;                 //体力ゲージ
+	//CGauge* m_pDiveGauge;               //ダイブゲージ
 
 	//行動状態
 	CPlayerMove* m_pMove;               //移動処理
