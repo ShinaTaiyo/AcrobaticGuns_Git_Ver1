@@ -63,6 +63,7 @@ public:
 		ACTIONMODE_DIVE, //ダイブモードUI
 		PHASETEXT,       //フェーズ文字
 		STAGETEXT,       //ステージ文字
+	    TARGET_000,      //ターゲット
 		MAX
 	};
 

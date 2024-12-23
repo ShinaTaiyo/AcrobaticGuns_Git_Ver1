@@ -1858,9 +1858,18 @@ void CEnemyMove_None::Process(CEnemy* pEnemy)
 //====================================================================================
 //コンストラクタ
 //====================================================================================
-CEnemyMove_Frightened::CEnemyMove_Frightened(CEnemy* pEnemy, D3DXVECTOR3 StopPos, int nStateTime) : m_StopPos(StopPos),m_nStateTime(nStateTime)
+CEnemyMove_Frightened::CEnemyMove_Frightened(CEnemy* pEnemy, D3DXVECTOR3 StopPos, int nStateTime) : m_StopPos(StopPos),m_nStateTime(nStateTime),m_pLockOn(nullptr)
 {
+	D3DXVECTOR3 ScreenPos = D3DXVECTOR3(0.0f, 0.0f,0.0f);
+	ScreenPos = CCalculation::CalcWorldToScreenNoViewport(pEnemy->GetSenterPos(), *CManager::GetCamera()->GetMtxView(), *CManager::GetCamera()->GetMtxProjection(),
+		SCREEN_WIDTH,SCREEN_HEIGHT);
 
+	m_pLockOn = CUi::Create(CUi::UITYPE::TARGET_000, CObject2D::POLYGONTYPE::SENTERROLLING, 200.0f, 200.0f, 100, true, D3DXVECTOR3(ScreenPos.x, ScreenPos.y, 0.0f),
+		D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f));
+
+	m_pLockOn->SetPolygonRotSpeed(0.1f);
+	m_pLockOn->SetUseAddScale(D3DXVECTOR2(-0.01f, -0.01f), true);
+	m_pLockOn->SetUseDeath(false);
 }
 //============================================================================================================================================
 
@@ -1869,7 +1878,12 @@ CEnemyMove_Frightened::CEnemyMove_Frightened(CEnemy* pEnemy, D3DXVECTOR3 StopPos
 //====================================================================================
 CEnemyMove_Frightened::~CEnemyMove_Frightened()
 {
-
+	if (m_pLockOn != nullptr)
+	{
+		m_pLockOn->SetUseDeath(true);
+		m_pLockOn->SetDeath();
+		m_pLockOn = nullptr;
+	}
 }
 //============================================================================================================================================
 
@@ -1885,6 +1899,19 @@ void CEnemyMove_Frightened::Process(CEnemy* pEnemy)
 
 	m_nStateTime--;
 
+	if (m_pLockOn != nullptr)
+	{
+		D3DXVECTOR3 ScreenPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		ScreenPos = CCalculation::CalcWorldToScreenNoViewport(pEnemy->GetSenterPos(), *CManager::GetCamera()->GetMtxView(), *CManager::GetCamera()->GetMtxProjection(),
+			SCREEN_WIDTH, SCREEN_HEIGHT);
+		m_pLockOn->SetPos(ScreenPos);
+		if (m_pLockOn->GetScale().x < 0.0f && m_pLockOn->GetScale().y < 0.0f)
+		{
+			m_pLockOn->SetUseDeath(true);
+			m_pLockOn->SetDeath();
+			m_pLockOn = nullptr;
+		}
+	}
 	if (m_nStateTime < 1)
 	{
 		pEnemy->ChengeMove(DBG_NEW CEnemyMove_AI());//AI移動処理に戻す

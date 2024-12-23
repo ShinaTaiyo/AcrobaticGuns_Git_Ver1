@@ -22,6 +22,7 @@
 //===========================================
 class CEnemyMove;
 class CAttackEnemy;
+class CUi;
 
 //===========================================
 //エネミークラス
@@ -370,6 +371,7 @@ public:
 	void Process(CEnemy* pEnemy) override;//処理
 private:
 	D3DXVECTOR3 m_StopPos;//止める位置
+	CUi* m_pLockOn;       //ロックオンする
 	int m_nStateTime;     //怯え状態になる時間を設定
 };
 
