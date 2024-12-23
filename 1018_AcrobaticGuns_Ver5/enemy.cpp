@@ -37,7 +37,8 @@ int CEnemy::m_nNumEnemy = 0;
 //====================================================================================
 CEnemy::CEnemy(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri, bUseintPri, type, ObjType),
 m_Type(ENEMYTYPE::SHOTWEAK), m_VecMoveAi(), m_MoveAiSavePos(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),m_nCntTime(0),m_nIdxMoveAi(0), m_nPhaseNum(0),m_pEnemyMove(DBG_NEW CEnemyMove_AI()),
-m_fRotMove(0.0f),m_fSensingRange(0.0f),m_fNormalSpeed(0.0f),m_Pattern(),m_bCollisoinDetection(true),m_bActivateCollisionDetection(false)
+m_fRotMove(0.0f),m_fSensingRange(0.0f),m_fNormalSpeed(0.0f),m_Pattern(),m_bCollisoinDetection(true),m_bActivateCollisionDetection(false),m_bCollisionWall(false),
+m_DefeatAttackType(CAttack::ATTACKTYPE::EXPLOSION)
 {
 	m_nNumEnemy++;//敵総数カウントアップ
 }
@@ -99,12 +100,17 @@ void CEnemy::Update()
 		m_pEnemyMove->Process(this);
 
 		m_nCntTime++;//時間をカウントする
-
 	    CollisionProcess();//当たり判定処理
+
+		CollisionDetectionProcess();
 
 		AttackProcess();//攻撃処理
 
-		CollisionDetectionProcess();
+		if (GetPos().y < -100.0f)
+		{
+			SetDeath();
+		}
+
 	}
 
 	if (CScene::GetMode() == CScene::MODE_EDIT)
@@ -454,6 +460,16 @@ void CEnemy::CollisionProcess()
 
 	}
 
+
+	if (bCollisionX == true || bCollisionZ == true)
+	{
+		m_bCollisionWall = true;
+	}
+	else
+	{
+		m_bCollisionWall = false;
+	}
+
 	SetExtrusionCollisionSquareX(bCollisionX);
 	SetExtrusionCollisionSquareY(bCollisionY);
 	SetExtrusionCollisionSquareZ(bCollisionZ);
@@ -614,10 +630,10 @@ void CEnemy::BattleMoveProcess()
 	SetRot(D3DXVECTOR3(GetRot().x, m_fRotMove + D3DX_PI, GetRot().z));
 	SetMove(D3DXVECTOR3(Move.x, GetMove().y,Move.z));
 	CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 30, 20.0f, 20.0f, 100, 10, false, Pos, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
-	if (fLengthPlayer > m_fSensingRange)
-	{
-		ChengeMove(DBG_NEW CEnemyMove_AI());
-	}	
+	//if (fLengthPlayer > m_fSensingRange)
+	//{
+	//	ChengeMove(DBG_NEW CEnemyMove_AI());
+	//}	
 
 	RayCollision();
 
@@ -650,7 +666,7 @@ void CEnemy::RayCollision()
 	if (CScene::GetMode() == CScene::MODE_GAME)
 	{
 		CObjectX* pObjX = nullptr;
-		D3DXVECTOR3 Ray = D3DXVECTOR3(CGame::GetPlayer()->GetPos().x,0.0f,CGame::GetPlayer()->GetPos().z) - D3DXVECTOR3(GetPos().x,0.0f,GetPos().z);
+		D3DXVECTOR3 Ray = CCalculation::RadToVec(D3DXVECTOR3(GetRot().x,GetRot().y,0.0f) - D3DXVECTOR3(D3DX_PI * 0.5f,0.0f,0.0f));//手前側にレイを飛ばす
 		D3DXVec3Normalize(&Ray, &Ray);
 
 		for (int nCntPri = 0; nCntPri < m_nMAXPRIORITY; nCntPri++)
@@ -661,22 +677,18 @@ void CEnemy::RayCollision()
 			{
 				CObject* pNext = pObj->GetNextObject();
 				D3DXVECTOR3 CollisionPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-				if (pObj->GetType() == CObject::TYPE::BGMODEL)
+				if (pObj->GetType() == CObject::TYPE::BGMODEL || pObj->GetType() == CObject::TYPE::BLOCK)
 				{
-					CBgModel* pBgModel = static_cast<CBgModel*>(pObj);
-					float fLength = CCalculation::CalculationLength(GetPos(), pBgModel->GetPos());
-					float r1 = GetSize().x / 2;
-					float r2 = pBgModel->GetSize().x / 2;
-					float r3 = r1 + r2;
-					if (CCollision::RayIntersectsAABBCollisionPos(GetPos(), Ray, pBgModel->GetPos() + pBgModel->GetVtxMin(), pBgModel->GetPos() + pBgModel->GetVtxMax(),
+					CObjectX * pComObjX = static_cast<CObjectX*>(pObj);
+					if (CCollision::RayIntersectsAABBCollisionPos(GetSenterPos(), Ray, pComObjX->GetPos() + pComObjX->GetVtxMin(), pComObjX->GetPos() + pComObjX->GetVtxMax(),
 						CollisionPos))
 					{
-						CManager::GetDebugProc()->PrintDebugProc("レイが当たったオブジェクトとの距離:%f\n", fLength);
-						CManager::GetDebugProc()->PrintDebugProc("半径の和：%f\n", r3);
-						if (fLength < r3 + 100.0f)
+						float fLength = sqrtf(powf(CollisionPos.x - GetSenterPos().x, 2) + 
+							powf(CollisionPos.y - GetSenterPos().y, 2) + powf(CollisionPos.z - GetSenterPos().z,2));
+						if (fLength < GetSize().x + 50.0f)
 						{
-							pObjX = pBgModel;
-							CManager::GetDebugProc()->PrintDebugProc("敵のレイが当たった！\n");
+							//敵のオブジェクトのサイズの少し上より距離が小さくなった
+							pObjX = pComObjX;
 						}
 					}
 				}
@@ -699,11 +711,12 @@ void CEnemy::RayCollision()
 
 			if (fDot > 0.0f)
 			{//ベクトルに対してプレイヤーが右側にいたら
-				SetMove(D3DXVECTOR3(sinf(fRot - D3DX_PI * 0.5f) * m_fNormalSpeed, GetMove().y, cosf(fRot - D3DX_PI * 0.5f) * m_fNormalSpeed));
+				//SetMove(D3DXVECTOR3(sinf(fRot - D3DX_PI * 0.5f) * m_fNormalSpeed, GetMove().y, cosf(fRot - D3DX_PI * 0.5f) * m_fNormalSpeed));
+				ChengeMove(DBG_NEW CEnemyMove_DodgeWall(this, D3DXVECTOR3(sinf(fRot - D3DX_PI * 0.5f) * m_fNormalSpeed, GetMove().y, cosf(fRot - D3DX_PI * 0.5f) * m_fNormalSpeed)));
 			}
 			else if (fDot < 0.0f)
 			{//ベクトルに対してプレイヤーが左側にいたら
-				SetMove(D3DXVECTOR3(sinf(fRot + D3DX_PI * 0.5f) * m_fNormalSpeed, GetMove().y, cosf(fRot + D3DX_PI * 0.5f) * m_fNormalSpeed));
+				ChengeMove(DBG_NEW CEnemyMove_DodgeWall(this, D3DXVECTOR3(sinf(fRot + D3DX_PI * 0.5f) * m_fNormalSpeed, GetMove().y, cosf(fRot + D3DX_PI * 0.5f) * m_fNormalSpeed)));
 			}
 		}
 	}
@@ -773,6 +786,7 @@ void CEnemy::CollisionDetectionProcess()
 					GetPos().y + GetVtxMax().y >= pObjX->GetPos().y + pObjX->GetVtxMin().y &&
 					GetPos().y + GetVtxMin().y <= pObjX->GetPos().y + pObjX->GetVtxMax().y)
 				{
+					SetPosOld(GetPos());
 					SetPos(GetPos() - AimVec * (fTotalLength - fLength));
 				}		
 			}
@@ -1273,7 +1287,7 @@ void CShotWeakEnemy::AttackProcess()
 	m_nAttackCoolTime++;//クールタイムをカウントする
 	if (fLength < s_fATTACKSTART_LENGTH && bAction == false && m_nAttackCoolTime > s_nATTACK_COOLTIME)
 	{//攻撃が開始されていなければ
-		ChengeMove(DBG_NEW CEnemyMove_None());
+		ChengeMove(DBG_NEW CEnemyMove_None());//AI移動と攻撃処理を入れ替える
 		SetAction(true);
 	}
 
@@ -1416,14 +1430,12 @@ void CDiveWeakEnemy::Draw()
 //====================================================================================
 void CDiveWeakEnemy::SetDeath()
 {
-
-	if (m_nDivisionNum > 0)
-	{
+	if (m_nDivisionNum > 0 && GetDefeatAttackType() == CAttack::ATTACKTYPE::BULLET && GetLife() < 1)
+	{ 
 		m_nDivisionNum--;
-		CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE::NORMAL, GetMaxLife(), 0, GetPos() + D3DXVECTOR3(0.0f, 100.0f, 0.0f), GetRot(), GetScale() / 2, m_nDivisionNum);
-		CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE::NORMAL, GetMaxLife(), 0, GetPos() + D3DXVECTOR3(0.0f, 100.0f, 0.0f), GetRot(), GetScale() / 2, m_nDivisionNum);
+		CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE::NORMAL, GetMaxLife()/ 2, 0, GetPos() + D3DXVECTOR3(0.0f, 100.0f, 0.0f), GetRot(), GetScale() / 2, m_nDivisionNum);
+		CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE::NORMAL, GetMaxLife()/ 2, 0, GetPos() + D3DXVECTOR3(0.0f, 100.0f, 0.0f), GetRot(), GetScale() / 2, m_nDivisionNum);
 	}
-
 
 	CEnemy::SetDeath();
 }
@@ -1648,7 +1660,7 @@ void CDiveWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 	EnemyType = static_cast<ENEMYTYPE>(nType);
 	if (CScene::GetMode() == CScene::MODE_EDIT)
 	{
-		CDiveWeakEnemy* pDiveWeakEnemy = CDiveWeakEnemy::Create(DiveWeakEnemyType, nLife, nPhaseNum, Pos, Rot, Scale,nDivisionNum);
+		CDiveWeakEnemy* pDiveWeakEnemy = CDiveWeakEnemy::Create(DiveWeakEnemyType, nLife, nPhaseNum, Pos, Rot, Scale,3);
 		pDiveWeakEnemy->SetUseDraw(true);
 		pDiveWeakEnemy->SetUseShadow(true);
 		pDiveWeakEnemy->SetVecMoveAiInfo(VecMoveAi);
@@ -1658,7 +1670,7 @@ void CDiveWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 	}
 	else if (CScene::GetMode() == CScene::MODE_GAME)
 	{
-		CGame::GetPhaseManager()->PushPhaseInfo(Pos, Rot, Scale, nLife, static_cast<int>(EnemyType), nDiveWeakEnemyType, nPhaseNum,fNormalSpeed,fSensingRange,nDivisionNum,VecMoveAiInfo);
+		CGame::GetPhaseManager()->PushPhaseInfo(Pos, Rot, Scale, nLife, static_cast<int>(EnemyType), nDiveWeakEnemyType, nPhaseNum,fNormalSpeed,fSensingRange,3,VecMoveAiInfo);
 	}
 }
 //============================================================================================================================================
@@ -1777,7 +1789,12 @@ void CDiveWeakEnemy::BattleMoveProcess()
 //====================================================================================
 void CDiveWeakEnemy::AttackProcess()
 {
+	if (GetCntTime() % s_nATTACK_FREQUENCY == 0)
+	{
+		D3DXVECTOR3 Aim = CCalculation::Calculation3DVec(GetPos() + D3DXVECTOR3(0.0f, GetVtxMax().y + GetVtxMax().y / 2, 0.0f), CGame::GetPlayer()->GetSenterPos(), 20.0f);
 
+		CAttackEnemy::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::PLAYER, CAttack::COLLISIONTYPE::SQUARE, true, true, 1, 60, 200, GetPos() + D3DXVECTOR3(0.0f, GetVtxMax().y, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), Aim, GetScale() * 0.5f);
+	}
 }
 //============================================================================================================================================
 
@@ -1789,13 +1806,6 @@ void CDiveWeakEnemy::AIMoveProcess()
 	if (CScene::GetMode() == CScene::MODE_GAME)
 	{
 		CEnemy::AIMoveProcess();
-
-		if (GetCntTime() % s_nATTACK_FREQUENCY == 0)
-		{
-			D3DXVECTOR3 Aim = CCalculation::Calculation3DVec(GetPos() + D3DXVECTOR3(0.0f,GetVtxMax().y + GetVtxMax().y / 2,0.0f), CGame::GetPlayer()->GetSenterPos(), 20.0f);
-
-			CAttackEnemy::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::PLAYER, CAttack::COLLISIONTYPE::SQUARE,true,true, 1, 60, 200, GetPos() + D3DXVECTOR3(0.0f, GetVtxMax().y, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), Aim, GetScale() * 0.5f);
-		}
 	}
 }
 //============================================================================================================================================
@@ -1988,6 +1998,42 @@ void CEnemyMove_Frightened::Process(CEnemy* pEnemy)
 	if (m_nStateTime < 1)
 	{
 		pEnemy->ChengeMove(DBG_NEW CEnemyMove_AI());//AI移動処理に戻す
+	}
+}
+//============================================================================================================================================
+
+//************************************************************************************
+//壁回避移動クラス
+//************************************************************************************
+
+//====================================================================================
+//コンストラクタ
+//====================================================================================
+CEnemyMove_DodgeWall::CEnemyMove_DodgeWall(CEnemy* pEnemy, D3DXVECTOR3 DodgeMove)
+{
+	m_DodgeMove = DodgeMove;
+}
+//============================================================================================================================================
+
+//====================================================================================
+//デストラクタ
+//====================================================================================
+CEnemyMove_DodgeWall::~CEnemyMove_DodgeWall()
+{
+
+}
+//============================================================================================================================================
+
+//====================================================================================
+//処理
+//====================================================================================
+void CEnemyMove_DodgeWall::Process(CEnemy* pEnemy)
+{
+	pEnemy->SetMove(m_DodgeMove);
+
+	if (pEnemy->GetCollisionWall() == false)
+	{
+		pEnemy->ChengeMove(DBG_NEW CEnemyMove_Battle());
 	}
 }
 //============================================================================================================================================

@@ -94,7 +94,7 @@ int CObjectXInfo::Regist(std::string pTextureName)
             D3DXMATERIAL* pMat;                                               //マテリアルへのポインタ
 
             //============================
-            //モデル情報を取得
+            //モデル情報を取得6
             //============================
             D3DXLoadMeshFromX(pTextureName.c_str(),
                 D3DXMESH_SYSTEMMEM,

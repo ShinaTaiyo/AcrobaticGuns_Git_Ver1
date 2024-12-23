@@ -15,6 +15,7 @@
 #include "objectXAlive.h"
 #include "lockon.h"
 #include "aimodel.h"
+#include "attack.h"
 //==========================================
 
 //===========================================
@@ -92,9 +93,13 @@ public:
 	void SetNormalSpeed(float fSpeed) { m_fNormalSpeed = fSpeed; }
 	const float& GetNormalSpeed() const { return m_fNormalSpeed; }
 
+	//倒された攻撃タイプを設定する
+	void SetDefeatAttack(CAttack::ATTACKTYPE Type) { m_DefeatAttackType = Type; }
+	const CAttack::ATTACKTYPE GetDefeatAttackType() const { return m_DefeatAttackType; }
+
+	const bool& GetCollisionWall() const { return m_bCollisionWall; }
 	//パターン
-
-
+    
 	//=================================================================================================================
 
 	static int GetNumEnemy() { return m_nNumEnemy; }
@@ -132,6 +137,7 @@ protected:
 	void SetUseCollisionDetection(bool bUse) { m_bCollisoinDetection = bUse; }
 
 	const bool& GetCollisionDetection() const { return m_bActivateCollisionDetection; }
+
 	//===============================================================================================
 
 private:
@@ -160,6 +166,11 @@ private:
 
 	bool m_bCollisoinDetection;//衝突判定を行うかどうか
 	bool m_bActivateCollisionDetection;//衝突判定発動
+
+	CAttack::ATTACKTYPE m_DefeatAttackType;//倒された攻撃
+
+	bool m_bCollisionWall;
+
 	//===============================================================================================
 
 	//================================================
@@ -344,6 +355,17 @@ public:
 	CEnemyMove_Battle();//コンストラクタ
 	~CEnemyMove_Battle() override;//デストラクタ
 	void Process(CEnemy* pEnemy) override;
+};
+
+//移動タイプ：壁よけ
+class CEnemyMove_DodgeWall : public CEnemyMove
+{
+public:
+	CEnemyMove_DodgeWall(CEnemy * pEnemy,D3DXVECTOR3 DodgeMove);//コンストラクタ
+	~CEnemyMove_DodgeWall();//デストラクタ
+	void Process(CEnemy* pEnemy)override;
+private:
+	D3DXVECTOR3 m_DodgeMove;//回避移動量
 };
 
 //移動タイプ：怯え

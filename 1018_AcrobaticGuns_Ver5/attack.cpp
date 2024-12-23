@@ -151,8 +151,12 @@ void CAttack::Collision()
 
 			if (pObj->GetType() == CObject::TYPE::ENEMY && m_TargetType == TARGETTYPE::ENEMY)
 			{
-				CObjectXAlive* pObjX = static_cast<CObjectXAlive*>(pObj);
-				CollisionProcess(bCollision, bNowCollision, pObjX);
+				CEnemy* pEnemy = static_cast<CEnemy*>(pObj);
+				CollisionProcess(bCollision, bNowCollision, pEnemy);
+				if (pEnemy->GetLife() < 1)
+				{
+					pEnemy->SetDefeatAttack(m_Type);
+				}
 			}
 			else if (pObj->GetType() == CObject::TYPE::PLAYER && m_TargetType == TARGETTYPE::PLAYER)
 			{
