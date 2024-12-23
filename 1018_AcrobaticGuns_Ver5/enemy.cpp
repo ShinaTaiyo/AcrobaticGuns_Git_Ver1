@@ -1314,7 +1314,7 @@ void CShotWeakEnemy::SwordCollision()
 {
 	if (CCollision::RectAngleCollisionXZ(m_pMagicSword,CGame::GetPlayer()))
 	{
-		D3DXVECTOR3 Aim = D3DXVECTOR3(CGame::GetPlayer()->GetPos().x,300.0f,CGame::GetPlayer()->GetPos().z) - D3DXVECTOR3(GetPos().x, 0.0f, GetPos().z);
+		D3DXVECTOR3 Aim = D3DXVECTOR3(CGame::GetPlayer()->GetPos().x,0.0f,CGame::GetPlayer()->GetPos().z) - D3DXVECTOR3(GetPos().x, 0.0f, GetPos().z);
 
 		CGame::GetPlayer()->SetDamage(5, 45);
 

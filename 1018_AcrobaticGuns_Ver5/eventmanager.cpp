@@ -182,11 +182,9 @@ int CNowEvent_NextPhase::s_nNumNextPhaseEvent = 0;//次のフェーズに移行するイベン
 //=====================================================================
 //コンストラクタ
 //=====================================================================
-CNowEvent_NextPhase::CNowEvent_NextPhase(int nPhaseNum, float fValueWidth, float fValueHeight) : m_PhaseText(nullptr)
+CNowEvent_NextPhase::CNowEvent_NextPhase(CUi* pUI, int nPhaseNum, float fValueWidth, float fValueHeight) : m_PhaseText(nullptr)
 {
-	m_PhaseText = CUi::Create(CUi::UITYPE::PHASETEXT, CObject2D::POLYGONTYPE::SENTERROLLING, 200.0f, 100.0f, 100, false,
-		D3DXVECTOR3(SCREEN_WIDTH , SCREEN_HEIGHT / 2, 0.0f), D3DXVECTOR3(sinf(D3DX_PI * -0.5f) * 10.0f, cosf(D3DX_PI * -0.5f) * 10.0f, 0.0f),
-		D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));//左に文字を飛ばす
+	m_PhaseText = pUI;
 	m_PhaseText->SetNumericState(nPhaseNum, fValueWidth, fValueHeight);//数字状態にする
 	m_PhaseText->SetUseDeath(true);//死亡フラグをオフにする
 

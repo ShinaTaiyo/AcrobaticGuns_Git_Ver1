@@ -53,6 +53,9 @@ CPhaseManager::~CPhaseManager()
 HRESULT CPhaseManager::Init()
 {
 	CObject::Init();
+	CEventManager::Create(DBG_NEW CNowEvent_NextPhase(CUi::Create(CUi::UITYPE::STAGETEXT, CObject2D::POLYGONTYPE::SENTERROLLING, 200.0f, 100.0f, 100, false,
+		D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT / 2 - 180.0f, 0.0f), D3DXVECTOR3(sinf(D3DX_PI * -0.5f) * 15.0f, cosf(D3DX_PI * -0.5f) * 15.0f, 0.0f),
+		D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f)), s_nNowStage, 80.0f, 80.0f));
 	return S_OK;
 }
 //======================================================================================================================
@@ -178,7 +181,9 @@ void CPhaseManager::AdvancePhase()
 
 		}
 		s_nNowPhase++;
-		CEventManager::Create(DBG_NEW CNowEvent_NextPhase(s_nNowPhase, 80.0f, 80.0f));
+		CEventManager::Create(DBG_NEW CNowEvent_NextPhase(CUi::Create(CUi::UITYPE::PHASETEXT, CObject2D::POLYGONTYPE::SENTERROLLING, 200.0f, 100.0f, 100, false,
+			D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT / 2, 0.0f), D3DXVECTOR3(sinf(D3DX_PI * -0.5f) * 10.0f, cosf(D3DX_PI * -0.5f) * 10.0f, 0.0f),
+			D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f)),s_nNowPhase, 80.0f, 80.0f));
 
 	}
 
@@ -196,6 +201,9 @@ void CPhaseManager::AdvancePhase()
 		{
 			CGame::GetStageManager()->LoadMapTxt(s_nNowStage);//次のステージをロードする
 			CGame::GetPlayer()->SetPos(CGame::GetStageManager()->GetSpawnPoint());
+			CEventManager::Create(DBG_NEW CNowEvent_NextPhase(CUi::Create(CUi::UITYPE::STAGETEXT, CObject2D::POLYGONTYPE::SENTERROLLING, 200.0f, 100.0f, 100, false,
+				D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT / 2 - 180.0f, 0.0f), D3DXVECTOR3(sinf(D3DX_PI * -0.5f) * 15.0f, cosf(D3DX_PI * -0.5f) * 15.0f, 0.0f),
+				D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f)), s_nNowStage, 80.0f, 80.0f));
 		}
 		else
 		{

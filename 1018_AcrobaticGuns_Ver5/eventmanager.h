@@ -39,7 +39,7 @@ public:
 class CNowEvent_NextPhase : public CNowEvent
 {
 public:
-	CNowEvent_NextPhase(int nPhaseNum,float fValueWidth,float fValueHeight);//コンストラクタ
+	CNowEvent_NextPhase(CUi * pUI,int nPhaseNum,float fValueWidth,float fValueHeight);//コンストラクタ
 	~CNowEvent_NextPhase() override;//デストラクタ
 	void Process(CEventManager* pEventManager) override;//処理
 	static const int& GetNumNextPhaseEvent() { return s_nNumNextPhaseEvent; }
@@ -90,7 +90,6 @@ public:
 	void SetDeath() override;         //死亡フラグ設定処理
 
 	void ChengeEvent(CNowEvent* pNowEvent);//イベントを変える
-	void SetNextPhaseEvent(int nNowPhase,float fValueWidth,float fValueHeight);
 
 	static CEventManager* Create(CNowEvent * pNowEvent);//生成処理
 	static const int GetEventManagerNum() { return s_nNumEventManager; }

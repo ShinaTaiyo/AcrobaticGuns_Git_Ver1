@@ -150,11 +150,12 @@ void CPlayer::Update()
 
     AdjustPos();//位置調整処理
 
+    m_pEffect->EffectProcess(this);//エフェクト処理
+
     CollisionProcess();
 
     m_pAttack->AttackProcess(this);//現在のアクションモードの攻撃処理を実装
 
-    m_pEffect->EffectProcess(this);//エフェクト処理
 
     m_pWireShot->WireShotProcess(this);//ワイヤー発射状態処理
 
@@ -628,9 +629,9 @@ void CPlayerAbnormalState_KnockBack::Process(CPlayer* pPlayer)
     m_KnockBackMove.y += (0.0f - m_KnockBackMove.y) * m_fInertia;
     m_KnockBackMove.z += (0.0f - m_KnockBackMove.z) * m_fInertia;
 
-    pPlayer->SetAddMove(m_KnockBackMove);
+    pPlayer->SetMove(m_KnockBackMove);
 
-    if (fabsf(m_KnockBackMove.x) < 0.01f && fabsf(m_KnockBackMove.y) < 0.01f && fabsf(m_KnockBackMove.z) < 0.01f)
+    if (fabsf(m_KnockBackMove.x) < 1.0f && fabsf(m_KnockBackMove.y) < 1.0f && fabsf(m_KnockBackMove.z) < 1.0f)
     {
         pPlayer->ChengeAbnormalState(DBG_NEW CPlayerAbnormalState());
     }
