@@ -104,8 +104,9 @@ void CPhaseManager::SetDeath()
 //===============================================================
 //フェーズマネージャーに情報を設定する
 //===============================================================
-void CPhaseManager::PushPhaseInfo(D3DXVECTOR3 Pos, D3DXVECTOR3 Rot, D3DXVECTOR3 Scale,
-	int nLife, int nEnemyType, int nTypeNum, int nPhaseNum, float fNormalSpeed, float fSensingRange, vector<CEnemy::MoveAiInfo> VecMoveAi)
+void CPhaseManager::PushPhaseInfo(D3DXVECTOR3 Pos, D3DXVECTOR3 Rot, D3DXVECTOR3 Scale, 
+	int nLife, int nEnemyType, int nTypeNum, int nPhaseNum, float fNormalSpeed, float fSensingRange, 
+	int nNumDivision, vector<CEnemy::MoveAiInfo> VecMoveAi)
 {
 	PhaseSaveInfo Info = {};
 	Info.Pos = Pos;
@@ -118,6 +119,7 @@ void CPhaseManager::PushPhaseInfo(D3DXVECTOR3 Pos, D3DXVECTOR3 Rot, D3DXVECTOR3 
 	Info.VecMoveAi = VecMoveAi;
 	Info.fNormalSpeed = fNormalSpeed;
 	Info.fSensingRange = fSensingRange;
+	Info.nNumDivision = nNumDivision;
 
 	//フェーズ最大数を超えていたら更新
 	if (nPhaseNum > s_MaxPhase)
@@ -165,7 +167,7 @@ void CPhaseManager::AdvancePhase()
 					pEnemy = CShotWeakEnemy::Create(static_cast<CShotWeakEnemy::SHOTWEAKENEMYTYPE>(it.nTypeNum), it.nLife, it.nPhaseNum, it.Pos, it.Rot, it.Scale);
 					break;
 				case CEnemy::ENEMYTYPE::DIVEWEAK:
-					pEnemy = CDiveWeakEnemy::Create(static_cast<CDiveWeakEnemy::DIVEWEAKENEMYTYPE>(it.nTypeNum), it.nLife, it.nPhaseNum, it.Pos, it.Rot, it.Scale);
+					pEnemy = CDiveWeakEnemy::Create(static_cast<CDiveWeakEnemy::DIVEWEAKENEMYTYPE>(it.nTypeNum), it.nLife, it.nPhaseNum, it.Pos, it.Rot, it.Scale,it.nNumDivision);
 					break;
 				default:
 					break;
@@ -189,9 +191,6 @@ void CPhaseManager::AdvancePhase()
 
 	if (CEnemy::GetNumEnemy() <= 0 && s_nNowPhase == s_MaxPhase + 1 && s_bStartFade == false)
 	{
-		
-		//CManager::GetSceneFade()->SetSceneFade(CFade::FADEMODE_IN, CScene::MODE_RESULT);
-
 		s_PhaseList.clear();//ステージをクリアしたのでリセット
 		s_nNowPhase = 0;    //ステージをクリアしたのでリセット
 

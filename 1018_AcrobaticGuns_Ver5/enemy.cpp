@@ -749,23 +749,37 @@ void CEnemy::AttackProcess()
 //====================================================================================
 void CEnemy::CollisionDetectionProcess()
 {
-	D3DXVECTOR3 AimVec = D3DXVECTOR3(CGame::GetPlayer()->GetPos().x,0.0f,CGame::GetPlayer()->GetPos().z) - 
-		D3DXVECTOR3(GetPos().x,0.0f,GetPos().z);//XZ方向だけのベクトルを取る
-	float fLength = CCalculation::CalculationLength(GetPos(), CGame::GetPlayer()->GetPos());
-	const D3DXVECTOR3& PlayerPos = CGame::GetPlayer()->GetPos();
-	const D3DXVECTOR3 & PlayerVtxMax = PlayerPos + D3DXVECTOR3(CGame::GetPlayer()->GetVtxMax().x, 0.0f, 0.0f);
-	D3DXVec3Normalize(&AimVec, &AimVec);
-
-	float fPlayerCornarDistance = CCalculation::CalculationLength(PlayerPos,PlayerVtxMax);
-	float fMyCornarDistance = CCalculation::CalculationLength(GetPos(),GetPos() + D3DXVECTOR3(GetVtxMax().x,0.0f,0.0f));
-	float fTotalLength = (fPlayerCornarDistance + fMyCornarDistance);
-	if (fLength < fTotalLength && 
-		GetPos().y + GetVtxMax().y >= CGame::GetPlayer()->GetPos().y + CGame::GetPlayer()->GetVtxMin().y && 
-		GetPos().y + GetVtxMin().y <= CGame::GetPlayer()->GetPos().y + CGame::GetPlayer()->GetVtxMax().y)
+	for (int nCntPri = 0; nCntPri < m_nMAXPRIORITY; nCntPri++)
 	{
-		SetPos(GetPos() - AimVec * (fTotalLength - fLength));
+		CObject* pObj = GetTopObject(nCntPri);
+		while (pObj != nullptr)
+		{
+			CObject* pNext = pObj->GetNextObject();
+			if (pObj->GetType() == CObject::TYPE::ENEMY || pObj->GetType() == CObject::TYPE::PLAYER)
+			{
+				CObjectX* pObjX = static_cast<CObjectX*>(pObj);
+
+				D3DXVECTOR3 AimVec = D3DXVECTOR3(pObjX->GetPos().x, 0.0f, pObjX->GetPos().z) -
+					D3DXVECTOR3(GetPos().x, 0.0f, GetPos().z);//XZ方向だけのベクトルを取る
+				float fLength = CCalculation::CalculationLength(GetPos(), pObjX->GetPos());
+				const D3DXVECTOR3& ComPos = pObjX->GetPos();
+				const D3DXVECTOR3& ComVtxMax = ComPos + D3DXVECTOR3(pObjX->GetVtxMax().x, 0.0f, 0.0f);
+				D3DXVec3Normalize(&AimVec, &AimVec);
+
+				float fComCornarDistance = CCalculation::CalculationLength(ComPos, ComVtxMax);
+				float fMyCornarDistance = CCalculation::CalculationLength(GetPos(), GetPos() + D3DXVECTOR3(GetVtxMax().x, 0.0f, 0.0f));
+				float fTotalLength = (fComCornarDistance + fMyCornarDistance);
+				if (fLength < fTotalLength &&
+					GetPos().y + GetVtxMax().y >= pObjX->GetPos().y + pObjX->GetVtxMin().y &&
+					GetPos().y + GetVtxMin().y <= pObjX->GetPos().y + pObjX->GetVtxMax().y)
+				{
+					SetPos(GetPos() - AimVec * (fTotalLength - fLength));
+				}		
+			}
+
+			pObj = pNext;
+		}
 	}
-	
 }
 
 //====================================================================================
@@ -1020,6 +1034,7 @@ void CShotWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 	int nShotWeakEnemyType = 0;                        //ショットに弱い敵タイプ   
 	int nLife = 0;                                     //体力
 	int nPhaseNum = 0;                                 //フェーズ番号
+	int nDivisionNum = 0;                              //分裂回数
 	D3DXVECTOR3 Move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);  //移動量
 	D3DXVECTOR3 Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);   //位置
 	D3DXVECTOR3 Scale = D3DXVECTOR3(0.0f, 0.0f, 0.0f); //拡大率
@@ -1171,7 +1186,7 @@ void CShotWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 	}
 	else if (CScene::GetMode() == CScene::MODE_GAME)
 	{
-		CGame::GetPhaseManager()->PushPhaseInfo(Pos, Rot, Scale, nLife, static_cast<int>(EnemyType), nShotWeakEnemyType, nPhaseNum,fNormalSpeed,fSensingRange, VecMoveAiInfo);
+		CGame::GetPhaseManager()->PushPhaseInfo(Pos, Rot, Scale, nLife, static_cast<int>(EnemyType), nShotWeakEnemyType, nPhaseNum,fNormalSpeed,fSensingRange,0,VecMoveAiInfo);
 	}
 
 }
@@ -1343,7 +1358,7 @@ const float CDiveWeakEnemy::s_fNORMAL_SPEED = 3.0f;
 //コンストラクタ
 //====================================================================================
 CDiveWeakEnemy::CDiveWeakEnemy(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CEnemy(nPri, bUseintPri, type, ObjType),
-m_DiveWeakEnemyType(DIVEWEAKENEMYTYPE::NORMAL)
+m_DiveWeakEnemyType(DIVEWEAKENEMYTYPE::NORMAL),m_nDivisionNum(0)
 {
 
 }
@@ -1401,6 +1416,15 @@ void CDiveWeakEnemy::Draw()
 //====================================================================================
 void CDiveWeakEnemy::SetDeath()
 {
+
+	if (m_nDivisionNum > 0)
+	{
+		m_nDivisionNum--;
+		CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE::NORMAL, GetMaxLife(), 0, GetPos() + D3DXVECTOR3(0.0f, 100.0f, 0.0f), GetRot(), GetScale() / 2, m_nDivisionNum);
+		CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE::NORMAL, GetMaxLife(), 0, GetPos() + D3DXVECTOR3(0.0f, 100.0f, 0.0f), GetRot(), GetScale() / 2, m_nDivisionNum);
+	}
+
+
 	CEnemy::SetDeath();
 }
 //============================================================================================================================================
@@ -1408,7 +1432,7 @@ void CDiveWeakEnemy::SetDeath()
 //====================================================================================
 //生成処理
 //====================================================================================
-CDiveWeakEnemy* CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE Type, int nLife, int nPhaseNum, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 Scale)
+CDiveWeakEnemy* CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE Type, int nLife, int nPhaseNum, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 Scale, int nDivisionNum)
 {
 	CDiveWeakEnemy* pDiveWeakEnemy = DBG_NEW CDiveWeakEnemy;
 
@@ -1433,6 +1457,7 @@ CDiveWeakEnemy* CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE Type, int nLife, int nP
 	pDiveWeakEnemy->SetNormalSpeed(s_fNORMAL_SPEED);//通常移動速度
 	pDiveWeakEnemy->SetUseInteria(false, GetNormalInertia());
 	pDiveWeakEnemy->SetCntTime(rand() % 100 + 1);
+	pDiveWeakEnemy->SetDivisionNum(nDivisionNum);
 
 	pDiveWeakEnemy->SetSize();//モデルサイズを設定
 	pDiveWeakEnemy->SetAutoSubLife(false);//自動的に体力を減らすかどうか
@@ -1458,6 +1483,8 @@ void CDiveWeakEnemy::SaveInfoTxt(fstream& WritingFile)
 		break;
 	}
 
+	WritingFile << "DIVISIONNUM = " << m_nDivisionNum << endl;
+
 	CEnemy::SaveInfoTxt(WritingFile);
 
 	WritingFile << "END_SETDIVEWEAKENEMY" << endl;
@@ -1473,6 +1500,7 @@ void CDiveWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 	int nDiveWeakEnemyType = 0;                        //ダイブに弱い敵タイプ   
 	int nLife = 0;                                     //体力
 	int nPhaseNum = 0;                                 //フェーズ番号
+	int nDivisionNum = 0;                              //分裂回数
  	D3DXVECTOR3 Move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);  //移動量
 	D3DXVECTOR3 Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);   //位置
 	D3DXVECTOR3 Scale = D3DXVECTOR3(0.0f, 0.0f, 0.0f); //拡大率
@@ -1548,6 +1576,11 @@ void CDiveWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 			LoadingFile >> Buff;//イコール
 			LoadingFile >> fSensingRange;
 		}
+		else if (Buff == "DIVISIONNUM")
+		{
+			LoadingFile >> Buff;//イコール
+			LoadingFile >> nDivisionNum;//分裂回数
+		}
 		else if (Buff == "SETMOVEAI")
 		{
 			while (1)
@@ -1615,7 +1648,7 @@ void CDiveWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 	EnemyType = static_cast<ENEMYTYPE>(nType);
 	if (CScene::GetMode() == CScene::MODE_EDIT)
 	{
-		CDiveWeakEnemy* pDiveWeakEnemy = CDiveWeakEnemy::Create(DiveWeakEnemyType, nLife, nPhaseNum, Pos, Rot, Scale);
+		CDiveWeakEnemy* pDiveWeakEnemy = CDiveWeakEnemy::Create(DiveWeakEnemyType, nLife, nPhaseNum, Pos, Rot, Scale,nDivisionNum);
 		pDiveWeakEnemy->SetUseDraw(true);
 		pDiveWeakEnemy->SetUseShadow(true);
 		pDiveWeakEnemy->SetVecMoveAiInfo(VecMoveAi);
@@ -1625,7 +1658,7 @@ void CDiveWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 	}
 	else if (CScene::GetMode() == CScene::MODE_GAME)
 	{
-		CGame::GetPhaseManager()->PushPhaseInfo(Pos, Rot, Scale, nLife, static_cast<int>(EnemyType), nDiveWeakEnemyType, nPhaseNum,fNormalSpeed,fSensingRange,VecMoveAiInfo);
+		CGame::GetPhaseManager()->PushPhaseInfo(Pos, Rot, Scale, nLife, static_cast<int>(EnemyType), nDiveWeakEnemyType, nPhaseNum,fNormalSpeed,fSensingRange,nDivisionNum,VecMoveAiInfo);
 	}
 }
 //============================================================================================================================================
@@ -1671,7 +1704,7 @@ CObject* CDiveWeakEnemy::ManagerChengeObject(bool bAim)
 	SetDeath();
 	//======================================================================================
 
-	return CDiveWeakEnemy::Create(NewType, GetLife(),GetPhaseNum(),GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
+	return CDiveWeakEnemy::Create(NewType, GetLife(),GetPhaseNum(),GetPos(), GetRot(), GetScale(),GetDivisionNum());//生成したオブジェクトを返す
 }
 //============================================================================================================================================
 
@@ -1682,11 +1715,51 @@ CObject* CDiveWeakEnemy::ManagerSaveObject()
 {
 	auto& Vec = GetVecAiModelInfo();
 	auto Vec2 = move(Vec);
-	CDiveWeakEnemy * pDiveWeakEnemy = CDiveWeakEnemy::Create(m_DiveWeakEnemyType, GetMaxLife(),GetPhaseNum(),GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
+	CDiveWeakEnemy * pDiveWeakEnemy = CDiveWeakEnemy::Create(m_DiveWeakEnemyType, GetMaxLife(),GetPhaseNum(),GetPos(), GetRot(), GetScale(),GetDivisionNum());//生成したオブジェクトを返す
 	pDiveWeakEnemy->SetSensingRange(GetSensingRange());//現在の敵の索敵範囲を保存する
 	pDiveWeakEnemy->SetNormalSpeed(GetNormalSpeed());//現在の敵の通常速度を保存する
 	pDiveWeakEnemy->SetVecMoveAiInfo(Vec2);
 	return pDiveWeakEnemy;//生成したオブジェクトを返す
+}
+//============================================================================================================================================
+
+//====================================================================================
+//ステージマネージャーから操作する
+//====================================================================================
+void CDiveWeakEnemy::ManagerChooseControlInfo()
+{
+	if (CManager::GetInputKeyboard()->GetPress(DIK_LCONTROL) == true)
+	{//Lコントロールキーを押しながら
+		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
+		{//シフトキーを押しながら・・・
+			if (CManager::GetInputKeyboard()->GetTrigger(DIK_U) == true)
+			{
+				m_nDivisionNum -= 1;
+			}
+		}
+		else if (CManager::GetInputKeyboard()->GetTrigger(DIK_U) == true)
+		{
+			m_nDivisionNum += 1;
+		}
+	}
+	else
+	{//Lコントロールキーを押していない
+		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
+		{//シフトキーを押しながら・・・
+			if (CManager::GetInputKeyboard()->GetTrigger(DIK_U) == true)
+			{
+				m_nDivisionNum -= 1;
+			}
+		}
+		else if (CManager::GetInputKeyboard()->GetTrigger(DIK_U) == true)
+		{
+			m_nDivisionNum += 1;
+		}
+	}
+
+	CManager::GetDebugProc()->PrintDebugProc("分裂回数(U)：%d\n", m_nDivisionNum);
+
+	CEnemy::ManagerChooseControlInfo();
 }
 //============================================================================================================================================
 

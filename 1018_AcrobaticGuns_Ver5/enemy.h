@@ -99,30 +99,6 @@ public:
 
 	static int GetNumEnemy() { return m_nNumEnemy; }
 protected:
-	//struct  MoveAiInfo
-	//{
-	//	D3DXVECTOR3 Pos;
-	//	D3DXVECTOR3 Rot;
-	//	D3DXVECTOR3 Scale;
-	//};
-
-	//struct PhaseSaveInfo
-	//{
-	//	D3DXVECTOR3 Pos;     //位置
-	//	D3DXVECTOR3 Rot;     //向き
-	//	D3DXVECTOR3 Scale;   //拡大率
-	//	int nLife;           //体力
-	//	ENEMYTYPE EnemyType; //敵タイプ
-	//	int nTypeNum;        //クラスごとのタイプ
-	//	int nPhaseNum;       //フェーズ番号を設定
-
-	//	vector<MoveAiInfo> VecMoveAi;//移動AIのVector
-	//};
-	////================================================
- //   //静的メンバ
- //   //================================================
-	//static list<PhaseSaveInfo>
- //   //===============================================================================================
 
 	struct Pattern
 	{
@@ -281,7 +257,7 @@ public:
 	void Update() override;             //更新処理
 	void Draw() override;               //描画処理
 	void SetDeath() override;           //死亡フラグを設定
-	static CDiveWeakEnemy* Create(DIVEWEAKENEMYTYPE Type, int nLife,int nPhaseNum,D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 Scale);
+	static CDiveWeakEnemy* Create(DIVEWEAKENEMYTYPE Type, int nLife,int nPhaseNum,D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 Scale,int nDivisionNum);
 
 	//==========================================================
     //エディタ関係
@@ -291,7 +267,15 @@ public:
 	static void LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveManager, string& Buff);  //テキストファイルから情報を読み込むための関数   
 	CObject* ManagerChengeObject(bool bAim) override; //ステージマネージャーに変更したオブジェクトを渡す
 	CObject* ManagerSaveObject() override;             //ステージマネージャーに今のオブジェクトを保存する
+	void ManagerChooseControlInfo() override;          //ステージマネージャーから操作する
 	//=================================================================================================================
+
+	//==========================================================
+	//ステータス関係
+	//==========================================================
+	void SetDivisionNum(int nNum) {m_nDivisionNum = nNum;}
+	const int& GetDivisionNum() const { return m_nDivisionNum; }
+	//===============================================================================================
 protected:
 private:
 	//================================================
@@ -307,7 +291,7 @@ private:
 	//変数宣言
 	//================================================
 	DIVEWEAKENEMYTYPE m_DiveWeakEnemyType;//敵の種類
-
+	int m_nDivisionNum;                   //分裂回数
 	//===============================================================================================
 
 	//================================================

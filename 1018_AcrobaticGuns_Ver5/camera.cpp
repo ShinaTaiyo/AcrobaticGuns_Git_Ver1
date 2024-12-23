@@ -112,6 +112,7 @@ void CCamera::Update()
 	CManager::GetDebugProc()->PrintDebugProc("カメラの向き：%f %f %f\n", m_Rot.x, m_Rot.y, m_Rot.z);
 	CManager::GetDebugProc()->PrintDebugProc("カメラの視点：%f %f %f\n", m_PosV.x, m_PosV.y, m_PosV.z);
 	CManager::GetDebugProc()->PrintDebugProc("カメラの注視点：%f %f %f\n", m_PosR.x, m_PosR.y, m_PosR.z);
+	CManager::GetDebugProc()->PrintDebugProc("カメラとの距離：%f\n",m_fAddLength);
 
 	//カメラの通常の注視点を設定し続ける
 	NormalCameraMove();
@@ -241,8 +242,7 @@ void CCamera::NormalCameraMove()
 				}
 				break;
 			case CScene::MODE_EDIT:
-				m_PosR += m_AddPosR;
-				m_PosV = m_PosR + RotVec * m_fLength;
+				m_PosV = m_PosR + RotVec * (m_fLength + m_fAddLength);
 				break;
 			default:
 				break;
@@ -488,12 +488,12 @@ void CCameraState_Normal::Process(CCamera* pCamera)
 	{//シフトキーを押しながら・・・
 		if (CManager::GetInputKeyboard()->GetPress(DIK_V) == true)
 		{
-			pCamera->SetAddLength(pCamera->GetLength() - 5.0f);
+			pCamera->SetAddLength(pCamera->GetAddLength() - 5.0f);
 		}
 	}
 	else if (CManager::GetInputKeyboard()->GetPress(DIK_V) == true)
 	{
-		pCamera->SetAddLength(pCamera->GetLength() + 5.0f);
+		pCamera->SetAddLength(pCamera->GetAddLength() + 5.0f);
 	}
 
 

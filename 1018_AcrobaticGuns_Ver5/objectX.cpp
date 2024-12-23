@@ -653,6 +653,7 @@ void CObjectX::ChengeEditPos()
 	m_SupportPos = m_Pos;
 	CManager::GetDebugProc()->PrintDebugProc("支点位置(矢印キー) %f %f %f\n", m_SupportPos.x, m_SupportPos.y, m_SupportPos.z);
 	CManager::GetDebugProc()->PrintDebugProc("向きZ(FGキー) %f\n", m_Rot.z);
+	CManager::GetCamera()->SetPosR(m_Pos);
 	//================================================================================================================================================
 
 }

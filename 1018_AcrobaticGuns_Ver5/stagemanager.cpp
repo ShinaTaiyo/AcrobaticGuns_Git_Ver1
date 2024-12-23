@@ -651,6 +651,8 @@ void CStageManagerState_NewObject::Process(CStageManager* pStageManager)
 			}
 		}
 
+		CManager::GetCamera()->SetPosR(static_cast<CObjectX*>(m_pManagerObject)->GetPos());
+
 		//現在のブロックの種類を変更する
 		TypeChenge(pStageManager);
 
@@ -776,7 +778,7 @@ void CStageManagerState_NewObject::ChengeObject(CStageManager* pStageManager)
 		m_pManagerObject = CShotWeakEnemy::Create(CShotWeakEnemy::SHOTWEAKENEMYTYPE::NORMAL, 10, 0, pStageManager->GetSavePos(), pStageManager->GetSaveRot(), pStageManager->GetSaveScale());
 		break;
 	case CObject::MANAGEROBJECTTYPE::DIVEWEAKENEMY:
-		m_pManagerObject = CDiveWeakEnemy::Create(CDiveWeakEnemy::DIVEWEAKENEMYTYPE::NORMAL, 10, 0, pStageManager->GetSavePos(), pStageManager->GetSaveRot(), pStageManager->GetSaveScale());
+		m_pManagerObject = CDiveWeakEnemy::Create(CDiveWeakEnemy::DIVEWEAKENEMYTYPE::NORMAL, 10, 0, pStageManager->GetSavePos(), pStageManager->GetSaveRot(), pStageManager->GetSaveScale(),0);
 		break;
 	default:
 		break;
