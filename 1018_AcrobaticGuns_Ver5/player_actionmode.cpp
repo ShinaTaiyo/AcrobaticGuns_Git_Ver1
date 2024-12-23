@@ -67,8 +67,6 @@ void CPlayerMove::MoveProcess(CPlayer* pPlayer)
 
 		pPlayer->SetUseInteria(true, CObjectXMove::GetNormalInertia());
 		pPlayer->SetUseGravity(true, CObjectXMove::GetNormalGravity());
-
-		//CManager::GetInputJoypad()->GetLStickPress();
 		if (bMove == true)
 		{
 			pPlayer->SetMove(AddMove + D3DXVECTOR3(0.0f, Move.y, 0.0f));
@@ -190,8 +188,7 @@ void CPlayerMove_PrepDive::MoveProcess(CPlayer* pPlayer)
 	pWireHead->SetPos(pPlayer->GetPos());//ダイブ準備中なのでワイヤーヘッドをプレイヤーの位置に固定
 
 	//CManager::GetDebugProc()->PrintDebugProc("移動量：%f %f %f\n", Move.x, Move.y, Move.z);
-	if (CManager::GetInputJoypad()->GetRT_Trigger() && pLockon->GetSuccessRayCollision() ||
-		CManager::GetInputMouse()->GetMouseLeftClickTrigger())
+	if ((CManager::GetInputJoypad()->GetRT_Trigger() || CManager::GetInputMouse()->GetMouseLeftClickTrigger()) && pLockon->GetSuccessRayCollision())
 	{//ワイヤー発射移動モードにチェンジ
 		CPlayerWireShot::StartWireShotProcess(pPlayer);
 	}
@@ -320,7 +317,6 @@ void CPlayerMove_Stuck::MoveProcess(CPlayer* pPlayer)
 
 	pWireHead->SetPos(pPlayer->GetPos());//ダイブ準備中なのでワイヤーヘッドをプレイヤーの位置に固定
 	//pPlayer->SetRot(D3DXVECTOR3(pCamera->GetRot().x + D3DX_PI,-pCamera->GetRot().y,0.0f));//向きをカメラに合わせる
-    CManager::GetDebugProc()->PrintDebugProc("ロックオンのレイが当たっているかどうか：%d\n",pLockon->GetSuccessRayCollision());
 	if ((CManager::GetInputJoypad()->GetRT_Trigger() || CManager::GetInputMouse()->GetMouseLeftClickTrigger()) && pLockon->GetSuccessRayCollision() == true)
 	{//ワイヤー発射移動モードにチェンジ
 		CPlayerWireShot::StartWireShotProcess(pPlayer);
@@ -464,14 +460,18 @@ CPlayerAttack_Dive::~CPlayerAttack_Dive()
 //=====================================================================================================
 void CPlayerAttack_Dive::AttackProcess(CPlayer* pPlayer)
 {
-	CAttackPlayer* pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::EXPLOSION,CAttack::TARGETTYPE::ENEMY,CAttack::COLLISIONTYPE::SQUARE,false,true,2,0,120, pPlayer->GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.1f, 0.1f, 0.1f),
-		D3DXVECTOR3(1.0f, 1.0f, 1.0f));
-
-	pAttackPlayer->SetUseAddScale(D3DXVECTOR3(0.4f, 0.4f, 0.4f), true);
-	pAttackPlayer->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), 200, false, false);
-	pAttackPlayer->SetUseRatioLifeAlpha(true);
-	pAttackPlayer->SetCollisionRelease(false);
-
+	CGauge* pDiveGauge = pPlayer->GetDiveGauge();
+	CUi* pDivePossibleNum = pPlayer->GetDivePossibleNum();
+	if (pDivePossibleNum->GetValue() > 0)
+	{//ダイブゲージがたまっていたら爆発攻撃を発動
+		CAttackPlayer* pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::ENEMY, CAttack::COLLISIONTYPE::SQUARE, false, true, 50,30, 100, pPlayer->GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.1f, 0.1f, 0.1f),
+			D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+		pAttackPlayer->SetUseAddScale(D3DXVECTOR3(0.4f, 0.4f, 0.4f), true);
+		pAttackPlayer->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), 200, false, false);
+		pAttackPlayer->SetUseRatioLifeAlpha(true);
+		pAttackPlayer->SetCollisionRelease(false);
+		pDivePossibleNum->SetNumericState(pDivePossibleNum->GetValue() - 1, 50.0f, 50.0f);
+	}
 	pPlayer->ChengeMoveMode(DBG_NEW CPlayerMove_PrepDive());
 	pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_Dont());
 

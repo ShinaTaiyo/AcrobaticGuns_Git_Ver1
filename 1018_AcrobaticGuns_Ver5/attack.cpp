@@ -13,9 +13,11 @@
 #include "manager.h"
 #include "enemy.h"
 #include "player.h"
+#include"gauge.h"
 #include "objectXInfo.h"
 #include "block.h"
 #include "bgModel.h"
+#include "game.h"
 #include "collision.h"
 //======================================================================================================================
 
@@ -35,7 +37,7 @@ const string CAttack::ATTACK_FILENAME[static_cast<int>(CAttack::ATTACKTYPE::MAX)
 //==================================================================
 CAttack::CAttack(int nPower, int nSetHitStopTime, int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri, bUseintPri, type, ObjType),
 m_Type(ATTACKTYPE::BULLET), m_nPower(nPower), m_HitStop({0,nSetHitStopTime}),m_bCollisionRelease(true),m_CollisionType(CAttack::COLLISIONTYPE::NONE),
-m_TargetType(CAttack::TARGETTYPE::NONE),m_bHitOtherThanLiving(false),m_bAutoCollision(true)
+m_TargetType(CAttack::TARGETTYPE::NONE),m_bHitOtherThanLiving(false),m_bAutoCollision(true),m_bCollisionSuccess(false)
 {
 
 }
@@ -164,6 +166,7 @@ void CAttack::Collision()
 
 	if (bCollision == true && GetCollisionRelease() == true)
 	{
+		m_bCollisionSuccess = true;
 		SetDeath();
 	}
 
@@ -197,8 +200,8 @@ void CAttack::CollisionProcess(bool& bCollision, bool& bNowCollision, CObjectXAl
 
 	if (bNowCollision == true)
 	{
-		pObjX->SetDamage(GetPower(), GetHitStopTime());
-		pObjX->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), GetHitStopTime(), false, false);
+		pObjX->SetDamage(GetPower(), m_HitStop.nSetTime);
+		pObjX->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), m_HitStop.nSetTime, false, false);
 	}
 
 }
@@ -249,6 +252,15 @@ void CAttackPlayer::Uninit()
 void CAttackPlayer::Update()
 {
 	CAttack::Update();
+
+	if (GetCollisionSuccess() == true && GetAttackType() == ATTACKTYPE::BULLET)
+	{
+		if (CScene::GetMode() == CScene::MODE::MODE_GAME)
+		{
+			CGauge* pPlayerDiveGauge = CGame::GetPlayer()->GetDiveGauge();
+			pPlayerDiveGauge->SetParam(pPlayerDiveGauge->GetParam() + 1);
+		}
+	}
 }
 //======================================================================================================================
 

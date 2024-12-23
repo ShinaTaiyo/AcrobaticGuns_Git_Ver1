@@ -16,7 +16,7 @@
 //コンストラクタ
 //===================================================================
 CGauge::CGauge(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject2D(nPri,bUseintPri,type,ObjType),
-m_nParam(0),m_nParamOld(0),m_type(GAUGETYPE::PLAYERHP),m_nMaxParam(0),m_fShakePower(0.0f),m_nShakeTime(0)
+m_nParam(0),m_nParamOld(0),m_type(GAUGETYPE::PLAYERHP),m_nMaxParam(0),m_fShakePower(0.0f),m_nShakeTime(0), m_bIsGaugeFull(false),m_nFullGaugeCntTime(0),m_bGaugeProcess(true)
 {
 
 }
@@ -56,30 +56,36 @@ void CGauge::Uninit()
 //===================================================================
 void CGauge::Update()
 {
-	float fRatio;//現在のゲージの割合
-	float fMaxWidth = GetMaxWidth();//2Dオブジェクトの横幅の最大値を取得する
-
-	if (m_nParam > m_nMaxParam)
-	{//パラメータが最大値を超えていたら、最大値に固定。
-		m_nParam = m_nMaxParam;
-	}
-
-	fRatio = (float)(m_nParam) / (float)(m_nMaxParam);
-
-	//シェイクさせる
-	if (m_nShakeTime > 0)
+	if (m_bGaugeProcess == true)
 	{
-		float fRatioRot = static_cast<float>(rand() % 100 + 1) / 100;
-		SetPos(GetSupportPos() + D3DXVECTOR3(sinf((D3DX_PI * 2) * fRatioRot) * m_fShakePower, cosf((D3DX_PI * 2) * fRatioRot) * m_fShakePower, 0.0f));
-		m_nShakeTime--;
+		float fRatio;//現在のゲージの割合
+		float fMaxWidth = GetMaxWidth();//2Dオブジェクトの横幅の最大値を取得する
 
-		if (m_nShakeTime == 0)
-		{
-			SetPos(GetSupportPos());
+		if (m_nParam > m_nMaxParam)
+		{//パラメータが最大値を超えていたら、最大値に固定。
+			m_nParam = m_nMaxParam;
 		}
+
+		fRatio = (float)(m_nParam) / (float)(m_nMaxParam);
+
+		//シェイクさせる
+		if (m_nShakeTime > 0)
+		{
+			float fRatioRot = static_cast<float>(rand() % 100 + 1) / 100;
+			SetPos(GetSupportPos() + D3DXVECTOR3(sinf((D3DX_PI * 2) * fRatioRot) * m_fShakePower, cosf((D3DX_PI * 2) * fRatioRot) * m_fShakePower, 0.0f));
+			m_nShakeTime--;
+
+			if (m_nShakeTime == 0)
+			{
+				SetPos(GetSupportPos());
+			}
+		}
+
+		SetWidth(fMaxWidth * fRatio);
+
+		FullGaugeTiming();
 	}
 
-	SetWidth(fMaxWidth * fRatio);
 
 	CObject2D::Update();
 }
@@ -149,5 +155,30 @@ CGauge * CGauge::Create(GAUGETYPE type, int nParam, float fWidth, float fHeight,
 	pGauge->SetColor(D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f), false, 1.0f);
 	pGauge->SetAnimInfo(1, 1, false);
 	return pGauge;
+}
+//==================================================================================================================================
+
+//===================================================================
+//ゲージがマックスになったタイミングを表す
+//===================================================================
+void CGauge::FullGaugeTiming()
+{
+	if (m_nFullGaugeCntTime == 1)
+	{
+		m_bIsGaugeFull = false;
+	}
+
+	if (m_nParam == m_nMaxParam)
+	{
+		if (m_bIsGaugeFull == false && m_nFullGaugeCntTime == 0)
+		{
+			m_bIsGaugeFull = true;
+			m_nFullGaugeCntTime++;
+		}
+	}
+	else
+	{
+		m_nFullGaugeCntTime = 0;
+	}
 }
 //==================================================================================================================================

@@ -28,6 +28,7 @@ const string CUi::UI_FILENAME[int(CUi::UITYPE::MAX)] =
 	"data\\TEXTURE\\UI\\PhaseText_000.png",
 	"data\\TEXTURE\\UI\\StageText_000.png",
 	"data\\TEXTURE\\UI\\Target_000.png",
+	"data\\TEXTURE\\UI\\PossibleDiveText_000.png",
 };//テクスチャファイル名
 
 //====================================================
@@ -35,7 +36,7 @@ const string CUi::UI_FILENAME[int(CUi::UITYPE::MAX)] =
 //====================================================
 CUi::CUi(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject2D(nPri,bUseintPri,type,ObjType),
 m_MoveType(UIMOVETYPE_NORMAL),m_Type(UITYPE::LOCKON),m_bUseUiEffect(false),m_nSetUiEffectLife(0),m_SetUiEffectColor(D3DXCOLOR(1.0f,1.0f,1.0f,1.0f)),
-m_pUiState(DBG_NEW CUiState())
+m_pUiState(DBG_NEW CUiState()),m_nValue(0)
 {
 
 }
@@ -344,14 +345,19 @@ void CUiState::Process(CUi* pUi)
 //====================================================
 //コンストラクタ
 //====================================================
-CUiState_Numeric::CUiState_Numeric(CUi* pUi, int nValue, float fWidth, float fHeight) : m_nValue(nValue)
+CUiState_Numeric::CUiState_Numeric(CUi* pUi, int nValue, float fWidth, float fHeight)
 {
-	int nDigit = CCalculation::CalculationDigit(m_nValue);
-    	
+	pUi->SetValue(nValue);
+	int nDigit = CCalculation::CalculationDigit(pUi->GetValue());
+	if (pUi->GetValue() == 0)
+	{
+		nDigit = 1;
+	}
+
 	for (int nCnt = 0; nCnt < nDigit; nCnt++)
 	{
 		CNumber* pNumber = CNumber::Create(pUi->GetPos(), fWidth, fHeight);
-		int nNum = CCalculation::getDigit(m_nValue, nCnt);
+		int nNum = CCalculation::getDigit(pUi->GetValue(), nCnt);
 		pNumber->SetAnim(nNum);//指定した桁の数値を取得する
 		pNumber->SetUseDeath(false);//死亡フラグを発動させない
 		m_VecNum.push_back(pNumber);//Vectorに保存
@@ -384,12 +390,11 @@ CUiState_Numeric::~CUiState_Numeric()
 //====================================================
 void CUiState_Numeric::Process(CUi* pUi)
 {
-
 	int nSize = m_VecNum.size();
 	int nCnt = 0;
 	for (auto it = m_VecNum.begin();it != m_VecNum.end();it++,nCnt++)
 	{//数字を横に並べ続ける
-		(*it)->SetPos(pUi->GetPos() + D3DXVECTOR3(pUi->GetWidth() / 2 + (*it)->GetWidth() / 2 + (*it)->GetWidth() * nCnt, 0.0f, 0.0f));
+		(*it)->SetPos(pUi->GetPos() + D3DXVECTOR3(pUi->GetWidth() / 2 + (*it)->GetWidth() / 2 + (*it)->GetWidth() * (nSize - 1) - ((*it)->GetWidth() * nCnt), 0.0f, 0.0f));
 	}
 }
 //===================================================================================================

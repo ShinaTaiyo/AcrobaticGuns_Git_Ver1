@@ -84,6 +84,7 @@ protected:
 	void SetAttackType(ATTACKTYPE AttackType) { m_Type = AttackType;}//攻撃の種類を設定する
 	const ATTACKTYPE & GetAttackType() const { return m_Type; }      //攻撃の種類を取得する
 	static const string ATTACK_FILENAME[static_cast<int>(ATTACKTYPE::MAX)];//攻撃モデルのファイル名 
+	const bool& GetCollisionSuccess() const { return m_bCollisionSuccess; }
 private:
 
 	//================================================
@@ -95,6 +96,8 @@ private:
 
 	bool m_bHitOtherThanLiving;//生きているオブジェクト以外にも当たるかどうか
 	bool m_bAutoCollision;     //当たり判定を攻撃クラスに任せるかどうか
+
+	bool m_bCollisionSuccess; //判定が成功したかどうか
 
 	HitStop m_HitStop;//ヒットストップ
 	ATTACKTYPE m_Type;//タイプ

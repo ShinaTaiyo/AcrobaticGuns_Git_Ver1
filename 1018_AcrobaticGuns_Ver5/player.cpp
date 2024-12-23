@@ -45,7 +45,7 @@ CPlayer::CPlayer(CPlayerMove* pPlayerMove, CPlayerAttack* pPlayerAttack, CPlayer
     , m_pMove(pPlayerMove), m_pAttack(pPlayerAttack), m_pEffect(pPlayerEffect), m_pWireShot(pPlayerWireShot),
     m_pMeshOrbit(nullptr),
     m_fRotAim(0.0f), m_pLockOn(nullptr), m_NowActionMode(ACTIONMODE::SHOT), m_pModeDisp(nullptr), m_bCollision(false),m_pWire(nullptr),
-    m_pHpGauge(nullptr),m_pAbnormalState(DBG_NEW CPlayerAbnormalState())
+    m_pHpGauge(nullptr),m_pAbnormalState(DBG_NEW CPlayerAbnormalState()),m_pDiveGauge(nullptr), m_pDivePossibleNum(nullptr)
 {
 
 }
@@ -81,9 +81,16 @@ HRESULT CPlayer::Init()
         D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
     m_pModeDisp->SetUseDeath(false);
 
-    //m_pDiveGauge = CGauge::Create(CGauge::GAUGETYPE::DIVE, 20, 200.0f, 50.0f, D3DXVECTOR3(SCREEN_WIDTH - 250.0f, 200.0f, 0.0f));
-    //m_pDiveGauge->SetColor(D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f), false, 1.0f);
-    //m_pDiveGauge->SetUseDeath(false);
+    m_pDiveGauge = CGauge::Create(CGauge::GAUGETYPE::DIVE, 20, 200.0f, 25.0f, D3DXVECTOR3(SCREEN_WIDTH - 300.0f, 200.0f, 0.0f));
+    m_pDiveGauge->SetColor(D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f), false, 1.0f);
+    m_pDiveGauge->SetUseDeath(false);
+    m_pDiveGauge->SetParam(0);//初期値からスタート
+    m_pDiveGauge->SetPolygonType(CObject2D::POLYGONTYPE::LEFT);
+
+    m_pDivePossibleNum = CUi::Create(CUi::UITYPE::POSSIBLEDIVENUMTEXT_000, CObject2D::POLYGONTYPE::SENTERROLLING, 200.0f, 100.0f, 1, false, D3DXVECTOR3(200.0f, 100.0f, 0.0f),
+        D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+    m_pDivePossibleNum->SetNumericState(0, 50.0f, 50.0f);
+    m_pDivePossibleNum->SetUseDeath(false);
 
     m_pWire = CWire::Create(CWire::WIRETYPE::NORMAL, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 15.0f, 20.0f, 4, 5);
     m_pWire->SetUseDeath(false);
@@ -156,6 +163,7 @@ void CPlayer::Update()
 
     m_pAttack->AttackProcess(this);//現在のアクションモードの攻撃処理を実装
 
+    DiveGaugeMaxEffect();//ダイブゲージがマックスになった時の演出
 
     m_pWireShot->WireShotProcess(this);//ワイヤー発射状態処理
 
@@ -223,12 +231,19 @@ void CPlayer::SetDeath()
             m_pHpGauge = nullptr;
         }
 
-        //if (m_pDiveGauge != nullptr)
-        //{
-        //    m_pDiveGauge->SetUseDeath(true);
-        //    m_pDiveGauge->SetDeath();
-        //    m_pDiveGauge = nullptr;
-        //}
+        if (m_pDiveGauge != nullptr)
+        {
+            m_pDiveGauge->SetUseDeath(true);
+            m_pDiveGauge->SetDeath();
+            m_pDiveGauge = nullptr;
+        }
+
+        if (m_pDivePossibleNum != nullptr)
+        {
+            m_pDivePossibleNum->SetUseDeath(true);
+            m_pDivePossibleNum->SetDeath();
+            m_pDivePossibleNum = nullptr;
+        }
     }
     CObject::SetDeath();
 }
@@ -341,6 +356,30 @@ void CPlayer::ActionModeChenge()
         m_pModeDisp->SetUseDeath(false);//死亡フラグを発動させない
 
 
+    }
+}
+//==========================================================================================================
+
+
+//========================================================
+//ダイブゲージがマックスになった時の演出を行う
+//========================================================
+void CPlayer::DiveGaugeMaxEffect()
+{
+    if (m_pDiveGauge->GetFullGaugeFlag() == true)
+    {
+        CGauge* pGauge = CGauge::Create(CGauge::GAUGETYPE::PLAYERHP, m_pDiveGauge->GetParam(), m_pDiveGauge->GetWidth(), m_pDiveGauge->GetHeight(), m_pDiveGauge->GetPos());
+        pGauge->SetUseLife(true, 50, 50);
+        pGauge->SetPolygonType(m_pDiveGauge->GetPolygonType());
+        pGauge->SetColor(m_pDiveGauge->GetColor(), false, 1.0f);
+        pGauge->SetUseLifeRatioColor(true);
+        pGauge->SetUseDeath(true);
+        pGauge->SetUseAddScale(D3DXVECTOR2(0.3f, 0.3f), true);
+        pGauge->SetUseScale(true);
+        pGauge->SetScale(D3DXVECTOR2(1.0f, 1.0f));
+
+        m_pDivePossibleNum->SetNumericState(m_pDivePossibleNum->GetValue() + 1, 50.0f, 50.0f);
+        m_pDiveGauge->SetParam(0);
     }
 }
 //==========================================================================================================

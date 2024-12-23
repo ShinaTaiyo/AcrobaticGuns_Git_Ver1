@@ -178,6 +178,7 @@ void CObjectXAlive::HitStopProcess()
 		if (m_nHitStopTime > 0)
 		{
 			m_nHitStopTime--;
+			CManager::GetDebugProc()->PrintDebugProc("ヒットストップ時間：%d\n", m_nHitStopTime);
 		}
 		else
 		{//ヒットストップ解除

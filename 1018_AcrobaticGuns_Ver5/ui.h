@@ -45,7 +45,6 @@ public:
 	void Process(CUi* pUi) override;//処理
 private:
 	vector<CNumber*> m_VecNum;//数字のベクター
-	int m_nValue;              //値
 };
 //=======================================================================================
 
@@ -64,6 +63,7 @@ public:
 		PHASETEXT,       //フェーズ文字
 		STAGETEXT,       //ステージ文字
 	    TARGET_000,      //ターゲット
+		POSSIBLEDIVENUMTEXT_000,//ダイブ可能回数文字
 		MAX
 	};
 
@@ -86,6 +86,10 @@ public:
 	void SetUseUiEffect(bool bUse, int nSetEffectLife, D3DXCOLOR col) { m_bUseUiEffect = bUse; m_nSetUiEffectLife = nSetEffectLife; m_SetUiEffectColor = col; }
 	UITYPE GetUiType() { return m_Type; }//UIの種類を取得
 	void SetNumericState(int nValue, float fWidth, float fHeight);//数字状態を設定する
+
+	void SetValue(int nValue) { m_nValue = nValue; }
+	const int & GetValue() const { return m_nValue; }
+
 protected:
 	static const string UI_FILENAME[int(UITYPE::MAX)];//UIのテクスチャファイル名
 private:
@@ -96,6 +100,8 @@ private:
 	D3DXCOLOR m_SetUiEffectColor;  //UIで出すエフェクトの色合い設定用
 	int m_nSetUiEffectLife;        //UIのエフェクトの体力設定用
 	CUiState* m_pUiState;          //UIの状態
+
+	int m_nValue;                  //数字
 };
 //=======================================================================================
 

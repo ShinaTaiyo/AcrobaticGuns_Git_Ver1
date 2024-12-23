@@ -54,6 +54,12 @@ public:
 	//オプション
 	//====================================
 	void SetShake(float fPower, int nTime) { m_fShakePower = fPower; m_nShakeTime = nTime;}
+	void SetUseGaugeProcess(bool bUse) { m_bGaugeProcess = bUse; }
+
+	//====================================
+	//ゲージの状態
+	//====================================
+	const bool& GetFullGaugeFlag() const { return m_bIsGaugeFull; }
 protected:
 private:
 	int m_nParam;               //ゲージで表記する現在のパラメータ
@@ -63,6 +69,15 @@ private:
 
 	float m_fShakePower;        //シェイクさせる力
 	int m_nShakeTime;           //シェイクさせる時間
+
+	bool m_bIsGaugeFull;        //ゲージがマックスになった瞬間を表す
+	int m_nFullGaugeCntTime;    //ゲージがマックスになった瞬間を表す 
+
+	bool m_bGaugeProcess;       //ゲージの処理をするかどうか
+	//====================================
+	//プロトタイプ宣言
+	//====================================
+	void FullGaugeTiming();//ゲージがマックスになったタイミングを表す
 };
 //=======================================================================================================================
 #endif
