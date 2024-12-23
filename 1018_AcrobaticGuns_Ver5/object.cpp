@@ -271,6 +271,10 @@ void CObject::ReleaseProcess()
 			if (pObj->m_bDeath == true)
 			{//Ž€–Sƒtƒ‰ƒO‚ªtrue‚È‚ç”jŠü‚·‚é
 
+				if (pObj->GetType() == CObject::TYPE::EVENTMANAGER)
+				{
+					int n = 0;
+				}
 				pObj->Release();
 			}
 			pObj = pNext;

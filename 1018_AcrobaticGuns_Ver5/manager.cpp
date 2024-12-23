@@ -20,6 +20,7 @@
 #include "light.h"
 #include "object3d.h"
 #include "texture.h"
+#include "eventmanager.h"
 #include "objectXInfo.h"
 #include "main.h"
 #include "fade.h"
@@ -333,8 +334,6 @@ void CManager::Update()
 #ifdef _DEBUG
 	m_pDebugProc->Update();    //デバッグプロシージャ
 #endif // _DEBUG
-
-
 	if (m_pScene != nullptr)
 	{
 		m_pScene->Update();        //シーンの更新処理

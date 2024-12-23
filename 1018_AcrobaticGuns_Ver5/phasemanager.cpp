@@ -178,7 +178,7 @@ void CPhaseManager::AdvancePhase()
 
 		}
 		s_nNowPhase++;
-		CGame::GetEventManager()->ChengeEvent(DBG_NEW CNowEvent_NextPhase(s_nNowPhase,80.0f,80.0f));//フェーズ移行イベントを呼ぶ
+		CEventManager::Create(DBG_NEW CNowEvent_NextPhase(s_nNowPhase, 80.0f, 80.0f));
 
 	}
 
@@ -189,6 +189,7 @@ void CPhaseManager::AdvancePhase()
 
 		s_PhaseList.clear();//ステージをクリアしたのでリセット
 		s_nNowPhase = 0;    //ステージをクリアしたのでリセット
+
 		s_nNowStage++;      //ステージ番号を次に進める
 
 		if (s_nNowStage != static_cast<int>(CStageManager::WORLDTYPE::MAX))

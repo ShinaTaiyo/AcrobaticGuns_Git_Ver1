@@ -42,8 +42,10 @@ public:
 	CNowEvent_NextPhase(int nPhaseNum,float fValueWidth,float fValueHeight);//コンストラクタ
 	~CNowEvent_NextPhase() override;//デストラクタ
 	void Process(CEventManager* pEventManager) override;//処理
+	static const int& GetNumNextPhaseEvent() { return s_nNumNextPhaseEvent; }
 private:
 	CUi* m_PhaseText;//フェーズの文字
+	static int s_nNumNextPhaseEvent;//次のフェーズに移行するイベントの数
 };
 
 //===================================================================================================
@@ -91,10 +93,13 @@ public:
 	void SetNextPhaseEvent(int nNowPhase,float fValueWidth,float fValueHeight);
 
 	static CEventManager* Create(CNowEvent * pNowEvent);//生成処理
+	static const int GetEventManagerNum() { return s_nNumEventManager; }
+	void SetEndEvent(bool bEnd);//イベントを終わらせるフラグを設定する
 	EventProgressInfo & GetEventProgressInfo(){ return m_EventProgressInfo; }
 private:
 	EventProgressInfo m_EventProgressInfo;//イベント進行を管理する変数
 	CNowEvent* m_pNowEvent;               //現在のイベントの状態
+	static int s_nNumEventManager;        //イベントマネージャーの数
 };
 
 #endif

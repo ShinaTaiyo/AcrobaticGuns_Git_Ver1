@@ -22,11 +22,17 @@
 //======================================================================================================================================
 
 //=====================================================================
+//静的メンバ宣言
+//=====================================================================
+int CEventManager::s_nNumEventManager = 0;//イベントマネージャーの総数をカウントする
+
+//=====================================================================
 //コンストラクタ
 //=====================================================================
 CEventManager::CEventManager(CNowEvent* pNowEvent, int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject(nPri,bUseintPri,type,ObjType),m_pNowEvent(pNowEvent), m_EventProgressInfo({})
 {
-
+	s_nNumEventManager++;
+   
 }
 //======================================================================================================================================
 
@@ -35,7 +41,7 @@ CEventManager::CEventManager(CNowEvent* pNowEvent, int nPri, bool bUseintPri, CO
 //=====================================================================
 CEventManager::~CEventManager()
 {
-
+	s_nNumEventManager--;
 }
 //======================================================================================================================================
 
@@ -66,8 +72,10 @@ void CEventManager::Update()
 	//常にイベント時間をカウントする
 	m_EventProgressInfo.nCntEventTime++;//イベント時間をカウントする
 
-	m_pNowEvent->Process(this);//それぞれのイベントの処理を呼ぶ
-
+	if (m_pNowEvent != nullptr)
+	{
+		m_pNowEvent->Process(this);//それぞれのイベントの処理を呼ぶ
+	}
 	CObject::Update();
 }
 //======================================================================================================================================
@@ -86,8 +94,6 @@ void CEventManager::Draw()
 //=====================================================================
 void CEventManager::SetDeath()
 {
-	CObject::SetDeath();
-
 	if (GetUseDeath() == true)
 	{
 		if (m_pNowEvent != nullptr)
@@ -96,6 +102,8 @@ void CEventManager::SetDeath()
 			m_pNowEvent = nullptr;
 		}
 	}
+
+	CObject::SetDeath();
 }
 //======================================================================================================================================
 
@@ -125,9 +133,22 @@ CEventManager* CEventManager::Create(CNowEvent* pNowEvent)
 	CEventManager* pEventManager = DBG_NEW CEventManager(pNowEvent);
 
 	pEventManager->Init();//初期化処理
-	pEventManager->SetUseDeath(false);
+	pEventManager->SetUseDeath(true);
 
 	return pEventManager;
+}
+//======================================================================================================================================
+
+
+//=====================================================================
+//イベントを終わらせるフラグ
+//=====================================================================
+void CEventManager::SetEndEvent(bool bEnd)
+{
+	if (bEnd == true)
+	{
+		SetDeath();//死亡フラグを設定する
+	}
 }
 //======================================================================================================================================
 
@@ -156,6 +177,7 @@ void CEventManager::EventProgressInfo::ResetPattern()
 //*********************************************************************
 //*フェーズ移行イベントステート
 //*********************************************************************
+int CNowEvent_NextPhase::s_nNumNextPhaseEvent = 0;//次のフェーズに移行するイベントの総数をカウントする
 
 //=====================================================================
 //コンストラクタ
@@ -166,7 +188,9 @@ CNowEvent_NextPhase::CNowEvent_NextPhase(int nPhaseNum, float fValueWidth, float
 		D3DXVECTOR3(SCREEN_WIDTH , SCREEN_HEIGHT / 2, 0.0f), D3DXVECTOR3(sinf(D3DX_PI * -0.5f) * 10.0f, cosf(D3DX_PI * -0.5f) * 10.0f, 0.0f),
 		D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));//左に文字を飛ばす
 	m_PhaseText->SetNumericState(nPhaseNum, fValueWidth, fValueHeight);//数字状態にする
-	m_PhaseText->SetUseDeath(false);//死亡フラグをオフにする
+	m_PhaseText->SetUseDeath(true);//死亡フラグをオフにする
+
+	s_nNumNextPhaseEvent++;
 }
 //======================================================================================================================================
 
@@ -175,6 +199,7 @@ CNowEvent_NextPhase::CNowEvent_NextPhase(int nPhaseNum, float fValueWidth, float
 //=====================================================================
 CNowEvent_NextPhase::~CNowEvent_NextPhase()
 {
+	s_nNumNextPhaseEvent--;
 	//フェーズの文字を破棄
 	if (m_PhaseText != nullptr)
 	{
@@ -191,6 +216,8 @@ CNowEvent_NextPhase::~CNowEvent_NextPhase()
 void CNowEvent_NextPhase::Process(CEventManager* pEventManager)
 {
     CEventManager::EventProgressInfo& eventProgressInfo = pEventManager->GetEventProgressInfo();
+
+	CManager::GetDebugProc()->PrintDebugProc("UIの死亡フラグ：%d\n",m_PhaseText->GetUseDeath());
 	switch (eventProgressInfo.nEventPattern)
 	{
 	case 0:
@@ -213,6 +240,7 @@ void CNowEvent_NextPhase::Process(CEventManager* pEventManager)
 		{//文字テクスチャが完全にいなくなったら
 			eventProgressInfo.ResetPattern();//パターンをリセット
 			pEventManager->ChengeEvent(DBG_NEW CNowEvent());
+			pEventManager->SetEndEvent(true);//イベントを終了させる
 		}
 		break;
 	default:

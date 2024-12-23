@@ -62,6 +62,7 @@ public:
 	    ACTIONMODE_GUN,  //ショットモードUI
 		ACTIONMODE_DIVE, //ダイブモードUI
 		PHASETEXT,       //フェーズ文字
+		STAGETEXT,       //ステージ文字
 		MAX
 	};
 
