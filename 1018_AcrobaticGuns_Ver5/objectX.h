@@ -86,7 +86,6 @@ public:
 	
 	//ˆÊ’u
 	void SetPos(D3DXVECTOR3 Pos) { 
-		m_PosOld = m_Pos;
 		m_Pos = Pos; }                                           //ˆÊ’u‚Ìİ’è
 	const D3DXVECTOR3& GetPos() const { return m_Pos; }                                     //ˆÊ’u‚Ìæ“¾
 
