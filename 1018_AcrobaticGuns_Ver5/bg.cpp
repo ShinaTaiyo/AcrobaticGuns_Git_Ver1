@@ -22,7 +22,7 @@
 //========================
 const std::string CBg::m_apBGFILE_NAME[CBg::BG_MAX] =
 {
-	"data\\TEXTURE\\Title\\Title_001.png",
+	"data\\TEXTURE\\UI\\Title_000.png",
 	"data\\TEXTURE\\Bg\\Wall_000.jpg",
 	"data\\TEXTURE\\Bg\\Result_BG.png"
 };//”wŒi‚Ìƒtƒ@ƒCƒ‹–¼
