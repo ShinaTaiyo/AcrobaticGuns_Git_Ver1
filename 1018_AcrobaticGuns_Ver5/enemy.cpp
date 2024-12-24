@@ -1671,6 +1671,7 @@ void CDiveWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 		pDiveWeakEnemy->SetVecMoveAiInfo(VecMoveAi);
 		pDiveWeakEnemy->SetNormalSpeed(fNormalSpeed);
 		pDiveWeakEnemy->SetSensingRange(fSensingRange);
+		pDiveWeakEnemy->SetUseUpdatePos(true);
 		listSaveManager.push_back(pDiveWeakEnemy);      //vector‚Éî•ñ‚ğ•Û‘¶‚·‚é
 	}
 	else if (CScene::GetMode() == CScene::MODE_GAME)

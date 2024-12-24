@@ -130,6 +130,6 @@ CBg3D* CBg3D::Create(BG3DTYPE type, D3DXVECTOR3 Pos, D3DXVECTOR3 Rot, D3DXVECTOR
 		CManager::GetObjectXInfo()->GetTexture(nIdx),
 		CManager::GetObjectXInfo()->GetColorValue(nIdx));
 
-	return nullptr;
+	return pBg3D;
 }
 //================================================================================================================

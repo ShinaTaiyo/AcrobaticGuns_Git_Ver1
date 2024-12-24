@@ -22,6 +22,7 @@
 #include "collision.h"
 #include "object.h"
 #include "objectX.h"
+#include "title.h"
 #include "tutorial.h"
 //====================================================================================================
 
@@ -93,9 +94,7 @@ void CCamera::Uninit()
 //====================================================================
 void CCamera::Update()
 {
-
 	m_pCameraState->Process(this);
-
 	//========================================
 	//カメラの向きを補正する
 	//========================================
@@ -118,15 +117,17 @@ void CCamera::Update()
 	//カメラの通常の注視点を設定し続ける
 	NormalCameraMove();
 
-	if (m_PosV.y < 0.0f)
-	{//視点が０以下なら全ての影を描画しない
-		CObjectX::SetCommonDraw(false);
-	}
-	else
+	if (CScene::GetMode() == CScene::MODE_GAME)
 	{
-		CObjectX::SetCommonDraw(true);
+		if (m_PosV.y < 0.0f)
+		{//視点が０以下なら全ての影を描画しない
+			CObjectX::SetCommonDraw(false);
+		}
+		else
+		{
+			CObjectX::SetCommonDraw(true);
+		}
 	}
-
 	MakeTransparent();//カメラと中止点と重なったオブジェクトを透明にする処理
 
 	//=================================================================================================================================
@@ -226,32 +227,25 @@ void CCamera::NormalCameraMove()
 {
 	CObject* pManagerObject = nullptr;
 	D3DXVECTOR3 RotVec = CCalculation::RadToVec(m_Rot);
-		switch (m_CameraType)
+	switch (CScene::GetMode())
+	{
+	case CScene::MODE_TITLE:
+		m_PosR = CTitle::GetPlayer()->GetSenterPos() + D3DXVECTOR3(0.0f,50.0f,0.0f);
+		m_PosV = m_PosR + RotVec * m_fLength;
+		break;
+	case CScene::MODE_GAME:
+		if (CGame::GetPlayer() != nullptr)
 		{
-		case CAMERATYPE_BIRD:
-			switch (CScene::GetMode())
-			{
-			case CScene::MODE_GAME:
-				if (CGame::GetPlayer() != nullptr)
-				{
-					if (m_bCustom == false)
-					{
-						m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(sinf(m_Rot.y + D3DX_PI * 0.5f) * 30.0f, 60.0f,cosf(m_Rot.y + D3DX_PI * 0.5f) * 30.0f) + m_AddPosR;
-						m_PosV = m_PosR + RotVec * m_fLength;
-						//m_PosV = m_PosR + D3DXVECTOR3(sinf(m_Rot.y) * -250.0f, 0.0f, cosf(m_Rot.y) * -250.0f); + m_AddPosV;
-					}
-				}
-				break;
-			case CScene::MODE_EDIT:
-				m_PosV = m_PosR + RotVec * (m_fLength + m_fAddLength);
-				break;
-			default:
-				break;
-			}
-			break;
-		default:
-			break;
+			m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(sinf(m_Rot.y + D3DX_PI * 0.5f) * 30.0f, 60.0f,cosf(m_Rot.y + D3DX_PI * 0.5f) * 30.0f) + m_AddPosR;
+			m_PosV = m_PosR + RotVec * m_fLength;
 		}
+		break;
+	case CScene::MODE_EDIT:
+		m_PosV = m_PosR + RotVec * (m_fLength);
+		break;
+	default:
+		break;
+	}
 }
 //====================================================================================================
 

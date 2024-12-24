@@ -61,8 +61,6 @@ public:
 	void LoadMapTxt(int nMapNum);               //マップをテキストファイルからロードする
 	void LoadMapFilePass(WORLDTYPE type);       //マップのファイルパスをロードする
 	void SaveMapTxt(int nMapNum);               //マップをテキストファイルにセーブする
-	void LoadMapBin(int nMapNum);               //マップをバイナリファイルからロードする
-	void SaveMapBin();                          //マップをバイナリファイルにセーブする
 	int GetMapIndex() { return m_nMapIndex; }   //現在のマップ番号を取得する
 	void MapChenge();                            //マップを変更する
 

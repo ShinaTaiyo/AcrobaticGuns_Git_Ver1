@@ -85,8 +85,7 @@ public:
 	//==========================================================
 	
 	//位置
-	void SetPos(D3DXVECTOR3 Pos) { 
-		m_Pos = Pos; }                                           //位置の設定
+	void SetPos(D3DXVECTOR3 Pos) { m_Pos = Pos; }                                           //位置の設定
 	const D3DXVECTOR3& GetPos() const { return m_Pos; }                                     //位置の取得
 
 	//1f前の位置

@@ -71,32 +71,35 @@ HRESULT CPlayer::Init()
     SetAutoSubLife(false);//自動的に体力を減らすかどうか
     SetUseGravity(true,1.0f);  //重力を使用する
 
-    m_pLockOn = CLockon::Create(D3DXVECTOR3(SCREEN_WIDTH / 2,SCREEN_HEIGHT / 2,0.0f), CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, D3DXCOLOR(1.0f,1.0f,1.0f,1.0f));
-    m_pLockOn->SetUseDeath(false);
-    m_pLockOn->SetPolygonRotSpeed(0.01f);
+    if (CScene::GetMode() == CScene::MODE::MODE_GAME)
+    {
+        m_pLockOn = CLockon::Create(D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f), CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+        m_pLockOn->SetUseDeath(false);
+        m_pLockOn->SetPolygonRotSpeed(0.01f);
 
-    m_pMeshOrbit = CMeshOrbit::Create(CMeshOrbit::MESHORBITTYPE::DEATHENAGA);
-    m_pMeshOrbit->SetUseDeath(false);
+        m_pMeshOrbit = CMeshOrbit::Create(CMeshOrbit::MESHORBITTYPE::DEATHENAGA);
+        m_pMeshOrbit->SetUseDeath(false);
 
-    m_pModeDisp = CUi::Create(CUi::UITYPE::ACTIONMODE_GUN, CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, 1, false, D3DXVECTOR3(50.0f, 50.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-        D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-    m_pModeDisp->SetUseDeath(false);
+        m_pModeDisp = CUi::Create(CUi::UITYPE::ACTIONMODE_GUN, CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, 1, false, D3DXVECTOR3(50.0f, 50.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+            D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+        m_pModeDisp->SetUseDeath(false);
 
-    m_pDiveGauge = CGauge::Create(CGauge::GAUGETYPE::DIVE, 20, 200.0f, 25.0f, D3DXVECTOR3(SCREEN_WIDTH - 300.0f, 200.0f, 0.0f));
-    m_pDiveGauge->SetColor(D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f), false, 1.0f);
-    m_pDiveGauge->SetUseDeath(false);
-    m_pDiveGauge->SetParam(0);//初期値からスタート
-    m_pDiveGauge->SetPolygonType(CObject2D::POLYGONTYPE::LEFT);
+        m_pDiveGauge = CGauge::Create(CGauge::GAUGETYPE::DIVE, 20, 200.0f, 25.0f, D3DXVECTOR3(SCREEN_WIDTH - 300.0f, 200.0f, 0.0f));
+        m_pDiveGauge->SetColor(D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f), false, 1.0f);
+        m_pDiveGauge->SetUseDeath(false);
+        m_pDiveGauge->SetParam(0);//初期値からスタート
+        m_pDiveGauge->SetPolygonType(CObject2D::POLYGONTYPE::LEFT);
 
-    m_pDivePossibleNum = CUi::Create(CUi::UITYPE::POSSIBLEDIVENUMTEXT_000, CObject2D::POLYGONTYPE::SENTERROLLING, 200.0f, 100.0f, 1, false, D3DXVECTOR3(200.0f, 100.0f, 0.0f),
-        D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-    m_pDivePossibleNum->SetNumericState(0, 50.0f, 50.0f);
-    m_pDivePossibleNum->SetUseDeath(false);
+        m_pDivePossibleNum = CUi::Create(CUi::UITYPE::POSSIBLEDIVENUMTEXT_000, CObject2D::POLYGONTYPE::SENTERROLLING, 200.0f, 100.0f, 1, false, D3DXVECTOR3(200.0f, 100.0f, 0.0f),
+            D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+        m_pDivePossibleNum->SetNumericState(0, 50.0f, 50.0f);
+        m_pDivePossibleNum->SetUseDeath(false);
 
-    m_pWire = CWire::Create(CWire::WIRETYPE::NORMAL, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 15.0f, 20.0f, 4, 5);
-    m_pWire->SetUseDeath(false);
-    m_pWire->SetPlayerPointer(this);//プレイヤーのポインタを設定
-    m_pWire->SetUseDraw(false);
+        m_pWire = CWire::Create(CWire::WIRETYPE::NORMAL, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 15.0f, 20.0f, 4, 5);
+        m_pWire->SetUseDeath(false);
+        m_pWire->SetPlayerPointer(this);//プレイヤーのポインタを設定
+        m_pWire->SetUseDraw(false);
+    }
     return S_OK;
 }
 //==========================================================================================================
@@ -146,34 +149,40 @@ void CPlayer::Uninit()
 //====================================================
 void CPlayer::Update()
 {
-    m_pMove->MoveProcess(this);//現在のアクションモードの移動処理を実行
+    if (CScene::GetMode() == CScene::MODE_GAME)
+    {
+        m_pMove->MoveProcess(this);//現在のアクションモードの移動処理を実行
 
-    m_pAbnormalState->Process(this);//状態異常の処理を実行
+        m_pAbnormalState->Process(this);//状態異常の処理を実行
 
-    AdjustRot();//向き調整処理
+        AdjustRot();//向き調整処理
 
-    ActionModeChenge(); //現在のアクションモードを変更する
+        ActionModeChenge(); //現在のアクションモードを変更する
+    }
 
     CObjectXAlive::Update();//更新処理
 
-    AdjustPos();//位置調整処理
-
-    m_pEffect->EffectProcess(this);//エフェクト処理
-
-    CollisionProcess();
-
-    m_pAttack->AttackProcess(this);//現在のアクションモードの攻撃処理を実装
-
-    DiveGaugeMaxEffect();//ダイブゲージがマックスになった時の演出
-
-    m_pWireShot->WireShotProcess(this);//ワイヤー発射状態処理
-
-    CManager::GetDebugProc()->PrintDebugProc("プレイヤーの位置：%f %f %f\n", GetPos().x, GetPos().y, GetPos().z);
-    CManager::GetDebugProc()->PrintDebugProc("プレイヤーの体力：%d\n",GetLife());
-
-    if (GetLife() < 1)
+    if (CScene::GetMode() == CScene::MODE_GAME)
     {
-        CManager::GetSceneFade()->SetSceneFade(CFade::FADEMODE_IN, CScene::MODE_RESULT);
+        AdjustPos();//位置調整処理
+
+        m_pEffect->EffectProcess(this);//エフェクト処理
+
+        CollisionProcess();
+
+        m_pAttack->AttackProcess(this);//現在のアクションモードの攻撃処理を実装
+
+        DiveGaugeMaxEffect();//ダイブゲージがマックスになった時の演出
+
+        m_pWireShot->WireShotProcess(this);//ワイヤー発射状態処理
+
+        CManager::GetDebugProc()->PrintDebugProc("プレイヤーの位置：%f %f %f\n", GetPos().x, GetPos().y, GetPos().z);
+        CManager::GetDebugProc()->PrintDebugProc("プレイヤーの体力：%d\n", GetLife());
+
+        if (GetLife() < 1)
+        {
+            CManager::GetSceneFade()->SetSceneFade(CFade::FADEMODE_IN, CScene::MODE_RESULT);
+        }
     }
 }
 //==========================================================================================================
@@ -288,8 +297,12 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
             //体力
             pPlayer->SetLife(s_nNORMAL_MAXLIFE);
             pPlayer->SetMaxLife(s_nNORMAL_MAXLIFE);
-            pPlayer->m_pHpGauge = CGauge::Create(CGauge::GAUGETYPE::PLAYERHP, s_nNORMAL_MAXLIFE, 600.0f, 50.0f, D3DXVECTOR3(50.0f, SCREEN_HEIGHT - 50.0f, 0.0f));
-            pPlayer->m_pHpGauge->SetUseDeath(false);
+
+            if (CScene::GetMode() == CScene::MODE::MODE_GAME)
+            {
+                pPlayer->m_pHpGauge = CGauge::Create(CGauge::GAUGETYPE::PLAYERHP, s_nNORMAL_MAXLIFE, 600.0f, 50.0f, D3DXVECTOR3(50.0f, SCREEN_HEIGHT - 50.0f, 0.0f));
+                pPlayer->m_pHpGauge->SetUseDeath(false);
+            }
         }
     }
     else

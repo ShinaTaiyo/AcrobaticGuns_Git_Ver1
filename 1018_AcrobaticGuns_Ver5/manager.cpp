@@ -40,7 +40,6 @@ CTexture* CManager::m_pTexture = nullptr;
 CObjectXInfo* CManager::m_pObjectXInfo = nullptr;
 CScene* CManager::m_pScene = nullptr;
 CSceneFade* CManager::m_pSceneFade = nullptr;
-CText* CManager::m_pText = nullptr;
 CDebugProc* CManager::m_pDebugProc = nullptr;
 CInputMouse* CManager::m_pInputMouse = nullptr;
 //===================================================
@@ -129,13 +128,6 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//オブジェクトX情報クラスを生成
     //===============================
 	m_pObjectXInfo = DBG_NEW CObjectXInfo;
-	//======================================================
-
-	//===============================
-	//テキストクラスを生成
-	//===============================
-	m_pText = DBG_NEW CText;
-	m_pText->Init();
 	//======================================================
 
 	//===================================
@@ -290,17 +282,6 @@ void CManager::Uninit()
 		m_pSceneFade->SetUseDeath(true);
 		m_pSceneFade->SetDeath();
 		m_pSceneFade = nullptr;
-	}
-	//===============================================
-
-	//================================
-	//テキスト情報
-	//================================
-	if (m_pText != nullptr)
-	{
-		m_pText->Uninit();
-		delete m_pText;
-		m_pText = nullptr;
 	}
 	//===============================================
 

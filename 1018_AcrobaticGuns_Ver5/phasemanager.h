@@ -27,7 +27,7 @@
 class CPhaseManager : public CObject
 {
 public:
-	CPhaseManager(int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::PHASEMANAGER, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_NONE);  //コンストラクタ
+	CPhaseManager(int nNumStage,int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::PHASEMANAGER, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_NONE);  //コンストラクタ
 	~CPhaseManager(); //デストラクタ
 	HRESULT Init() override;   //初期化処理
 	void Uninit() override;     //終了処理

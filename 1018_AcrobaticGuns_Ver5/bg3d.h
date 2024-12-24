@@ -24,7 +24,7 @@ class CBg3D : public CObjectX
 public:
 	enum class BG3DTYPE
 	{
-		GLASS = 0,
+	    SKY = 0,
 		MAX
 	};
 

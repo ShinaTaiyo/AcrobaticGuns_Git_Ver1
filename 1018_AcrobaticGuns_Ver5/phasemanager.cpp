@@ -29,11 +29,17 @@ bool CPhaseManager::s_bStartFade = false;
 //===============================================================
 //コンストラクタ
 //===============================================================
-CPhaseManager::CPhaseManager(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) :CObject(nPri, bUseintPri, type, ObjType)
+CPhaseManager::CPhaseManager(int nNumStage, int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : 
+	CObject(nPri, bUseintPri, type, ObjType)
 {
 	s_nNowPhase = 0;
 	s_MaxPhase = 0;
 	s_nNowStage = 0;
+
+	if (nNumStage >= static_cast<int>(CStageManager::WORLDTYPE::MAX))
+	{
+		nNumStage = static_cast<int>(CStageManager::WORLDTYPE::MAX) - 1;
+	}
 	s_bStartFade = false;
 }
 //======================================================================================================================
@@ -217,7 +223,7 @@ void CPhaseManager::AdvancePhase()
 //===============================================================
 CPhaseManager* CPhaseManager::Create()
 {
-	CPhaseManager* pPhaseManager = DBG_NEW CPhaseManager();
+	CPhaseManager* pPhaseManager = DBG_NEW CPhaseManager(3);
 
 	pPhaseManager->Init();//初期化処理
 

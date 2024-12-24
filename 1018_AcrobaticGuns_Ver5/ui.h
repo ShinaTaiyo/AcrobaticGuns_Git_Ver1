@@ -66,6 +66,7 @@ public:
 		POSSIBLEDIVENUMTEXT_000,//ダイブ可能回数文字
 		TUTORIAL_TEX,           //チュートリアル用テクスチャ
 		CHECKMARK_000,   //チェックマーク
+		TITLELOGO_000,   //タイトルロゴ
 		MAX
 	};
 

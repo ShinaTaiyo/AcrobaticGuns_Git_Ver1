@@ -54,7 +54,6 @@ public:
 	static CObjectXInfo* GetObjectXInfo() { return m_pObjectXInfo; }    //オブジェクトXクラスを取得する
 	static CSceneFade* GetSceneFade() { return m_pSceneFade; }                         //フェードクラスを取得する
 	static CScene* GetScene() { return m_pScene; }                      //シーンクラスを取得する
-	static CText* GetText() { return m_pText; }                         //テキストクラスを取得する
 	static CDebugProc* GetDebugProc() { return m_pDebugProc; }          //デバッグプロシージャクラスを取得する
 	static CInputMouse* GetInputMouse() { return m_pInputMouse; }       //マウス入力情報を取得する
 	static void SetMode(CScene::MODE mode);                             //モードを設定する
@@ -69,7 +68,6 @@ private:
 	static CObjectXInfo* m_pObjectXInfo;                                //オブジェクトX情報
 	static CScene* m_pScene;                                            //シーン情報
 	static CSceneFade* m_pSceneFade;                                              //フェード情報	
-	static CText* m_pText;                                              //テキスト情報
 	static CDebugProc* m_pDebugProc;                                    //デバッグプロシージャ情報
 	static CInputMouse* m_pInputMouse;                                  //マウス情報
 }; 

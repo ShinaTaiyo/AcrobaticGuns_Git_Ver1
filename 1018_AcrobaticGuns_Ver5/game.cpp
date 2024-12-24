@@ -65,8 +65,9 @@ CGame::~CGame()
 HRESULT CGame::Init()
 {
 	CScene::Init();//シーン初期化処理
+	CObjectX::SetCommonDraw(true);
 
-	CBg3D::Create(CBg3D::BG3DTYPE::GLASS, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1200.0f, 1200.0f, 1200.0f));
+	CBg3D::Create(CBg3D::BG3DTYPE::SKY, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1200.0f, 1200.0f, 1200.0f));
 
 	m_pPhaseManager = CPhaseManager::Create();//フェーズマネージャーを生成
 	m_pPhaseManager->SetUseDeath(false);
