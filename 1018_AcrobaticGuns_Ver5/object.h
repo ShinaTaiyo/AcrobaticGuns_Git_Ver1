@@ -52,6 +52,7 @@ public:
 		STAGEMANAGER,    //ステージマネージャー
 		PHASEMANAGER,    //フェーズマネージャー
 		EVENTMANAGER,    //イベントマネージャー
+		TUTORIAL,        //チュートリアル
 		BG,              //背景
 		FADE,            //フェード
 		MAX

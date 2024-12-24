@@ -22,6 +22,8 @@
 #include "lockon.h"
 #include "wire.h"
 #include "player.h"
+#include "game.h"
+#include "tutorial.h"
 #include "particle.h"
 #include "wire_head.h"
 #include "camera.h"
@@ -70,6 +72,7 @@ void CPlayerMove::MoveProcess(CPlayer* pPlayer)
 		if (bMove == true)
 		{
 			pPlayer->SetMove(AddMove + D3DXVECTOR3(0.0f, Move.y, 0.0f));
+			CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::MOVE);
 		}
 	}
 }
@@ -85,6 +88,7 @@ void CPlayerMove::JumpProcess(CPlayer* pPlayer)
 		pPlayer->SetUseGravity(true, 1.0f);
 		if (CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::A) || CManager::GetInputKeyboard()->GetTrigger(DIK_SPACE))
 		{
+			CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::JUMP);
 			pPlayer->SetMove(D3DXVECTOR3(pPlayer->GetMove().x, 20.0f, pPlayer->GetMove().z));
 		}
 	}
@@ -102,6 +106,7 @@ void CPlayerMove::DodgeProcess(CPlayer* pPlayer)
 		m_bDodge = true;
 		pPlayer->SetMove(D3DXVECTOR3(pPlayer->GetMove().x * s_fACCELL_PARAM, pPlayer->GetMove().y, pPlayer->GetMove().z * s_fACCELL_PARAM));
 		pPlayer->SetUseInteria(true, 0.1f);
+		CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::DASH);
 	}
 	float fAverageSpeed = (fabsf(pPlayer->GetMove().x) + fabsf(pPlayer->GetMove().z)) / 2;
 
@@ -252,6 +257,7 @@ void CPlayerMove_Dive::MoveProcess(CPlayer* pPlayer)
 		else
 		{//引っ付き→ダイブ
 			//pPlayer->SetRot(pPlayer->GetRot());
+			CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::STUCKWALL);
 			pPlayer->ChengeMoveMode(DBG_NEW CPlayerMove_Stuck(pPlayer));
 			pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_Dont());
 		}
@@ -398,6 +404,9 @@ void CPlayerAttack_Shot::AttackProcess(CPlayer* pPlayer)
 		pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::BULLET,CAttack::TARGETTYPE::ENEMY,CAttack::COLLISIONTYPE::SQUARE,true,true,3,0,45,ShotPos, pPlayer->GetRot(), Move, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 		pAttackPlayer->SetUseInteria(false, CObjectXMove::GetNormalInertia());
 		pAttackPlayer->SetAutoSubLife(true);
+
+		CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::SHOT);
+		
 	}
 }
 //======================================================================================================================================================
@@ -471,6 +480,8 @@ void CPlayerAttack_Dive::AttackProcess(CPlayer* pPlayer)
 		pAttackPlayer->SetUseRatioLifeAlpha(true);
 		pAttackPlayer->SetCollisionRelease(false);
 		pDivePossibleNum->SetNumericState(pDivePossibleNum->GetValue() - 1, 50.0f, 50.0f);
+
+		CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::TAKEDIVE);
 	}
 	pPlayer->ChengeMoveMode(DBG_NEW CPlayerMove_PrepDive());
 	pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_Dont());

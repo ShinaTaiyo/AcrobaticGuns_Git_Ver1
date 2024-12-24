@@ -28,6 +28,7 @@
 #include "ui.h"
 #include "particle2d.h"
 #include "debugproc.h"
+#include "tutorial.h"
 #include "collision.h"
 //==========================================================================================================
 
@@ -314,6 +315,7 @@ void CPlayer::ActionModeChenge()
             m_pModeDisp->SetDeath();
             m_pModeDisp = nullptr;
         }
+        CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::MODECHENGE);
 
         //ƒ‚[ƒh‚ðØ‚è‘Ö‚¦‚é
         if (m_NowActionMode == ACTIONMODE::SHOT)

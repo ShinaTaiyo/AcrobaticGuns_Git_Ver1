@@ -48,6 +48,15 @@ private:
 	static int s_nNumNextPhaseEvent;//次のフェーズに移行するイベントの数
 };
 
+//チュートリアルクラス
+class CNowEvent_Tutorial : public CNowEvent
+{
+public:
+	CNowEvent_Tutorial();//コンストラクタ
+	~CNowEvent_Tutorial();//デストラクタ
+	void Process(CEventManager* pEventManager) override;
+};
+
 //===================================================================================================
 
 //==========================================
@@ -63,6 +72,7 @@ public:
 	{
 		NONE = 0, //なし
 		NEXTPHASE,//フェーズを次へ
+		TUTORIAL, //チュートリアル
 		MAX
 	};
 	//=========================================================================================

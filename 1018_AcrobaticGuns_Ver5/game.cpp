@@ -31,6 +31,7 @@
 CPlayer* CGame::m_pPlayer = nullptr;
 CStageManager* CGame::m_pStageManager = nullptr;
 CPhaseManager* CGame::m_pPhaseManager = nullptr;
+CTutorial* CGame::m_pTutorial = nullptr;
 int CGame::s_nPhaseNum = 0;
 bool CGame::s_bUseGamePad = false;
 //=========================================================================================================================
@@ -43,6 +44,7 @@ CGame::CGame(bool bUseGamePad) : m_pBgModel(nullptr)
 	m_pPlayer = nullptr;
 	m_pStageManager = nullptr;
 	m_pPhaseManager = nullptr;
+	m_pTutorial = nullptr;
 	s_nPhaseNum = 0;
 	s_bUseGamePad = bUseGamePad;
 }
@@ -73,6 +75,9 @@ HRESULT CGame::Init()
 	m_pStageManager->SetUseDeath(false);
 
 	m_pStageManager->LoadMapTxt(0);
+
+	m_pTutorial = CTutorial::Create();
+	m_pTutorial->SetUseDeath(false);
 
 	m_pPlayer = CPlayer::Create(m_pStageManager->GetSpawnPoint(), D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 	m_pPlayer->SetUseDeath(false);
@@ -127,6 +132,17 @@ void CGame::Uninit()
 		m_pBgModel->SetUseDeath(true);
 		m_pBgModel->SetDeath();
 		m_pBgModel = nullptr;
+	}
+	//=====================================================================
+
+	//============================================
+	//チュートリアルの破棄
+	//============================================
+	if (m_pTutorial != nullptr)
+	{
+		m_pTutorial->SetUseDeath(true);
+		m_pTutorial->SetDeath();
+		m_pTutorial = nullptr;
 	}
 	//=====================================================================
 

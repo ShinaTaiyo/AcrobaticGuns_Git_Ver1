@@ -64,6 +64,8 @@ public:
 		STAGETEXT,       //ステージ文字
 	    TARGET_000,      //ターゲット
 		POSSIBLEDIVENUMTEXT_000,//ダイブ可能回数文字
+		TUTORIAL_TEX,           //チュートリアル用テクスチャ
+		CHECKMARK_000,   //チェックマーク
 		MAX
 	};
 

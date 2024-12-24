@@ -19,6 +19,7 @@
 #include "main.h"
 #include "phasemanager.h"
 #include "eventmanager.h"
+#include "tutorial.h"
 //===============================================================================
 
 //========================================
@@ -36,10 +37,12 @@ public:
 	static CPhaseManager* GetPhaseManager() { return m_pPhaseManager; }    //フェーズマネージャーを取得する
 	static bool GetUseGamePad() { return s_bUseGamePad; }                    
 	static CStageManager* GetStageManager() { return m_pStageManager; }    //ステージマネージャーを取得する
+	static CTutorial* GetTutorial() { return m_pTutorial; }                //チュートリアル
 private:
 	static CPlayer* m_pPlayer;                                             //プレイヤー
 	static CStageManager* m_pStageManager;                                 //ステージマネージャー
 	static CPhaseManager* m_pPhaseManager;                                 //フェーズマネージャー
+	static CTutorial* m_pTutorial;                                         //チュートリアル
 	CBgModel* m_pBgModel;                                                  //背景モデル
 	static int s_nPhaseNum;                                                //フェーズ番号
 	static bool s_bUseGamePad;                                             //ゲームパッドを使用するかどうか

@@ -1980,9 +1980,9 @@ CEnemyMove_Frightened::~CEnemyMove_Frightened()
 //====================================================================================
 void CEnemyMove_Frightened::Process(CEnemy* pEnemy)
 {
-	float fX = static_cast<float>(rand() % 30 - 15);
-	float fY = static_cast<float>(rand() % 30 - 15);
-	float fZ = static_cast<float>(rand() % 30 - 15);
+	float fX = static_cast<float>(rand() % 10 - 5);
+	float fY = static_cast<float>(rand() % 10 - 5);
+	float fZ = static_cast<float>(rand() % 10 - 5);
 	pEnemy->SetPos(m_StopPos + D3DXVECTOR3(fX, fY, fZ));//k‚¦‚³‚¹‚é
 	pEnemy->SetMove(D3DXVECTOR3(0.0f, 0.0f,0.0f));
 	m_nStateTime--;

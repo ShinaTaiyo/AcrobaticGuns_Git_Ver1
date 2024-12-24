@@ -152,6 +152,7 @@ public:
 	//ï`âÊån
 	//================================
 	void SetUseDraw(bool bUse) { m_bUseDraw = bUse; }//ï`âÊÇ∑ÇÈÇ©Ç«Ç§Ç©Çê›íË
+	const bool& GetUseDraw() const { return m_bUseDraw; }
 	//==============================================================================================================================================================
 protected:
 	LPDIRECT3DVERTEXBUFFER9& GetVertexBuffer() { return m_pVtxBuff; }

@@ -22,6 +22,7 @@
 #include "collision.h"
 #include "object.h"
 #include "objectX.h"
+#include "tutorial.h"
 //====================================================================================================
 
 //====================================================================
@@ -456,12 +457,21 @@ void CCameraState_Normal::Process(CCamera* pCamera)
 	//=================================================
 	if (CManager::GetInputJoypad()->GetRStickPress(16) == true)
 	{
+		if (CScene::GetMode() == CScene::MODE::MODE_GAME)
+		{
+			CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::CAMERACONTROLL);
+		}
+
 		CManager::GetCamera()->SetRot(pCamera->GetRot() + D3DXVECTOR3(cosf(CManager::GetInputJoypad()->GetRStickAimRot() + D3DX_PI) * 0.04f,
 			sinf(CManager::GetInputJoypad()->GetRStickAimRot()) * 0.04f, 0.0f));
 	}
 	float fAngle = 0.0f;
 	if (CManager::GetInputMouse()->GetMouseMoveAngle(fAngle))
 	{
+		if (CScene::GetMode() == CScene::MODE::MODE_GAME)
+		{
+			CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::CAMERACONTROLL);
+		}
 		CManager::GetCamera()->SetRot(pCamera->GetRot() + D3DXVECTOR3(cosf(fAngle) * 0.06f,
 			sinf(fAngle) * 0.06f, 0.0f));
 	}
@@ -510,6 +520,10 @@ void CCameraState_Normal::Process(CCamera* pCamera)
 	//========================================
 	if (CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::Y))
 	{
+		if (CScene::GetMode() == CScene::MODE::MODE_GAME)
+		{
+			CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::TURNAROUND);
+		}
 		pCamera->ChengeState(DBG_NEW CCameraState_TurnAround(pCamera->GetRot() + D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), 0.15f));
 	}
 
