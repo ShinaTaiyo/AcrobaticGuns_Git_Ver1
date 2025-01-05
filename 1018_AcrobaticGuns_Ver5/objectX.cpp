@@ -34,11 +34,8 @@ bool CObjectX::s_bCOMMON_DRAWSHADOW = true;
 //コンストラクタ
 //================================================
 CObjectX::CObjectX(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject(nPri, bUseintPri, type, ObjType)
-, m_ObjectXInfo(), m_bUseAddRot(false),
-m_bUseAddScaling(false), m_nIndexObjectX(0), m_nManagerType(0), m_nObjXType(OBJECTXTYPE_BLOCK),
-m_nTypeNum(0), m_bUseMultiScale(false), m_MultiScale(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_PosInfo({}), m_Rot(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_Scale(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_FormarScale(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_Size(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_VtxMin(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),
-m_OriginVtxMin(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_VtxMax(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_OriginVtxMax(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_AddRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),
-m_AddScale(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_fAxis(0.0f), m_VecAxis(D3DXVECTOR3(0.0f, 1.0f, 0.0f)), m_DrawInfo({})
+, m_ObjectXInfo(), m_nIndexObjectX(0), m_nManagerType(0), m_nObjXType(OBJECTXTYPE_BLOCK), m_fAxis(0.0f), m_VecAxis(D3DXVECTOR3(0.0f, 1.0f, 0.0f)),
+m_nTypeNum(0), m_PosInfo({}),m_DrawInfo({}), m_RotInfo({}), m_SizeInfo({})
 {
 	SetObjectType(CObject::OBJECTTYPE::OBJECTTYPE_X);
 }
@@ -58,9 +55,6 @@ CObjectX::~CObjectX()
 //================================================
 HRESULT CObjectX::Init()
 {
-	m_bUseAddScaling = false;                 //拡大率の加算を使用するかどうか
-	m_AddScale = D3DXVECTOR3(0.0f,0.0f,0.0f);                //拡大率の加算量    
-
 	CObject::Init();
 
 	return S_OK;
@@ -120,43 +114,43 @@ void CObjectX::Update()
 	//==================================
 	//拡大率の加算がONになっていたら
 	//==================================
-	if (m_bUseAddScaling == true)
+	if (m_SizeInfo.bUseAddScaling == true)
 	{
-		m_Scale += m_AddScale;
+		m_SizeInfo.Scale += m_SizeInfo.AddScale;
 	}
 	//==========================================================
 
 	//==================================
 	//拡大率の乗算がONになっていたら
 	//==================================
-	if (m_bUseMultiScale == true)
+	if (m_SizeInfo.bUseMultiScale == true)
 	{
-		m_Scale.x *= m_MultiScale.x;
-		m_Scale.y *= m_MultiScale.y;
-		m_Scale.z *= m_MultiScale.z;
+		m_SizeInfo.Scale.x *= m_SizeInfo.MultiScale.x;
+		m_SizeInfo.Scale.y *= m_SizeInfo.MultiScale.y;
+		m_SizeInfo.Scale.z *= m_SizeInfo.MultiScale.z;
 	}
 	//==========================================================
 
 	//常に拡大率を参照して最大最小頂点を求める
-	if (m_bSwapVtxXZ == false)
+	if (m_SizeInfo.bSwapVtxXZ == false)
 	{
-		m_VtxMax.x = m_OriginVtxMax.x * m_Scale.x;
-		m_VtxMax.y = m_OriginVtxMax.y * m_Scale.y;
-		m_VtxMax.z = m_OriginVtxMax.z * m_Scale.z;
-		m_VtxMin.x = m_OriginVtxMin.x * m_Scale.x;
-		m_VtxMin.y = m_OriginVtxMin.y * m_Scale.y;
-		m_VtxMin.z = m_OriginVtxMin.z * m_Scale.z;
+		m_SizeInfo.VtxMax.x = m_SizeInfo.OriginVtxMax.x * m_SizeInfo.Scale.x;
+		m_SizeInfo.VtxMax.y = m_SizeInfo.OriginVtxMax.y * m_SizeInfo.Scale.y;
+		m_SizeInfo.VtxMax.z = m_SizeInfo.OriginVtxMax.z * m_SizeInfo.Scale.z;
+		m_SizeInfo.VtxMin.x = m_SizeInfo.OriginVtxMin.x * m_SizeInfo.Scale.x;
+		m_SizeInfo.VtxMin.y = m_SizeInfo.OriginVtxMin.y * m_SizeInfo.Scale.y;
+		m_SizeInfo.VtxMin.z = m_SizeInfo.OriginVtxMin.z * m_SizeInfo.Scale.z;
 	}
 	else
 	{
-		m_VtxMax.x = m_OriginVtxMax.x * m_Scale.z;
-		m_VtxMax.y = m_OriginVtxMax.y * m_Scale.y;
-		m_VtxMax.z = m_OriginVtxMax.z * m_Scale.x;
-		m_VtxMin.x = m_OriginVtxMin.x * m_Scale.z;
-		m_VtxMin.y = m_OriginVtxMin.y * m_Scale.y;
-		m_VtxMin.z = m_OriginVtxMin.z * m_Scale.x;
+		m_SizeInfo.VtxMax.x = m_SizeInfo.OriginVtxMax.x * m_SizeInfo.Scale.z;
+		m_SizeInfo.VtxMax.y = m_SizeInfo.OriginVtxMax.y * m_SizeInfo.Scale.y;
+		m_SizeInfo.VtxMax.z = m_SizeInfo.OriginVtxMax.z * m_SizeInfo.Scale.x;
+		m_SizeInfo.VtxMin.x = m_SizeInfo.OriginVtxMin.x * m_SizeInfo.Scale.z;
+		m_SizeInfo.VtxMin.y = m_SizeInfo.OriginVtxMin.y * m_SizeInfo.Scale.y;
+		m_SizeInfo.VtxMin.z = m_SizeInfo.OriginVtxMin.z * m_SizeInfo.Scale.x;
 	}
-	m_Size = m_VtxMax - m_VtxMin;
+	m_SizeInfo.Size = m_SizeInfo.VtxMax - m_SizeInfo.VtxMin;
 
 	if (m_DrawInfo.bColorChenge == true)
 	{
@@ -170,9 +164,9 @@ void CObjectX::Update()
 		m_DrawInfo.bColorChenge = false;
 	}
 
-	if (m_bUseAddRot == true)
+	if (m_RotInfo.bUseAddRot == true)
 	{//向きの加算処理
-		m_Rot += m_AddRot;
+		m_RotInfo.Rot += m_RotInfo.AddRot;
 	}
 
 	CObject::Update();
@@ -203,11 +197,11 @@ void CObjectX::Draw()
 	D3DXMatrixIdentity(&m_DrawInfo.mtxWorld);
 
 	//大きさを反映
-	D3DXMatrixScaling(&mtxScale, m_Scale.x, m_Scale.y, m_Scale.z);
+	D3DXMatrixScaling(&mtxScale, m_SizeInfo.Scale.x, m_SizeInfo.Scale.y, m_SizeInfo.Scale.z);
 	D3DXMatrixMultiply(&m_DrawInfo.mtxWorld, &m_DrawInfo.mtxWorld, &mtxScale);
 
 	//向きを反映
-	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_Rot.y, m_Rot.x, m_Rot.z);
+	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_RotInfo.Rot.y, m_RotInfo.Rot.x, m_RotInfo.Rot.z);
 	D3DXMatrixMultiply(&m_DrawInfo.mtxWorld, &m_DrawInfo.mtxWorld, &mtxRot);
 
 	//位置を反映
@@ -289,15 +283,6 @@ void CObjectX::Draw()
 }
 //================================================================================================================================================
 
-//==========================================================================
-//拡大率の加算を設定
-//==========================================================================
-void CObjectX::SetUseAddScale(D3DXVECTOR3 AddScale, bool bUse)
-{
-	m_bUseAddScaling = bUse;
-	m_AddScale = AddScale;
-}
-//===================================================================================================================================================
 
 //================================================
 //モデル情報を割り当てる
@@ -362,7 +347,7 @@ void CObjectX::SetColor(D3DXCOLOR col, int nColChengeTime, bool bChoose, bool bS
 void CObjectX::CalculateSenterPos()
 {
 	m_PosInfo.SenterPos = m_PosInfo.Pos;
-	m_PosInfo.SenterPos.y += (m_VtxMax.y + m_VtxMin.y) / 2;
+	m_PosInfo.SenterPos.y += (m_SizeInfo.VtxMax.y + m_SizeInfo.VtxMin.y) / 2;
 }
 //================================================================================================================================================
 
@@ -403,29 +388,29 @@ void CObjectX::SetSize()
 		//====================================================
 		//頂点座標を比較してモデルの最小値最大値を取得
 		//====================================================
-		if (vtx.x > m_OriginVtxMax.x)
+		if (vtx.x > m_SizeInfo.OriginVtxMax.x)
 		{
-			m_OriginVtxMax.x = vtx.x;
+			m_SizeInfo.OriginVtxMax.x = vtx.x;
 		}
-		else if (vtx.y > m_OriginVtxMax.y)
+		else if (vtx.y > m_SizeInfo.OriginVtxMax.y)
 		{//今回読み込んだ頂点が、一番大きい頂点より大きい場合
-			m_OriginVtxMax.y = vtx.y;
+			m_SizeInfo.OriginVtxMax.y = vtx.y;
 		}
-		else if (vtx.z > m_OriginVtxMax.z)
+		else if (vtx.z > m_SizeInfo.OriginVtxMax.z)
 		{//今回読み込んだ頂点が、一番大きい頂点より大きい場合
-			m_OriginVtxMax.z = vtx.z;
+			m_SizeInfo.OriginVtxMax.z = vtx.z;
 		}
-		else if (vtx.x < m_OriginVtxMin.x)
+		else if (vtx.x < m_SizeInfo.OriginVtxMin.x)
 		{//今回読み込んだ頂点が、一番小さい頂点より小さい場合
-			m_OriginVtxMin.x = vtx.x;
+			m_SizeInfo.OriginVtxMin.x = vtx.x;
 		}
-		else if (vtx.y < m_OriginVtxMin.y)
+		else if (vtx.y < m_SizeInfo.OriginVtxMin.y)
 		{//今回読み込んだ頂点が、一番小さい頂点より小さい場合
-			m_OriginVtxMin.y = vtx.y;
+			m_SizeInfo.OriginVtxMin.y = vtx.y;
 		}
-		else if (vtx.z < m_OriginVtxMin.z)
+		else if (vtx.z < m_SizeInfo.OriginVtxMin.z)
 		{//今回読み込んだ頂点が、一番小さい頂点より小さい場合
-			m_OriginVtxMin.z = vtx.z;
+			m_SizeInfo.OriginVtxMin.z = vtx.z;
 		}
 		//=============================================================================================================
 
@@ -439,18 +424,18 @@ void CObjectX::SetSize()
 	//==========================================================
 	//上の処理で出した最小最大の頂点を拡大率で計算し直す
 	//==========================================================
-	m_VtxMax.x = m_OriginVtxMax.x * m_Scale.x;
-	m_VtxMax.y = m_OriginVtxMax.y * m_Scale.y;
-	m_VtxMax.z = m_OriginVtxMax.z * m_Scale.z;
-	m_VtxMin.x = m_OriginVtxMin.x * m_Scale.x;
-	m_VtxMin.y = m_OriginVtxMin.y * m_Scale.y;
-	m_VtxMin.z = m_OriginVtxMin.z * m_Scale.z;
+	m_SizeInfo.VtxMax.x = m_SizeInfo.OriginVtxMax.x * m_SizeInfo.Scale.x;
+	m_SizeInfo.VtxMax.y = m_SizeInfo.OriginVtxMax.y * m_SizeInfo.Scale.y;
+	m_SizeInfo.VtxMax.z = m_SizeInfo.OriginVtxMax.z * m_SizeInfo.Scale.z;
+	m_SizeInfo.VtxMin.x = m_SizeInfo.OriginVtxMin.x * m_SizeInfo.Scale.x;
+	m_SizeInfo.VtxMin.y = m_SizeInfo.OriginVtxMin.y * m_SizeInfo.Scale.y;
+	m_SizeInfo.VtxMin.z = m_SizeInfo.OriginVtxMin.z * m_SizeInfo.Scale.z;
 	//================================================================================================================================================
 
 	//==========================================================
 	//最大最小を参照してサイズを設定する
 	//==========================================================
-	m_Size = m_VtxMax - m_VtxMin;
+	m_SizeInfo.Size = m_SizeInfo.VtxMax - m_SizeInfo.VtxMin;
 	//================================================================================================================================================
 
 }
@@ -461,7 +446,7 @@ void CObjectX::SetSize()
 //===================================================================================================================
 void CObjectX::ChengeEditScale()
 {
-	D3DXVECTOR3& Scale = GetScale();//拡大率
+	D3DXVECTOR3& Scale = m_SizeInfo.GetScale();//拡大率
 
 	ChengeEditScaleX();
 
@@ -478,7 +463,7 @@ void CObjectX::ChengeEditScale()
 //===================================================================================================================
 void CObjectX::ChengeEditScaleX()
 {
-	D3DXVECTOR3& Scale = GetScale();                                //拡大率
+	D3DXVECTOR3& Scale = m_SizeInfo.GetScale();                                //拡大率
 
 	if (CManager::GetInputKeyboard()->GetPress(DIK_LCONTROL) == true)
 	{//Lコントロールキーを押しながら
@@ -517,7 +502,7 @@ void CObjectX::ChengeEditScaleX()
 //===================================================================================================================
 void CObjectX::ChengeEditScaleY()
 {
-	D3DXVECTOR3& Scale = GetScale();                                //拡大率
+	D3DXVECTOR3& Scale = m_SizeInfo.GetScale();                                //拡大率
 
 	if (CManager::GetInputKeyboard()->GetPress(DIK_LCONTROL) == true)
 	{//Lコントロールキーを押しながら
@@ -555,7 +540,7 @@ void CObjectX::ChengeEditScaleY()
 //===================================================================================================================
 void CObjectX::ChengeEditScaleZ()
 {
-	D3DXVECTOR3& Scale = GetScale();                                //拡大率
+	D3DXVECTOR3& Scale = m_SizeInfo.GetScale();                                //拡大率
 	if (CManager::GetInputKeyboard()->GetPress(DIK_LCONTROL) == true)
 	{//Lコントロールキーを押しながら
 		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
@@ -632,13 +617,13 @@ void CObjectX::ChengeEditPos()
 	}
 	else
 	{
-		CCalculation::CaluclationMove(false, Move, 5.0f, CCalculation::MOVEAIM_XZ, m_Rot.y);
+		CCalculation::CaluclationMove(false, Move, 5.0f, CCalculation::MOVEAIM_XZ, m_RotInfo.Rot.y);
 	}
 	//支点も一緒に移動
 	m_PosInfo.Pos += Move;
 	m_PosInfo.SupportPos = m_PosInfo.Pos;
 	CManager::GetDebugProc()->PrintDebugProc("支点位置(矢印キー) %f %f %f\n", m_PosInfo.SupportPos.x,m_PosInfo.SupportPos.y, m_PosInfo.SupportPos.z);
-	CManager::GetDebugProc()->PrintDebugProc("向きZ(FGキー) %f\n", m_Rot.z);
+	CManager::GetDebugProc()->PrintDebugProc("向きZ(FGキー) %f\n", m_RotInfo.Rot.z);
 	CManager::GetCamera()->SetPosR(m_PosInfo.Pos);
 	//================================================================================================================================================
 
@@ -654,10 +639,10 @@ void CObjectX::ChengeEditSwapVtxXZ()
 
 	if (pInputKeyBoard->GetTrigger(DIK_7))
 	{
-		m_bSwapVtxXZ = m_bSwapVtxXZ ? false : true;
+		m_SizeInfo.bSwapVtxXZ = m_SizeInfo.bSwapVtxXZ ? false : true;
 	}
 
-	CManager::GetDebugProc()->PrintDebugProc("頂点のXZを入れ替えるかどうか（７）：%d\n", m_bSwapVtxXZ);
+	CManager::GetDebugProc()->PrintDebugProc("頂点のXZを入れ替えるかどうか（７）：%d\n", m_SizeInfo.bSwapVtxXZ);
 }
 //================================================================================================================================================
 
@@ -684,14 +669,14 @@ void CObjectX::SaveInfoTxt(fstream & WritingFile)
 	WritingFile << "POS = " << fixed << setprecision(3)<< m_PosInfo.Pos.x << " " <<
 		fixed << setprecision(3) << m_PosInfo.Pos.y << " " << 
 		fixed << setprecision(3) << m_PosInfo.Pos.z << " " << endl;//位置
-	WritingFile << "ROT = " << fixed << setprecision(3) << m_Rot.x << " " <<
-		fixed << setprecision(3) << m_Rot.y << " " <<
-		fixed << setprecision(3) << m_Rot.z << " " << endl;//向き
-	WritingFile << "SCALE = " << fixed << setprecision(3) << m_Scale.x << " " <<
-		fixed << setprecision(3) << m_Scale.y << " " <<
-		fixed << setprecision(3) << m_Scale.z << " " << endl;//拡大率
+	WritingFile << "ROT = " << fixed << setprecision(3) << m_RotInfo.Rot.x << " " <<
+		fixed << setprecision(3) << m_RotInfo.Rot.y << " " <<
+		fixed << setprecision(3) << m_RotInfo.Rot.z << " " << endl;//向き
+	WritingFile << "SCALE = " << fixed << setprecision(3) << m_SizeInfo.Scale.x << " " <<
+		fixed << setprecision(3) << m_SizeInfo.Scale.y << " " <<
+		fixed << setprecision(3) << m_SizeInfo.Scale.z << " " << endl;//拡大率
 
-	WritingFile << "SWAPVTXXZ = " << m_bSwapVtxXZ << endl;
+	WritingFile << "SWAPVTXXZ = " << m_SizeInfo.bSwapVtxXZ << endl;
 }
 //================================================================================================================================================
 
@@ -737,7 +722,7 @@ void CObjectX::DrawShadow()
 	D3DXMatrixShadow(&mtxShadow, &vecLight, &plane);
 
 	//大きさを反映
-	D3DXMatrixScaling(&mtxScale, m_Scale.x, m_Scale.y, m_Scale.z);
+	D3DXMatrixScaling(&mtxScale, m_SizeInfo.Scale.x, m_SizeInfo.Scale.y, m_SizeInfo.Scale.z);
 	D3DXMatrixMultiply(&mtxShadow, &mtxShadow, &mtxScale);
 
 	////向きを反映
@@ -757,7 +742,7 @@ void CObjectX::DrawShadow()
 			{
 				CObjectX* pObjX = static_cast<CObjectX*>(pObj);
 				if (CCollision::RayIntersectsAABBCollisionPos(m_PosInfo.Pos + D3DXVECTOR3(0.0f,0.1f,0.0f), D3DXVECTOR3(0.0f, -1.0f, 0.0f),
-					pObjX->GetPosInfo().GetPos() + pObjX->GetVtxMin(),pObjX->GetPosInfo().GetPos() + pObjX->GetVtxMax(), CalcRayCollisionPos))
+					pObjX->GetPosInfo().GetPos() + pObjX->m_SizeInfo.GetVtxMin(),pObjX->GetPosInfo().GetPos() + pObjX->m_SizeInfo.GetVtxMax(), CalcRayCollisionPos))
 				{
 					float fLength = sqrtf(powf(CalcRayCollisionPos.y - m_PosInfo.Pos.y,2));//レイが当たった位置のY軸の距離を取る
 					nCntColRay++;
@@ -828,5 +813,15 @@ void CObjectX::DrawShadow()
 
 	//保存していたマテリアルを戻す
 	pDevice->SetMaterial(&matDef);
+}
+//================================================================================================================================================
+
+//============================================================================
+//拡大率を加算するかどうか
+//============================================================================
+void CObjectX::SizeInfo::SetUseAddScale(D3DXVECTOR3 CopyAddScale, bool bUse)
+{
+	bUseAddScaling = bUse;
+	AddScale = CopyAddScale;
 }
 //================================================================================================================================================

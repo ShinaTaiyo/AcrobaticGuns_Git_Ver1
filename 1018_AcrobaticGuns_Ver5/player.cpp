@@ -289,9 +289,9 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
             pPlayer->GetPosInfo().SetPos(pos);                                                            //ˆÊ’u‚ÌÝ’è
             pPlayer->GetPosInfo().SetPosOld(pos);                                                         //1f‘O‚ÌˆÊ’u‚ðÝ’è
             pPlayer->GetPosInfo().SetSupportPos(pos);                                                     //Ý’uˆÊ’u
-            pPlayer->SetRot(rot);                                                            //Œü‚«‚ÌÝ’è
-            pPlayer->SetScale(Scale);                                                        //Šg‘å—¦‚ÌÝ’è
-            pPlayer->SetFormarScale(Scale);                                                  //Œ³‚ÌŠg‘å—¦‚ðÝ’è‚·‚é
+            pPlayer->GetRotInfo().SetRot(rot);                                                            //Œü‚«‚ÌÝ’è
+            pPlayer->GetSizeInfo().SetScale(Scale);                                                        //Šg‘å—¦‚ÌÝ’è
+            pPlayer->GetSizeInfo().SetFormarScale(Scale);                                                  //Œ³‚ÌŠg‘å—¦‚ðÝ’è‚·‚é
             pPlayer->SetAutoDeath(false);                                                    //Ž€–Sƒtƒ‰ƒO‚ðŽ©“®‚Å”­“®‚·‚é‚©‚Ç‚¤‚©
             pPlayer->GetDrawInfo().SetUseShadow(true);
             //‘Ì—Í
@@ -466,8 +466,8 @@ void CPlayer::CollisionProcess()
 {
     D3DXVECTOR3 MyPos = GetPosInfo().GetPos();
     D3DXVECTOR3 MyPosOld = GetPosInfo().GetPosOld();
-    D3DXVECTOR3 MyVtxMax = GetVtxMax();
-    D3DXVECTOR3 MyVtxMin = GetVtxMin();
+    D3DXVECTOR3 MyVtxMax = GetSizeInfo().GetVtxMax();
+    D3DXVECTOR3 MyVtxMin = GetSizeInfo().GetVtxMin();
     const D3DXVECTOR3 Move = GetMove();
     bool bCollisionXOld = GetExtrusionCollisionSquareX();
     bool bCollisionYOld = GetExtrusionCollisionSquareY();
@@ -497,8 +497,8 @@ void CPlayer::CollisionProcess()
             if (type == CObject::TYPE::BLOCK || type == CObject::TYPE::BGMODEL)
             {
                 D3DXVECTOR3 ComPos = static_cast<CObjectX*>(pObj)->GetPosInfo().GetPos();
-                D3DXVECTOR3 ComVtxMax = static_cast<CObjectX*>(pObj)->GetVtxMax();
-                D3DXVECTOR3 ComVtxMin = static_cast<CObjectX*>(pObj)->GetVtxMin();
+                D3DXVECTOR3 ComVtxMax = static_cast<CObjectX*>(pObj)->GetSizeInfo().GetVtxMax();
+                D3DXVECTOR3 ComVtxMin = static_cast<CObjectX*>(pObj)->GetSizeInfo().GetVtxMin();
 
                 bSuccessCollision = CCollision::ExtrusionCollisionSquare(MyPos, bCollisionX, bCollisionY, bCollisionZ, Move, MyPosOld, MyVtxMax, MyVtxMin,
                     ComPos, ComVtxMax, ComVtxMin, bCollisionXOld, bCollisionYOld, bCollisionZOld, bIsLanding);
@@ -591,7 +591,7 @@ void CPlayer::AdjustRot()
 {
     //D3DXVECTOR3& Rot = GetRot();
     const D3DXVECTOR3& CameraRot = CManager::GetCamera()->GetRot();
-    SetRot(D3DXVECTOR3(GetRot().x,D3DX_PI + CameraRot.y,GetRot().z));
+    GetRotInfo().SetRot(D3DXVECTOR3(GetRotInfo().GetRot().x,D3DX_PI + CameraRot.y, GetRotInfo().GetRot().z));
 
     //CCamera* pCaemra = CManager::GetCamera();
     //if (m_pLockOn->GetEndState() == CLockon::ENDSTATE::RIGHTEND)

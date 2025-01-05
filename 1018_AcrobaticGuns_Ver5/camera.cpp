@@ -268,7 +268,7 @@ void CCamera::MakeTransparent()
 			if (pObj->GetObjectType() == CObject::OBJECTTYPE::OBJECTTYPE_X && pObj->GetType() != CObject::TYPE::PLAYER && pObj->GetType() != CObject::TYPE::ENEMY)
 			{
 				CObjectX* pObjX = static_cast<CObjectX*>(pObj);//オブジェクトXの機能を使う
-				if (CCollision::RayIntersectsAABBCollisionPos(m_PosV, Ray, pObjX->GetPosInfo().GetPos() + pObjX->GetVtxMin(), pObjX->GetPosInfo().GetPos() + pObjX->GetVtxMax(), RayCollisionPos))
+				if (CCollision::RayIntersectsAABBCollisionPos(m_PosV, Ray, pObjX->GetPosInfo().GetPos() + pObjX->GetSizeInfo().GetVtxMin(), pObjX->GetPosInfo().GetPos() + pObjX->GetSizeInfo().GetVtxMax(), RayCollisionPos))
 				{
 					fLength = CCalculation::CalculationLength(m_PosV,RayCollisionPos);
 

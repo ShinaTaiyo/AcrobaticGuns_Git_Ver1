@@ -671,8 +671,8 @@ void CStageManagerState_NewObject::ReleaseObject(CStageManager* pStageManager)
 	{
 	case CObject::OBJECTTYPE::OBJECTTYPE_X:
 		pStageManager->SetSavePos(static_cast<CObjectX*>(m_pManagerObject)->GetPosInfo().GetPos());
-		pStageManager->SetSaveRot(static_cast<CObjectX*>(m_pManagerObject)->GetRot());
-		pStageManager->SetSaveScale(static_cast<CObjectX*>(m_pManagerObject)->GetScale());
+		pStageManager->SetSaveRot(static_cast<CObjectX*>(m_pManagerObject)->GetRotInfo().GetRot());
+		pStageManager->SetSaveScale(static_cast<CObjectX*>(m_pManagerObject)->GetSizeInfo().GetScale());
 		break;
 	default:
 		break;

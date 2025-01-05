@@ -103,9 +103,9 @@ CWireHead* CWireHead::Create(D3DXVECTOR3 Pos, D3DXVECTOR3 Rot, D3DXVECTOR3 Move,
 	pWireHead->Init();
 	pWireHead->GetPosInfo().SetPos(Pos);
 	pWireHead->GetPosInfo().SetSupportPos(Pos);
-	pWireHead->SetRot(Rot);
+	pWireHead->GetRotInfo().SetRot(Rot);
 	pWireHead->SetMove(Move);
-	pWireHead->SetScale(Scale);
+	pWireHead->GetSizeInfo().SetScale(Scale);
 	pWireHead->SetLife(nLife);
 	pWireHead->SetMaxLife(nLife);
 	pWireHead->SetAutoSubLife(true);
@@ -141,7 +141,7 @@ bool CWireHead::CollisionSquare()
 			if (type == CObject::TYPE::BGMODEL || type == CObject::TYPE::ENEMY || type == CObject::TYPE::BLOCK)
 			{
 				CObjectX* pObjX = static_cast<CObjectX*>(pObj);
-				if (CCollision::CollisionSquare(GetPosInfo().GetPos(), GetVtxMax(), GetVtxMin(), pObjX->GetPosInfo().GetPos(), pObjX->GetVtxMax(), pObjX->GetVtxMin()) == true)
+				if (CCollision::CollisionSquare(GetPosInfo().GetPos(), GetSizeInfo().GetVtxMax(), GetSizeInfo().GetVtxMin(), pObjX->GetPosInfo().GetPos(), pObjX->GetSizeInfo().GetVtxMax(), pObjX->GetSizeInfo().GetVtxMin()) == true)
 				{
 					CManager::GetDebugProc()->PrintDebugProc("ワイヤーヘッドの当たり判定成功！\n");
 					return true;

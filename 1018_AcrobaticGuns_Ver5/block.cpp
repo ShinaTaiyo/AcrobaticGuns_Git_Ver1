@@ -125,8 +125,8 @@ CBlock* CBlock::Create(BLOCKTYPE type, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 r
 		if (pBlock != nullptr)
 		{
 			pBlock->Init();                               //初期化処理
-			pBlock->SetRot(rot);                          //向きを設定
-			pBlock->SetUseSwapVtxXZ(bSwapVtxXZ);          //頂点XZを入れ替える
+			pBlock->GetRotInfo().SetRot(rot);                          //向きを設定
+			pBlock->GetSizeInfo().SetUseSwapVtxXZ(bSwapVtxXZ);          //頂点XZを入れ替える
 			pBlock->SetUseDeath(true);                    //死亡フラグを発動するかどうかを設定する
 			pBlock->m_type = type;                        //ブロックの種類
 			pBlock->SetLife(nLife);                       //ブロックの体力
@@ -137,8 +137,8 @@ CBlock* CBlock::Create(BLOCKTYPE type, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 r
 			pBlock->GetPosInfo().SetPos(pos);                //オブジェクトXの位置を設定
 			pBlock->GetPosInfo().SetPosOld(pos);                       //1f前の位置を設定
 			pBlock->CObject::SetType(CObject::TYPE::BLOCK);//オブジェクトの種類を決める
-			pBlock->SetScale(scale);                      //オブジェクトの拡大率
-			pBlock->SetFormarScale(scale);                //元の拡大率を設定する
+			pBlock->GetSizeInfo().SetScale(scale);                      //オブジェクトの拡大率
+			pBlock->GetSizeInfo().SetFormarScale(scale);                //元の拡大率を設定する
 			nIdx = CManager::GetObjectXInfo()->Regist(m_BLOCK_FILENAME[(int)(type)]);
 			pBlock->CObjectX::BindObjectXInfo(CManager::GetObjectXInfo()->GetMesh(nIdx),
 				CManager::GetObjectXInfo()->GetBuffMat(nIdx),
@@ -150,7 +150,7 @@ CBlock* CBlock::Create(BLOCKTYPE type, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 r
 			pBlock->CObjectX::SetTypeNum((int)(type));                                //オブジェクトXごとのタイプ番号を設定
 			pBlock->SetSize();                                                        //Xオブジェクトのサイズを設定する
 			pBlock->SetManagerObjectType(CObject::MANAGEROBJECTTYPE::BLOCK);           //マネージャーで呼び出す時の種類を設定
-			pBlock->ActiveSwapVtxMaxMin();
+			pBlock->GetSizeInfo().ActiveSwapVtxMaxMin();
 		}
 	}
 	else
@@ -186,8 +186,8 @@ void CBlock::Collision()
 	D3DXVECTOR3 ComparisonVtxMin = D3DXVECTOR3(0.0f,0.0f,0.0f);               //判定対象の最小頂点を取得
 	D3DXVECTOR3 MySize = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	D3DXVECTOR3 BlockPos = GetPosInfo().GetPos();                          //ブロックの位置を取得
-	D3DXVECTOR3 BlockVtxMax = GetVtxMax();                    //ブロックの最大頂点を取得
-	D3DXVECTOR3 BlockVtxMin = GetVtxMin();                    //ブロックの最小頂点を取得
+	D3DXVECTOR3 BlockVtxMax = GetSizeInfo().GetVtxMax();                    //ブロックの最大頂点を取得
+	D3DXVECTOR3 BlockVtxMin = GetSizeInfo().GetVtxMin();                    //ブロックの最小頂点を取得
 	//===========================================================
 
 	//オブジェクト取得
@@ -213,21 +213,21 @@ void CBlock::Collision()
 				ComparisonPos.y = (float)(floor(((CObjectX*)pObj)->GetPosInfo().GetPos().y));                   //位置を取得
 				ComparisonPos.z = (float)(floor(((CObjectX*)pObj)->GetPosInfo().GetPos().z));                   //位置を取得]
 
-				ComparisonVtxMax.x = (float)(floor(((CObjectX*)pObj)->GetVtxMax().x));             //最大頂点を取得
-				ComparisonVtxMax.y = (float)(floor(((CObjectX*)pObj)->GetVtxMax().y));             //最大頂点を取得
-				ComparisonVtxMax.z = (float)(floor(((CObjectX*)pObj)->GetVtxMax().z));             //最大頂点を取得
+				ComparisonVtxMax.x = (float)(floor(((CObjectX*)pObj)->GetSizeInfo().GetVtxMax().x));             //最大頂点を取得
+				ComparisonVtxMax.y = (float)(floor(((CObjectX*)pObj)->GetSizeInfo().GetVtxMax().y));             //最大頂点を取得
+				ComparisonVtxMax.z = (float)(floor(((CObjectX*)pObj)->GetSizeInfo().GetVtxMax().z));             //最大頂点を取得
 
-				ComparisonVtxMin.x = (float)(floor(((CObjectX*)pObj)->GetVtxMin().x));             //最小頂点を取得
-				ComparisonVtxMin.y = (float)(floor(((CObjectX*)pObj)->GetVtxMin().y));             //最小頂点を取得
-				ComparisonVtxMin.z = (float)(floor(((CObjectX*)pObj)->GetVtxMin().z));             //最小頂点を取得
+				ComparisonVtxMin.x = (float)(floor(((CObjectX*)pObj)->GetSizeInfo().GetVtxMin().x));             //最小頂点を取得
+				ComparisonVtxMin.y = (float)(floor(((CObjectX*)pObj)->GetSizeInfo().GetVtxMin().y));             //最小頂点を取得
+				ComparisonVtxMin.z = (float)(floor(((CObjectX*)pObj)->GetSizeInfo().GetVtxMin().z));             //最小頂点を取得
 
 				ComparisonPosOld.x = (float)(floor(((CObjectX*)pObj)->GetPosInfo().GetPosOld().x));             //1f前の位置を取得
 				ComparisonPosOld.y = (float)(floor(((CObjectX*)pObj)->GetPosInfo().GetPosOld().y));             //1f前の位置を取得
 				ComparisonPosOld.z = (float)(floor(((CObjectX*)pObj)->GetPosInfo().GetPosOld().z));             //1f前の位置を取得
 
-				MySize.x = (float)(floor(((CObjectX*)pObj)->GetSize().x));
-				MySize.y = (float)(floor(((CObjectX*)pObj)->GetSize().y));
-				MySize.z = (float)(floor(((CObjectX*)pObj)->GetSize().z));
+				MySize.x = (float)(floor(((CObjectX*)pObj)->GetSizeInfo().GetSize().x));
+				MySize.y = (float)(floor(((CObjectX*)pObj)->GetSizeInfo().GetSize().y));
+				MySize.z = (float)(floor(((CObjectX*)pObj)->GetSizeInfo().GetSize().z));
 				//((CObjectX*)pObj)->SetLiftLanding(false);                     //リフトに乗っていない状態に初期化
 				//上
 				if (ComparisonPos.x + ComparisonVtxMax.x > BlockPos.x + BlockVtxMin.x
@@ -376,17 +376,17 @@ void CBlock::LandingCorrection(D3DXVECTOR3& Pos, CObject* pSaveObj,D3DXVECTOR3 V
 			ComparisonPosOld.y = (float)(floor(pBlock->GetPosInfo().GetPosOld().y));
 			ComparisonPosOld.z = (float)(floor(pBlock->GetPosInfo().GetPosOld().z));
 
-			ComparisonVtxMax.x = (float)(floor(pBlock->GetVtxMax().x));
-			ComparisonVtxMax.y = (float)(floor(pBlock->GetVtxMax().y));
-			ComparisonVtxMax.z = (float)(floor(pBlock->GetVtxMax().z));
+			ComparisonVtxMax.x = (float)(floor(pBlock->GetSizeInfo().GetVtxMax().x));
+			ComparisonVtxMax.y = (float)(floor(pBlock->GetSizeInfo().GetVtxMax().y));
+			ComparisonVtxMax.z = (float)(floor(pBlock->GetSizeInfo().GetVtxMax().z));
 
-			ComparisonVtxMin.x = (float)(floor(pBlock->GetVtxMin().x));
-			ComparisonVtxMin.y = (float)(floor(pBlock->GetVtxMin().y));
-			ComparisonVtxMin.z = (float)(floor(pBlock->GetVtxMin().z));
+			ComparisonVtxMin.x = (float)(floor(pBlock->GetSizeInfo().GetVtxMin().x));
+			ComparisonVtxMin.y = (float)(floor(pBlock->GetSizeInfo().GetVtxMin().y));
+			ComparisonVtxMin.z = (float)(floor(pBlock->GetSizeInfo().GetVtxMin().z));
 
-			ComparisonSize.x = (float)(floor(pBlock->GetSize().x));
-			ComparisonSize.y = (float)(floor(pBlock->GetSize().y));
-			ComparisonSize.z = (float)(floor(pBlock->GetSize().z));
+			ComparisonSize.x = (float)(floor(pBlock->GetSizeInfo().GetSize().x));
+			ComparisonSize.y = (float)(floor(pBlock->GetSizeInfo().GetSize().y));
+			ComparisonSize.z = (float)(floor(pBlock->GetSizeInfo().GetSize().z));
 			 
 
 			float fPosY = fabsf(MyVtxMin.y);
@@ -470,7 +470,7 @@ CObject* CBlock::ManagerChengeObject(bool bAim)
 	SetDeath();
 	//======================================================================================
 
-	return CBlock::Create(NewType, GetMaxLife(), GetPosInfo().GetPos(), GetRot(), GetScale(),GetUseSwapVtxXZ());//生成したオブジェクトを返す
+	return CBlock::Create(NewType, GetMaxLife(), GetPosInfo().GetPos(), GetRotInfo().GetRot(), GetSizeInfo().GetScale(), GetSizeInfo().GetUseSwapVtxXZ());//生成したオブジェクトを返す
 }
 //=========================================================================================================================
 
@@ -549,7 +549,7 @@ void CBlock::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveManager, 
 //=======================================================================
 CObject* CBlock::ManagerSaveObject()
 {
-	return CBlock::Create(m_type, GetMaxLife(), GetPosInfo().GetPos(), GetRot(), GetScale(),GetUseSwapVtxXZ());//生成したオブジェクトを返す
+	return CBlock::Create(m_type, GetMaxLife(), GetPosInfo().GetPos(), GetRotInfo().GetRot(), GetSizeInfo().GetScale(),GetSizeInfo().GetUseSwapVtxXZ());//生成したオブジェクトを返す
 }
 //=========================================================================================================================
 

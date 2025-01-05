@@ -195,7 +195,7 @@ void CWire::Draw()
 	if (m_pWireHead != nullptr && GetUseDraw() == true)
 	{
 		D3DXVECTOR3 PosZero = D3DXVECTOR3(0.0f, 0.0f, 0.0f);//ワールド座標代入処理で使用する
-		D3DXVECTOR3 WireHeadRot = m_pWireHead->GetRot();//ワイヤーヘッドの向き
+		D3DXVECTOR3 WireHeadRot = m_pWireHead->GetRotInfo().GetRot();//ワイヤーヘッドの向き
 		D3DXVECTOR3 WireHeadPos = m_pWireHead->GetPosInfo().GetPos();//ワイヤーヘッドの位置
 		int Size = m_VecMtxCircle.size();
 

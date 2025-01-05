@@ -64,7 +64,7 @@ void CPlayerMove::MoveProcess(CPlayer* pPlayer)
 		float fRotAim = 0.0f;
 
 		bMove = CCalculation::CaluclationMove(true, AddMove, 10.0f, CCalculation::MOVEAIM_XZ, fRotAim);
-		pPlayer->SetRot(D3DXVECTOR3(pPlayer->GetRot().x, fRotAim, pPlayer->GetRot().z));
+		pPlayer->GetRotInfo().SetRot(D3DXVECTOR3(pPlayer->GetRotInfo().GetRot().x, fRotAim, pPlayer->GetRotInfo().GetRot().z));
 
 		pPlayer->SetUseInteria(true, CObjectXMove::GetNormalInertia());
 		pPlayer->SetUseGravity(true, CObjectXMove::GetNormalGravity());
@@ -250,7 +250,7 @@ void CPlayerMove_Dive::MoveProcess(CPlayer* pPlayer)
 			pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_Dive());
 			pPlayer->GetWire()->SetUseDraw(false);
 			pPlayer->ChengeMoveMode(DBG_NEW CPlayerMove_PrepDive());
-			pPlayer->SetRot(D3DXVECTOR3(0.0f, pCamera->GetRot().y, 0.0f));
+			pPlayer->GetRotInfo().SetRot(D3DXVECTOR3(0.0f, pCamera->GetRot().y, 0.0f));
 			//pPlayer->SetRot(D3DXVECTOR3(0.0f, pPlayer->GetRot().y, 0.0f));//向きを前に傾ける
 		}
 		else
@@ -291,7 +291,7 @@ CPlayerMove_Stuck::CPlayerMove_Stuck(CPlayer* pPlayer) : m_NowPos(pPlayer->GetPo
 		pCamera->GetRot().y > ResultRot.y - 0.5f && pCamera->GetRot().y < ResultRot.y + 0.5f)
 	{//現在のカメラの向きが目的の向きに近かったらダイブ先に合わせる
 		//CParticle::SummonParticle(CParticle::TYPE::TYPE00_NORMAL, 10, 60, 30.0f, 30.0f, 100, 10, false, pPlayer->GetSenterPos(), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
-		pCamera->ChengeState(DBG_NEW CCameraState_TurnAround(D3DXVECTOR3(-pWireHead->GetRot().x, pWireHead->GetRot().y + D3DX_PI, 0.0f), 0.15f));
+		pCamera->ChengeState(DBG_NEW CCameraState_TurnAround(D3DXVECTOR3(-pWireHead->GetRotInfo().GetRot().x, pWireHead->GetRotInfo().GetRot().y + D3DX_PI, 0.0f), 0.15f));
 	}
 	//==============================================================================================
 }
@@ -316,7 +316,7 @@ void CPlayerMove_Stuck::MoveProcess(CPlayer* pPlayer)
 	//*変数宣言
 	CCamera* pCamera = CManager::GetCamera(); // カメラへのポインタ
 	CWireHead* pWireHead = pPlayer->GetWire()->GetWireHead(); // ワイヤーヘッドへのポインタ
-	D3DXVECTOR3 WireHeadRot = pWireHead->GetRot(); // ワイヤーヘッドの向き（オイラー角）
+	D3DXVECTOR3 WireHeadRot = pWireHead->GetRotInfo().GetRot(); // ワイヤーヘッドの向き（オイラー角）
 	CWire* pWire = pPlayer->GetWire();
 	CLockon* pLockon = pPlayer->GetLockOn();//ロックオンへのポインタ
 
@@ -394,13 +394,13 @@ CPlayerAttack_Shot::~CPlayerAttack_Shot()
 void CPlayerAttack_Shot::AttackProcess(CPlayer* pPlayer)
 {
 	CLockon* pLockon = pPlayer->GetLockOn();
-	D3DXVECTOR3 ShotPos = pPlayer->GetPosInfo().GetPos() + D3DXVECTOR3(0.0f, pPlayer->GetVtxMax().y, 0.0f);
+	D3DXVECTOR3 ShotPos = pPlayer->GetPosInfo().GetPos() + D3DXVECTOR3(0.0f, pPlayer->GetSizeInfo().GetVtxMax().y, 0.0f);
 	D3DXVECTOR3 Move = CCalculation::Calculation3DVec(ShotPos, pLockon->GetNearRayColObjPos(), s_fNORMAL_SHOTSPEED);
 	CAttackPlayer* pAttackPlayer = nullptr;//プレイヤー攻撃へのポインタ
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_J) == true || CManager::GetInputJoypad()->GetRT_Repeat(4) == true ||
 		CManager::GetInputMouse()->GetMouseLeftClickRepeat(4) == true)
 	{
-		pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::BULLET,CAttack::TARGETTYPE::ENEMY,CAttack::COLLISIONTYPE::SQUARE,true,true,3,0,45,ShotPos, pPlayer->GetRot(), Move, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+		pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::BULLET,CAttack::TARGETTYPE::ENEMY,CAttack::COLLISIONTYPE::SQUARE,true,true,3,0,45,ShotPos, pPlayer->GetRotInfo().GetRot(), Move, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 		pAttackPlayer->SetUseInteria(false, CObjectXMove::GetNormalInertia());
 		pAttackPlayer->SetAutoSubLife(true);
 
@@ -474,7 +474,7 @@ void CPlayerAttack_Dive::AttackProcess(CPlayer* pPlayer)
 	{//ダイブゲージがたまっていたら爆発攻撃を発動
 		CAttackPlayer* pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::ENEMY, CAttack::COLLISIONTYPE::SQUARE, false,true, 50,30, 100, pPlayer->GetPosInfo().GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.1f, 0.1f, 0.1f),
 			D3DXVECTOR3(1.0f, 1.0f, 1.0f));
-		pAttackPlayer->SetUseAddScale(D3DXVECTOR3(0.4f, 0.4f, 0.4f), true);
+		pAttackPlayer->GetSizeInfo().SetUseAddScale(D3DXVECTOR3(0.4f, 0.4f, 0.4f), true);
 		pAttackPlayer->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), 200, false, false);
 		pAttackPlayer->SetUseRatioLifeAlpha(true);
 		pAttackPlayer->SetCollisionRelease(false);
@@ -552,7 +552,7 @@ void CPlayerEffect_Dive::EffectProcess(CPlayer* pPlayer)
 
 	//縦にメッシュの軌跡を展開
 	pMeshOrbit->SetPos1(pPlayer->GetPosInfo().GetPos());
-	pMeshOrbit->SetPos2(pPlayer->GetPosInfo().GetPos() + D3DXVECTOR3(0.0f, pPlayer->GetVtxMax().y, 0.0f));
+	pMeshOrbit->SetPos2(pPlayer->GetPosInfo().GetPos() + D3DXVECTOR3(0.0f, pPlayer->GetSizeInfo().GetVtxMax().y, 0.0f));
 
 	//現在の位置にシリンダーを展開
 	//pWire->SetPos(pPlayer->GetPos());
@@ -607,7 +607,7 @@ void CPlayerWireShot::StartWireShotProcess(CPlayer* pPlayer)
 	pPlayer->GetWire()->GetWireHead()->SetUseInteria(false, CObjectXMove::GetNormalInertia());
 	pPlayer->GetWire()->GetWireHead()->SetUseGravity(false, 1.0f);
 	pPlayer->GetWire()->SetUseDraw(true);
-	pPlayer->GetWire()->GetWireHead()->SetRot(D3DXVECTOR3(D3DX_PI * 0.5f + fPitch, fYaw, 0.0f));//Xの意味は、前を基準にするという意味
+	pPlayer->GetWire()->GetWireHead()->GetRotInfo().SetRot(D3DXVECTOR3(D3DX_PI * 0.5f + fPitch, fYaw, 0.0f));//Xの意味は、前を基準にするという意味
 	pPlayer->ChengeMoveMode(DBG_NEW CPlayerMove_Dont());//移動モード「なし」
 	pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_Dont());//攻撃モード「なし」
 	pPlayer->ChengeWireShotMode(DBG_NEW CPlayerWireShot_Do());//ワイヤーショットモード「する」
@@ -694,7 +694,7 @@ void CPlayerWireShot_Do::FrightenedEnemy(CPlayer* pPlayer)
 		CEnemy* pEnemy = static_cast<CEnemy*>(pObj);
 		if (pEnemy->GetEnemyType() == CEnemy::ENEMYTYPE::DIVEWEAK)
 		{//ダイブに弱い敵だけ処理をする6
-			if (CCollision::RayIntersectsAABBCollisionPos(FrontPos, Ray, pEnemy->GetPosInfo().GetPos() + pEnemy->GetVtxMin(), pEnemy->GetPosInfo().GetPos() + pEnemy->GetVtxMax(), CollisionPos))
+			if (CCollision::RayIntersectsAABBCollisionPos(FrontPos, Ray, pEnemy->GetPosInfo().GetPos() + pEnemy->GetSizeInfo().GetVtxMin(), pEnemy->GetPosInfo().GetPos() + pEnemy->GetSizeInfo().GetVtxMax(), CollisionPos))
 			{
 				pEnemy->ChengeMove(DBG_NEW CEnemyMove_Frightened(pEnemy, pEnemy->GetPosInfo().GetPos(),90));//1秒間怯え状態にする
 			}

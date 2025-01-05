@@ -110,9 +110,9 @@ CBgModel* CBgModel::Create(BGMODELTYPE bgModelType, D3DXVECTOR3 pos, D3DXVECTOR3
 	pBgModel->SetBgModelType(bgModelType);   //背景モデルの種類を設定する
 	pBgModel->GetPosInfo().SetPos(pos);                   //位置  
 	pBgModel->GetPosInfo().SetSupportPos(pos);            //支点となる位置を設定
-	pBgModel->SetRot(rot);                   //向き
-	pBgModel->SetScale(Scale);               //拡大率
-	pBgModel->SetUseSwapVtxXZ(bSwapVtxXZ);   //XZをチェンジする
+	pBgModel->GetRotInfo().SetRot(rot);                   //向き
+	pBgModel->GetSizeInfo().SetScale(Scale);             //拡大率
+	pBgModel->GetSizeInfo().SetUseSwapVtxXZ(bSwapVtxXZ);   //XZをチェンジする
 	pBgModel->GetDrawInfo().SetUseShadow(false);
 	//モデル情報設定
 	int nIdx = CManager::GetObjectXInfo()->Regist(BGMODEL_FILENAME[static_cast<int>(bgModelType)]);
@@ -129,15 +129,15 @@ CBgModel* CBgModel::Create(BGMODELTYPE bgModelType, D3DXVECTOR3 pos, D3DXVECTOR3
 
 	if (bSwapVtxXZ == true)
 	{
-		D3DXVECTOR3 VtxMax = pBgModel->GetOriginVtxMax();
-		D3DXVECTOR3 VtxMin = pBgModel->GetOriginVtxMin();
+		D3DXVECTOR3 VtxMax = pBgModel->GetSizeInfo().GetOriginVtxMax();
+		D3DXVECTOR3 VtxMin = pBgModel->GetSizeInfo().GetOriginVtxMin();
 
-		VtxMax.x = pBgModel->GetOriginVtxMax().z;
-		VtxMax.z = pBgModel->GetOriginVtxMax().x;
-		VtxMin.x = pBgModel->GetOriginVtxMin().z;
-		VtxMin.z = pBgModel->GetOriginVtxMin().x;
-		pBgModel->SetOriginVtxMax(VtxMax);
-		pBgModel->SetOriginVtxMin(VtxMin);
+		VtxMax.x = pBgModel->GetSizeInfo().GetOriginVtxMax().z;
+		VtxMax.z = pBgModel->GetSizeInfo().GetOriginVtxMax().x;
+		VtxMin.x = pBgModel->GetSizeInfo().GetOriginVtxMin().z;
+		VtxMin.z = pBgModel->GetSizeInfo().GetOriginVtxMin().x;
+		pBgModel->GetSizeInfo().SetOriginVtxMax(VtxMax);
+		pBgModel->GetSizeInfo().SetOriginVtxMin(VtxMin);
 	}
 	return pBgModel;
 }
@@ -269,7 +269,7 @@ CObject* CBgModel::ManagerChengeObject(bool bAim)
 	SetDeath();
 	//======================================================================================
 
-	return CBgModel::Create(NewType, GetPosInfo().GetPos(), GetRot(), GetScale(),GetUseSwapVtxXZ());//生成したオブジェクトを返す
+	return CBgModel::Create(NewType, GetPosInfo().GetPos(), GetRotInfo().GetRot(), GetSizeInfo().GetScale(),GetSizeInfo().GetUseSwapVtxXZ());//生成したオブジェクトを返す
 }
 //======================================================================================================================
 
@@ -278,6 +278,6 @@ CObject* CBgModel::ManagerChengeObject(bool bAim)
 //==================================================================
 CObject* CBgModel::ManagerSaveObject()
 {
-	return CBgModel::Create(m_Type, GetPosInfo().GetPos(),GetRot(),GetScale(),GetUseSwapVtxXZ());//生成したオブジェクトを返す
+	return CBgModel::Create(m_Type, GetPosInfo().GetPos(), GetRotInfo().GetRot(), GetSizeInfo().GetScale(), GetSizeInfo().GetUseSwapVtxXZ());//生成したオブジェクトを返す
 }
 //======================================================================================================================

@@ -210,7 +210,7 @@ void CLockon::RayCollisionToObject()
 			{
 				CObjectX* pObjX = dynamic_cast<CObjectX*>(pObj);
 				//Žw’è‚µ‚½ƒ‚ƒfƒ‹‚ÌˆÊ’u
-				bRayCollision = CCollision::RayIntersectsAABBCollisionPos(m_FrontPos, m_NowRay, pObjX->GetVtxMin() + pObjX->GetPosInfo().GetPos(), pObjX->GetVtxMax() + pObjX->GetPosInfo().GetPos(),
+				bRayCollision = CCollision::RayIntersectsAABBCollisionPos(m_FrontPos, m_NowRay, pObjX->GetSizeInfo().GetVtxMin() + pObjX->GetPosInfo().GetPos(), pObjX->GetSizeInfo().GetVtxMax() + pObjX->GetPosInfo().GetPos(),
 					CollisionStartPos);
 
 				if (CCalculation::CalculationLength(m_FrontPos, CollisionStartPos) < CManager::GetCamera()->GetPosRToPosVLength())

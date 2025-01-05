@@ -66,9 +66,9 @@ void CBg3D::Uninit()
 //==============================================================
 void CBg3D::Update()
 {
-	D3DXVECTOR3& Rot = GetRot();
+	D3DXVECTOR3& Rot = GetRotInfo().GetRot();
 
-	SetRot(Rot + D3DXVECTOR3(0.0f, 0.001f, 0.0f));
+	GetRotInfo().SetRot(Rot + D3DXVECTOR3(0.0f, 0.001f, 0.0f));
 
 	CObjectX::Update();
 }
@@ -117,8 +117,8 @@ CBg3D* CBg3D::Create(BG3DTYPE type, D3DXVECTOR3 Pos, D3DXVECTOR3 Rot, D3DXVECTOR
 	pBg3D->Init();
 	pBg3D->SetBg3DType(type);
 	pBg3D->GetPosInfo().SetPos(Pos);
-	pBg3D->SetRot(Rot);
-	pBg3D->SetScale(Scale);
+	pBg3D->GetRotInfo().SetRot(Rot);
+	pBg3D->GetSizeInfo().SetScale(Scale);
 	pBg3D->SetUseDeath(true);
 	pBg3D->GetDrawInfo().SetUseShadow(false);
 	//ƒ‚ƒfƒ‹î•ñİ’è

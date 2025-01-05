@@ -107,8 +107,8 @@ CAIModel* CAIModel::Create(AIMODELTYPE type, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D
 	pAiModel->GetDrawInfo().SetUseDraw(true);
 	pAiModel->GetDrawInfo().SetUseShadow(true);
 	pAiModel->GetPosInfo().SetSupportPos(pos);                                                   //設置位置
-	pAiModel->CObjectX::SetScale(Scale);                                            //オブジェクトの拡大率
-	pAiModel->SetFormarScale(Scale);                                                //元の拡大率を設定する
+	pAiModel->GetSizeInfo().SetScale(Scale);                                            //オブジェクトの拡大率
+	pAiModel->GetSizeInfo().SetFormarScale(Scale);                                                //元の拡大率を設定する
 	pAiModel->GetDrawInfo().SetMtxParent(mtxWorld);                                               //親マトリックスを設定する
 	nIdx = CManager::GetObjectXInfo()->Regist(m_aAIMODEL_FILENAME[static_cast<int>(type)]);
 	pAiModel->CObjectX::BindObjectXInfo(CManager::GetObjectXInfo()->GetMesh(nIdx),

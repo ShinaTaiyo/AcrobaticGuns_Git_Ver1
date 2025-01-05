@@ -100,7 +100,7 @@ void CAttack::Update()
 				{
 					CObjectX* pObjX = static_cast<CObjectX*>(pObj);
 
-					if (CCollision::CollisionSquare(GetPosInfo().GetPos(), GetVtxMax(), GetVtxMin(), pObjX->GetPosInfo().GetPos(), pObjX->GetVtxMax(), pObjX->GetVtxMin()))
+					if (CCollision::CollisionSquare(GetPosInfo().GetPos(), GetSizeInfo().GetVtxMax(), GetSizeInfo().GetVtxMin(), pObjX->GetPosInfo().GetPos(), pObjX->GetSizeInfo().GetVtxMax(), pObjX->GetSizeInfo().GetVtxMin()))
 					{
 						bCollision = true;
 					}
@@ -185,7 +185,7 @@ void CAttack::CollisionProcess(bool& bCollision, bool& bNowCollision, CObjectXAl
 	switch (GetCollisionType())
 	{
 	case CAttack::COLLISIONTYPE::SQUARE:
-		if (CCollision::CollisionSquare(GetPosInfo().GetPos(), GetVtxMax(), GetVtxMin(), pObjX->GetPosInfo().GetPos(), pObjX->GetVtxMax(), pObjX->GetVtxMin()) == true)
+		if (CCollision::CollisionSquare(GetPosInfo().GetPos(), GetSizeInfo().GetVtxMax(), GetSizeInfo().GetVtxMin(), pObjX->GetPosInfo().GetPos(), pObjX->GetSizeInfo().GetVtxMax(), pObjX->GetSizeInfo().GetVtxMin()) == true)
 		{
 			bCollision = true;
 			bNowCollision = true;
@@ -303,9 +303,9 @@ CAttackPlayer* CAttackPlayer::Create(ATTACKTYPE AttackType, TARGETTYPE TargetTyp
 	pAttackPlayer->SetMaxLife(nLife);             //Å‘å‘Ì—Í‚ðÝ’è
 	pAttackPlayer->GetPosInfo().SetPos(pos);                   //ˆÊ’u  
 	pAttackPlayer->GetPosInfo().SetSupportPos(pos);            //Žx“_ˆÊ’u
-	pAttackPlayer->SetRot(rot);                   //Œü‚«
+	pAttackPlayer->GetRotInfo().SetRot(rot);                   //Œü‚«
 	pAttackPlayer->SetMove(move);                 //ˆÚ“®—Ê
-	pAttackPlayer->SetScale(Scale);               //Šg‘å—¦
+	pAttackPlayer->GetSizeInfo().SetScale(Scale);               //Šg‘å—¦
 	pAttackPlayer->SetAutoSubLife(true);          //‘Ì—Í‚ðŽg—p‚·‚é
 	pAttackPlayer->SetUseInteria(false, CObjectXMove::GetNormalInertia());
 	pAttackPlayer->SetUseGravity(false,1.0f);
@@ -409,9 +409,9 @@ CAttackEnemy* CAttackEnemy::Create(ATTACKTYPE AttackType, TARGETTYPE TargetType,
 	pAttackEnemy->SetMaxLife(nLife);             //Å‘å‘Ì—Í‚ðÝ’è
 	pAttackEnemy->SetAutoSubLife(true);          //‘Ì—Í‚ðŽ©“®“I‚ÉŒ¸‚ç‚·
 	pAttackEnemy->GetPosInfo().SetPos(pos);                   //ˆÊ’u  
-	pAttackEnemy->SetRot(rot);                   //Œü‚«
+	pAttackEnemy->GetRotInfo().SetRot(rot);                   //Œü‚«
 	pAttackEnemy->SetMove(move);                 //ˆÚ“®—Ê
-	pAttackEnemy->SetScale(Scale);               //Šg‘å—¦
+	pAttackEnemy->GetSizeInfo().SetScale(Scale);               //Šg‘å—¦
 	pAttackEnemy->SetUseInteria(false, CObjectXMove::GetNormalInertia());
 	pAttackEnemy->SetUseGravity(false, 1.0f);
 	pAttackEnemy->SetHitOtherThanLibing(bHitOtherThanLiving);
