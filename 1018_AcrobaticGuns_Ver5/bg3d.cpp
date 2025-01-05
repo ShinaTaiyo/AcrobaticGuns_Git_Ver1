@@ -120,7 +120,7 @@ CBg3D* CBg3D::Create(BG3DTYPE type, D3DXVECTOR3 Pos, D3DXVECTOR3 Rot, D3DXVECTOR
 	pBg3D->SetRot(Rot);
 	pBg3D->SetScale(Scale);
 	pBg3D->SetUseDeath(true);
-	pBg3D->SetUseShadow(false);
+	pBg3D->GetDrawInfo().SetUseShadow(false);
 	//ƒ‚ƒfƒ‹î•ñİ’è
 	int nIdx = CManager::GetObjectXInfo()->Regist(s_BG3D_FILENAME[static_cast<int>(type)]);
 	//ƒ‚ƒfƒ‹î•ñ‚ğŠ„‚è“–‚Ä‚é

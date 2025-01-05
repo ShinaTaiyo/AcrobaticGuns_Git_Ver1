@@ -160,8 +160,8 @@ void CPhaseManager::AdvancePhase()
 					for (const auto it2 : it.VecMoveAi)
 					{
 						CAIModel* pAiModel = CAIModel::Create(CAIModel::AIMODELTYPE::MOVEPOINT, it2.Pos, it2.Rot, it2.Scale, nullptr);
-						pAiModel->SetUseDraw(false);
-						pAiModel->SetUseShadow(false);
+						pAiModel->GetDrawInfo().SetUseDraw(false);
+						pAiModel->GetDrawInfo().SetUseShadow(false);
 						VecMoveAi.push_back(pAiModel);
 					}
 				}

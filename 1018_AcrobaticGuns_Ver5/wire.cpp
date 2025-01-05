@@ -65,7 +65,7 @@ HRESULT CWire::Init()
 	m_pWireHead = CWireHead::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), 120);
 	m_pWireHead->SetAutoSubLife(false);
 	m_pWireHead->SetUseDeath(false);
-	m_pWireHead->SetUseDraw(true);
+	m_pWireHead->GetDrawInfo().SetUseDraw(true);
 
 	return S_OK;
 }
@@ -222,7 +222,7 @@ void CWire::Draw()
 			D3DXMatrixMultiply(&m_VecMtxCircle[nCnt].WorldMtx, &m_VecMtxCircle[nCnt].WorldMtx, &mtxTrans);
 
 			//ワイヤーヘッドとワールド変換行列を掛け合わせる
-			D3DXMatrixMultiply(&m_VecMtxCircle[nCnt].WorldMtx, &m_VecMtxCircle[nCnt].WorldMtx,&m_pWireHead->GetMatrixWorld());
+			D3DXMatrixMultiply(&m_VecMtxCircle[nCnt].WorldMtx, &m_VecMtxCircle[nCnt].WorldMtx,&m_pWireHead->GetDrawInfo().GetMatrixWorld());
 
 			//ワールド座標を代入
 			D3DXVec3TransformCoord(&m_VecMtxCircle[nCnt].Pos, &PosZero, &m_VecMtxCircle[nCnt].WorldMtx);

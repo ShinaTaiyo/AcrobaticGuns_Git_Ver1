@@ -67,6 +67,46 @@ public:
 	}ObjectXInfo;
 	//============================================================================================================
 
+	//=================================
+	//描画情報構造体
+	//=================================
+	struct DrawInfo
+	{
+		//影
+		bool bUseShadow = true;//影を使用するかどうか!
+
+		//描画を使用するかどうか
+		bool bUseDraw = true;//!
+
+		//カリングするかどうか
+		bool bUseCulling = false;
+
+		//色
+		int nChengeColorTime = 0;                    //色を変える時間!
+		bool bColorChenge = false;                       //色を変えているかどうか!
+
+		//ワールド変換行列
+		D3DXMATRIX mtxWorld = {};                     //マトリックスワールド!
+		D3DXMATRIX* pMtxParent = nullptr;             //親マトリックス 
+		D3DXCOLOR Color = { 1.0f,1.0f,1.0f,1.0f };    //現在の統一の色合い
+
+		//影
+		void SetUseShadow(bool bUse) { bUseShadow = bUse; }
+		const bool& GetUseDraw() const { return bUseDraw; }
+
+		//描画するかどうか
+		void SetUseDraw(bool bUse) { bUseDraw = bUse; }
+
+		//カリングするかどうか
+		void SetUseCulling(bool bUse) { bUseCulling = bUse; }
+
+        //ワールド変換行列
+		void SetMtxParent(D3DXMATRIX* mtx) {pMtxParent = mtx; }              //親マトリックスを取得                   
+		D3DXMATRIX& GetMatrixWorld() { return mtxWorld; }                     //ワールド変換行列の取得
+		//================================================================================================================================================
+	};
+	//============================================================================================================
+
 	CObjectX(int nPri = 0, bool bUseintPri = false,CObject::TYPE type = CObject::TYPE::NONE, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_X);                                                           //コンストラクタ
 	~CObjectX() override;                                                 //デストラクタ
 	HRESULT Init() override;                                              //初期化処理
@@ -189,13 +229,6 @@ public:
 	//================================================================================================================================================
 
 	//==========================================================
-	//ワールド変換行列
-	//==========================================================
-	void SetMtxParent(D3DXMATRIX* mtx) { m_pMtxParent = mtx; }              //親マトリックスを取得                   
-	D3DXMATRIX &GetMatrixWorld() { return m_mtxWorld; }                     //ワールド変換行列の取得
-	//================================================================================================================================================
-
-	//==========================================================
 	//モデル情報
 	//==========================================================
 	CObjectX::ObjectXInfo& GetObjectXInfo() { return m_ObjectXInfo; }
@@ -204,22 +237,16 @@ public:
 	//===================================
 	//描画
 	//===================================
-	
-	//影
-	void SetUseShadow(bool bUse) { m_bUseShadow = bUse; }
-	const bool& GetUseDraw() const { return m_bUseDraw; }
-
-	//描画するかどうか
-	void SetUseDraw(bool bUse) { m_bUseDraw = bUse; }
-
-	//カリングするかどうか
-	void SetUseCulling(bool bUse) { m_bUseCulling = bUse; }
-
 	//狙ったマテリアルにテクスチャ割り当て（ポインタのポインタになってるから大丈夫）
 	void SetLockOnMatBindTexture(int nNumMat, LPDIRECT3DTEXTURE9 pTexture);
 
 	//色合い
-	void SetColor(D3DXCOLOR col, int nColChengeTime,bool bChoose,bool bSetAlpha);
+	void SetColor(D3DXCOLOR col, int nColChengeTime, bool bChoose, bool bSetAlpha);
+
+	//描画情報の取得
+	DrawInfo& GetDrawInfo() { return m_DrawInfo; }
+    
+
 	//=================================================================================================================
 private:
 	static bool s_bCOMMON_DRAWSHADOW;
@@ -296,28 +323,11 @@ private:
 	//===================================
 	//描画関係
 	//===================================
-
-	//影
-	bool m_bUseShadow;//影を使用するかどうか!
-
-	//描画を使用するかどうか
-	bool m_bUseDraw;//!
-
-	//カリングするかどうか
-	bool m_bUseCulling;
-
+	void SetFormarColor();                     //元の色合いに戻す 
 	//最大頂点と最小頂点をチェンジするかどうか
 	bool m_bSwapVtxXZ;
 
-	//色
-	int m_nChengeColorTime;                    //色を変える時間!
-	bool m_bColorChenge;                       //色を変えているかどうか!
-	void SetFormarColor();                     //元の色合いに戻す 
-
-	//ワールド変換行列
-	D3DXMATRIX m_mtxWorld;                     //マトリックスワールド!
-	D3DXMATRIX * m_pMtxParent;                 //親マトリックス 
-	D3DXCOLOR m_Color;                         //現在の統一の色合い   
+	DrawInfo m_DrawInfo;//描画情報
 	//=================================================================================================================
 
 	//===================================

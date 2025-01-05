@@ -33,14 +33,13 @@ bool CObjectX::s_bCOMMON_DRAWSHADOW = true;
 //================================================
 //コンストラクタ
 //================================================
-CObjectX::CObjectX(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject(nPri,bUseintPri,type,ObjType),
-m_bUseDraw(true),m_ObjectXInfo(),m_bColorChenge(false),m_bUseAddRot(false),
-m_bUseAddScaling(false),m_bUseShadow(false),m_nChengeColorTime(0),m_nIndexObjectX(0),m_nManagerType(0),m_nObjXType(OBJECTXTYPE_BLOCK), 
-m_nTypeNum(0), m_bUseMultiScale(false), m_MultiScale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_bUseCulling(false), m_Pos(D3DXVECTOR3(0.0f,0.0f,0.0f)), m_SupportPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),
-m_PosOld(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Rot(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Scale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_FormarScale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Size(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_VtxMin(D3DXVECTOR3(0.0f,0.0f,0.0f)),
-m_OriginVtxMin(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_VtxMax(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_OriginVtxMax(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_mtxWorld(),m_AddRot(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_SenterPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),
-m_AddScale(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_fAxis(0.0f),m_VecAxis(D3DXVECTOR3(0.0f,1.0f,0.0f)),m_pMtxParent(nullptr),
-m_bSwapVtxXZ(false),m_Color(1.0f,1.0f,1.0f,1.0f)
+CObjectX::CObjectX(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject(nPri, bUseintPri, type, ObjType)
+, m_ObjectXInfo(), m_bUseAddRot(false),
+m_bUseAddScaling(false), m_nIndexObjectX(0), m_nManagerType(0), m_nObjXType(OBJECTXTYPE_BLOCK),
+m_nTypeNum(0), m_bUseMultiScale(false), m_MultiScale(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_Pos(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_SupportPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),
+m_PosOld(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_Rot(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_Scale(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_FormarScale(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_Size(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_VtxMin(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),
+m_OriginVtxMin(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_VtxMax(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_OriginVtxMax(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_AddRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_SenterPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),
+m_AddScale(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_fAxis(0.0f), m_VecAxis(D3DXVECTOR3(0.0f, 1.0f, 0.0f)), m_DrawInfo({})
 {
 	SetObjectType(CObject::OBJECTTYPE::OBJECTTYPE_X);
 }
@@ -60,18 +59,6 @@ CObjectX::~CObjectX()
 //================================================
 HRESULT CObjectX::Init()
 {
-	//==========================
-	//変数の初期化
-	//==========================
-	m_mtxWorld = {};                                   //ワールドマトリックス
-	//==================================================================================
-
-	//===========================================
-	//影関係
-	//===========================================
-	m_bUseShadow = true;
-	//==================================================================================
-
 	m_bUseAddScaling = false;                 //拡大率の加算を使用するかどうか
 	m_AddScale = D3DXVECTOR3(0.0f,0.0f,0.0f);                //拡大率の加算量    
 
@@ -172,16 +159,16 @@ void CObjectX::Update()
 	}
 	m_Size = m_VtxMax - m_VtxMin;
 
-	if (m_bColorChenge == true)
+	if (m_DrawInfo.bColorChenge == true)
 	{
-		m_nChengeColorTime--;
+		m_DrawInfo.nChengeColorTime--;
 	}
 
-	if (m_nChengeColorTime <= 0 && m_bColorChenge == true )
+	if (m_DrawInfo.nChengeColorTime <= 0 && m_DrawInfo.bColorChenge == true )
 	{
-		m_nChengeColorTime = 0;
+		m_DrawInfo.nChengeColorTime = 0;
 		SetFormarColor();//元の色合いに戻す
-		m_bColorChenge = false;
+		m_DrawInfo.bColorChenge = false;
 	}
 
 	if (m_bUseAddRot == true)
@@ -208,28 +195,28 @@ void CObjectX::Draw()
 	//現在のマテリアルを取得
 	pDevice->GetMaterial(&matDef);
 
-	if (m_bUseShadow == true && s_bCOMMON_DRAWSHADOW == true)
+	if (m_DrawInfo.bUseShadow == true && s_bCOMMON_DRAWSHADOW == true)
 	{
 		DrawShadow();
 	}
 
 	//ワールドマトリックスの初期化
-	D3DXMatrixIdentity(&m_mtxWorld);
+	D3DXMatrixIdentity(&m_DrawInfo.mtxWorld);
 
 	//大きさを反映
 	D3DXMatrixScaling(&mtxScale, m_Scale.x, m_Scale.y, m_Scale.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxScale);
+	D3DXMatrixMultiply(&m_DrawInfo.mtxWorld, &m_DrawInfo.mtxWorld, &mtxScale);
 
 	//向きを反映
 	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_Rot.y, m_Rot.x, m_Rot.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
+	D3DXMatrixMultiply(&m_DrawInfo.mtxWorld, &m_DrawInfo.mtxWorld, &mtxRot);
 
 	//位置を反映
 	D3DXMatrixTranslation(&mtxTrans, m_Pos.x, m_Pos.y, m_Pos.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
+	D3DXMatrixMultiply(&m_DrawInfo.mtxWorld, &m_DrawInfo.mtxWorld, &mtxTrans);
 
 	//ワールドマトリックスの設定
-	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
+	pDevice->SetTransform(D3DTS_WORLD, &m_DrawInfo.mtxWorld);
 	//=======================================
 	//描画の調整
 	//=======================================
@@ -242,13 +229,13 @@ void CObjectX::Draw()
 	//法線の長さを１にする。（スケールなどを使った時は、必ず使う。)
 	pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);
 
-	if (m_Color.a < 1.0f)
+	if (m_DrawInfo.Color.a < 1.0f)
 	{
 		//Zバッファに書き込まない
 		pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 	}
 
-	if (m_bUseCulling == true)
+	if (m_DrawInfo.bUseCulling == true)
 	{
 		//両面を描画する
 		pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
@@ -258,7 +245,7 @@ void CObjectX::Draw()
 	//マテリアルへのポインタを取得
 	pMat = (D3DXMATERIAL*)m_ObjectXInfo.pBuffMat->GetBufferPointer();
 
-	if (m_bUseDraw == true)
+	if (m_DrawInfo.bUseDraw == true)
 	{
 		//==========================================================================
 		//マテリアルの数分、テクスチャを読み込む。
@@ -338,9 +325,9 @@ void CObjectX::BindObjectXInfo(LPD3DXMESH pMesh, LPD3DXBUFFER pBuffMat, DWORD dw
 //================================================
 void CObjectX::SetColor(D3DXCOLOR col, int nColChengeTime, bool bChoose, bool bSetAlpha)
 {
-	m_bColorChenge = true;
-	m_nChengeColorTime = nColChengeTime;
-	m_Color = col;
+	m_DrawInfo.bColorChenge = true;
+	m_DrawInfo.nChengeColorTime = nColChengeTime;
+	m_DrawInfo.Color = col;
 	if (bChoose == true)
 	{
 		if (bSetAlpha == false)
@@ -385,7 +372,7 @@ void CObjectX::CalculateSenterPos()
 //================================================
 void CObjectX::SetFormarColor()
 {
-	m_Color = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	m_DrawInfo.Color = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	for (int nCnt = 0; nCnt < (int)(m_ObjectXInfo.dwNumMat); nCnt++)
 	{
 		m_ObjectXInfo.Diffuse[nCnt] = m_ObjectXInfo.FormarDiffuse[nCnt];

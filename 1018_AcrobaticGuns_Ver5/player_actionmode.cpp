@@ -616,8 +616,8 @@ void CPlayerWireShot::StartWireShotProcess(CPlayer* pPlayer)
 	pPlayer->SetMove(Move);
 
 	//描画を復活させる
-	pPlayer->GetWire()->GetWireHead()->SetUseDraw(true);
-	pPlayer->SetUseDraw(true);
+	pPlayer->GetWire()->GetWireHead()->GetDrawInfo().SetUseDraw(true);
+	pPlayer->GetDrawInfo().SetUseDraw(true);
 
 	//ワイヤーの更新を復活させる
 	pPlayer->GetWire()->SetUseUpdate(true);

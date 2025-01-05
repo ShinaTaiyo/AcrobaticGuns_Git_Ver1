@@ -118,9 +118,9 @@ void CEnemy::Update()
 	{
 		for (auto it : m_VecMoveAi)
 		{
-			if (it->GetUseDraw())
+			if (it->GetDrawInfo().GetUseDraw())
 			{
-				it->SetUseDraw(false);
+				it->GetDrawInfo().SetUseDraw(false);
 			}
 		}
 	}
@@ -375,7 +375,7 @@ void CEnemy::ManagerChooseControlInfo()
 	//ステージマネージャーに選択されている時だけ表示する
 	for (auto it : m_VecMoveAi)
 	{
-		it->SetUseDraw(true);
+		it->GetDrawInfo().SetUseDraw(true);
 	}
 
 	SetMoveAiPoint();//移動AIの設定を行う
@@ -1165,8 +1165,8 @@ void CShotWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 							if (CScene::GetMode() == CScene::MODE_EDIT)
 							{
 								CAIModel* pAiModel = CAIModel::Create(CAIModel::AIMODELTYPE::MOVEPOINT, MoveAiPos, MoveAiRot, MoveAiScale, nullptr);
-								pAiModel->SetUseDraw(false);
-								pAiModel->SetUseShadow(false);
+								pAiModel->GetDrawInfo().SetUseDraw(false);
+								pAiModel->GetDrawInfo().SetUseShadow(false);
 								VecMoveAi.push_back(pAiModel);
 							}
 							else if (CScene::GetMode() == CScene::MODE_GAME)
@@ -1637,8 +1637,8 @@ void CDiveWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 							if (CScene::GetMode() == CScene::MODE_EDIT)
 							{
 								CAIModel* pAiModel = CAIModel::Create(CAIModel::AIMODELTYPE::MOVEPOINT, MoveAiPos, MoveAiRot, MoveAiScale, nullptr);
-								pAiModel->SetUseDraw(true);
-								pAiModel->SetUseShadow(true);
+								pAiModel->GetDrawInfo().SetUseDraw(true);
+								pAiModel->GetDrawInfo().SetUseShadow(true);
 								VecMoveAi.push_back(pAiModel);
 							}
 							else if (CScene::GetMode() == CScene::MODE_GAME)
@@ -1666,8 +1666,8 @@ void CDiveWeakEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveM
 	if (CScene::GetMode() == CScene::MODE_EDIT)
 	{
 		CDiveWeakEnemy* pDiveWeakEnemy = CDiveWeakEnemy::Create(DiveWeakEnemyType, nLife, nPhaseNum, Pos, Rot, Scale,3);
-		pDiveWeakEnemy->SetUseDraw(true);
-		pDiveWeakEnemy->SetUseShadow(true);
+		pDiveWeakEnemy->GetDrawInfo().SetUseDraw(true);
+		pDiveWeakEnemy->GetDrawInfo().SetUseShadow(true);
 		pDiveWeakEnemy->SetVecMoveAiInfo(VecMoveAi);
 		pDiveWeakEnemy->SetNormalSpeed(fNormalSpeed);
 		pDiveWeakEnemy->SetSensingRange(fSensingRange);
