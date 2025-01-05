@@ -332,7 +332,6 @@ bool CInputJoypad::GetTrigger(JOYKEY key)
 //=====================================
 bool CInputJoypad::GetRT_Press()
 {
-	CManager::GetDebugProc()->PrintDebugProc("トリガーの値：%d\n", m_joykeyStatePress.Gamepad.bRightTrigger);
 	return m_joykeyStatePress.Gamepad.bRightTrigger != 0;//0x0004（JOYKEY_LEFT)なら0x01<<2 = 00000111 = 0x0004;
 }
 //========================================================================================================================================================
@@ -665,8 +664,6 @@ D3DXVECTOR2 CInputMouse::GetMousePos()
 			}
 		}
 	}
-	//デバッグ表示
-	CManager::GetDebugProc()->PrintDebugProc("カーソルの位置：%f %f\n", CursorPos.x, CursorPos.y);
 	return CursorPos;
 }
 //================================================================
@@ -680,7 +677,6 @@ bool CInputMouse::GetMouseMoveAngle(float& fAngle)
 	D3DXVECTOR2 CursorPos = GetMousePos();
 	CursorPos.x = static_cast<float>(CursorPos.x);
 	CursorPos.y = static_cast<float>(CursorPos.y);
-	CManager::GetDebugProc()->PrintDebugProc("カーソルの位置：%f %f\n", CursorPos.x, CursorPos.y);
 	
 	bool bSuccess = true;
 	if (m_CursorPosOld == CursorPos)
@@ -729,12 +725,10 @@ bool CInputMouse::GetMouseLeftClickTrigger()
 			return true;
 		}
 		m_bLeftClickTriggerFlag = false;
-		CManager::GetDebugProc()->PrintDebugProc("右クリックしてる\n");
 	}
 	else
 	{
 		m_bLeftClickTriggerFlag = true;
-		CManager::GetDebugProc()->PrintDebugProc("右クリックしてない\n");
 	}
 	return false;
 }

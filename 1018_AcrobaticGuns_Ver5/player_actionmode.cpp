@@ -65,7 +65,6 @@ void CPlayerMove::MoveProcess(CPlayer* pPlayer)
 
 		bMove = CCalculation::CaluclationMove(true, AddMove, 10.0f, CCalculation::MOVEAIM_XZ, fRotAim);
 		pPlayer->SetRot(D3DXVECTOR3(pPlayer->GetRot().x, fRotAim, pPlayer->GetRot().z));
-		//CCalculation::CalculationCollectionRot2D(CalRot.y, m_fRotAim, 0.25f);
 
 		pPlayer->SetUseInteria(true, CObjectXMove::GetNormalInertia());
 		pPlayer->SetUseGravity(true, CObjectXMove::GetNormalGravity());
