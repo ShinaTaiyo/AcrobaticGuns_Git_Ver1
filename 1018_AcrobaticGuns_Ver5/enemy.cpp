@@ -89,8 +89,8 @@ void CEnemy::Update()
 	if (CScene::GetMode() == CScene::MODE_GAME)
 	{
 		const D3DXVECTOR3& Rot = GetRot();
-		const D3DXVECTOR3& Pos = GetPos();
-		const D3DXVECTOR3& PlayerPos = CGame::GetPlayer()->GetPos();
+		const D3DXVECTOR3& Pos = GetPosInfo().GetPos();
+		const D3DXVECTOR3& PlayerPos = CGame::GetPlayer()->GetPosInfo().GetPos();
 		//float fElevaRot = atan2f(PlayerPos.y - Pos.y, sqrtf(powf(PlayerPos.x - Pos.x, 2) + powf(PlayerPos.z - Pos.z, 2)));
 		//SetRot(D3DXVECTOR3(fElevaRot, atan2f(PlayerPos.x - Pos.x, PlayerPos.z - Pos.z) + D3DX_PI,0.0f));
 
@@ -107,7 +107,7 @@ void CEnemy::Update()
 
 	    CollisionProcess();//当たり判定処理
 
-		if (GetPos().y < -100.0f)
+		if (GetPosInfo().GetPos().y < -100.0f)
 		{
 			SetDeath();
 		}
@@ -225,9 +225,9 @@ void CEnemy::SaveInfoTxt(fstream& WritingFile)
 	{
 		WritingFile << "SETNUM = " << nCnt << endl;
 
-		WritingFile << "POS = " << fixed << setprecision(3) << (*it)->GetPos().x << " " <<
-			fixed << setprecision(3) << (*it)->GetPos().y << " " <<
-			fixed << setprecision(3) << (*it)->GetPos().z << " " << endl;//位置
+		WritingFile << "POS = " << fixed << setprecision(3) << (*it)->GetPosInfo().GetPos().x << " " <<
+			fixed << setprecision(3) << (*it)->GetPosInfo().GetPos().y << " " <<
+			fixed << setprecision(3) << (*it)->GetPosInfo().GetPos().z << " " << endl;//位置
 		WritingFile << "ROT = " << fixed << setprecision(3) << (*it)->GetRot().x << " " <<
 			fixed << setprecision(3) << (*it)->GetRot().y << " " <<
 			fixed << setprecision(3) << (*it)->GetRot().z << " " << endl;//向き
@@ -403,8 +403,8 @@ void CEnemy::SetVecMoveAiInfo(vector<CAIModel*>& vec)
 //====================================================================================
 void CEnemy::CollisionProcess()
 {
-	D3DXVECTOR3 MyPos = GetPos();
-	D3DXVECTOR3 MyPosOld = GetPosOld();
+	D3DXVECTOR3 MyPos = GetPosInfo().GetPos();
+	D3DXVECTOR3 MyPosOld = GetPosInfo().GetPosOld();
 	D3DXVECTOR3 MyVtxMax = GetVtxMax();
 	D3DXVECTOR3 MyVtxMin = GetVtxMin();
 	const D3DXVECTOR3 Move = GetMove();
@@ -432,7 +432,7 @@ void CEnemy::CollisionProcess()
 
 			if (type == CObject::TYPE::BLOCK || type == CObject::TYPE::BGMODEL)
 			{
-				D3DXVECTOR3 ComPos = static_cast<CObjectX*>(pObj)->GetPos();
+				D3DXVECTOR3 ComPos = static_cast<CObjectX*>(pObj)->GetPosInfo().GetPos();
 				D3DXVECTOR3 ComVtxMax = static_cast<CObjectX*>(pObj)->GetVtxMax();
 				D3DXVECTOR3 ComVtxMin = static_cast<CObjectX*>(pObj)->GetVtxMin();
 
@@ -441,7 +441,7 @@ void CEnemy::CollisionProcess()
 
 				if (bSuccessCollision == true)
 				{
-					SetPos(MyPos);
+					GetPosInfo().SetPos(MyPos);
 				}
 
 				if (bCollisionY == true)
@@ -541,7 +541,7 @@ void CEnemy::SetMoveAiPoint()
 		m_MoveAiSavePos += D3DXVECTOR3(0.0f, fAddPosY, 0.0f);
 	}
 
-	D3DXVECTOR3 NowPos = m_MoveAiSavePos + GetPos();
+	D3DXVECTOR3 NowPos = m_MoveAiSavePos + GetPosInfo().GetPos();
 
 	CManager::GetDebugProc()->PrintDebugProc("移動AIの位置：%f %f %f\n", NowPos.x,NowPos.y,NowPos.z);
 
@@ -564,7 +564,7 @@ void CEnemy::SetMoveAiPoint()
 	{
 		if (Input->GetTrigger(DIK_O))
 		{
-			m_VecMoveAi.push_back(CAIModel::Create(CAIModel::AIMODELTYPE::MOVEPOINT, m_MoveAiSavePos + GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(3.0f, 3.0f, 3.0f), nullptr));
+			m_VecMoveAi.push_back(CAIModel::Create(CAIModel::AIMODELTYPE::MOVEPOINT, m_MoveAiSavePos + GetPosInfo().GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(3.0f, 3.0f, 3.0f), nullptr));
 		}
 	}
 }
@@ -577,7 +577,7 @@ void CEnemy::AIMoveProcess()
 {
 	if (CScene::GetMode() == CScene::MODE_GAME)
 	{
-		float fLengthPlayer = CCalculation::CalculationLength(CGame::GetPlayer()->GetPos(), GetPos());
+		float fLengthPlayer = CCalculation::CalculationLength(CGame::GetPlayer()->GetPosInfo().GetPos(), GetPosInfo().GetPos());
 		if (fLengthPlayer < m_fSensingRange)
 		{
 			ChengeMove(DBG_NEW CEnemyMove_Battle());
@@ -589,8 +589,8 @@ void CEnemy::AIMoveProcess()
 
 			advance(it, m_nIdxMoveAi);//指定している番号まで進める
 
-			float fLength = CCalculation::CalculationLength(GetPos(), (*it)->GetPos());//距離を測る
-			float fRot = atan2f((*it)->GetPos().x - GetPos().x, (*it)->GetPos().z - GetPos().z);
+			float fLength = CCalculation::CalculationLength(GetPosInfo().GetPos(), (*it)->GetPosInfo().GetPos());//距離を測る
+			float fRot = atan2f((*it)->GetPosInfo().GetPos().x - GetPosInfo().GetPos().x, (*it)->GetPosInfo().GetPos().z - GetPosInfo().GetPos().z);
 			SetMove(D3DXVECTOR3(sinf(fRot) * m_fNormalSpeed, GetMove().y, cosf(fRot) * m_fNormalSpeed));
 
 			if (fLength < 30.0f)
@@ -618,14 +618,14 @@ void CEnemy::AIMoveProcess()
 //====================================================================================
 void CEnemy::BattleMoveProcess()
 {
-	float fLengthPlayer = CCalculation::CalculationLength(CGame::GetPlayer()->GetPos(), GetPos());
-	const D3DXVECTOR3 & PlayerPos = CGame::GetPlayer()->GetPos();
-	const D3DXVECTOR3& Pos = GetPos();
+	float fLengthPlayer = CCalculation::CalculationLength(CGame::GetPlayer()->GetPosInfo().GetPos(), GetPosInfo().GetPos());
+	const D3DXVECTOR3 & PlayerPos = CGame::GetPlayer()->GetPosInfo().GetPos();
+	const D3DXVECTOR3& Pos = GetPosInfo().GetPos();
 	D3DXVECTOR3 Aim = PlayerPos - Pos;
 	D3DXVec3Normalize(&Aim, &Aim);
 	float fRot = atan2f(Aim.x,Aim.z);
 
-	D3DXVECTOR3 Move = CCalculation::HormingVecRotXZ(m_fRotMove, GetPos(), CGame::GetPlayer()->GetSenterPos(), 0.1f, m_fNormalSpeed);
+	D3DXVECTOR3 Move = CCalculation::HormingVecRotXZ(m_fRotMove, GetPosInfo().GetPos(), CGame::GetPlayer()->GetPosInfo().GetSenterPos(), 0.1f, m_fNormalSpeed);
 	SetRot(D3DXVECTOR3(GetRot().x, m_fRotMove + D3DX_PI, GetRot().z));
 	SetMove(D3DXVECTOR3(Move.x, GetMove().y,Move.z));
 	CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 30, 20.0f, 20.0f, 100, 10, false, Pos, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
@@ -679,11 +679,11 @@ void CEnemy::RayCollision()
 				if (pObj->GetType() == CObject::TYPE::BGMODEL || pObj->GetType() == CObject::TYPE::BLOCK)
 				{
 					CObjectX * pComObjX = static_cast<CObjectX*>(pObj);
-					if (CCollision::RayIntersectsAABBCollisionPos(GetSenterPos(), Ray, pComObjX->GetPos() + pComObjX->GetVtxMin(), pComObjX->GetPos() + pComObjX->GetVtxMax(),
+					if (CCollision::RayIntersectsAABBCollisionPos(GetPosInfo().GetSenterPos(), Ray, pComObjX->GetPosInfo().GetPos() + pComObjX->GetVtxMin(), pComObjX->GetPosInfo().GetPos() + pComObjX->GetVtxMax(),
 						CollisionPos))
 					{
-						float fLength = sqrtf(powf(CollisionPos.x - GetSenterPos().x, 2) + 
-							powf(CollisionPos.y - GetSenterPos().y, 2) + powf(CollisionPos.z - GetSenterPos().z,2));
+						float fLength = sqrtf(powf(CollisionPos.x - GetPosInfo().GetSenterPos().x, 2) +
+							powf(CollisionPos.y - GetPosInfo().GetSenterPos().y, 2) + powf(CollisionPos.z - GetPosInfo().GetSenterPos().z,2));
 						if (fLength < GetSize().x + 50.0f)
 						{
 							//敵のオブジェクトのサイズの少し上より距離が小さくなった
@@ -698,12 +698,12 @@ void CEnemy::RayCollision()
 
 		if (pObjX != nullptr)
 		{
-			D3DXVECTOR3 ObjectAim = pObjX->GetPos() - GetPos();
+			D3DXVECTOR3 ObjectAim = pObjX->GetPosInfo().GetPos() - GetPosInfo().GetPos();
 			D3DXVec3Normalize(&ObjectAim, &ObjectAim);
 
-			float fDot = CCalculation::DetermineSide3D(GetPos(), ObjectAim, D3DXVECTOR3(0.0f, 1.0f, 0.0f), CGame::GetPlayer()->GetPos());
-			const D3DXVECTOR3& PlayerPos = CGame::GetPlayer()->GetPos();
-			const D3DXVECTOR3& Pos = GetPos();
+			float fDot = CCalculation::DetermineSide3D(GetPosInfo().GetPos(), ObjectAim, D3DXVECTOR3(0.0f, 1.0f, 0.0f), CGame::GetPlayer()->GetPosInfo().GetPos());
+			const D3DXVECTOR3& PlayerPos = CGame::GetPlayer()->GetPosInfo().GetPos();
+			const D3DXVECTOR3& Pos = GetPosInfo().GetPos();
 			D3DXVECTOR3 Aim = PlayerPos - Pos;
 			D3DXVec3Normalize(&Aim, &Aim);
 			float fRot = atan2f(Aim.x, Aim.z);
@@ -772,19 +772,19 @@ void CEnemy::CollisionDetectionProcess()
 				CObjectX* pObjX = static_cast<CObjectX*>(pObj);
 				if (pObjX != this)
 				{
-					D3DXVECTOR3 AimVec = D3DXVECTOR3(pObjX->GetPos().x, 0.0f, pObjX->GetPos().z) -
-						D3DXVECTOR3(GetPos().x, 0.0f, GetPos().z);//XZ方向だけのベクトルを取る
-					float fLength = CCalculation::CalculationLength(GetPos(), pObjX->GetPos());
-					const D3DXVECTOR3& ComPos = pObjX->GetPos();
+					D3DXVECTOR3 AimVec = D3DXVECTOR3(pObjX->GetPosInfo().GetPos().x, 0.0f, pObjX->GetPosInfo().GetPos().z) -
+						D3DXVECTOR3(GetPosInfo().GetPos().x, 0.0f, GetPosInfo().GetPos().z);//XZ方向だけのベクトルを取る
+					float fLength = CCalculation::CalculationLength(GetPosInfo().GetPos(), pObjX->GetPosInfo().GetPos());
+					const D3DXVECTOR3& ComPos = pObjX->GetPosInfo().GetPos();
 					const D3DXVECTOR3& ComVtxMax = ComPos + D3DXVECTOR3(pObjX->GetVtxMax().x, 0.0f, 0.0f);
 					D3DXVec3Normalize(&AimVec, &AimVec);
 
 					float fComCornarDistance = CCalculation::CalculationLength(ComPos,ComVtxMax);
-					float fMyCornarDistance = CCalculation::CalculationLength(GetPos(), GetPos() + D3DXVECTOR3(GetVtxMax().x, 0.0f, 0.0f));
+					float fMyCornarDistance = CCalculation::CalculationLength(GetPosInfo().GetPos(), GetPosInfo().GetPos() + D3DXVECTOR3(GetVtxMax().x, 0.0f, 0.0f));
 					float fTotalLength = (fComCornarDistance + fMyCornarDistance);
 					if (fLength < fTotalLength &&
-						GetPos().y + GetVtxMax().y >= pObjX->GetPos().y + pObjX->GetVtxMin().y &&
-						GetPos().y + GetVtxMin().y <= pObjX->GetPos().y + pObjX->GetVtxMax().y)
+						GetPosInfo().GetPos().y + GetVtxMax().y >= pObjX->GetPosInfo().GetPos().y + pObjX->GetVtxMin().y &&
+						GetPosInfo().GetPos().y + GetVtxMin().y <= pObjX->GetPosInfo().GetPos().y + pObjX->GetVtxMax().y)
 					{
 						SetMove(-AimVec * (fTotalLength - fLength) + GetMove());//攻撃時の動きよりも優先的にこの移動量を割り当てる
 						break;
@@ -922,7 +922,7 @@ HRESULT CShotWeakEnemy::Init()
 	float fRatioRot = static_cast<float>(rand() % 200 - 100) / 100;
 	float fRotSpeed = static_cast<float>(rand() % 40 - 20) / 100;
 	m_pMagicSword = CAttackEnemy::Create(CAttack::ATTACKTYPE::MAGICSWORD, CAttack::TARGETTYPE::PLAYER, CAttack::COLLISIONTYPE::RECTANGLE_XZ,
-		false,false,1, 60, 200, GetPos(), D3DXVECTOR3(0.0f,D3DX_PI * fRatioRot, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+		false,false,1, 60, 200, GetPosInfo().GetPos(), D3DXVECTOR3(0.0f,D3DX_PI * fRatioRot, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 	m_pMagicSword->SetUseDeath(false);
 	m_pMagicSword->SetUseAddRot(true,D3DXVECTOR3(0.0f,fRotSpeed, 0.0f));
 	SetEnemyType(CEnemy::ENEMYTYPE::SHOTWEAK);//敵タイプを設定
@@ -948,7 +948,7 @@ void CShotWeakEnemy::Update()
 
 	if (CScene::GetMode() == CScene::MODE_GAME)
 	{
-		m_pMagicSword->SetPos(GetPos());
+		m_pMagicSword->GetPosInfo().SetPos(GetPosInfo().GetPos());
 
 		SwordCollision();//剣の当たり判定を行う
 	}
@@ -1001,8 +1001,8 @@ CShotWeakEnemy* CShotWeakEnemy::Create(SHOTWEAKENEMYTYPE Type, int nLife, int nP
 	pShotWeakEnemy->SetLife(nLife);    //体力
 	pShotWeakEnemy->SetMaxLife(nLife); //最大体力
 	pShotWeakEnemy->SetAutoSubLife(false);
-	pShotWeakEnemy->SetPos(pos);       //位置
-	pShotWeakEnemy->SetSupportPos(pos);//支点位置
+	pShotWeakEnemy->GetPosInfo().SetPos(pos);       //位置
+	pShotWeakEnemy->GetPosInfo().SetSupportPos(pos);//支点位置
 	pShotWeakEnemy->SetRot(rot);       //向き
 	pShotWeakEnemy->SetScale(Scale);   //拡大率
 	pShotWeakEnemy->SetFormarScale(Scale);//元の拡大率を設定
@@ -1248,7 +1248,7 @@ CObject* CShotWeakEnemy::ManagerChengeObject(bool bAim)
 	SetDeath();
 	//======================================================================================
 
-	return CShotWeakEnemy::Create(NewType, GetMaxLife(), GetPhaseNum(), GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
+	return CShotWeakEnemy::Create(NewType, GetMaxLife(), GetPhaseNum(), GetPosInfo().GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
 }
 //============================================================================================================================================
 
@@ -1259,7 +1259,7 @@ CObject* CShotWeakEnemy::ManagerSaveObject()
 {
 	auto& Vec = GetVecAiModelInfo();
 	auto Vec2 = move(Vec);
-	CShotWeakEnemy * pShotWeakEnemy = CShotWeakEnemy::Create(m_ShotWeakEnemyType, GetMaxLife(),GetPhaseNum(),GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
+	CShotWeakEnemy * pShotWeakEnemy = CShotWeakEnemy::Create(m_ShotWeakEnemyType, GetMaxLife(),GetPhaseNum(), GetPosInfo().GetPos(), GetRot(), GetScale());//生成したオブジェクトを返す
 	pShotWeakEnemy->SetVecMoveAiInfo(Vec2);
 	pShotWeakEnemy->SetNormalSpeed(GetNormalSpeed());//現在の敵の通常速度を保存する
 	pShotWeakEnemy->SetSensingRange(GetSensingRange());//現在の敵の索敵範囲を保存する
@@ -1281,7 +1281,7 @@ void CShotWeakEnemy::BattleMoveProcess()
 //====================================================================================
 void CShotWeakEnemy::AttackProcess()
 {
-	float fLength = CCalculation::CalculationLength(GetPos(), CGame::GetPlayer()->GetPos());
+	float fLength = CCalculation::CalculationLength(GetPosInfo().GetPos(), CGame::GetPlayer()->GetPosInfo().GetPos());
 	const bool& bAction = GetAction();
 	const int& nPatternTime = GetPatternTime();
 	const int& nPattern = GetPattern();
@@ -1302,18 +1302,18 @@ void CShotWeakEnemy::AttackProcess()
 			{
 				SetPattern(nPattern + 1);
 				SetPatternTime(0);
-				m_SaveAimPos = CGame::GetPlayer()->GetPos();
+				m_SaveAimPos = CGame::GetPlayer()->GetPosInfo().GetPos();
 			}
 			break;
 		case 1:
 			CParticle::SummonChargeParticle(CParticle::TYPE::TYPE00_NORMAL, 1, 45, 5.0f, 20.0f, 20.0f, GetSize().x, 100, 10, false,
-				GetSenterPos(), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
+				GetPosInfo().GetSenterPos(), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
 
 			if (nPatternTime == 45)
 			{
 				SetUseInteria(true, 0.05f);
 
-				SetMove(CCalculation::Calculation3DVec(GetPos(),m_SaveAimPos, 30.0f));
+				SetMove(CCalculation::Calculation3DVec(GetPosInfo().GetPos(),m_SaveAimPos, 30.0f));
 				SetPattern(nPattern + 1);
 				SetPatternTime(0);
 			}
@@ -1344,7 +1344,7 @@ void CShotWeakEnemy::SwordCollision()
 {
 	if (CCollision::RectAngleCollisionXZ(m_pMagicSword,CGame::GetPlayer()))
 	{
-		D3DXVECTOR3 Aim = D3DXVECTOR3(CGame::GetPlayer()->GetPos().x,0.0f,CGame::GetPlayer()->GetPos().z) - D3DXVECTOR3(GetPos().x, 0.0f, GetPos().z);
+		D3DXVECTOR3 Aim = D3DXVECTOR3(CGame::GetPlayer()->GetPosInfo().GetPos().x,0.0f,CGame::GetPlayer()->GetPosInfo().GetPos().z) - D3DXVECTOR3(GetPosInfo().GetPos().x, 0.0f, GetPosInfo().GetPos().z);
 
 		CGame::GetPlayer()->SetDamage(5, 45);
 
@@ -1436,9 +1436,9 @@ void CDiveWeakEnemy::SetDeath()
 		float fPosX = static_cast<float>(rand() % 30 - 15);
 		float fPosZ = static_cast<float>(rand() % 30 - 15);
 		m_nDivisionNum--;
-		CDiveWeakEnemy * pDiveWeakEnemy = CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE::NORMAL, GetMaxLife()/ 2, 0, GetPos() + D3DXVECTOR3(fPosX, 100.0f, fPosZ), GetRot(), GetScale() / 2, m_nDivisionNum);
+		CDiveWeakEnemy * pDiveWeakEnemy = CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE::NORMAL, GetMaxLife()/ 2, 0, GetPosInfo().GetPos() + D3DXVECTOR3(fPosX, 100.0f, fPosZ), GetRot(), GetScale() / 2, m_nDivisionNum);
 		pDiveWeakEnemy->SetSensingRange(9999.0f);
-		pDiveWeakEnemy = CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE::NORMAL, GetMaxLife()/ 2, 0, GetPos() + D3DXVECTOR3(fPosZ, 100.0f, fPosX), GetRot(), GetScale() / 2, m_nDivisionNum);
+		pDiveWeakEnemy = CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE::NORMAL, GetMaxLife()/ 2, 0, GetPosInfo().GetPos() + D3DXVECTOR3(fPosZ, 100.0f, fPosX), GetRot(), GetScale() / 2, m_nDivisionNum);
 		pDiveWeakEnemy->SetSensingRange(9999.0f);
 	}
 
@@ -1465,8 +1465,8 @@ CDiveWeakEnemy* CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE Type, int nLife, int nP
 	pDiveWeakEnemy->m_DiveWeakEnemyType = Type;
 	pDiveWeakEnemy->SetLife(nLife);    //体力
 	pDiveWeakEnemy->SetMaxLife(nLife); //最大体力
-	pDiveWeakEnemy->SetPos(pos);       //位置
-	pDiveWeakEnemy->SetSupportPos(pos);//支点位置
+	pDiveWeakEnemy->GetPosInfo().SetPos(pos);       //位置
+	pDiveWeakEnemy->GetPosInfo().SetSupportPos(pos);//支点位置
 	pDiveWeakEnemy->SetRot(rot);       //向き
 	pDiveWeakEnemy->SetScale(Scale);   //拡大率
 	pDiveWeakEnemy->SetFormarScale(Scale);//元の拡大率を設定
@@ -1722,7 +1722,7 @@ CObject* CDiveWeakEnemy::ManagerChengeObject(bool bAim)
 	SetDeath();
 	//======================================================================================
 
-	return CDiveWeakEnemy::Create(NewType, GetLife(),GetPhaseNum(),GetPos(), GetRot(), GetScale(),GetDivisionNum());//生成したオブジェクトを返す
+	return CDiveWeakEnemy::Create(NewType, GetLife(),GetPhaseNum(), GetPosInfo().GetPos(), GetRot(), GetScale(),GetDivisionNum());//生成したオブジェクトを返す
 }
 //============================================================================================================================================
 
@@ -1733,7 +1733,7 @@ CObject* CDiveWeakEnemy::ManagerSaveObject()
 {
 	auto& Vec = GetVecAiModelInfo();
 	auto Vec2 = move(Vec);
-	CDiveWeakEnemy * pDiveWeakEnemy = CDiveWeakEnemy::Create(m_DiveWeakEnemyType, GetMaxLife(),GetPhaseNum(),GetPos(), GetRot(), GetScale(),GetDivisionNum());//生成したオブジェクトを返す
+	CDiveWeakEnemy * pDiveWeakEnemy = CDiveWeakEnemy::Create(m_DiveWeakEnemyType, GetMaxLife(),GetPhaseNum(), GetPosInfo().GetPos(), GetRot(), GetScale(),GetDivisionNum());//生成したオブジェクトを返す
 	pDiveWeakEnemy->SetSensingRange(GetSensingRange());//現在の敵の索敵範囲を保存する
 	pDiveWeakEnemy->SetNormalSpeed(GetNormalSpeed());//現在の敵の通常速度を保存する
 	pDiveWeakEnemy->SetVecMoveAiInfo(Vec2);
@@ -1797,9 +1797,9 @@ void CDiveWeakEnemy::AttackProcess()
 {
 	if (GetCntTime() % s_nATTACK_FREQUENCY == 0)
 	{
-		D3DXVECTOR3 Aim = CCalculation::Calculation3DVec(GetPos() + D3DXVECTOR3(0.0f, GetVtxMax().y + GetVtxMax().y / 2, 0.0f), CGame::GetPlayer()->GetSenterPos(), 20.0f);
+		D3DXVECTOR3 Aim = CCalculation::Calculation3DVec(GetPosInfo().GetPos() + D3DXVECTOR3(0.0f, GetVtxMax().y + GetVtxMax().y / 2, 0.0f), CGame::GetPlayer()->GetPosInfo().GetSenterPos(), 20.0f);
 
-		CAttackEnemy::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::PLAYER, CAttack::COLLISIONTYPE::SQUARE, true, true, 1, 60, 200, GetPos() + D3DXVECTOR3(0.0f, GetVtxMax().y, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), Aim, GetScale() * 0.5f);
+		CAttackEnemy::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::PLAYER, CAttack::COLLISIONTYPE::SQUARE, true, true, 1, 60, 200, GetPosInfo().GetPos() + D3DXVECTOR3(0.0f, GetVtxMax().y, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), Aim, GetScale() * 0.5f);
 	}
 }
 //============================================================================================================================================
@@ -1950,7 +1950,7 @@ void CEnemyMove_None::Process(CEnemy* pEnemy)
 CEnemyMove_Frightened::CEnemyMove_Frightened(CEnemy* pEnemy, D3DXVECTOR3 StopPos, int nStateTime) : m_StopPos(StopPos),m_nStateTime(nStateTime),m_pLockOn(nullptr)
 {
 	D3DXVECTOR3 ScreenPos = D3DXVECTOR3(0.0f, 0.0f,0.0f);
-	ScreenPos = CCalculation::CalcWorldToScreenNoViewport(pEnemy->GetSenterPos(), *CManager::GetCamera()->GetMtxView(), *CManager::GetCamera()->GetMtxProjection(),
+	ScreenPos = CCalculation::CalcWorldToScreenNoViewport(pEnemy->GetPosInfo().GetSenterPos(), *CManager::GetCamera()->GetMtxView(), *CManager::GetCamera()->GetMtxProjection(),
 		SCREEN_WIDTH,SCREEN_HEIGHT);
 
 	m_pLockOn = CUi::Create(CUi::UITYPE::TARGET_000, CObject2D::POLYGONTYPE::SENTERROLLING, 200.0f, 200.0f, 100, true, D3DXVECTOR3(ScreenPos.x, ScreenPos.y, 0.0f),
@@ -1984,14 +1984,14 @@ void CEnemyMove_Frightened::Process(CEnemy* pEnemy)
 	float fX = static_cast<float>(rand() % 10 - 5);
 	float fY = static_cast<float>(rand() % 10 - 5);
 	float fZ = static_cast<float>(rand() % 10 - 5);
-	pEnemy->SetPos(m_StopPos + D3DXVECTOR3(fX, fY, fZ));//震えさせる
+	pEnemy->GetPosInfo().SetPos(m_StopPos + D3DXVECTOR3(fX, fY, fZ));//震えさせる
 	pEnemy->SetMove(D3DXVECTOR3(0.0f, 0.0f,0.0f));
 	m_nStateTime--;
 
 	if (m_pLockOn != nullptr)
 	{
 		D3DXVECTOR3 ScreenPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-		ScreenPos = CCalculation::CalcWorldToScreenNoViewport(pEnemy->GetSenterPos(), *CManager::GetCamera()->GetMtxView(), *CManager::GetCamera()->GetMtxProjection(),
+		ScreenPos = CCalculation::CalcWorldToScreenNoViewport(pEnemy->GetPosInfo().GetSenterPos(), *CManager::GetCamera()->GetMtxView(), *CManager::GetCamera()->GetMtxProjection(),
 			SCREEN_WIDTH, SCREEN_HEIGHT);
 		m_pLockOn->SetPos(ScreenPos);
 		if (m_pLockOn->GetScale().x < 0.0f && m_pLockOn->GetScale().y < 0.0f)
@@ -2003,7 +2003,7 @@ void CEnemyMove_Frightened::Process(CEnemy* pEnemy)
 	}
 	if (m_nStateTime < 1)
 	{
-		pEnemy->SetPos(m_StopPos + D3DXVECTOR3(0.0f,50.0f,0.0f));
+		pEnemy->GetPosInfo().SetPos(m_StopPos + D3DXVECTOR3(0.0f,50.0f,0.0f));
 		pEnemy->ChengeMove(DBG_NEW CEnemyMove_AI());//AI移動処理に戻す
 	}
 }

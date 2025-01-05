@@ -144,10 +144,10 @@ void CObjectXMove::UpdatePos()
 {
 	if (m_bUseUpdatePos == true)
 	{
-		const D3DXVECTOR3& Pos = GetPos();
+		const D3DXVECTOR3& Pos = GetPosInfo().GetPos();
 
 		//1fëOÇÃà íuÇê›íË
-		SetPosOld(Pos);
+		GetPosInfo().SetPosOld(Pos);
 
 		//äµê´ÇÃèàóù
 		if (m_bUseInteria == true)
@@ -157,7 +157,7 @@ void CObjectXMove::UpdatePos()
 		}
 
 		//à íuÇÃê›íË
-		SetPos(Pos + m_Move + m_AddMove);
+		GetPosInfo().SetPos(Pos + m_Move + m_AddMove);
 	}
 }
 //===============================================================================================================================================================

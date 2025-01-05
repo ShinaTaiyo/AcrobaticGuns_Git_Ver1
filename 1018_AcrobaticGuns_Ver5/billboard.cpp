@@ -524,7 +524,7 @@ void CBillboard::HormingProcess()
 	//===================================
 	if (CScene::GetMode() == CScene::MODE_GAME)
 	{
-		TargetPos = CGame::GetPlayer()->GetPos();
+		TargetPos = CGame::GetPlayer()->GetPosInfo().GetPos();
 		fVXaim = TargetPos.x - m_Pos.x;
 		fVYaim = TargetPos.y - m_Pos.y;
 

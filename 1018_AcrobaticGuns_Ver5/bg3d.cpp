@@ -116,7 +116,7 @@ CBg3D* CBg3D::Create(BG3DTYPE type, D3DXVECTOR3 Pos, D3DXVECTOR3 Rot, D3DXVECTOR
 
 	pBg3D->Init();
 	pBg3D->SetBg3DType(type);
-	pBg3D->SetPos(Pos);
+	pBg3D->GetPosInfo().SetPos(Pos);
 	pBg3D->SetRot(Rot);
 	pBg3D->SetScale(Scale);
 	pBg3D->SetUseDeath(true);

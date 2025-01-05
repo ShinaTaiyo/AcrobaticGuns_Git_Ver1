@@ -100,7 +100,7 @@ void CAttack::Update()
 				{
 					CObjectX* pObjX = static_cast<CObjectX*>(pObj);
 
-					if (CCollision::CollisionSquare(GetPos(), GetVtxMax(), GetVtxMin(), pObjX->GetPos(), pObjX->GetVtxMax(), pObjX->GetVtxMin()))
+					if (CCollision::CollisionSquare(GetPosInfo().GetPos(), GetVtxMax(), GetVtxMin(), pObjX->GetPosInfo().GetPos(), pObjX->GetVtxMax(), pObjX->GetVtxMin()))
 					{
 						bCollision = true;
 					}
@@ -185,7 +185,7 @@ void CAttack::CollisionProcess(bool& bCollision, bool& bNowCollision, CObjectXAl
 	switch (GetCollisionType())
 	{
 	case CAttack::COLLISIONTYPE::SQUARE:
-		if (CCollision::CollisionSquare(GetPos(), GetVtxMax(), GetVtxMin(), pObjX->GetPos(), pObjX->GetVtxMax(), pObjX->GetVtxMin()) == true)
+		if (CCollision::CollisionSquare(GetPosInfo().GetPos(), GetVtxMax(), GetVtxMin(), pObjX->GetPosInfo().GetPos(), pObjX->GetVtxMax(), pObjX->GetVtxMin()) == true)
 		{
 			bCollision = true;
 			bNowCollision = true;
@@ -301,8 +301,8 @@ CAttackPlayer* CAttackPlayer::Create(ATTACKTYPE AttackType, TARGETTYPE TargetTyp
 	pAttackPlayer->SetAttackType(AttackType);     //UŒ‚‚ÌŽí—Þ‚ðÝ’è‚·‚é
 	pAttackPlayer->SetLife(nLife);                //‘Ì—Í‚ðÝ’è
 	pAttackPlayer->SetMaxLife(nLife);             //Å‘å‘Ì—Í‚ðÝ’è
-	pAttackPlayer->SetPos(pos);                   //ˆÊ’u  
-	pAttackPlayer->SetSupportPos(pos);            //Žx“_ˆÊ’u
+	pAttackPlayer->GetPosInfo().SetPos(pos);                   //ˆÊ’u  
+	pAttackPlayer->GetPosInfo().SetSupportPos(pos);            //Žx“_ˆÊ’u
 	pAttackPlayer->SetRot(rot);                   //Œü‚«
 	pAttackPlayer->SetMove(move);                 //ˆÚ“®—Ê
 	pAttackPlayer->SetScale(Scale);               //Šg‘å—¦
@@ -408,7 +408,7 @@ CAttackEnemy* CAttackEnemy::Create(ATTACKTYPE AttackType, TARGETTYPE TargetType,
 	pAttackEnemy->SetLife(nLife);                //‘Ì—Í‚ðÝ’è
 	pAttackEnemy->SetMaxLife(nLife);             //Å‘å‘Ì—Í‚ðÝ’è
 	pAttackEnemy->SetAutoSubLife(true);          //‘Ì—Í‚ðŽ©“®“I‚ÉŒ¸‚ç‚·
-	pAttackEnemy->SetPos(pos);                   //ˆÊ’u  
+	pAttackEnemy->GetPosInfo().SetPos(pos);                   //ˆÊ’u  
 	pAttackEnemy->SetRot(rot);                   //Œü‚«
 	pAttackEnemy->SetMove(move);                 //ˆÚ“®—Ê
 	pAttackEnemy->SetScale(Scale);               //Šg‘å—¦

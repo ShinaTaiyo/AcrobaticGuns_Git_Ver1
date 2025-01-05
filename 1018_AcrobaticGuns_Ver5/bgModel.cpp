@@ -108,8 +108,8 @@ CBgModel* CBgModel::Create(BGMODELTYPE bgModelType, D3DXVECTOR3 pos, D3DXVECTOR3
 
 	pBgModel->Init();                        //初期化処理
 	pBgModel->SetBgModelType(bgModelType);   //背景モデルの種類を設定する
-	pBgModel->SetPos(pos);                   //位置  
-	pBgModel->SetSupportPos(pos);            //支点となる位置を設定
+	pBgModel->GetPosInfo().SetPos(pos);                   //位置  
+	pBgModel->GetPosInfo().SetSupportPos(pos);            //支点となる位置を設定
 	pBgModel->SetRot(rot);                   //向き
 	pBgModel->SetScale(Scale);               //拡大率
 	pBgModel->SetUseSwapVtxXZ(bSwapVtxXZ);   //XZをチェンジする
@@ -269,7 +269,7 @@ CObject* CBgModel::ManagerChengeObject(bool bAim)
 	SetDeath();
 	//======================================================================================
 
-	return CBgModel::Create(NewType, GetPos(), GetRot(), GetScale(),GetUseSwapVtxXZ());//生成したオブジェクトを返す
+	return CBgModel::Create(NewType, GetPosInfo().GetPos(), GetRot(), GetScale(),GetUseSwapVtxXZ());//生成したオブジェクトを返す
 }
 //======================================================================================================================
 
@@ -278,6 +278,6 @@ CObject* CBgModel::ManagerChengeObject(bool bAim)
 //==================================================================
 CObject* CBgModel::ManagerSaveObject()
 {
-	return CBgModel::Create(m_Type,GetPos(),GetRot(),GetScale(),GetUseSwapVtxXZ());//生成したオブジェクトを返す
+	return CBgModel::Create(m_Type, GetPosInfo().GetPos(),GetRot(),GetScale(),GetUseSwapVtxXZ());//生成したオブジェクトを返す
 }
 //======================================================================================================================

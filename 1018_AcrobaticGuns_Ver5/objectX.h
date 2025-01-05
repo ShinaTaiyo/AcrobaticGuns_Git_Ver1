@@ -107,6 +107,34 @@ public:
 	};
 	//============================================================================================================
 
+	struct PosInfo
+	{
+		//==========================================================
+        //位置
+        //==========================================================
+		D3DXVECTOR3 Pos = { 0.0f,0.0f,0.0f };                              //位置!
+		D3DXVECTOR3 SupportPos = { 0.0f,0.0f,0.0f };                       //最初に設置された位置!
+		D3DXVECTOR3 PosOld = { 0.0f,0.0f,0.0f };                           //1f前の位置!
+		D3DXVECTOR3 SenterPos = { 0.0f,0.0f,0.0f };                        //中心点の位置
+		//=================================================================================================================
+    
+	    //位置
+		void SetPos(D3DXVECTOR3 CopyPos) { Pos = CopyPos; }                                           //位置の設定
+		const D3DXVECTOR3& GetPos() const { return Pos; }                                     //位置の取得
+
+		//1f前の位置
+		void SetPosOld(D3DXVECTOR3 CopyPosOld) { PosOld = CopyPosOld; }                               //1f前の位置の設定
+		const D3DXVECTOR3& GetPosOld() const { return PosOld; }                                            //1f前の位置を設定
+
+		//初期位置
+		void SetSupportPos(D3DXVECTOR3 CopySupportPos) { SupportPos = CopySupportPos; }               //設置位置を設定する
+		D3DXVECTOR3& GetSupportPos() { return SupportPos; }                                  //設置位置を取得する
+
+		//中心点の位置
+		D3DXVECTOR3& GetSenterPos() { return SenterPos; }                                     //中心点を取得する
+		//============================================================================================================
+	};
+
 	CObjectX(int nPri = 0, bool bUseintPri = false,CObject::TYPE type = CObject::TYPE::NONE, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_X);                                                           //コンストラクタ
 	~CObjectX() override;                                                 //デストラクタ
 	HRESULT Init() override;                                              //初期化処理
@@ -119,26 +147,6 @@ public:
 	//静的メンバ宣言
 	//==========================================================
 	static void SetCommonDraw(bool bDraw) { s_bCOMMON_DRAWSHADOW = bDraw; }
-
-	//==========================================================
-	//位置
-	//==========================================================
-	
-	//位置
-	void SetPos(D3DXVECTOR3 Pos) { m_Pos = Pos; }                                           //位置の設定
-	const D3DXVECTOR3& GetPos() const { return m_Pos; }                                     //位置の取得
-
-	//1f前の位置
-	void SetPosOld(D3DXVECTOR3 PosOld) { m_PosOld = PosOld; }                               //1f前の位置の設定
-	const D3DXVECTOR3& GetPosOld() const { return m_PosOld; }                                            //1f前の位置を設定
-
-	//初期位置
-	void SetSupportPos(D3DXVECTOR3 SupportPos) { m_SupportPos = SupportPos; }               //設置位置を設定する
-	D3DXVECTOR3 & GetSupportPos() { return m_SupportPos; }                                  //設置位置を取得する
-
-	//中心点の位置
-	D3DXVECTOR3& GetSenterPos() { return m_SenterPos; }                                     //中心点を取得する
-	//============================================================================================================
 	
 	//==========================================================
 	//向き
@@ -179,6 +187,7 @@ public:
 	//==========================================================
 	//サイズ
 	//==========================================================
+	void CalculateSenterPos();
 
 	//最大頂点
 	D3DXVECTOR3 & GetVtxMax() { return m_VtxMax; }                                          //各頂点最大値の取得
@@ -246,6 +255,8 @@ public:
 	//描画情報の取得
 	DrawInfo& GetDrawInfo() { return m_DrawInfo; }
     
+	//位置情報の取得
+	PosInfo& GetPosInfo() { return m_PosInfo; }
 
 	//=================================================================================================================
 private:
@@ -258,16 +269,6 @@ private:
 	//==========================================================
     float m_fAxis;//クォータニオンの回転角
 	D3DXVECTOR3 m_VecAxis;//クォータニオンの回転軸
-
-	//==========================================================
-	//位置
-	//==========================================================
-	D3DXVECTOR3 m_Pos;                              //位置!
-	D3DXVECTOR3 m_SupportPos;                       //最初に設置された位置!
-	D3DXVECTOR3 m_PosOld;                           //1f前の位置!
-	D3DXVECTOR3 m_SenterPos;                        //中心点の位置
-	void CalculateSenterPos();
-	//=================================================================================================================
 
 	//==========================================================
 	//向き
@@ -328,6 +329,7 @@ private:
 	bool m_bSwapVtxXZ;
 
 	DrawInfo m_DrawInfo;//描画情報
+	PosInfo m_PosInfo;  //位置情報
 	//=================================================================================================================
 
 	//===================================

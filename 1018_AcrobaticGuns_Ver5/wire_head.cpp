@@ -62,7 +62,7 @@ void CWireHead::Update()
 {
 	CObjectXAlive::Update();
 
-	CManager::GetDebugProc()->PrintDebugProc("ワイヤーヘッドの位置：%f %f %f\n", GetPos().x, GetPos().y, GetPos().z);
+	CManager::GetDebugProc()->PrintDebugProc("ワイヤーヘッドの位置：%f %f %f\n", GetPosInfo().GetPos().x, GetPosInfo().GetPos().y, GetPosInfo().GetPos().z);
 
 	if (m_nCoolTime == 0)
 	{//０距離で当たらないようにするためにクールタイムを設定（０除算回避）
@@ -101,8 +101,8 @@ CWireHead* CWireHead::Create(D3DXVECTOR3 Pos, D3DXVECTOR3 Rot, D3DXVECTOR3 Move,
 {
 	CWireHead* pWireHead = DBG_NEW CWireHead();
 	pWireHead->Init();
-	pWireHead->SetPos(Pos);
-	pWireHead->SetSupportPos(Pos);
+	pWireHead->GetPosInfo().SetPos(Pos);
+	pWireHead->GetPosInfo().SetSupportPos(Pos);
 	pWireHead->SetRot(Rot);
 	pWireHead->SetMove(Move);
 	pWireHead->SetScale(Scale);
@@ -141,7 +141,7 @@ bool CWireHead::CollisionSquare()
 			if (type == CObject::TYPE::BGMODEL || type == CObject::TYPE::ENEMY || type == CObject::TYPE::BLOCK)
 			{
 				CObjectX* pObjX = static_cast<CObjectX*>(pObj);
-				if (CCollision::CollisionSquare(GetPos(), GetVtxMax(), GetVtxMin(), pObjX->GetPos(), pObjX->GetVtxMax(), pObjX->GetVtxMin()) == true)
+				if (CCollision::CollisionSquare(GetPosInfo().GetPos(), GetVtxMax(), GetVtxMin(), pObjX->GetPosInfo().GetPos(), pObjX->GetVtxMax(), pObjX->GetVtxMin()) == true)
 				{
 					CManager::GetDebugProc()->PrintDebugProc("ワイヤーヘッドの当たり判定成功！\n");
 					return true;

@@ -189,7 +189,7 @@ void CPlayerMove_PrepDive::MoveProcess(CPlayer* pPlayer)
 	CWire* pWire = pPlayer->GetWire();
 	CWireHead* pWireHead = pPlayer->GetWire()->GetWireHead();
 	CLockon* pLockon = pPlayer->GetLockOn();//ロックオンへのポインタ
-	pWireHead->SetPos(pPlayer->GetPos());//ダイブ準備中なのでワイヤーヘッドをプレイヤーの位置に固定
+	pWireHead->GetPosInfo().SetPos(pPlayer->GetPosInfo().GetPos());//ダイブ準備中なのでワイヤーヘッドをプレイヤーの位置に固定
 
 	//CManager::GetDebugProc()->PrintDebugProc("移動量：%f %f %f\n", Move.x, Move.y, Move.z);
 	if ((CManager::GetInputJoypad()->GetRT_Trigger() || CManager::GetInputMouse()->GetMouseLeftClickTrigger()) && pLockon->GetSuccessRayCollision())
@@ -240,9 +240,9 @@ void CPlayerMove_Dive::MoveProcess(CPlayer* pPlayer)
 	{
 		bInput = true;
 	}
-	pPlayer->SetMove(CCalculation::Calculation3DVec(pPlayer->GetPos(),pWireHead->GetPos(), 40.0f));//目的地に達するまで狙い続ける
+	pPlayer->SetMove(CCalculation::Calculation3DVec(pPlayer->GetPosInfo().GetPos(),pWireHead->GetPosInfo().GetPos(), 40.0f));//目的地に達するまで狙い続ける
 	CCamera* pCamera = CManager::GetCamera();
-	if (CCalculation::CalculationLength(pPlayer->GetPos(), pWireHead->GetPos()) < s_fCOLLISIONDIVEMOVELENGTH)
+	if (CCalculation::CalculationLength(pPlayer->GetPosInfo().GetPos(), pWireHead->GetPosInfo().GetPos()) < s_fCOLLISIONDIVEMOVELENGTH)
 	{//ダイブ時に判定したら移動モードと攻撃モードを通常に戻す
 		if (bInput == false)
 		{//攻撃→射撃モード
@@ -271,17 +271,17 @@ void CPlayerMove_Dive::MoveProcess(CPlayer* pPlayer)
 //=====================================================================================================
 //コンストラクタ
 //=====================================================================================================
-CPlayerMove_Stuck::CPlayerMove_Stuck(CPlayer* pPlayer) : m_NowPos(pPlayer->GetPos())
+CPlayerMove_Stuck::CPlayerMove_Stuck(CPlayer* pPlayer) : m_NowPos(pPlayer->GetPosInfo().GetPos())
 {
 	CCamera* pCamera = CManager::GetCamera();
 	CWireHead* pWireHead = pPlayer->GetWire()->GetWireHead();
-	pPlayer->SetPos(pPlayer->GetPos() - pPlayer->GetMove());
+	pPlayer->GetPosInfo().SetPos(pPlayer->GetPosInfo().GetPos() - pPlayer->GetMove());
 	//pCamera->SetRot(D3DXVECTOR3(-pWireHead->GetRot().x,pWireHead->GetRot().y + D3DX_PI,0.0f));//カメラの向きを固定したワイヤーヘッドの逆側に！
 
 	//==========================
 	//カメラの向きを求める
 	//==========================
-	D3DXVECTOR3 ComRot = pWireHead->GetPos() - pPlayer->GetPos();
+	D3DXVECTOR3 ComRot = pWireHead->GetPosInfo().GetPos() - pPlayer->GetPosInfo().GetPos();
 	D3DXVec3Normalize(&ComRot, &ComRot);
 	float fYaw = atan2f(ComRot.x, ComRot.z);
 	float fPitch = atan2f(ComRot.y, sqrtf(powf(ComRot.x, 2) + powf(ComRot.z, 2)));
@@ -320,7 +320,7 @@ void CPlayerMove_Stuck::MoveProcess(CPlayer* pPlayer)
 	CWire* pWire = pPlayer->GetWire();
 	CLockon* pLockon = pPlayer->GetLockOn();//ロックオンへのポインタ
 
-	pWireHead->SetPos(pPlayer->GetPos());//ダイブ準備中なのでワイヤーヘッドをプレイヤーの位置に固定
+	pWireHead->GetPosInfo().SetPos(pPlayer->GetPosInfo().GetPos());//ダイブ準備中なのでワイヤーヘッドをプレイヤーの位置に固定
 	//pPlayer->SetRot(D3DXVECTOR3(pCamera->GetRot().x + D3DX_PI,-pCamera->GetRot().y,0.0f));//向きをカメラに合わせる
 	if ((CManager::GetInputJoypad()->GetRT_Trigger() || CManager::GetInputMouse()->GetMouseLeftClickTrigger()) && pLockon->GetSuccessRayCollision() == true)
 	{//ワイヤー発射移動モードにチェンジ
@@ -394,7 +394,7 @@ CPlayerAttack_Shot::~CPlayerAttack_Shot()
 void CPlayerAttack_Shot::AttackProcess(CPlayer* pPlayer)
 {
 	CLockon* pLockon = pPlayer->GetLockOn();
-	D3DXVECTOR3 ShotPos = pPlayer->GetPos() + D3DXVECTOR3(0.0f, pPlayer->GetVtxMax().y, 0.0f);
+	D3DXVECTOR3 ShotPos = pPlayer->GetPosInfo().GetPos() + D3DXVECTOR3(0.0f, pPlayer->GetVtxMax().y, 0.0f);
 	D3DXVECTOR3 Move = CCalculation::Calculation3DVec(ShotPos, pLockon->GetNearRayColObjPos(), s_fNORMAL_SHOTSPEED);
 	CAttackPlayer* pAttackPlayer = nullptr;//プレイヤー攻撃へのポインタ
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_J) == true || CManager::GetInputJoypad()->GetRT_Repeat(4) == true ||
@@ -472,7 +472,7 @@ void CPlayerAttack_Dive::AttackProcess(CPlayer* pPlayer)
 	CUi* pDivePossibleNum = pPlayer->GetDivePossibleNum();
 	if (pDivePossibleNum->GetValue() > 0)
 	{//ダイブゲージがたまっていたら爆発攻撃を発動
-		CAttackPlayer* pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::ENEMY, CAttack::COLLISIONTYPE::SQUARE, false,true, 50,30, 100, pPlayer->GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.1f, 0.1f, 0.1f),
+		CAttackPlayer* pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::ENEMY, CAttack::COLLISIONTYPE::SQUARE, false,true, 50,30, 100, pPlayer->GetPosInfo().GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.1f, 0.1f, 0.1f),
 			D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 		pAttackPlayer->SetUseAddScale(D3DXVECTOR3(0.4f, 0.4f, 0.4f), true);
 		pAttackPlayer->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), 200, false, false);
@@ -551,8 +551,8 @@ void CPlayerEffect_Dive::EffectProcess(CPlayer* pPlayer)
 	CMeshOrbit* pMeshOrbit = pPlayer->GetMeshOrbit();
 
 	//縦にメッシュの軌跡を展開
-	pMeshOrbit->SetPos1(pPlayer->GetPos());
-	pMeshOrbit->SetPos2(pPlayer->GetPos() + D3DXVECTOR3(0.0f, pPlayer->GetVtxMax().y, 0.0f));
+	pMeshOrbit->SetPos1(pPlayer->GetPosInfo().GetPos());
+	pMeshOrbit->SetPos2(pPlayer->GetPosInfo().GetPos() + D3DXVECTOR3(0.0f, pPlayer->GetVtxMax().y, 0.0f));
 
 	//現在の位置にシリンダーを展開
 	//pWire->SetPos(pPlayer->GetPos());
@@ -595,8 +595,8 @@ void CPlayerWireShot::WireShotProcess(CPlayer* pPlayer)
 //=====================================================================================================
 void CPlayerWireShot::StartWireShotProcess(CPlayer* pPlayer)
 {
-	D3DXVECTOR3 Move = CCalculation::Calculation3DVec(pPlayer->GetPos(), pPlayer->GetLockOn()->GetNearRayColObjPos(), 60.0f);
-	D3DXVECTOR3 Rot = pPlayer->GetLockOn()->GetNearRayColObjPos() - pPlayer->GetPos();
+	D3DXVECTOR3 Move = CCalculation::Calculation3DVec(pPlayer->GetPosInfo().GetPos(), pPlayer->GetLockOn()->GetNearRayColObjPos(), 60.0f);
+	D3DXVECTOR3 Rot = pPlayer->GetLockOn()->GetNearRayColObjPos() - pPlayer->GetPosInfo().GetPos();
 	D3DXVec3Normalize(&Rot, &Rot);
 	float fYaw = atan2f(Rot.x, Rot.z);
 	float fPitch = atan2f(Rot.y, sqrtf(powf(Rot.x, 2) + powf(Rot.z, 2)));
@@ -666,7 +666,7 @@ void CPlayerWireShot_Do::WireShotProcess(CPlayer* pPlayer)
 		DecisionCameraRot(pPlayer);//カメラの向きを決める
 
 		pWireHead->SetMove(D3DXVECTOR3(0.0f, 0.0f, 0.0f));//ワイヤーヘッドの移動を止める
-		D3DXVECTOR3 Move = CCalculation::Calculation3DVec(pPlayer->GetPos(), pWireHead->GetPos(),40.0f);
+		D3DXVECTOR3 Move = CCalculation::Calculation3DVec(pPlayer->GetPosInfo().GetPos(), pWireHead->GetPosInfo().GetPos(),40.0f);
 		CPlayerMove_Dive * pPlayerMove_Dive = DBG_NEW CPlayerMove_Dive();//ダイブを開始する
 		pPlayerMove_Dive->SetDiveMove(Move);
         pPlayer->ChengeMoveMode(pPlayerMove_Dive);
@@ -694,9 +694,9 @@ void CPlayerWireShot_Do::FrightenedEnemy(CPlayer* pPlayer)
 		CEnemy* pEnemy = static_cast<CEnemy*>(pObj);
 		if (pEnemy->GetEnemyType() == CEnemy::ENEMYTYPE::DIVEWEAK)
 		{//ダイブに弱い敵だけ処理をする6
-			if (CCollision::RayIntersectsAABBCollisionPos(FrontPos, Ray, pEnemy->GetPos() + pEnemy->GetVtxMin(), pEnemy->GetPos() + pEnemy->GetVtxMax(), CollisionPos))
+			if (CCollision::RayIntersectsAABBCollisionPos(FrontPos, Ray, pEnemy->GetPosInfo().GetPos() + pEnemy->GetVtxMin(), pEnemy->GetPosInfo().GetPos() + pEnemy->GetVtxMax(), CollisionPos))
 			{
-				pEnemy->ChengeMove(DBG_NEW CEnemyMove_Frightened(pEnemy, pEnemy->GetPos(),90));//1秒間怯え状態にする
+				pEnemy->ChengeMove(DBG_NEW CEnemyMove_Frightened(pEnemy, pEnemy->GetPosInfo().GetPos(),90));//1秒間怯え状態にする
 			}
 		}
 		pObj = pNext;//リストを次に進める
@@ -716,7 +716,7 @@ void CPlayerWireShot_Do::DecisionCameraRot(CPlayer* pPlayer)
 	//==========================
     //カメラの向きを求める
     //==========================
-	D3DXVECTOR3 ComRot = pWireHead->GetPos() - pPlayer->GetPos();
+	D3DXVECTOR3 ComRot = pWireHead->GetPosInfo().GetPos() - pPlayer->GetPosInfo().GetPos();
 	D3DXVec3Normalize(&ComRot, &ComRot);
 	float fYaw = atan2f(ComRot.x, ComRot.z);
 	float fPitch = atan2f(ComRot.y, sqrtf(powf(ComRot.x, 2) + powf(ComRot.z, 2)));

@@ -102,11 +102,11 @@ CAIModel* CAIModel::Create(AIMODELTYPE type, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D
 	pAiModel->Init();                                                               //初期化処理
 	pAiModel->SetUseDeath(false);                                                   //死亡フラグを発動するかどうかを設定する
 	pAiModel->m_Type = type;                                                        //敵の種類
-	pAiModel->CObjectX::SetPos(pos);                                                //オブジェクト２Ｄの位置を設定
-	pAiModel->SetPosOld(pos);                                                       //1f前の位置を設定
+	pAiModel->GetPosInfo().SetPos(pos);                                                //オブジェクト２Ｄの位置を設定
+	pAiModel->GetPosInfo().SetPosOld(pos);                                                       //1f前の位置を設定
 	pAiModel->GetDrawInfo().SetUseDraw(true);
 	pAiModel->GetDrawInfo().SetUseShadow(true);
-	pAiModel->SetSupportPos(pos);                                                   //設置位置
+	pAiModel->GetPosInfo().SetSupportPos(pos);                                                   //設置位置
 	pAiModel->CObjectX::SetScale(Scale);                                            //オブジェクトの拡大率
 	pAiModel->SetFormarScale(Scale);                                                //元の拡大率を設定する
 	pAiModel->GetDrawInfo().SetMtxParent(mtxWorld);                                               //親マトリックスを設定する

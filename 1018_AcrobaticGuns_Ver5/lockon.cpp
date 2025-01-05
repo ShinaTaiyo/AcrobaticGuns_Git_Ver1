@@ -210,7 +210,7 @@ void CLockon::RayCollisionToObject()
 			{
 				CObjectX* pObjX = dynamic_cast<CObjectX*>(pObj);
 				//指定したモデルの位置
-				bRayCollision = CCollision::RayIntersectsAABBCollisionPos(m_FrontPos, m_NowRay, pObjX->GetVtxMin() + pObjX->GetPos(), pObjX->GetVtxMax() + pObjX->GetPos(),
+				bRayCollision = CCollision::RayIntersectsAABBCollisionPos(m_FrontPos, m_NowRay, pObjX->GetVtxMin() + pObjX->GetPosInfo().GetPos(), pObjX->GetVtxMax() + pObjX->GetPosInfo().GetPos(),
 					CollisionStartPos);
 
 				if (CCalculation::CalculationLength(m_FrontPos, CollisionStartPos) < CManager::GetCamera()->GetPosRToPosVLength())
@@ -223,7 +223,7 @@ void CLockon::RayCollisionToObject()
 				{//レイとサイズ/２分の球の当たり判定成功
 					CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 20, 30.0f, 30.0f, 100, 10, false, CollisionStartPos, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f), true);
 					//敵の中心のスクリーン座標を求める
-					D3DXVECTOR3 ScreenPos = CCalculation::CalcWorldToScreenNoViewport(pObjX->GetSenterPos(), *CManager::GetCamera()->GetMtxView(), *CManager::GetCamera()->GetMtxProjection(),
+					D3DXVECTOR3 ScreenPos = CCalculation::CalcWorldToScreenNoViewport(pObjX->GetPosInfo().GetSenterPos(), *CManager::GetCamera()->GetMtxView(), *CManager::GetCamera()->GetMtxProjection(),
 						float(SCREEN_WIDTH), float(SCREEN_HEIGHT));
 					VecCollisionSuccess.push_back(CollisionStartPos);//当たり判定が成功したオブジェクトの判定開始位置を保存する
 				}

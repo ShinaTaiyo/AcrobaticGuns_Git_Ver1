@@ -237,11 +237,11 @@ bool CCollision::RectAngleCollisionXZ(CObjectX* pMyObj, CObjectX* pComObj)
 	D3DXVECTOR2 FourVtxRotPos[4] = {};//回転した４頂点の位置
 	D3DXVECTOR2 FourComparisonVtxPos[4] = {};    //比較用４頂点
 	bool bCollision = true;
-	D3DXVECTOR3 MyPos = pMyObj->GetPos();
+	D3DXVECTOR3 MyPos = pMyObj->GetPosInfo().GetPos();
 	D3DXVECTOR3 MyVtxMin = pMyObj->GetVtxMin();
 	D3DXVECTOR3 MyVtxMax = pMyObj->GetVtxMax();
 	D3DXVECTOR3 MyRot = pMyObj->GetRot();
-	D3DXVECTOR3 ComparisonPos = pComObj->GetPos();
+	D3DXVECTOR3 ComparisonPos = pComObj->GetPosInfo().GetPos();
 	D3DXVECTOR3 ComparisonVtxMin = pComObj->GetVtxMin();
 	D3DXVECTOR3 ComparisonVtxMax = pComObj->GetVtxMax();
 
@@ -376,14 +376,14 @@ bool CCollision::RectAngleCollisionXZ(CObjectX* pMyObj, CObjectX* pComObj)
 //================================================================
 bool CCollision::IsPointInsideAABB(const D3DXVECTOR3& Point, CObjectX* pComObjX)
 {
-	if (Point.x >= pComObjX->GetPos().x + pComObjX->GetVtxMin().x &&
-		Point.x <= pComObjX->GetPos().x + pComObjX->GetVtxMax().x &&
-		Point.y >= pComObjX->GetPos().y + pComObjX->GetVtxMin().y &&
-		Point.y <= pComObjX->GetPos().y + pComObjX->GetVtxMax().y &&
-		Point.z >= pComObjX->GetPos().z + pComObjX->GetVtxMin().z &&
-		Point.z <= pComObjX->GetPos().z + pComObjX->GetVtxMax().z)
+	if (Point.x >= pComObjX->GetPosInfo().GetPos().x + pComObjX->GetVtxMin().x &&
+		Point.x <= pComObjX->GetPosInfo().GetPos().x + pComObjX->GetVtxMax().x &&
+		Point.y >= pComObjX->GetPosInfo().GetPos().y + pComObjX->GetVtxMin().y &&
+		Point.y <= pComObjX->GetPosInfo().GetPos().y + pComObjX->GetVtxMax().y &&
+		Point.z >= pComObjX->GetPosInfo().GetPos().z + pComObjX->GetVtxMin().z &&
+		Point.z <= pComObjX->GetPosInfo().GetPos().z + pComObjX->GetVtxMax().z)
 	{
-		CManager::GetDebugProc()->PrintDebugProc("レイの支点とAABBの当たり判定が無効！位置：%f %f %f\n", pComObjX->GetPos().x, pComObjX->GetPos().y, pComObjX->GetPos().z);
+		CManager::GetDebugProc()->PrintDebugProc("レイの支点とAABBの当たり判定が無効！位置：%f %f %f\n", pComObjX->GetPosInfo().GetPos().x, pComObjX->GetPosInfo().GetPos().y, pComObjX->GetPosInfo().GetPos().z);
 		CManager::GetDebugProc()->PrintDebugProc("最大頂点：%f %f %f\n", pComObjX->GetVtxMax().x, pComObjX->GetVtxMax().y, pComObjX->GetVtxMax().z);
 		CManager::GetDebugProc()->PrintDebugProc("最小頂点：%f %f %f\n", pComObjX->GetVtxMin().x, pComObjX->GetVtxMin().y, pComObjX->GetVtxMin().z);
 		return true;

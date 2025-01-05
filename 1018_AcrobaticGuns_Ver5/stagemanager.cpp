@@ -518,11 +518,11 @@ void CStageManagerState_NewObject::Process(CStageManager* pStageManager)
 		{
 			if (CManager::GetInputKeyboard()->GetTrigger(DIK_P) == true)
 			{
-				pStageManager->SetSpawnPoint(static_cast<CObjectX*>(m_pManagerObject)->GetPos());
+				pStageManager->SetSpawnPoint(static_cast<CObjectX*>(m_pManagerObject)->GetPosInfo().GetPos());
 			}
 		}
 
-		CManager::GetCamera()->SetPosR(static_cast<CObjectX*>(m_pManagerObject)->GetPos());
+		CManager::GetCamera()->SetPosR(static_cast<CObjectX*>(m_pManagerObject)->GetPosInfo().GetPos());
 
 		//現在のブロックの種類を変更する
 		TypeChenge(pStageManager);
@@ -670,7 +670,7 @@ void CStageManagerState_NewObject::ReleaseObject(CStageManager* pStageManager)
 	switch (m_pManagerObject->GetObjectType())
 	{
 	case CObject::OBJECTTYPE::OBJECTTYPE_X:
-		pStageManager->SetSavePos(static_cast<CObjectX*>(m_pManagerObject)->GetPos());
+		pStageManager->SetSavePos(static_cast<CObjectX*>(m_pManagerObject)->GetPosInfo().GetPos());
 		pStageManager->SetSaveRot(static_cast<CObjectX*>(m_pManagerObject)->GetRot());
 		pStageManager->SetSaveScale(static_cast<CObjectX*>(m_pManagerObject)->GetScale());
 		break;

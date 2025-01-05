@@ -230,13 +230,13 @@ void CCamera::NormalCameraMove()
 	switch (CScene::GetMode())
 	{
 	case CScene::MODE_TITLE:
-		m_PosR = CTitle::GetPlayer()->GetSenterPos() + D3DXVECTOR3(0.0f,50.0f,0.0f);
+		m_PosR = CTitle::GetPlayer()->GetPosInfo().GetSenterPos() + D3DXVECTOR3(0.0f,50.0f,0.0f);
 		m_PosV = m_PosR + RotVec * m_fLength;
 		break;
 	case CScene::MODE_GAME:
 		if (CGame::GetPlayer() != nullptr)
 		{
-			m_PosR = CGame::GetPlayer()->GetPos() + D3DXVECTOR3(sinf(m_Rot.y + D3DX_PI * 0.5f) * 30.0f, 60.0f,cosf(m_Rot.y + D3DX_PI * 0.5f) * 30.0f) + m_AddPosR;
+			m_PosR = CGame::GetPlayer()->GetPosInfo().GetPos() + D3DXVECTOR3(sinf(m_Rot.y + D3DX_PI * 0.5f) * 30.0f, 60.0f,cosf(m_Rot.y + D3DX_PI * 0.5f) * 30.0f) + m_AddPosR;
 			m_PosV = m_PosR + RotVec * m_fLength;
 		}
 		break;
@@ -268,7 +268,7 @@ void CCamera::MakeTransparent()
 			if (pObj->GetObjectType() == CObject::OBJECTTYPE::OBJECTTYPE_X && pObj->GetType() != CObject::TYPE::PLAYER && pObj->GetType() != CObject::TYPE::ENEMY)
 			{
 				CObjectX* pObjX = static_cast<CObjectX*>(pObj);//オブジェクトXの機能を使う
-				if (CCollision::RayIntersectsAABBCollisionPos(m_PosV, Ray, pObjX->GetPos() + pObjX->GetVtxMin(), pObjX->GetPos() + pObjX->GetVtxMax(), RayCollisionPos))
+				if (CCollision::RayIntersectsAABBCollisionPos(m_PosV, Ray, pObjX->GetPosInfo().GetPos() + pObjX->GetVtxMin(), pObjX->GetPosInfo().GetPos() + pObjX->GetVtxMax(), RayCollisionPos))
 				{
 					fLength = CCalculation::CalculationLength(m_PosV,RayCollisionPos);
 

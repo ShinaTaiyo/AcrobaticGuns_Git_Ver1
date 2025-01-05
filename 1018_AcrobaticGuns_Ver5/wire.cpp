@@ -100,11 +100,11 @@ void CWire::Update()
 	const float& fRadius = GetRadius();            //半径
 	const float& fHeight = GetHeight();            //高さ
 
-	float fLength = CCalculation::CalculationLength(m_pPlayer->GetPos(), m_pWireHead->GetPos());
+	float fLength = CCalculation::CalculationLength(m_pPlayer->GetPosInfo().GetPos(), m_pWireHead->GetPosInfo().GetPos());
 	SetHeight(fLength);
 	//CManager::GetDebugProc()->PrintDebugProc("距離：%f\n", fLength);
 
-	D3DXVECTOR3 RotMove = m_pWireHead->GetPos() - m_pPlayer->GetPos();
+	D3DXVECTOR3 RotMove = m_pWireHead->GetPosInfo().GetPos() - m_pPlayer->GetPosInfo().GetPos();
 	D3DXVec3Normalize(&RotMove, &RotMove);
 	VERTEX_3D* pVtx;
 	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBufferPointer();
@@ -126,7 +126,7 @@ void CWire::Update()
 				fRatioXZ = (1.0f / (nNumDivisionXZ)) * nCntVtxXZ;
 				if (nCntVtxY == 0 && nCntVtxXZ == 0)
 				{//最初の周なので上面の中心点を設定する
-					pVtx[nCntArray].pos = m_pWireHead->GetPos();//Y方向分割数3つの場合、底面 = 1
+					pVtx[nCntArray].pos = m_pWireHead->GetPosInfo().GetPos();//Y方向分割数3つの場合、底面 = 1
 					nCntArray++;
 				}
 
@@ -148,7 +148,7 @@ void CWire::Update()
 				}
 				if (nCntVtxY == nNumDivisionY - 1 && nCntVtxXZ == nNumDivisionXZ)
 				{//最後
-					pVtx[nCntArray].pos = m_pPlayer->GetPos();//底面の中心に位置を設定
+					pVtx[nCntArray].pos = m_pPlayer->GetPosInfo().GetPos();//底面の中心に位置を設定
 				}
 			}
 		}
@@ -196,7 +196,7 @@ void CWire::Draw()
 	{
 		D3DXVECTOR3 PosZero = D3DXVECTOR3(0.0f, 0.0f, 0.0f);//ワールド座標代入処理で使用する
 		D3DXVECTOR3 WireHeadRot = m_pWireHead->GetRot();//ワイヤーヘッドの向き
-		D3DXVECTOR3 WireHeadPos = m_pWireHead->GetPos();//ワイヤーヘッドの位置
+		D3DXVECTOR3 WireHeadPos = m_pWireHead->GetPosInfo().GetPos();//ワイヤーヘッドの位置
 		int Size = m_VecMtxCircle.size();
 
 		for (int nCnt = 0; nCnt < Size; nCnt++)

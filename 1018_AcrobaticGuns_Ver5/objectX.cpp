@@ -36,9 +36,8 @@ bool CObjectX::s_bCOMMON_DRAWSHADOW = true;
 CObjectX::CObjectX(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject(nPri, bUseintPri, type, ObjType)
 , m_ObjectXInfo(), m_bUseAddRot(false),
 m_bUseAddScaling(false), m_nIndexObjectX(0), m_nManagerType(0), m_nObjXType(OBJECTXTYPE_BLOCK),
-m_nTypeNum(0), m_bUseMultiScale(false), m_MultiScale(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_Pos(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_SupportPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),
-m_PosOld(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_Rot(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_Scale(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_FormarScale(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_Size(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_VtxMin(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),
-m_OriginVtxMin(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_VtxMax(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_OriginVtxMax(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_AddRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_SenterPos(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),
+m_nTypeNum(0), m_bUseMultiScale(false), m_MultiScale(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_PosInfo({}), m_Rot(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_Scale(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_FormarScale(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_Size(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_VtxMin(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),
+m_OriginVtxMin(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_VtxMax(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_OriginVtxMax(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_AddRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),
 m_AddScale(D3DXVECTOR3(0.0f, 0.0f, 0.0f)), m_fAxis(0.0f), m_VecAxis(D3DXVECTOR3(0.0f, 1.0f, 0.0f)), m_DrawInfo({})
 {
 	SetObjectType(CObject::OBJECTTYPE::OBJECTTYPE_X);
@@ -212,7 +211,7 @@ void CObjectX::Draw()
 	D3DXMatrixMultiply(&m_DrawInfo.mtxWorld, &m_DrawInfo.mtxWorld, &mtxRot);
 
 	//位置を反映
-	D3DXMatrixTranslation(&mtxTrans, m_Pos.x, m_Pos.y, m_Pos.z);
+	D3DXMatrixTranslation(&mtxTrans, m_PosInfo.Pos.x, m_PosInfo.Pos.y, m_PosInfo.Pos.z);
 	D3DXMatrixMultiply(&m_DrawInfo.mtxWorld, &m_DrawInfo.mtxWorld, &mtxTrans);
 
 	//ワールドマトリックスの設定
@@ -362,8 +361,8 @@ void CObjectX::SetColor(D3DXCOLOR col, int nColChengeTime, bool bChoose, bool bS
 //================================================
 void CObjectX::CalculateSenterPos()
 {
-	m_SenterPos = m_Pos;
-	m_SenterPos.y += (m_VtxMax.y + m_VtxMin.y) / 2;
+	m_PosInfo.SenterPos = m_PosInfo.Pos;
+	m_PosInfo.SenterPos.y += (m_VtxMax.y + m_VtxMin.y) / 2;
 }
 //================================================================================================================================================
 
@@ -600,7 +599,7 @@ void CObjectX::ChengeEditPos()
 	//===========================
 	//位置を支点に固定
 	//===========================
-	m_Pos = m_SupportPos;
+	m_PosInfo.Pos = m_PosInfo.SupportPos;
 	//========================================================================================
 
 	//===========================
@@ -612,22 +611,22 @@ void CObjectX::ChengeEditPos()
 		{
 			if (pInput->GetTrigger(DIK_W) == true)
 			{
-				m_Pos.y += 0.1f;
+				m_PosInfo.Pos.y += 0.1f;
 			}
 			else if (pInput->GetTrigger(DIK_S) == true)
 			{
-				m_Pos.y -= 0.1f;
+				m_PosInfo.Pos.y -= 0.1f;
 			}
 		}
 		else
 		{
 			if (pInput->GetPress(DIK_W) == true)
 			{
-				m_Pos.y += 5.0f;
+				m_PosInfo.Pos.y += 5.0f;
 			}
 			else if (pInput->GetPress(DIK_S) == true)
 			{
-				m_Pos.y -= 5.0f;
+				m_PosInfo.Pos.y -= 5.0f;
 			}
 		}
 	}
@@ -636,11 +635,11 @@ void CObjectX::ChengeEditPos()
 		CCalculation::CaluclationMove(false, Move, 5.0f, CCalculation::MOVEAIM_XZ, m_Rot.y);
 	}
 	//支点も一緒に移動
-	m_Pos += Move;
-	m_SupportPos = m_Pos;
-	CManager::GetDebugProc()->PrintDebugProc("支点位置(矢印キー) %f %f %f\n", m_SupportPos.x, m_SupportPos.y, m_SupportPos.z);
+	m_PosInfo.Pos += Move;
+	m_PosInfo.SupportPos = m_PosInfo.Pos;
+	CManager::GetDebugProc()->PrintDebugProc("支点位置(矢印キー) %f %f %f\n", m_PosInfo.SupportPos.x,m_PosInfo.SupportPos.y, m_PosInfo.SupportPos.z);
 	CManager::GetDebugProc()->PrintDebugProc("向きZ(FGキー) %f\n", m_Rot.z);
-	CManager::GetCamera()->SetPosR(m_Pos);
+	CManager::GetCamera()->SetPosR(m_PosInfo.Pos);
 	//================================================================================================================================================
 
 }
@@ -673,7 +672,7 @@ void CObjectX::ManagerChooseControlInfo()
 
 	ChengeEditSwapVtxXZ();
 
-	CManager::GetCamera()->SetPosR(m_Pos);//カメラの注視点を現在の位置に設定
+	CManager::GetCamera()->SetPosR(m_PosInfo.Pos);//カメラの注視点を現在の位置に設定
 }
 //================================================================================================================================================
 
@@ -682,9 +681,9 @@ void CObjectX::ManagerChooseControlInfo()
 //============================================================================
 void CObjectX::SaveInfoTxt(fstream & WritingFile)
 {
-	WritingFile << "POS = " << fixed << setprecision(3)<< m_Pos.x << " " << 
-		fixed << setprecision(3) << m_Pos.y << " " << 
-		fixed << setprecision(3) << m_Pos.z << " " << endl;//位置
+	WritingFile << "POS = " << fixed << setprecision(3)<< m_PosInfo.Pos.x << " " <<
+		fixed << setprecision(3) << m_PosInfo.Pos.y << " " << 
+		fixed << setprecision(3) << m_PosInfo.Pos.z << " " << endl;//位置
 	WritingFile << "ROT = " << fixed << setprecision(3) << m_Rot.x << " " <<
 		fixed << setprecision(3) << m_Rot.y << " " <<
 		fixed << setprecision(3) << m_Rot.z << " " << endl;//向き
@@ -757,10 +756,10 @@ void CObjectX::DrawShadow()
 			if (pObj->GetType() == CObject::TYPE::BLOCK || pObj->GetType() == CObject::TYPE::BGMODEL)
 			{
 				CObjectX* pObjX = static_cast<CObjectX*>(pObj);
-				if (CCollision::RayIntersectsAABBCollisionPos(m_Pos + D3DXVECTOR3(0.0f,0.1f,0.0f), D3DXVECTOR3(0.0f, -1.0f, 0.0f), 
-					pObjX->GetPos() + pObjX->GetVtxMin(),pObjX->GetPos() + pObjX->GetVtxMax(), CalcRayCollisionPos))
+				if (CCollision::RayIntersectsAABBCollisionPos(m_PosInfo.Pos + D3DXVECTOR3(0.0f,0.1f,0.0f), D3DXVECTOR3(0.0f, -1.0f, 0.0f),
+					pObjX->GetPosInfo().GetPos() + pObjX->GetVtxMin(),pObjX->GetPosInfo().GetPos() + pObjX->GetVtxMax(), CalcRayCollisionPos))
 				{
-					float fLength = sqrtf(powf(CalcRayCollisionPos.y - m_Pos.y,2));//レイが当たった位置のY軸の距離を取る
+					float fLength = sqrtf(powf(CalcRayCollisionPos.y - m_PosInfo.Pos.y,2));//レイが当たった位置のY軸の距離を取る
 					nCntColRay++;
 					if (nCntColRay == 1)
 					{//最初の当たったオブジェクトなので、無条件で距離とレイが当たった位置を記録する
@@ -783,7 +782,7 @@ void CObjectX::DrawShadow()
 	}
 
 	//位置を反映
-	D3DXMatrixTranslation(&mtxTrans,m_Pos.x,RayCollisionPos.y, m_Pos.z);
+	D3DXMatrixTranslation(&mtxTrans,m_PosInfo.Pos.x,RayCollisionPos.y, m_PosInfo.Pos.z);
 	D3DXMatrixMultiply(&mtxShadow, &mtxShadow, &mtxTrans);
 
 	//ワールドマトリックスの設定

@@ -117,7 +117,7 @@ void CTitle::Update()
 
 	if (m_pPlayer != nullptr && m_pBg3D != nullptr)
 	{
-		m_pBg3D->SetPos(m_pPlayer->GetPos());
+		m_pBg3D->GetPosInfo().SetPos(m_pPlayer->GetPosInfo().GetPos());
 
 		PlayerProcess();
 	}

@@ -176,7 +176,7 @@ void CPlayer::Update()
 
         m_pWireShot->WireShotProcess(this);//ワイヤー発射状態処理
 
-        CManager::GetDebugProc()->PrintDebugProc("プレイヤーの位置：%f %f %f\n", GetPos().x, GetPos().y, GetPos().z);
+        CManager::GetDebugProc()->PrintDebugProc("プレイヤーの位置：%f %f %f\n", GetPosInfo().GetPos().x, GetPosInfo().GetPos().y, GetPosInfo().GetPos().z);
         CManager::GetDebugProc()->PrintDebugProc("プレイヤーの体力：%d\n", GetLife());
 
         if (GetLife() < 1)
@@ -286,9 +286,9 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
                 CManager::GetObjectXInfo()->GetColorValue(nIdx));
             //モデル情報を割り当てる
             pPlayer->SetSize();
-            pPlayer->SetPos(pos);                                                            //位置の設定
-            pPlayer->SetPosOld(pos);                                                         //1f前の位置を設定
-            pPlayer->SetSupportPos(pos);                                                     //設置位置
+            pPlayer->GetPosInfo().SetPos(pos);                                                            //位置の設定
+            pPlayer->GetPosInfo().SetPosOld(pos);                                                         //1f前の位置を設定
+            pPlayer->GetPosInfo().SetSupportPos(pos);                                                     //設置位置
             pPlayer->SetRot(rot);                                                            //向きの設定
             pPlayer->SetScale(Scale);                                                        //拡大率の設定
             pPlayer->SetFormarScale(Scale);                                                  //元の拡大率を設定する
@@ -464,8 +464,8 @@ void CPlayer::ChengeWireShotMode(CPlayerWireShot* pPlayerWireShot)
 //========================================================
 void CPlayer::CollisionProcess()
 {
-    D3DXVECTOR3 MyPos = GetPos();
-    D3DXVECTOR3 MyPosOld = GetPosOld();
+    D3DXVECTOR3 MyPos = GetPosInfo().GetPos();
+    D3DXVECTOR3 MyPosOld = GetPosInfo().GetPosOld();
     D3DXVECTOR3 MyVtxMax = GetVtxMax();
     D3DXVECTOR3 MyVtxMin = GetVtxMin();
     const D3DXVECTOR3 Move = GetMove();
@@ -496,7 +496,7 @@ void CPlayer::CollisionProcess()
 
             if (type == CObject::TYPE::BLOCK || type == CObject::TYPE::BGMODEL)
             {
-                D3DXVECTOR3 ComPos = static_cast<CObjectX*>(pObj)->GetPos();
+                D3DXVECTOR3 ComPos = static_cast<CObjectX*>(pObj)->GetPosInfo().GetPos();
                 D3DXVECTOR3 ComVtxMax = static_cast<CObjectX*>(pObj)->GetVtxMax();
                 D3DXVECTOR3 ComVtxMin = static_cast<CObjectX*>(pObj)->GetVtxMin();
 
@@ -505,7 +505,7 @@ void CPlayer::CollisionProcess()
 
                 if (bSuccessCollision == true)
                 {
-                    SetPos(MyPos);
+                    GetPosInfo().SetPos(MyPos);
                     m_bCollision = true;
                     SetSuccessCollision(true);
                 }
@@ -609,14 +609,14 @@ void CPlayer::AdjustRot()
 //========================================================
 void CPlayer::AdjustPos()
 {
-    const D3DXVECTOR3& Pos = GetPos();
+    const D3DXVECTOR3& Pos = GetPosInfo().GetPos();
     D3DXVECTOR3 ScreenPos = CCalculation::CalcWorldToScreenNoViewport(Pos, *CManager::GetCamera()->GetMtxView(), *CManager::GetCamera()->GetMtxProjection(),
         static_cast<float>(SCREEN_WIDTH), static_cast<float>(SCREEN_HEIGHT));
 
     //画面外に出ないように補正
     if (ScreenPos.x > SCREEN_WIDTH || ScreenPos.x < 0.0f)
     {
-        SetPos(GetPosOld());
+        GetPosInfo().SetPos(GetPosInfo().GetPosOld());
     }
 }
 //==========================================================================================================
