@@ -42,7 +42,7 @@ const int CPlayer::s_nNORMAL_MAXLIFE = 100;
 //コンストラクタ
 //====================================================
 CPlayer::CPlayer(CPlayerMove* pPlayerMove, CPlayerAttack* pPlayerAttack, CPlayerEffect* pPlayerEffect, CPlayerWireShot* pPlayerWireShot,
-    int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri, bUseintPri, type, ObjType)
+    int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectX(nPri, bUseintPri, type, ObjType)
     , m_pMove(pPlayerMove), m_pAttack(pPlayerAttack), m_pEffect(pPlayerEffect), m_pWireShot(pPlayerWireShot),
     m_pMeshOrbit(nullptr),
     m_fRotAim(0.0f), m_pLockOn(nullptr), m_NowActionMode(ACTIONMODE::SHOT), m_pModeDisp(nullptr), m_bCollision(false),m_pWire(nullptr),
@@ -66,10 +66,10 @@ CPlayer::~CPlayer()
 //====================================================
 HRESULT CPlayer::Init()
 {
-    CObjectXAlive::Init();                 //Xオブジェクト初期化
+    CObjectX::Init();                 //Xオブジェクト初期化
 
-    SetAutoSubLife(false);//自動的に体力を減らすかどうか
-    SetUseGravity(true,1.0f);  //重力を使用する
+    GetLifeInfo().SetAutoSubLife(false);//自動的に体力を減らすかどうか
+    GetMoveInfo().SetUseGravity(true,1.0f);  //重力を使用する
 
     if (CScene::GetMode() == CScene::MODE::MODE_GAME)
     {
@@ -109,7 +109,7 @@ HRESULT CPlayer::Init()
 //====================================================
 void CPlayer::Uninit()
 {
-    CObjectXAlive::Uninit();//Xオブジェクト終了
+    CObjectX::Uninit();//Xオブジェクト終了
 
     if (m_pMove != nullptr)
     {
@@ -160,7 +160,7 @@ void CPlayer::Update()
         ActionModeChenge(); //現在のアクションモードを変更する
     }
 
-    CObjectXAlive::Update();//更新処理
+    CObjectX::Update();//更新処理
 
     if (CScene::GetMode() == CScene::MODE_GAME)
     {
@@ -177,9 +177,9 @@ void CPlayer::Update()
         m_pWireShot->WireShotProcess(this);//ワイヤー発射状態処理
 
         CManager::GetDebugProc()->PrintDebugProc("プレイヤーの位置：%f %f %f\n", GetPosInfo().GetPos().x, GetPosInfo().GetPos().y, GetPosInfo().GetPos().z);
-        CManager::GetDebugProc()->PrintDebugProc("プレイヤーの体力：%d\n", GetLife());
+        CManager::GetDebugProc()->PrintDebugProc("プレイヤーの体力：%d\n", GetLifeInfo().GetLife());
 
-        if (GetLife() < 1)
+        if (GetLifeInfo().GetLife() < 1)
         {
             CManager::GetSceneFade()->SetSceneFade(CFade::FADEMODE_IN, CScene::MODE_RESULT);
         }
@@ -192,7 +192,7 @@ void CPlayer::Update()
 //====================================================
 void CPlayer::Draw()
 {
-    CObjectXAlive::Draw();
+    CObjectX::Draw();
     //CManager::GetText()->DrawSet(D3DXVECTOR3(SCREEN_WIDTH - 350.0f, SCREEN_HEIGHT / 2, 0.0f), 30, CText::FONT_KEIFONT, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f),
     //    "操作方法\n移動：左スティック\n視点：左スティック\n射撃、ダイブ：Rトリガー\nダッシュ：Lトリガー\nジャンプ：A\nモード切替：X");
 }
@@ -273,10 +273,10 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
         if (pPlayer != nullptr)
         {
             pPlayer->Init();                                                                 //初期化処理
-            pPlayer->SetMove(move);//移動量
+            pPlayer->GetMoveInfo().SetMove(move);//移動量
             pPlayer->CObject::SetType(CObject::TYPE::PLAYER);                                 //オブジェクトの種類を決める
-            pPlayer->CObjectXMove::SetObjXType(CObjectXMove::OBJECTXTYPE_PLAYER);                    //オブジェクトXのタイプを設定
-            pPlayer->CObjectXMove::SetTypeNum(0);                                                //オブジェクトXごとのタイプ番号を設定
+            pPlayer->SetObjXType(CObjectX::OBJECTXTYPE_PLAYER);                    //オブジェクトXのタイプを設定
+            pPlayer->SetTypeNum(0);                                                //オブジェクトXごとのタイプ番号を設定
             //pPlayer->SetUseGravity(true,1.0f);//重力
             nIdx = CManager::GetObjectXInfo()->Regist("data\\MODEL\\Player\\Player_ProtoType.x");
             pPlayer->BindObjectXInfo(CManager::GetObjectXInfo()->GetMesh(nIdx),
@@ -292,11 +292,11 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
             pPlayer->GetRotInfo().SetRot(rot);                                                            //向きの設定
             pPlayer->GetSizeInfo().SetScale(Scale);                                                        //拡大率の設定
             pPlayer->GetSizeInfo().SetFormarScale(Scale);                                                  //元の拡大率を設定する
-            pPlayer->SetAutoDeath(false);                                                    //死亡フラグを自動で発動するかどうか
+            pPlayer->GetLifeInfo().SetAutoDeath(false);                                                    //死亡フラグを自動で発動するかどうか
             pPlayer->GetDrawInfo().SetUseShadow(true);
             //体力
-            pPlayer->SetLife(s_nNORMAL_MAXLIFE);
-            pPlayer->SetMaxLife(s_nNORMAL_MAXLIFE);
+            pPlayer->GetLifeInfo().SetLife(s_nNORMAL_MAXLIFE);
+            pPlayer->GetLifeInfo().SetMaxLife(s_nNORMAL_MAXLIFE);
 
             if (CScene::GetMode() == CScene::MODE::MODE_GAME)
             {
@@ -338,8 +338,8 @@ void CPlayer::ActionModeChenge()
         else
         {//ダイブ→ショット
             m_NowActionMode = ACTIONMODE::SHOT;
-            SetUseInteria(true, CObjectXMove::GetNormalInertia());
-            SetUseGravity(true, GetNormalGravity());
+            GetMoveInfo().SetUseInteria(true, GetNormalInertia());
+            GetMoveInfo().SetUseGravity(true, GetNormalGravity());
         }
 
         //モード生成
@@ -468,7 +468,7 @@ void CPlayer::CollisionProcess()
     D3DXVECTOR3 MyPosOld = GetPosInfo().GetPosOld();
     D3DXVECTOR3 MyVtxMax = GetSizeInfo().GetVtxMax();
     D3DXVECTOR3 MyVtxMin = GetSizeInfo().GetVtxMin();
-    const D3DXVECTOR3 Move = GetMove();
+    const D3DXVECTOR3 Move = GetMoveInfo().GetMove();
     bool bCollisionXOld = GetExtrusionCollisionSquareX();
     bool bCollisionYOld = GetExtrusionCollisionSquareY();
     bool bCollisionZOld = GetExtrusionCollisionSquareZ();
@@ -514,7 +514,7 @@ void CPlayer::CollisionProcess()
                 {
                     if (bIsLanding == true)
                     {
-                        SetMove(D3DXVECTOR3(GetMove().x,0.0f, GetMove().z));
+                        GetMoveInfo().SetMove(D3DXVECTOR3(GetMoveInfo().GetMove().x,0.0f, GetMoveInfo().GetMove().z));
                         SetIsLanding(true);
                     }
                 }
@@ -568,9 +568,9 @@ void CPlayer::ChengeAbnormalState(CPlayerAbnormalState* pAbnormalState)
 //========================================================
 void CPlayer::SetDamage(int nDamage, int nHitStopTime)
 {
-    CObjectXAlive::SetDamage(nDamage, nHitStopTime);
+    CObjectX::SetDamage(nDamage, nHitStopTime);
 
-    m_pHpGauge->SetParam(GetLife());
+    m_pHpGauge->SetParam(GetLifeInfo().GetLife());
     m_pHpGauge->SetShake(5.0f * nDamage, 30);
 
     CGauge* pGauge = CGauge::Create(CGauge::GAUGETYPE::PLAYERHP, m_pHpGauge->GetParam(), m_pHpGauge->GetWidth(), m_pHpGauge->GetHeight(), m_pHpGauge->GetPos());
@@ -683,7 +683,7 @@ void CPlayerAbnormalState_KnockBack::Process(CPlayer* pPlayer)
     m_KnockBackMove.y += (0.0f - m_KnockBackMove.y) * m_fInertia;
     m_KnockBackMove.z += (0.0f - m_KnockBackMove.z) * m_fInertia;
 
-    pPlayer->SetMove(m_KnockBackMove);
+    pPlayer->GetMoveInfo().SetMove(m_KnockBackMove);
 
     if (fabsf(m_KnockBackMove.x) < 1.0f && fabsf(m_KnockBackMove.y) < 1.0f && fabsf(m_KnockBackMove.z) < 1.0f)
     {

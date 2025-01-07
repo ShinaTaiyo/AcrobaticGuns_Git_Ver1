@@ -38,7 +38,7 @@ const char* CBlock::m_BLOCK_FILENAME[static_cast<int>(CBlock::BLOCKTYPE::MAX)] =
 //=========================
 //コンストラクタ
 //=========================
-CBlock::CBlock(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri,bUseintPri,type,ObjType),
+CBlock::CBlock(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectX(nPri,bUseintPri,type,ObjType),
 m_bCollision(false),m_type(BLOCKTYPE::NORMAL)
 {
 
@@ -62,7 +62,7 @@ HRESULT CBlock::Init()
 	//===========================
 	//Xオブジェクト初期化
 	//===========================
-	CObjectXAlive::Init();
+	CObjectX::Init();
 	//=========================================
 	m_type = BLOCKTYPE::NORMAL;   //ブロックの種類
 	m_bCollision = true;           //当たり判定をするかどうか
@@ -75,7 +75,7 @@ HRESULT CBlock::Init()
 //=========================
 void CBlock::Uninit()
 {
-	CObjectXAlive::Uninit();//Xオブジェクト終了処理
+	CObjectX::Uninit();//Xオブジェクト終了処理
 }
 //=================================================
 
@@ -87,7 +87,7 @@ void CBlock::Update()
 	//========================================
     //Xオブジェクトの更新処理
     //========================================
-	CObjectXAlive::Update();
+	CObjectX::Update();
 	//===========================================================================================
 
 	Collision();//接触判定を行う
@@ -99,7 +99,7 @@ void CBlock::Update()
 //===================================================
 void CBlock::Draw()
 {
-	CObjectXAlive::Draw();
+	CObjectX::Draw();
 }
 //===========================================================================================
 
@@ -129,9 +129,9 @@ CBlock* CBlock::Create(BLOCKTYPE type, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 r
 			pBlock->GetSizeInfo().SetUseSwapVtxXZ(bSwapVtxXZ);          //頂点XZを入れ替える
 			pBlock->SetUseDeath(true);                    //死亡フラグを発動するかどうかを設定する
 			pBlock->m_type = type;                        //ブロックの種類
-			pBlock->SetLife(nLife);                       //ブロックの体力
-			pBlock->SetMaxLife(nLife);                    //ブロックの体力
-			pBlock->SetAutoSubLife(false);                //自動的に体力を減らすかどうか
+			pBlock->GetLifeInfo().SetLife(nLife);                       //ブロックの体力
+			pBlock->GetLifeInfo().SetMaxLife(nLife);                    //ブロックの体力
+			pBlock->GetLifeInfo().SetAutoSubLife(false);                //自動的に体力を減らすかどうか
 			pBlock->GetPosInfo().SetSupportPos(pos);                   //設置位置
 			pBlock->GetDrawInfo().SetUseShadow(false);
 			pBlock->GetPosInfo().SetPos(pos);                //オブジェクトXの位置を設定
@@ -260,7 +260,7 @@ void CBlock::Collision()
 //===============================================================
 //ブロックとの当たり判定を行う
 //===============================================================
-void CBlock::CollisionSquare(CObjectXAlive* pObjX)
+void CBlock::CollisionSquare(CObjectX* pObjX)
 {
 	//D3DXVECTOR3 ComparisonPos = D3DXVECTOR3(0.0f,0.0f,0.0f);        //比較用位置
 	//D3DXVECTOR3 ComparisonPosOld = D3DXVECTOR3(0.0f,0.0f,0.0f);     //比較用1f前の位置
@@ -422,7 +422,7 @@ void CBlock::SaveInfoTxt(fstream& WritingFile)
 		break;
 	}
 
-	CObjectXAlive::SaveInfoTxt(WritingFile);
+	CObjectX::SaveInfoTxt(WritingFile);
 
 	WritingFile << "END_SETBLOCK" << endl;
 }
@@ -470,7 +470,7 @@ CObject* CBlock::ManagerChengeObject(bool bAim)
 	SetDeath();
 	//======================================================================================
 
-	return CBlock::Create(NewType, GetMaxLife(), GetPosInfo().GetPos(), GetRotInfo().GetRot(), GetSizeInfo().GetScale(), GetSizeInfo().GetUseSwapVtxXZ());//生成したオブジェクトを返す
+	return CBlock::Create(NewType, GetLifeInfo().GetMaxLife(), GetPosInfo().GetPos(), GetRotInfo().GetRot(), GetSizeInfo().GetScale(), GetSizeInfo().GetUseSwapVtxXZ());//生成したオブジェクトを返す
 }
 //=========================================================================================================================
 
@@ -549,14 +549,14 @@ void CBlock::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveManager, 
 //=======================================================================
 CObject* CBlock::ManagerSaveObject()
 {
-	return CBlock::Create(m_type, GetMaxLife(), GetPosInfo().GetPos(), GetRotInfo().GetRot(), GetSizeInfo().GetScale(),GetSizeInfo().GetUseSwapVtxXZ());//生成したオブジェクトを返す
+	return CBlock::Create(m_type, GetLifeInfo().GetMaxLife(), GetPosInfo().GetPos(), GetRotInfo().GetRot(), GetSizeInfo().GetScale(),GetSizeInfo().GetUseSwapVtxXZ());//生成したオブジェクトを返す
 }
 //=========================================================================================================================
 
 //=======================================================================
 //X方向の押し出し判定を行う
 //=======================================================================
-void CBlock::ExtrusionCollisionX(CObjectXAlive* pMyObjX, CBlock* pBlock)
+void CBlock::ExtrusionCollisionX(CObjectX* pMyObjX, CBlock* pBlock)
 {
 	//D3DXVECTOR3 MyPos = pMyObjX->GetPos();
 	//const D3DXVECTOR3& Pos = pMyObjX->GetPos();              //位置を取得
@@ -619,7 +619,7 @@ void CBlock::ExtrusionCollisionX(CObjectXAlive* pMyObjX, CBlock* pBlock)
 //=======================================================================
 //Y方向の押し出し判定を行う
 //=======================================================================
-void CBlock::ExtrusionCollisionY(CObjectXAlive* pMyObjX, CBlock* pBlock)
+void CBlock::ExtrusionCollisionY(CObjectX* pMyObjX, CBlock* pBlock)
 {
 	//D3DXVECTOR3 MyVtxMax = D3DXVECTOR3(0.0f,0.0f,0.0f);             //自分自身の最大頂点
 	//D3DXVECTOR3 MyVtxMin = D3DXVECTOR3(0.0f,0.0f,0.0f);             //自分自身の最小頂点

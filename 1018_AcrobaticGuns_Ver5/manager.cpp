@@ -327,12 +327,12 @@ void CManager::Update()
 //=======================
 void CManager::Draw()
 {
+	m_pRenderer->Draw();         //レンダラー
+
 	if (m_pScene != nullptr)
 	{
 		m_pScene->Draw();        //シーンの更新処理
 	}
-
-	m_pRenderer->Draw();         //レンダラー
 }
 //===================================================
 

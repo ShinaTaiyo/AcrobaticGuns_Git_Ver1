@@ -22,6 +22,7 @@
 #include <iostream>
 #include "collision.h"
 #include "particle.h"
+#include "damage.h"
 #include <algorithm>
 //===========================================================================================
 
@@ -35,7 +36,7 @@ bool CObjectX::s_bCOMMON_DRAWSHADOW = true;
 //================================================
 CObjectX::CObjectX(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject(nPri, bUseintPri, type, ObjType)
 , m_ObjectXInfo(), m_nIndexObjectX(0), m_nManagerType(0), m_nObjXType(OBJECTXTYPE_BLOCK), m_fAxis(0.0f), m_VecAxis(D3DXVECTOR3(0.0f, 1.0f, 0.0f)),
-m_nTypeNum(0), m_PosInfo({}),m_DrawInfo({}), m_RotInfo({}), m_SizeInfo({})
+m_nTypeNum(0), m_PosInfo({}), m_DrawInfo({}), m_RotInfo({}), m_SizeInfo({}), m_MoveInfo({}), m_LifeInfo({})
 {
 	SetObjectType(CObject::OBJECTTYPE::OBJECTTYPE_X);
 }
@@ -168,6 +169,17 @@ void CObjectX::Update()
 	{//向きの加算処理
 		m_RotInfo.Rot += m_RotInfo.AddRot;
 	}
+
+	m_LifeInfo.AutoSubLifeProcess();             //体力を自動的に減らす処理
+	m_LifeInfo.RatioLifeAlphaColorProcess(this); //体力の割合に応じて透明度を変える処理
+	m_LifeInfo.AutoDeathProcess(this);           //体力が０になった場合に死亡フラグを発動する処理
+	m_LifeInfo.HitStopProcess();                 //無敵時間をカウントする処理
+
+	m_MoveInfo.MultiSpeedProcess();              //乗算加速処理
+	m_MoveInfo.AddSpeedProcess();                //加速処理
+	m_MoveInfo.GravityProcess();                 //重力処理
+
+	UpdatePos();//位置の更新を行う
 
 	CObject::Update();
 }
@@ -342,6 +354,26 @@ void CObjectX::SetColor(D3DXCOLOR col, int nColChengeTime, bool bChoose, bool bS
 //================================================================================================================================================
 
 //================================================
+//ダメージを与える処理
+//================================================
+void CObjectX::SetDamage(int nDamage, int nHitStopTime)
+{
+	if (m_LifeInfo.bHitStop == false && nDamage > 0)
+	{//ヒットストップ状態じゃなければ
+		m_LifeInfo.bHitStop = true;              //ヒットストップ状態にする
+		nHitStopTime = nHitStopTime;  //ヒットストップ時間
+		CDamage::Create(nDamage, GetPosInfo().GetSenterPos(), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), 30.0f + nDamage * 1.0f, 30.0f + nDamage * 1.0f, true);
+		for (int nCnt = 0; nCnt < 3; nCnt++)
+		{
+			D3DXVECTOR3 Pos = CObjectX::GetPosInfo().GetPos();//位置を取得
+		}
+
+		m_LifeInfo.nLife -= nDamage;
+	}
+}
+//================================================================================================================================================
+
+//================================================
 //中心点を求める
 //================================================
 void CObjectX::CalculateSenterPos()
@@ -360,6 +392,31 @@ void CObjectX::SetFormarColor()
 	for (int nCnt = 0; nCnt < (int)(m_ObjectXInfo.dwNumMat); nCnt++)
 	{
 		m_ObjectXInfo.Diffuse[nCnt] = m_ObjectXInfo.FormarDiffuse[nCnt];
+	}
+}
+//================================================================================================================================================
+
+//================================================
+//位置の更新
+//================================================
+void CObjectX::UpdatePos()
+{
+	if (m_MoveInfo.bUseUpdatePos == true)
+	{
+		const D3DXVECTOR3& Pos = GetPosInfo().GetPos();
+
+		//1f前の位置を設定
+		GetPosInfo().SetPosOld(Pos);
+
+		//慣性の処理
+		if (m_MoveInfo.bUseInteria == true)
+		{
+			m_MoveInfo.Move.x += (0.0f - m_MoveInfo.Move.x) * m_MoveInfo.fInertia;
+			m_MoveInfo.Move.z += (0.0f - m_MoveInfo.Move.z) * m_MoveInfo.fInertia;
+		}
+
+		//位置の設定
+		GetPosInfo().SetPos(Pos + m_MoveInfo.Move + m_MoveInfo.AddMove);
 	}
 }
 //================================================================================================================================================
@@ -630,6 +687,44 @@ void CObjectX::ChengeEditPos()
 }
 //================================================================================================================================================
 
+//===================================================================================================================
+//位置を移動させる
+//===================================================================================================================
+void CObjectX::EditLife()
+{
+	if (CManager::GetInputKeyboard()->GetPress(DIK_LCONTROL) == true)
+	{//Lコントロールキーを押しながら
+		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
+		{//シフトキーを押しながら・・・
+			if (CManager::GetInputKeyboard()->GetPress(DIK_3) == true)
+			{
+				m_LifeInfo.nMaxLife++;
+			}
+		}
+		else if (CManager::GetInputKeyboard()->GetPress(DIK_3) == true)
+		{
+			m_LifeInfo.nMaxLife--;
+		}
+	}
+	else
+	{//Lコントロールキーを押していない
+		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
+		{//シフトキーを押しながら・・・
+			if (CManager::GetInputKeyboard()->GetTrigger(DIK_3) == true)
+			{
+				m_LifeInfo.nMaxLife++;
+			}
+		}
+		else if (CManager::GetInputKeyboard()->GetTrigger(DIK_3) == true)
+		{
+			m_LifeInfo.nMaxLife--;
+		}
+	}
+
+	CManager::GetDebugProc()->PrintDebugProc("最大体力(3)：%d\n", m_LifeInfo.nMaxLife);
+}
+//================================================================================================================================================
+
 //============================================================================
 //最大頂点と最小頂点を入れ替えるかどうか
 //============================================================================
@@ -655,7 +750,9 @@ void CObjectX::ManagerChooseControlInfo()
 
 	ChengeEditScale();//拡大率を変える
 
-	ChengeEditSwapVtxXZ();
+	ChengeEditSwapVtxXZ();//
+
+	EditLife();//体力を変更する
 
 	CManager::GetCamera()->SetPosR(m_PosInfo.Pos);//カメラの注視点を現在の位置に設定
 }
@@ -675,6 +772,10 @@ void CObjectX::SaveInfoTxt(fstream & WritingFile)
 	WritingFile << "SCALE = " << fixed << setprecision(3) << m_SizeInfo.Scale.x << " " <<
 		fixed << setprecision(3) << m_SizeInfo.Scale.y << " " <<
 		fixed << setprecision(3) << m_SizeInfo.Scale.z << " " << endl;//拡大率
+
+	WritingFile << "MOVE = " << (m_MoveInfo.Move.x) << " " << m_MoveInfo.Move.y << " " << m_MoveInfo.Move.z << endl;//移動量
+
+	WritingFile << "LIFE = " << m_LifeInfo.nMaxLife << endl;//体力を設定
 
 	WritingFile << "SWAPVTXXZ = " << m_SizeInfo.bSwapVtxXZ << endl;
 }
@@ -823,5 +924,100 @@ void CObjectX::SizeInfo::SetUseAddScale(D3DXVECTOR3 CopyAddScale, bool bUse)
 {
 	bUseAddScaling = bUse;
 	AddScale = CopyAddScale;
+}
+//================================================================================================================================================
+
+//============================================================================
+//重力の処理
+//============================================================================
+void CObjectX::MoveInfo::GravityProcess()
+{
+	if (bUseGravity == true)
+	{
+		const D3DXVECTOR3& Move = GetMove();
+		SetMove(Move + D3DXVECTOR3(0.0f, -fGravityPower, 0.0f));
+	}
+}
+
+//==================================
+//乗算加速処理
+//==================================
+void CObjectX::MoveInfo::MultiSpeedProcess()
+{
+	if (bUseMultiSpeed == true)
+	{
+		Move.x *= MultiSpeed.x;
+		Move.y *= MultiSpeed.y;
+		Move.z *= MultiSpeed.z;
+	}
+}
+
+//==================================
+//乗算加速処理
+//==================================
+void CObjectX::MoveInfo::AddSpeedProcess()
+{
+	if (bUseAddSpeed == true)
+	{
+		Move += AddSpeed;
+	}
+}
+//================================================================================================================================================
+
+//==================================
+//ヒットストップ処理
+//==================================
+void CObjectX::LifeInfo::HitStopProcess()
+{
+	if (bHitStop == true)
+	{
+		if (nHitStopTime > 0)
+		{
+			nHitStopTime--;
+		}
+		else
+		{//ヒットストップ解除
+			bHitStop = false;
+			nHitStopTime = 0;
+		}
+	}
+}
+//================================================================================================================================================
+
+//==============================================
+//体力を減らす
+//==============================================
+void CObjectX::LifeInfo::AutoSubLifeProcess()
+{
+	if (bAutoSubLife == true)
+	{
+		nLife--;
+	}
+}
+//================================================================================================================================================
+
+//==============================================
+//体力の割合で色合いの透明度を変える
+//==============================================
+void CObjectX::LifeInfo::RatioLifeAlphaColorProcess(CObjectX* pObjX)
+{
+	if (bUseRatioLifeAlpha == true)
+	{
+		float fRatio;
+		fRatio = float(nLife) / float(nMaxLife);
+		pObjX->SetColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, fRatio), 3, true, true);
+	}
+}
+//================================================================================================================================================
+
+//==============================================
+//自動的に死亡フラグを発動する処理
+//==============================================
+void CObjectX::LifeInfo::AutoDeathProcess(CObjectX* pObjX)
+{
+	if (nLife < 1 && bAutoDeath == true)
+	{
+		pObjX->SetDeath();
+	}
 }
 //================================================================================================================================================

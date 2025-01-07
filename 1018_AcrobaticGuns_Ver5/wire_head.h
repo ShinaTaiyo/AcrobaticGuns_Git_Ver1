@@ -15,7 +15,7 @@
 #include "objectXAlive.h"
 //===============================================================================
 
-class CWireHead : public CObjectXAlive
+class CWireHead : public CObjectX
 {
 public:
 	CWireHead(int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::WIREHEAD, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_X);//コンストラクタ

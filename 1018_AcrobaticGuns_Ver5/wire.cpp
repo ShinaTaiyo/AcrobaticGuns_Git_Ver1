@@ -63,7 +63,7 @@ HRESULT CWire::Init()
 
 	//ワイヤーヘッドを生成
 	m_pWireHead = CWireHead::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), 120);
-	m_pWireHead->SetAutoSubLife(false);
+	m_pWireHead->GetLifeInfo().SetAutoSubLife(false);
 	m_pWireHead->SetUseDeath(false);
 	m_pWireHead->GetDrawInfo().SetUseDraw(true);
 

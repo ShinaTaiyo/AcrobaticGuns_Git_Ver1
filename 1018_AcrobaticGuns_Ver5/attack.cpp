@@ -35,7 +35,7 @@ const string CAttack::ATTACK_FILENAME[static_cast<int>(CAttack::ATTACKTYPE::MAX)
 //==================================================================
 //コンストラクタ
 //==================================================================
-CAttack::CAttack(int nPower, int nSetHitStopTime, int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri, bUseintPri, type, ObjType),
+CAttack::CAttack(int nPower, int nSetHitStopTime, int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectX(nPri, bUseintPri, type, ObjType),
 m_Type(ATTACKTYPE::BULLET), m_nPower(nPower), m_HitStop({0,nSetHitStopTime}),m_bCollisionRelease(true),m_CollisionType(CAttack::COLLISIONTYPE::NONE),
 m_TargetType(CAttack::TARGETTYPE::NONE),m_bHitOtherThanLiving(false),m_bAutoCollision(true),m_bCollisionSuccess(false)
 {
@@ -57,9 +57,7 @@ CAttack::~CAttack()
 //==================================================================
 HRESULT CAttack::Init()
 {
-	CObjectXAlive::Init();
-
-	SetAdjustPos(false);
+	CObjectX::Init();
 	return S_OK;
 }
 //======================================================================================================================
@@ -69,7 +67,7 @@ HRESULT CAttack::Init()
 //==================================================================
 void CAttack::Uninit()
 {
-	CObjectXAlive::Uninit();
+	CObjectX::Uninit();
 }
 //======================================================================================================================
 
@@ -78,7 +76,7 @@ void CAttack::Uninit()
 //==================================================================
 void CAttack::Update()
 {
-	CObjectXAlive::Update();
+	CObjectX::Update();
 
 	if (m_bAutoCollision == true)
 	{
@@ -122,7 +120,7 @@ void CAttack::Update()
 //==================================================================
 void CAttack::Draw()
 {
-	CObjectXAlive::Draw();
+	CObjectX::Draw();
 }
 //======================================================================================================================
 
@@ -153,14 +151,14 @@ void CAttack::Collision()
 			{
 				CEnemy* pEnemy = static_cast<CEnemy*>(pObj);
 				CollisionProcess(bCollision, bNowCollision, pEnemy);
-				if (pEnemy->GetLife() < 1)
+				if (pEnemy->GetLifeInfo().GetLife() < 1)
 				{
 					pEnemy->SetDefeatAttack(m_Type);
 				}
 			}
 			else if (pObj->GetType() == CObject::TYPE::PLAYER && m_TargetType == TARGETTYPE::PLAYER)
 			{
-				CObjectXAlive* pObjX = static_cast<CObjectXAlive*>(pObj);
+				CObjectX* pObjX = static_cast<CObjectX*>(pObj);
 				CollisionProcess(bCollision, bNowCollision, pObjX);
 			}
 
@@ -180,7 +178,7 @@ void CAttack::Collision()
 //==================================================================
 //当たり判定共通処理
 //==================================================================
-void CAttack::CollisionProcess(bool& bCollision, bool& bNowCollision, CObjectXAlive* pObjX)
+void CAttack::CollisionProcess(bool& bCollision, bool& bNowCollision, CObjectX* pObjX)
 {
 	switch (GetCollisionType())
 	{
@@ -299,16 +297,17 @@ CAttackPlayer* CAttackPlayer::Create(ATTACKTYPE AttackType, TARGETTYPE TargetTyp
 	pAttackPlayer->SetCollisionType(CollisionType);//判定タイプを設定
 	pAttackPlayer->SetType(CObject::TYPE::ATTACK);//オブジェクトごとのタイプを設定する
 	pAttackPlayer->SetAttackType(AttackType);     //攻撃の種類を設定する
-	pAttackPlayer->SetLife(nLife);                //体力を設定
-	pAttackPlayer->SetMaxLife(nLife);             //最大体力を設定
+	pAttackPlayer->GetLifeInfo().SetLife(nLife);                //体力を設定
+	pAttackPlayer->GetLifeInfo().SetMaxLife(nLife);             //最大体力を設定
 	pAttackPlayer->GetPosInfo().SetPos(pos);                   //位置  
 	pAttackPlayer->GetPosInfo().SetSupportPos(pos);            //支点位置
 	pAttackPlayer->GetRotInfo().SetRot(rot);                   //向き
-	pAttackPlayer->SetMove(move);                 //移動量
+	pAttackPlayer->GetMoveInfo().SetMove(move);                 //移動量
 	pAttackPlayer->GetSizeInfo().SetScale(Scale);               //拡大率
-	pAttackPlayer->SetAutoSubLife(true);          //体力を使用する
-	pAttackPlayer->SetUseInteria(false, CObjectXMove::GetNormalInertia());
-	pAttackPlayer->SetUseGravity(false,1.0f);
+	pAttackPlayer->GetLifeInfo().SetAutoSubLife(true);          //体力を使用する
+	pAttackPlayer->GetLifeInfo().SetAutoDeath(true);
+	pAttackPlayer->GetMoveInfo().SetUseInteria(false, CObjectX::GetNormalInertia());
+	pAttackPlayer->GetMoveInfo().SetUseGravity(false,1.0f);
 	pAttackPlayer->SetHitOtherThanLibing(bHitOtherThanLiving);
 	pAttackPlayer->SetAutoCollision(bAutoCollision);//攻撃の当たり判定を攻撃クラスに任せるかどうか
 	//モデル情報設定
@@ -405,15 +404,16 @@ CAttackEnemy* CAttackEnemy::Create(ATTACKTYPE AttackType, TARGETTYPE TargetType,
 	pAttackEnemy->SetAttackType(AttackType);     //攻撃の種類を設定する
 	pAttackEnemy->SetTargetType(TargetType);     //ターゲットタイプを設定する
 	pAttackEnemy->SetCollisionType(CollisionType);//判定タイプを設定する
-	pAttackEnemy->SetLife(nLife);                //体力を設定
-	pAttackEnemy->SetMaxLife(nLife);             //最大体力を設定
-	pAttackEnemy->SetAutoSubLife(true);          //体力を自動的に減らす
+	pAttackEnemy->GetLifeInfo().SetLife(nLife);                //体力を設定
+	pAttackEnemy->GetLifeInfo().SetMaxLife(nLife);             //最大体力を設定
+	pAttackEnemy->GetLifeInfo().SetAutoSubLife(true);          //体力を自動的に減らす
 	pAttackEnemy->GetPosInfo().SetPos(pos);                   //位置  
 	pAttackEnemy->GetRotInfo().SetRot(rot);                   //向き
-	pAttackEnemy->SetMove(move);                 //移動量
+	pAttackEnemy->GetMoveInfo().SetMove(move);                 //移動量
 	pAttackEnemy->GetSizeInfo().SetScale(Scale);               //拡大率
-	pAttackEnemy->SetUseInteria(false, CObjectXMove::GetNormalInertia());
-	pAttackEnemy->SetUseGravity(false, 1.0f);
+	pAttackEnemy->GetMoveInfo().SetUseInteria(false, CObjectX::GetNormalInertia());
+	pAttackEnemy->GetLifeInfo().SetAutoDeath(true);
+	pAttackEnemy->GetMoveInfo().SetUseGravity(false, 1.0f);
 	pAttackEnemy->SetHitOtherThanLibing(bHitOtherThanLiving);
 	pAttackEnemy->SetAutoCollision(bAutoCollision);//攻撃クラスに判定を任せるかどうか
 	//モデル情報設定

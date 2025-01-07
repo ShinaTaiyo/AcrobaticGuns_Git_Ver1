@@ -33,9 +33,9 @@ CBg3D* CTitle::m_pBg3D = nullptr;
 CTitle::CTitle() : m_bMoveSwitch(true)
 {
 	m_pPlayer = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, D3DX_PI , 0.0f), D3DXVECTOR3(0.0f, -5.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f));
-	m_pPlayer->SetUseGravity(false, CObjectXMove::GetNormalGravity());
-	m_pPlayer->SetUseInteria(false, CObjectXMove::GetNormalInertia());
-	m_pPlayer->SetUseUpdatePos(true);
+	m_pPlayer->GetMoveInfo().SetUseGravity(false, CObjectX::GetNormalGravity());
+	m_pPlayer->GetMoveInfo().SetUseInteria(false, CObjectX::GetNormalInertia());
+	m_pPlayer->GetMoveInfo().SetUseUpdatePos(true);
 
 	m_pBg3D = CBg3D::Create(CBg3D::BG3DTYPE::SKY, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(500.0f, 500.0f, 500.0f));
 	m_pBg3D->SetUseDeath(false);
@@ -140,9 +140,9 @@ void CTitle::PlayerProcess()
 {
 	if (m_bMoveSwitch == false)
 	{
-		m_pPlayer->SetMove(D3DXVECTOR3(m_pPlayer->GetMove().x,m_pPlayer->GetMove().y + 0.1f,m_pPlayer->GetMove().z));
+		m_pPlayer->GetMoveInfo().SetMove(D3DXVECTOR3(m_pPlayer->GetMoveInfo().GetMove().x,m_pPlayer->GetMoveInfo().GetMove().y + 0.1f,m_pPlayer->GetMoveInfo().GetMove().z));
 
-		if (m_pPlayer->GetMove().y >= 5.0f)
+		if (m_pPlayer->GetMoveInfo().GetMove().y >= 5.0f)
 		{
 			m_bMoveSwitch = m_bMoveSwitch ? false : true;
 		}
@@ -150,9 +150,9 @@ void CTitle::PlayerProcess()
 	}
 	else
 	{
-		m_pPlayer->SetMove(D3DXVECTOR3(m_pPlayer->GetMove().x, m_pPlayer->GetMove().y - 0.1f, m_pPlayer->GetMove().z));
+		m_pPlayer->GetMoveInfo().SetMove(D3DXVECTOR3(m_pPlayer->GetMoveInfo().GetMove().x, m_pPlayer->GetMoveInfo().GetMove().y - 0.1f, m_pPlayer->GetMoveInfo().GetMove().z));
 
-		if (m_pPlayer->GetMove().y <= -5.0f)
+		if (m_pPlayer->GetMoveInfo().GetMove().y <= -5.0f)
 		{
 			m_bMoveSwitch = m_bMoveSwitch ? false : true;
 		}

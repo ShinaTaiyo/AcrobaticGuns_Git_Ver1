@@ -25,7 +25,7 @@
 //==========================================
 //ブロッククラス
 //==========================================
-class CBlock : public CObjectXAlive
+class CBlock : public CObjectX
 {
 public:
 	//===========================
@@ -61,7 +61,7 @@ public:
 	static CBlock * Create(BLOCKTYPE type, int nLife,D3DXVECTOR3 pos,D3DXVECTOR3 rot,D3DXVECTOR3 scale,bool bSwapVtxXZ);//ブロックを生成
 	BLOCKTYPE GetType();//ブロックの種類を取得する
 	void Collision();                                                                  //当たり判定を行う
-	static void CollisionSquare(CObjectXAlive * pObjX);                                //正方形の当たり判定を行う
+	static void CollisionSquare(CObjectX * pObjX);                                //正方形の当たり判定を行う
 	static void LandingCorrection(D3DXVECTOR3& Pos,CObject * pSaveObj,D3DXVECTOR3 VtxMin);              //第２、第３引数で指定したブロックの上に乗っている場合、位置を補正する
 	static int GetNumFile() { return m_nNumFile; }                                                                 //ファイル数を取得する
 	BLOCKTYPE GetBlockType() { return m_type; }                                                                    //ブロックのタイプを取得する
@@ -96,8 +96,8 @@ private:
 	//======================================
 	//ブロックとの押し出し判定用
 	//======================================
-	void ExtrusionCollisionX(CObjectXAlive* pMyObjX,CBlock * pBlock);//X方向の押し出し判定を行う
-	void ExtrusionCollisionY(CObjectXAlive* pMyObjX, CBlock* pBlock);//Y方向の押し出し判定を行う
+	void ExtrusionCollisionX(CObjectX* pMyObjX,CBlock * pBlock);//X方向の押し出し判定を行う
+	void ExtrusionCollisionY(CObjectX* pMyObjX, CBlock* pBlock);//Y方向の押し出し判定を行う
 };
 
 #endif

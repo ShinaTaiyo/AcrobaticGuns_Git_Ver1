@@ -30,7 +30,7 @@ class CPlayerAbnormalState_KnockBack;
 //===========================================
 //プレイヤー3Dクラス
 //===========================================
-class CPlayer : public CObjectXAlive
+class CPlayer : public CObjectX
 {
 public:
 	CPlayer(CPlayerMove* pPlayerMove, CPlayerAttack* pPlayerAttack, CPlayerEffect* pPlayerEffect, CPlayerWireShot* pPlayer,

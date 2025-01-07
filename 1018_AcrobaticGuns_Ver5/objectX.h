@@ -218,6 +218,118 @@ public:
 		const bool& GetUseSwapVtxXZ()const { return bSwapVtxXZ; }
 	};
 
+	struct MoveInfo
+	{
+		//*変数
+
+		//移動量
+		D3DXVECTOR3 Move = { 0.0f,0.0f,0.0f };                             //移動量!
+		D3DXVECTOR3 AddMove = { 0.0f,0.0f,0.0f };                          //加算移動量
+		//慣性
+		float fInertia = m_fNORMAL_INERTIA;                               //慣性!
+		bool bUseInteria = false;                             //慣性をかけるかどうか!
+		//重力
+		bool bUseGravity = false;                             //重力を使用するかどうか!
+		float fGravityPower = m_fNORMAL_GRAVITY;                          //重力の大きさ!
+		//乗算加速
+		bool bUseMultiSpeed = false;                                  //乗算加速をするかどうか!
+		D3DXVECTOR3 MultiSpeed = { 0.0f,0.0f,0.0f };                               //乗算加速度!
+		//加速
+		bool bUseAddSpeed = false;                                    //加速を使用するかどうか!
+		D3DXVECTOR3 AddSpeed = { 0.0f,0.0f,0.0f };                                 //加速度
+
+		//位置の更新をするかどうか
+		bool bUseUpdatePos = true;                           //位置の更新を使用するかどうか!
+
+		//*関数
+		
+		//移動量
+		void SetMove(D3DXVECTOR3 CopyMove) { Move = CopyMove; }//移動量を設定する
+		const D3DXVECTOR3& GetMove() const { return Move; }//移動量を取得する
+
+		void SetAddMove(D3DXVECTOR3 CopyMove) { AddMove = CopyMove; }//加算移動量を設定
+		const D3DXVECTOR3& GetAddMove() const { return AddMove; }//加算移動量を取得
+
+		//慣性
+		void SetUseInteria(bool bUse, float fCopyInertia) { bUseInteria = bUse; fInertia = fCopyInertia; }//慣性をかけるかどうか
+		float& GetInertia() { return fInertia; }//慣性を取得する
+		void SetUndoInertia() { fInertia = m_fNORMAL_INERTIA; }//慣性の大きさを元に戻す
+		bool& GetUseInteria() { return bUseInteria; }//慣性を掛けるかどうかを取得
+
+		//重力
+		void SetUseGravity(bool bUse, float fCopyGravityPower) { bUseGravity = bUse; fGravityPower = fCopyGravityPower; }//重力を設定する
+		const bool& GetUseGravity() const { return bUseGravity; }//重力を使用するかどうかを設定
+
+		//乗算加速
+		void SetUseMultiSpeed(bool bUse, D3DXVECTOR3 CopyMultiSpeed) { MultiSpeed = CopyMultiSpeed; bUseMultiSpeed = bUse; }//乗算加速を使用するかどうか
+
+		//加算速度
+		void SetUseAddSpeed(bool bUse, D3DXVECTOR3 CopyAddSpeed) { bUseAddSpeed = bUse; AddSpeed = CopyAddSpeed; }//加速を使用するかどうか
+		//============================================================================================================
+
+		//===================================
+		//位置更新関係
+		//===================================
+		void SetUseUpdatePos(bool bUse) { bUseUpdatePos = bUse; }//位置の更新を使用するかどうか
+		void GravityProcess();                                   //重力の処理
+		void MultiSpeedProcess();                                //乗算加速処理
+		void AddSpeedProcess();                                  //加速処理
+		//=================================================================================================================
+	};
+
+	struct LifeInfo
+	{
+		//*変数
+		bool bHitStop = false;                        //ヒットストップ!
+		int nHitStopTime = 0;                             //ヒットストップ時間!
+		void HitStopProcess();                        //ヒットストップの処理
+
+		//自動的に体力を減らすかどうか
+		bool bAutoSubLife = false;                            //自動的に体力を減らし続けるかどうか!
+
+		//体力
+		int nLife = 1;                                    //体力!
+		int nMaxLife = 1;                                 //最大体力!
+
+		//色
+		bool bUseRatioLifeAlpha = false;                      //体力の割合で透明度を変えるかどうか!
+
+		//死亡
+		bool bAutoDeath = false;                             //体力０で自動的に破棄されるかどうか
+		//============================================================================================================
+
+		//体力
+		void SetLife(int nCopyLife) { nLife = nCopyLife; }                    //体力を設定する
+		int& GetLife() { return nLife; }                              //体力を取得する
+
+		//最大体力
+		void SetMaxLife(int nCopyMaxLife) { nMaxLife = nCopyMaxLife; }        //最大体力を設定する
+		int& GetMaxLife() { return nMaxLife; }                        //最大体力を取得する
+
+		//ヒットストップ
+		void SetHitStopTime(int nCopyHitStopTime) { nHitStopTime = nCopyHitStopTime; }//ヒットストップ時間を設定する
+		bool& GetHitStop() { return bHitStop; }                       //ヒットストップ状態かどうかを取得する
+
+		//自動的に体力を減らす
+		void SetAutoSubLife(bool bUse) { bAutoSubLife = bUse; }       //体力を自動的に減らすかどうかを設定
+		int& GetHitStopTime() { return nHitStopTime; }                //ヒットストップ時間を取得する
+
+		//体力によって透明度を変えるかどうか
+		void SetUseRatioLifeAlpha(bool bUse) { bUseRatioLifeAlpha = bUse; }
+
+		//体力０で自動的に破棄するかどうか
+		void SetAutoDeath(bool bUse) { bAutoDeath = bUse; }
+		const bool& GetAutoDeath() const { return bAutoDeath; }
+
+		//体力を自動的に減らす処理
+		void AutoSubLifeProcess();
+
+		//体力の割合に応じて色合いを変える処理
+		void RatioLifeAlphaColorProcess(CObjectX * pObjX);
+
+		//体力が０になったら自動的に死亡フラグを発動する処理
+		void AutoDeathProcess(CObjectX* pObjX);
+	};
 
 
 	CObjectX(int nPri = 0, bool bUseintPri = false,CObject::TYPE type = CObject::TYPE::NONE, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_X);                                                           //コンストラクタ
@@ -244,6 +356,12 @@ public:
 	//==========================================================
 	//拡大率
 	//==========================================================
+	//============================================================================================================
+	
+	//==========================================================
+	//体力関係
+	//==========================================================
+	virtual void SetDamage(int nDamage, int nHitStopTime);          //ダメージを与える
 	//============================================================================================================
 
 	//==========================================================
@@ -305,10 +423,54 @@ public:
 
 	//サイズ情報の取得
 	SizeInfo& GetSizeInfo() { return m_SizeInfo; }
+
+	//移動量情報の取得
+	MoveInfo& GetMoveInfo() { return m_MoveInfo; }
+
+	//体力情報の取得
+	LifeInfo& GetLifeInfo() { return m_LifeInfo; }
+
 	//=================================================================================================================
 
+	//==========================================================
+	//判定関係
+	//==========================================================
+
+	//正方形の押し出し判定
+
+	//X
+	void SetExtrusionCollisionSquareX(bool bSuccess) { m_bExtrusionCollisionSquareX = bSuccess; }
+	const bool& GetExtrusionCollisionSquareX() const { return m_bExtrusionCollisionSquareX; }
+
+	//Y
+	void SetExtrusionCollisionSquareY(bool bSuccess) { m_bExtrusionCollisionSquareY = bSuccess; }
+	const bool& GetExtrusionCollisionSquareY() const { return m_bExtrusionCollisionSquareY; }
+
+	//Z
+	void SetExtrusionCollisionSquareZ(bool bSuccess) { m_bExtrusionCollisionSquareZ = bSuccess; }
+	const bool& GetExtrusionCollisionSquareZ() const { return m_bExtrusionCollisionSquareZ; }
+
+	//地面にいるかどうか
+	void SetIsLanding(bool bLanding) { m_bIsLanding = bLanding; }
+	const bool& GetLanding() const { return m_bIsLanding; }
+
+	//============================================================================================================
+
+
+    //==========================================================
+	//静的メンバ取得
+	//==========================================================
+	static const float GetNormalGravity() { return m_fNORMAL_GRAVITY; }
+	static const float GetNormalInertia() { return m_fNORMAL_INERTIA; }
+	//=================================================================================================================
 private:
-	static bool s_bCOMMON_DRAWSHADOW;
+	//===============================================
+    //静的メンバ
+    //===============================================
+	static constexpr float m_fNORMAL_INERTIA = 0.5f;//普通の慣性
+	static constexpr float m_fNORMAL_GRAVITY = 1.0f;//普通の重力
+	static bool s_bCOMMON_DRAWSHADOW;               //描画
+	//=================================================================================================================
 
 	void DrawShadow();                                                       //影を描画する
 
@@ -318,7 +480,7 @@ private:
     float m_fAxis;//クォータニオンの回転角
 	D3DXVECTOR3 m_VecAxis;//クォータニオンの回転軸
 	//==========================================================================================================================================================
-
+	
 	//===============================================
 	//モデル情報
 	//===============================================
@@ -330,6 +492,12 @@ private:
 	//===================================
 	void SetFormarColor();                     //元の色合いに戻す
 	//=================================================================================================================
+
+	//===================================
+	//位置更新関係
+	//===================================
+	void UpdatePos();
+	//==================================================================================================================
 
 	//===================================
 	//モデルインデックス
@@ -344,7 +512,24 @@ private:
 	PosInfo m_PosInfo;     //位置情報
 	RotInfo m_RotInfo;     //向き情報
 	SizeInfo m_SizeInfo;   //サイズ情報
+	MoveInfo m_MoveInfo;   //移動量情報
+	LifeInfo m_LifeInfo;   //体力情報
 	//==================================================================================================================
+
+	//===================================
+	//判定関係
+	//===================================
+	
+	//正方形の押し出し判定
+	bool m_bExtrusionCollisionSquareX;//X
+	bool m_bExtrusionCollisionSquareY;//Y
+	bool m_bExtrusionCollisionSquareZ;//Z
+
+	//地面にいるかどうか
+	bool m_bIsLanding;
+
+	//============================================================================================================
+
 
 	//===================================
 	//エディタ関係
@@ -358,6 +543,7 @@ private:
 	void ChengeEditScaleY();
 	void ChengeEditScaleZ();
 	void ChengeEditPos();               //位置を移動する
+	void EditLife();//体力を変更する
 	void ChengeEditSwapVtxXZ();         //最大頂点と最小頂点を変えるかどうか
 	//=================================================================================================================
 

@@ -20,7 +20,7 @@
 //=================================================================
 //コンストラクタ
 //=================================================================
-CWireHead::CWireHead(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectXAlive(nPri, bUseintPri, type, ObjType),
+CWireHead::CWireHead(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectX(nPri, bUseintPri, type, ObjType),
 m_bCollision(false),m_nCoolTime(0)
 {
 
@@ -41,7 +41,7 @@ CWireHead::~CWireHead()
 //=================================================================
 HRESULT CWireHead::Init()
 {
-	CObjectXAlive::Init();
+	CObjectX::Init();
 	return S_OK;
 }
 //===================================================================================================================================
@@ -51,7 +51,7 @@ HRESULT CWireHead::Init()
 //=================================================================
 void CWireHead::Uninit()
 {
-	CObjectXAlive::Uninit();
+	CObjectX::Uninit();
 }
 //===================================================================================================================================
 
@@ -60,7 +60,7 @@ void CWireHead::Uninit()
 //=================================================================
 void CWireHead::Update()
 {
-	CObjectXAlive::Update();
+	CObjectX::Update();
 
 	CManager::GetDebugProc()->PrintDebugProc("ワイヤーヘッドの位置：%f %f %f\n", GetPosInfo().GetPos().x, GetPosInfo().GetPos().y, GetPosInfo().GetPos().z);
 
@@ -81,7 +81,7 @@ void CWireHead::Update()
 //=================================================================
 void CWireHead::Draw()
 {
-	CObjectXAlive::Draw();
+	CObjectX::Draw();
 }
 //===================================================================================================================================
 
@@ -90,7 +90,7 @@ void CWireHead::Draw()
 //=================================================================
 void CWireHead::SetDeath()
 {
-	CObjectXAlive::SetDeath();
+	CObjectX::SetDeath();
 }
 //===================================================================================================================================
 
@@ -104,11 +104,11 @@ CWireHead* CWireHead::Create(D3DXVECTOR3 Pos, D3DXVECTOR3 Rot, D3DXVECTOR3 Move,
 	pWireHead->GetPosInfo().SetPos(Pos);
 	pWireHead->GetPosInfo().SetSupportPos(Pos);
 	pWireHead->GetRotInfo().SetRot(Rot);
-	pWireHead->SetMove(Move);
+	pWireHead->GetMoveInfo().SetMove(Move);
 	pWireHead->GetSizeInfo().SetScale(Scale);
-	pWireHead->SetLife(nLife);
-	pWireHead->SetMaxLife(nLife);
-	pWireHead->SetAutoSubLife(true);
+	pWireHead->GetLifeInfo().SetLife(nLife);
+	pWireHead->GetLifeInfo().SetMaxLife(nLife);
+	pWireHead->GetLifeInfo().SetAutoSubLife(true);
 	//モデル情報設定
 	int nIdx = CManager::GetObjectXInfo()->Regist("data\\MODEL\\Wire_Head\\Wire_Head_000.x");
 

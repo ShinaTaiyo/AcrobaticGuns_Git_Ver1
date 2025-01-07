@@ -28,7 +28,7 @@ class CUi;
 //===========================================
 //エネミークラス
 //===========================================
-class CEnemy : public CObjectXAlive
+class CEnemy : public CObjectX
 {
 public:
 	struct MoveAiInfo

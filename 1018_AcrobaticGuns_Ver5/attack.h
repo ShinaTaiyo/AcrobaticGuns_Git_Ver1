@@ -19,7 +19,7 @@
 //===========================================
 //攻撃クラス
 //===========================================
-class CAttack : public CObjectXAlive
+class CAttack : public CObjectX
 {
 public:
 	enum class ATTACKTYPE
@@ -109,7 +109,7 @@ private:
 	//プロトタイプ宣言
 	//================================================
 	void Collision();//当たり判定を行う処理
-	void CollisionProcess(bool& bCollision,bool & bNowCollision,CObjectXAlive * pObjX);
+	void CollisionProcess(bool& bCollision,bool & bNowCollision,CObjectX * pObjX);
 	//==========================================================================================
 };
 //==================================================================================================================================================
