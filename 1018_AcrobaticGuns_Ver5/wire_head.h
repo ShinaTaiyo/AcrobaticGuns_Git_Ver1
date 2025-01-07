@@ -12,7 +12,7 @@
 //インクルード
 //==========================================
 #include "main.h"
-#include "objectXAlive.h"
+#include "objectX.h"
 //===============================================================================
 
 class CWireHead : public CObjectX

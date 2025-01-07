@@ -12,7 +12,7 @@
 //インクルード
 //======================
 #include "main.h"
-#include "objectXAlive.h"
+#include "objectX.h"
 #include "lockon.h"
 #include "meshorbit.h"
 #include "ui.h"
