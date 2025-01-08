@@ -112,46 +112,9 @@ void CObjectX::Update()
 	//==============================================
 	CalculateSenterPos();
 
-	//==================================
-	//拡大率の加算がONになっていたら
-	//==================================
-	if (m_SizeInfo.bUseAddScaling == true)
-	{
-		m_SizeInfo.Scale += m_SizeInfo.AddScale;
-	}
-	//==========================================================
-
-	//==================================
-	//拡大率の乗算がONになっていたら
-	//==================================
-	if (m_SizeInfo.bUseMultiScale == true)
-	{
-		m_SizeInfo.Scale.x *= m_SizeInfo.MultiScale.x;
-		m_SizeInfo.Scale.y *= m_SizeInfo.MultiScale.y;
-		m_SizeInfo.Scale.z *= m_SizeInfo.MultiScale.z;
-	}
-	//==========================================================
-
-	//常に拡大率を参照して最大最小頂点を求める
-	if (m_SizeInfo.bSwapVtxXZ == false)
-	{
-		m_SizeInfo.VtxMax.x = m_SizeInfo.OriginVtxMax.x * m_SizeInfo.Scale.x;
-		m_SizeInfo.VtxMax.y = m_SizeInfo.OriginVtxMax.y * m_SizeInfo.Scale.y;
-		m_SizeInfo.VtxMax.z = m_SizeInfo.OriginVtxMax.z * m_SizeInfo.Scale.z;
-		m_SizeInfo.VtxMin.x = m_SizeInfo.OriginVtxMin.x * m_SizeInfo.Scale.x;
-		m_SizeInfo.VtxMin.y = m_SizeInfo.OriginVtxMin.y * m_SizeInfo.Scale.y;
-		m_SizeInfo.VtxMin.z = m_SizeInfo.OriginVtxMin.z * m_SizeInfo.Scale.z;
-	}
-	else
-	{
-		m_SizeInfo.VtxMax.x = m_SizeInfo.OriginVtxMax.x * m_SizeInfo.Scale.z;
-		m_SizeInfo.VtxMax.y = m_SizeInfo.OriginVtxMax.y * m_SizeInfo.Scale.y;
-		m_SizeInfo.VtxMax.z = m_SizeInfo.OriginVtxMax.z * m_SizeInfo.Scale.x;
-		m_SizeInfo.VtxMin.x = m_SizeInfo.OriginVtxMin.x * m_SizeInfo.Scale.z;
-		m_SizeInfo.VtxMin.y = m_SizeInfo.OriginVtxMin.y * m_SizeInfo.Scale.y;
-		m_SizeInfo.VtxMin.z = m_SizeInfo.OriginVtxMin.z * m_SizeInfo.Scale.x;
-	}
-	m_SizeInfo.Size = m_SizeInfo.VtxMax - m_SizeInfo.VtxMin;
+	m_SizeInfo.AddScaleProcess();//拡大率加算処理
+	m_SizeInfo.MultiScaleProcess();//拡大率乗算処理
+	m_SizeInfo.DecideVtxMaxMinProcess();//頂点の最大最小を決める処理
 
 	if (m_DrawInfo.bColorChenge == true)
 	{
@@ -220,8 +183,19 @@ void CObjectX::Draw()
 	D3DXMatrixTranslation(&mtxTrans, m_PosInfo.Pos.x, m_PosInfo.Pos.y, m_PosInfo.Pos.z);
 	D3DXMatrixMultiply(&m_DrawInfo.mtxWorld, &m_DrawInfo.mtxWorld, &mtxTrans);
 
+	//親マトリックスが設定されていた場合
+	if (m_DrawInfo.bUseMatrixChild == true && m_DrawInfo.pMtxParent != nullptr)
+	{
+		D3DXMatrixMultiply(&m_DrawInfo.mtxWorld, &m_DrawInfo.mtxWorld,m_DrawInfo.pMtxParent);
+	}
+
 	//ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_DrawInfo.mtxWorld);
+
+	//ワールド座標を求める
+	D3DXVECTOR3 PosZero = { 0.0f,0.0f,0.0f };
+	D3DXVec3TransformCoord(&m_PosInfo.WorldPos, &PosZero, &m_DrawInfo.mtxWorld);
+
 	//=======================================
 	//描画の調整
 	//=======================================
@@ -830,6 +804,10 @@ void CObjectX::DrawShadow()
 	//D3DXMatrixRotationYawPitchRoll(&mtxRot,m_Rot.y, m_Rot.x, m_Rot.z);
 	//D3DXMatrixMultiply(&mtxShadow, &mtxShadow, &mtxRot);
 
+
+	//==================================================================================
+	//下にレイを飛ばし、当たったオブジェクトの中で一番近いオブジェクトの位置を求める
+	//==================================================================================
 	int nCntColRay = 0;//レイが当たった回数をカウントする
 	for (int nCntPri = 0; nCntPri < CObject::m_nMAXPRIORITY; nCntPri++)
 	{
@@ -866,6 +844,7 @@ void CObjectX::DrawShadow()
 			pObj = pNext;//リストを次に進める
 		}
 	}
+	//==================================================================================================================================================================
 
 	//位置を反映
 	D3DXMatrixTranslation(&mtxTrans,m_PosInfo.Pos.x,RayCollisionPos.y, m_PosInfo.Pos.z);
@@ -924,6 +903,62 @@ void CObjectX::SizeInfo::SetUseAddScale(D3DXVECTOR3 CopyAddScale, bool bUse)
 {
 	bUseAddScaling = bUse;
 	AddScale = CopyAddScale;
+}
+//================================================================================================================================================
+
+//============================================================================
+//拡大率加算処理
+//============================================================================
+void CObjectX::SizeInfo::AddScaleProcess()
+{
+	if (bUseAddScaling == true)
+	{
+		Scale += AddScale;
+	}
+}
+//================================================================================================================================================
+
+//============================================================================
+//拡大率乗算処理
+//============================================================================
+void CObjectX::SizeInfo::MultiScaleProcess()
+{
+	if (bUseMultiScale == true)
+	{
+		Scale.x *= MultiScale.x;
+		Scale.y *= MultiScale.y;
+		Scale.z *= MultiScale.z;
+	}
+}
+//================================================================================================================================================
+
+//============================================================================
+//拡大率を参照して頂点の最大最小を決める処理
+//============================================================================
+void CObjectX::SizeInfo::DecideVtxMaxMinProcess()
+{
+	//XZの頂点を入れ替えるかどうかによってx,zの値を変える
+	if (bSwapVtxXZ == false)
+	{
+		VtxMax.x = OriginVtxMax.x * Scale.x;
+		VtxMax.y = OriginVtxMax.y * Scale.y;
+		VtxMax.z = OriginVtxMax.z * Scale.z;
+		VtxMin.x = OriginVtxMin.x * Scale.x;
+		VtxMin.y = OriginVtxMin.y * Scale.y;
+		VtxMin.z = OriginVtxMin.z * Scale.z;
+	}
+	else
+	{
+		VtxMax.x = OriginVtxMax.x * Scale.z;
+		VtxMax.y = OriginVtxMax.y * Scale.y;
+		VtxMax.z = OriginVtxMax.z * Scale.x;
+		VtxMin.x = OriginVtxMin.x * Scale.z;
+		VtxMin.y = OriginVtxMin.y * Scale.y;
+		VtxMin.z = OriginVtxMin.z * Scale.x;
+	}
+
+	//サイズ決定
+	Size = VtxMax - VtxMin;
 }
 //================================================================================================================================================
 

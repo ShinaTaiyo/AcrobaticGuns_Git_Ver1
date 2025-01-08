@@ -492,12 +492,12 @@ void CCameraState_Normal::Process(CCamera* pCamera)
 	{//シフトキーを押しながら・・・
 		if (CManager::GetInputKeyboard()->GetPress(DIK_V) == true)
 		{
-			pCamera->SetAddLength(pCamera->GetAddLength() - 5.0f);
+			pCamera->SetLength(pCamera->GetLength() - 5.0f);
 		}
 	}
 	else if (CManager::GetInputKeyboard()->GetPress(DIK_V) == true)
 	{
-		pCamera->SetAddLength(pCamera->GetAddLength() + 5.0f);
+		pCamera->SetLength(pCamera->GetLength() + 5.0f);
 	}
 
 

@@ -81,13 +81,16 @@ public:
 		//カリングするかどうか
 		bool bUseCulling = false;
 
+		//子マトリックスにするかどうか
+		bool bUseMatrixChild = false;
+
 		//色
 		int nChengeColorTime = 0;                    //色を変える時間!
 		bool bColorChenge = false;                       //色を変えているかどうか!
 
 		//ワールド変換行列
 		D3DXMATRIX mtxWorld = {};                     //マトリックスワールド!
-		D3DXMATRIX* pMtxParent = nullptr;             //親マトリックス 
+	    D3DXMATRIX * pMtxParent = nullptr;            //親マトリックス 
 		D3DXCOLOR Color = { 1.0f,1.0f,1.0f,1.0f };    //現在の統一の色合い
 
 		//影
@@ -97,11 +100,14 @@ public:
 		//描画するかどうか
 		void SetUseDraw(bool bUse) { bUseDraw = bUse; }
 
+		//子マトリックスにするかどうか
+		void SetUseMatrixChild(bool bUse,D3DXMATRIX * CopyMatrixParent) { bUseMatrixChild = bUse; pMtxParent = CopyMatrixParent; }
+
 		//カリングするかどうか
 		void SetUseCulling(bool bUse) { bUseCulling = bUse; }
 
         //ワールド変換行列
-		void SetMtxParent(D3DXMATRIX* mtx) {pMtxParent = mtx; }              //親マトリックスを取得                   
+		void SetMtxParent(D3DXMATRIX* pCopyMtxParent) {pMtxParent = pCopyMtxParent; }              //親マトリックスを取得                   
 		D3DXMATRIX& GetMatrixWorld() { return mtxWorld; }                     //ワールド変換行列の取得
 		//================================================================================================================================================
 	};
@@ -114,6 +120,7 @@ public:
         //==========================================================
 		D3DXVECTOR3 Pos = { 0.0f,0.0f,0.0f };                              //位置!
 		D3DXVECTOR3 SupportPos = { 0.0f,0.0f,0.0f };                       //最初に設置された位置!
+		D3DXVECTOR3 WorldPos = { 0.0f,0.0f,0.0f };                         //ワールド座標を求める
 		D3DXVECTOR3 PosOld = { 0.0f,0.0f,0.0f };                           //1f前の位置!
 		D3DXVECTOR3 SenterPos = { 0.0f,0.0f,0.0f };                        //中心点の位置
 		//=================================================================================================================
@@ -216,6 +223,11 @@ public:
 
 		void SetUseSwapVtxXZ(bool bUse) { bSwapVtxXZ = bUse; }
 		const bool& GetUseSwapVtxXZ()const { return bSwapVtxXZ; }
+
+		//処理
+		void AddScaleProcess();//拡大率加算処理
+		void MultiScaleProcess();//拡大率乗算処理
+		void DecideVtxMaxMinProcess();//拡大率を参照して頂点の最大最小を決める処理
 	};
 
 	struct MoveInfo

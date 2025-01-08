@@ -31,14 +31,15 @@ public:
 		FIELD,           //床
 		BLOCK,           //ブロック
 		BGMODEL,         //背景モデル
+		AIMODEL,         //AIモデル
 		WIREHEAD,        //ワイヤー頭
 		WIRE,            //ワイヤー
 		PLAYER,          //プレイヤー
 		ENEMY,           //敵
 		BULLET,          //弾
 		ATTACK,          //攻撃
+		MODELPARTS,      //モデルパーツ
 		MESHORBIT,       //軌跡メッシュ
-		AIMODEL,         //AIモデル
 		EFFECT,          //エフェクト
 		PARTICLE,        //パーティクル
 		UI3D,            //UI3D
