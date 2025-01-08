@@ -11,6 +11,7 @@
 #include "character.h"
 #include "manager.h"
 #include "objectXInfo.h"
+#include "debugproc.h"
 #include "calculation.h"
 //===================================================================================================================
 
@@ -69,8 +70,6 @@ void CCharacter::Update()
     {
         it->ExtraUpdate();//それぞれのモデルパーツの更新処理を呼ぶ
     }
-
-    MotionProcess();//モーション処理を行う
 }
 //===================================================================================================================
 
@@ -100,9 +99,19 @@ void CCharacter::SetDeath()
         it->SetUseDeath(true);//死亡フラグをアクティブにする
         it->SetDeath();       //死亡フラグを設定する
     }
+}
+//===================================================================================================================
 
-    m_VecModelParts.clear();//モデルパーツ情報をクリアする
-    m_VecModelParts.shrink_to_fit();//モデルパーツ情報のメモリを破棄
+//=============================================================
+//次のモーションを設定する
+//=============================================================
+void CCharacter::SetNextMotion(int nNext)
+{
+    if (nNext >= s_VecMotionInfo[m_nIdxCharacter].nNumMotion)
+    {//指定したモーションが、モーション最大数（配列）を超えていたら初期モーションを指定する
+        nNext = 0;
+    }
+    m_NowMotionInfo.nNextMotion = nNext;//設定する
 }
 //===================================================================================================================
 
@@ -122,6 +131,7 @@ int CCharacter::Regist(string String, CCharacter* pCharacter)
 		}
 		nIdx++;
 	}
+
 	SaveMotion(String);//まだモーションが存在していないので、新しいモーション情報を保存する
     LoadModelParts(String, pCharacter);//モデルパーツ情報を読み込む
     pCharacter->m_nIdxCharacter = nIdx;//キャラクター番号を設定
@@ -141,6 +151,8 @@ void CCharacter::MotionProcess()
     {//1f前のモーションと異なる場合、フレーム数とキーカウントをリセットし、ブレンド開始
         m_NowMotionInfo.nCntFrame = 0;
         m_NowMotionInfo.nCntKey = 0;
+
+        CManager::GetDebugProc()->PrintDebugProc("フレーム数、キーカウントリセット！\n");
     }
 
     //参照する値を変数に格納しておく
@@ -266,7 +278,7 @@ void CCharacter::SaveMotion(string MotionFileName)
                 {//キー情報設定
                     MotionIt->VecKeySet.push_back({});//現在のモーションのキーセット情報を設定するので、キーセット情報の初期値を代入
                     auto KeySetIt = MotionIt->VecKeySet.begin();//キーセット情報の先頭をイテレータで指す
-                    if (nNumMotion != 0)
+                    if (nNumKeySet != 0)
                     {
                         advance(KeySetIt, nNumKeySet);//現在のキーセット情報の総数分イテレータを進める
                     }
@@ -334,6 +346,8 @@ void CCharacter::SaveMotion(string MotionFileName)
             }
         }
     }
+
+    CharacterMotionData.nNumMotion = nNumMotion;//モーション総数を格納する
 
     s_VecMotionInfo.push_back(CharacterMotionData);//上記の処理で新しいモーション情報を設定したのでキャラクターモーションのベクターに保存
 
@@ -408,11 +422,11 @@ void CCharacter::LoadModelParts(string MotionFileName, CCharacter* pCharacter)
                             //親モデルパーツを設定
                             if (nIdxParent >= 0)
                             {//モデルパーツに親が存在する
-                                (*PartsIt)->GetDrawInfo().SetMtxParent(&pCharacter->m_VecModelParts[nIdxParent]->GetDrawInfo().GetMatrixWorld());//モデルパーツごとのインデックスを設定
+                                (*PartsIt)->GetDrawInfo().SetUseMatrixChild(true,&pCharacter->m_VecModelParts[nIdxParent]->GetDrawInfo().GetMatrixWorld());//モデルパーツごとのインデックスを設定
                             }
                             else
                             {//モデルパーツに親が存在しないので、キャラクターを親にする
-                                (*PartsIt)->GetDrawInfo().SetMtxParent(&pCharacter->GetDrawInfo().GetMatrixWorld());
+                                (*PartsIt)->GetDrawInfo().SetUseMatrixChild(true, &pCharacter->GetDrawInfo().GetMatrixWorld());//モデルパーツごとのインデックスを設定
                             }
                         }
                         else if (Reading_Buff == "POS")

@@ -57,7 +57,7 @@ void CModelParts::Uninit()
 //============================================
 void CModelParts::SetDeath()
 {
-	CObject::SetDeath();
+	CObjectX::SetDeath();
 }
 //====================================================================================
 
@@ -115,7 +115,7 @@ CModelParts* CModelParts::Create(string String)
 		CManager::GetObjectXInfo()->GetdwNumMat(nIdx),
 		CManager::GetObjectXInfo()->GetTexture(nIdx),
 		CManager::GetObjectXInfo()->GetColorValue(nIdx));                  //モデル情報を割り当てる
-	
+	pModelParts->GetDrawInfo().SetUseShadow(true);
 	pModelParts->SetSize();                                                                                 //Xオブジェクトのサイズを設定する
 	return pModelParts;
 }

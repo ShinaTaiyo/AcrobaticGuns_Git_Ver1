@@ -40,8 +40,9 @@ public:
 
 	struct CHARACTERMOTIONDATA
 	{
-		string FileName = "";//モーションファイル名
-		vector<MOTION> VecMotion;//モーション情報
+		int nNumMotion = 0;       //モーション総数
+		string FileName = "";     //モーションファイル名
+		vector<MOTION> VecMotion; //モーション情報
 	};
 
 	CCharacter(int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::NONE, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_X);                                                           //コンストラクタ
@@ -51,8 +52,10 @@ public:
 	void Update() override; //更新処理
 	void Draw() override;   //描画処理
 	void SetDeath() override;//死亡フラグ設定処理
-
+	void SetNextMotion(int nNext);
 	static int Regist(string String,CCharacter * pCharacter);//モーション情報のファイルパスを指定し、モーション情報のインデックスとモデルパーツを取得
+protected:
+	void MotionProcess();//モーション処理を行う（位置の更新とかじゃないので、派生クラスの更新の最後で呼びたいのでpublicに置く）
 private:
 	//=======================
 	//静的メンバ
@@ -85,7 +88,6 @@ private:
 	//=======================
 	//関数
 	//=======================
-	void MotionProcess();//モーション処理を行う
 	void MotionInfoChengeProcess();//モーション情報を更新する処理
 
 	//静的メンバ

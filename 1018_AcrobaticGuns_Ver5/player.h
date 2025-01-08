@@ -12,7 +12,7 @@
 //インクルード
 //======================
 #include "main.h"
-#include "objectX.h"
+#include "character.h"
 #include "lockon.h"
 #include "meshorbit.h"
 #include "ui.h"
@@ -30,7 +30,7 @@ class CPlayerAbnormalState_KnockBack;
 //===========================================
 //プレイヤー3Dクラス
 //===========================================
-class CPlayer : public CObjectX
+class CPlayer : public CCharacter
 {
 public:
 	CPlayer(CPlayerMove* pPlayerMove, CPlayerAttack* pPlayerAttack, CPlayerEffect* pPlayerEffect, CPlayerWireShot* pPlayer,

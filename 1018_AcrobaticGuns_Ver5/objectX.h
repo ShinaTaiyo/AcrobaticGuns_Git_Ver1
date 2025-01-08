@@ -350,6 +350,7 @@ public:
 	void Uninit() override;                                               //終了処理
 	void Update() override;                                               //更新処理
 	void Draw() override;                                                 //描画処理
+	void SetDeath() override;                                             //死亡フラグ設定処理
 	void BindObjectXInfo(LPD3DXMESH pMesh, LPD3DXBUFFER pBuffMat, DWORD dwNumMat, LPDIRECT3DTEXTURE9* pTexture,D3DCOLORVALUE * pDiffuse);//モデル情報を割り当てる
 
 	//==========================================================

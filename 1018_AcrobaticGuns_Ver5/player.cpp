@@ -42,7 +42,7 @@ const int CPlayer::s_nNORMAL_MAXLIFE = 100;
 //コンストラクタ
 //====================================================
 CPlayer::CPlayer(CPlayerMove* pPlayerMove, CPlayerAttack* pPlayerAttack, CPlayerEffect* pPlayerEffect, CPlayerWireShot* pPlayerWireShot,
-    int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectX(nPri, bUseintPri, type, ObjType)
+    int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CCharacter(nPri, bUseintPri, type, ObjType)
     , m_pMove(pPlayerMove), m_pAttack(pPlayerAttack), m_pEffect(pPlayerEffect), m_pWireShot(pPlayerWireShot),
     m_pMeshOrbit(nullptr),
     m_fRotAim(0.0f), m_pLockOn(nullptr), m_NowActionMode(ACTIONMODE::SHOT), m_pModeDisp(nullptr), m_bCollision(false),m_pWire(nullptr),
@@ -66,7 +66,7 @@ CPlayer::~CPlayer()
 //====================================================
 HRESULT CPlayer::Init()
 {
-    CObjectX::Init();                 //Xオブジェクト初期化
+    CCharacter::Init();                 //Xオブジェクト初期化
 
     GetLifeInfo().SetAutoSubLife(false);//自動的に体力を減らすかどうか
     GetMoveInfo().SetUseGravity(true,1.0f);  //重力を使用する
@@ -109,7 +109,7 @@ HRESULT CPlayer::Init()
 //====================================================
 void CPlayer::Uninit()
 {
-    CObjectX::Uninit();//Xオブジェクト終了
+    CCharacter::Uninit();//Xオブジェクト終了
 
     if (m_pMove != nullptr)
     {
@@ -160,7 +160,7 @@ void CPlayer::Update()
         ActionModeChenge(); //現在のアクションモードを変更する
     }
 
-    CObjectX::Update();//更新処理
+    CCharacter::Update();//更新処理
 
     if (CScene::GetMode() == CScene::MODE_GAME)
     {
@@ -184,6 +184,8 @@ void CPlayer::Update()
             CManager::GetSceneFade()->SetSceneFade(CFade::FADEMODE_IN, CScene::MODE_RESULT);
         }
     }
+
+    MotionProcess();//モーション処理を行う
 }
 //==========================================================================================================
 
@@ -192,7 +194,7 @@ void CPlayer::Update()
 //====================================================
 void CPlayer::Draw()
 {
-    CObjectX::Draw();
+    CCharacter::Draw();
     //CManager::GetText()->DrawSet(D3DXVECTOR3(SCREEN_WIDTH - 350.0f, SCREEN_HEIGHT / 2, 0.0f), 30, CText::FONT_KEIFONT, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f),
     //    "操作方法\n移動：左スティック\n視点：左スティック\n射撃、ダイブ：Rトリガー\nダッシュ：Lトリガー\nジャンプ：A\nモード切替：X");
 }
@@ -255,7 +257,7 @@ void CPlayer::SetDeath()
             m_pDivePossibleNum = nullptr;
         }
     }
-    CObject::SetDeath();
+    CCharacter::SetDeath();
 }
 //===========================================================================================================
 
@@ -278,14 +280,17 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
             pPlayer->SetObjXType(CObjectX::OBJECTXTYPE_PLAYER);                    //オブジェクトXのタイプを設定
             pPlayer->SetTypeNum(0);                                                //オブジェクトXごとのタイプ番号を設定
             //pPlayer->SetUseGravity(true,1.0f);//重力
-            nIdx = CManager::GetObjectXInfo()->Regist("data\\MODEL\\Player\\Player_ProtoType.x");
+            //モデル情報を割り当てる
+            nIdx = CManager::GetObjectXInfo()->Regist("data\\MODEL\\Enemy\\MotionEnemy\\DiveWeakEnemy\\DiveWeakEnemy00_Source.x");
             pPlayer->BindObjectXInfo(CManager::GetObjectXInfo()->GetMesh(nIdx),
                 CManager::GetObjectXInfo()->GetBuffMat(nIdx),
                 CManager::GetObjectXInfo()->GetdwNumMat(nIdx),
                 CManager::GetObjectXInfo()->GetTexture(nIdx),
                 CManager::GetObjectXInfo()->GetColorValue(nIdx));
-            //モデル情報を割り当てる
+
+            pPlayer->Regist("data\\MODEL\\Enemy\\MotionEnemy\\DiveWeakEnemy\\DiveWeakEnemyMotion.txt",pPlayer);//モーションファイルを割り当てる
             pPlayer->SetSize();
+            pPlayer->GetDrawInfo().SetUseDraw(false);                                                     //描画しない
             pPlayer->GetPosInfo().SetPos(pos);                                                            //位置の設定
             pPlayer->GetPosInfo().SetPosOld(pos);                                                         //1f前の位置を設定
             pPlayer->GetPosInfo().SetSupportPos(pos);                                                     //設置位置

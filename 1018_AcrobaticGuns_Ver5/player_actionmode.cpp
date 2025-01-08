@@ -70,8 +70,13 @@ void CPlayerMove::MoveProcess(CPlayer* pPlayer)
 		pPlayer->GetMoveInfo().SetUseGravity(true, CObjectX::GetNormalGravity());
 		if (bMove == true)
 		{
+			pPlayer->SetNextMotion(1);//移動モーションを次のモーションに指定する
 			pPlayer->GetMoveInfo().SetMove(AddMove + D3DXVECTOR3(0.0f, Move.y, 0.0f));
 			CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::MOVE);
+		}
+		else
+		{
+			pPlayer->SetNextMotion(0);//動いていないので、初期モーションのニュートラルに設定
 		}
 	}
 }
@@ -404,8 +409,12 @@ void CPlayerAttack_Shot::AttackProcess(CPlayer* pPlayer)
 		pAttackPlayer->GetMoveInfo().SetUseInteria(false, CObjectX::GetNormalInertia());
 		pAttackPlayer->GetLifeInfo().SetAutoSubLife(true);
 
-		CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::SHOT);
-		
+		CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::SHOT);		
+	}
+
+	if (CManager::GetInputJoypad()->GetRT_Press())
+	{
+		pPlayer->SetNextMotion(2);//攻撃ボタンを押している限り、次のモーションは攻撃モーションになる
 	}
 }
 //======================================================================================================================================================
@@ -617,7 +626,6 @@ void CPlayerWireShot::StartWireShotProcess(CPlayer* pPlayer)
 
 	//描画を復活させる
 	pPlayer->GetWire()->GetWireHead()->GetDrawInfo().SetUseDraw(true);
-	pPlayer->GetDrawInfo().SetUseDraw(true);
 
 	//ワイヤーの更新を復活させる
 	pPlayer->GetWire()->SetUseUpdate(true);
