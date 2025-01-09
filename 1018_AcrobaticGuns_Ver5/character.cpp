@@ -151,7 +151,7 @@ void CCharacter::MotionProcess()
     {//1f前のモーションと異なる場合、フレーム数とキーカウントをリセットし、ブレンド開始
         m_NowMotionInfo.nCntFrame = 0;
         m_NowMotionInfo.nCntKey = 0;
-
+        m_NowMotionInfo.bNowBrending = true;
         CManager::GetDebugProc()->PrintDebugProc("フレーム数、キーカウントリセット！\n");
     }
 
@@ -164,16 +164,46 @@ void CCharacter::MotionProcess()
     float fRatioFrame = static_cast<float>(nNowFrame) / static_cast<float>(nMaxFrame);                //現在のフレームの最大フレームに対しての割合を格納
 
     int nSize = m_VecModelParts.size();//配列の大きさを格納
+    int nBrendCheck = 0;//モーションブレンドが発動している場合、モーションブレンドが完了したモデルパーツの数をカウントする
     for (int nCntParts = 0; nCntParts < nSize; nCntParts++)
     {
-        D3DXVECTOR3 NowPos = s_VecMotionInfo[m_nIdxCharacter].VecMotion[nNowMotion].VecKeySet[nNowKey].VecKey[nCntParts].Pos;//現在のキーの位置
-        D3DXVECTOR3 NextPos = s_VecMotionInfo[m_nIdxCharacter].VecMotion[nNowMotion].VecKeySet[nNextKey].VecKey[nCntParts].Pos;//次のキーの位置
+        D3DXVECTOR3 NowPos = { 0.0f,0.0f,0.0f };//現在のキーの位置
+        D3DXVECTOR3 NextPos = { 0.0f,0.0f,0.0f };//次のキーの位置
+        D3DXVECTOR3 NowRot = { 0.0f,0.0f,0.0f };//現在のキーの向き
+        D3DXVECTOR3 NextRot = { 0.0f,0.0f,0.0f };//次のキーの向き
 
-        D3DXVECTOR3 NowRot = s_VecMotionInfo[m_nIdxCharacter].VecMotion[nNowMotion].VecKeySet[nNowKey].VecKey[nCntParts].Rot;//現在のキーの向き
-        D3DXVECTOR3 NextRot = s_VecMotionInfo[m_nIdxCharacter].VecMotion[nNowMotion].VecKeySet[nNextKey].VecKey[nCntParts].Rot;//次のキーの向き
+        //モーションブレンドをするかしないかによって参照する位置や向きが変わる
+        if (m_NowMotionInfo.bNowBrending == false)
+        {//モーションブレンド状態じゃなければ
+            NowPos = s_VecMotionInfo[m_nIdxCharacter].VecMotion[nNowMotion].VecKeySet[nNowKey].VecKey[nCntParts].Pos;
+            NextPos = s_VecMotionInfo[m_nIdxCharacter].VecMotion[nNowMotion].VecKeySet[nNextKey].VecKey[nCntParts].Pos;
 
+            NowRot = s_VecMotionInfo[m_nIdxCharacter].VecMotion[nNowMotion].VecKeySet[nNowKey].VecKey[nCntParts].Rot;
+            NextRot = s_VecMotionInfo[m_nIdxCharacter].VecMotion[nNowMotion].VecKeySet[nNextKey].VecKey[nCntParts].Rot;
+        }
+        else
+        {//モーションブレンド状態ならば
+            NowPos = m_VecModelParts[nCntParts]->GetPosInfo().GetPos();//モデルパーツの現在の位置から徐々にブレンドするモーションのキーの位置に近づけていく
+            NextPos = s_VecMotionInfo[m_nIdxCharacter].VecMotion[nNowMotion].VecKeySet[0].VecKey[nCntParts].Pos + m_VecModelParts[nCntParts]->GetPosInfo().GetSupportPos();
+
+            NowRot = m_VecModelParts[nCntParts]->GetRotInfo().GetRot();//モデルパーツの現在の向きから徐々にブレンドするモーションのキーの向きに近づけていく
+            NextRot = s_VecMotionInfo[m_nIdxCharacter].VecMotion[nNowMotion].VecKeySet[0].VecKey[nCntParts].Rot;
+        }
         D3DXVECTOR3 DifferencePos = NextPos - NowPos;//次の位置と現在の位置の差分を求める
         D3DXVECTOR3 DifferenceRot = NextRot - NowRot;//次の向きと現在の向きの差分を求める
+
+        if (m_NowMotionInfo.bNowBrending == true)
+        {//モーションブレンドが成功したかどうかを判定
+            if (DifferencePos.x < s_fMotionBrend_CheckDefference && 
+                DifferencePos.y < s_fMotionBrend_CheckDefference && 
+                DifferencePos.z < s_fMotionBrend_CheckDefference &&
+                DifferenceRot.x < s_fMotionBrend_CheckDefference && 
+                DifferenceRot.y < s_fMotionBrend_CheckDefference && 
+                DifferenceRot.z < s_fMotionBrend_CheckDefference)
+            {
+                nBrendCheck++;
+            }
+        }
 
         //向きの補正を行う（向きの境界の突破）
         CCalculation::CorrectionRot(DifferenceRot.x);
@@ -181,29 +211,48 @@ void CCharacter::MotionProcess()
         CCalculation::CorrectionRot(DifferenceRot.z);
 
         //上記で求めたデータを使用し、モーションした位置と向きを求める
-        D3DXVECTOR3 DecisionPos = (DifferencePos * fRatioFrame) + m_VecModelParts[nCntParts]->GetPosInfo().GetSupportPos() + NowPos;
-        D3DXVECTOR3 DecisionRot = (DifferenceRot * fRatioFrame) + NowRot;
+        D3DXVECTOR3 DecisionPos = { 0.0f,0.0f,0.0f };
+        D3DXVECTOR3 DecisionRot = { 0.0f,0.0f,0.0f };
 
+        if (m_NowMotionInfo.bNowBrending == false)
+        {//現在のキーの値と次のキーの値に向けて動かす
+            DecisionPos = (DifferencePos * fRatioFrame) + m_VecModelParts[nCntParts]->GetPosInfo().GetSupportPos() + NowPos;
+            DecisionRot = (DifferenceRot * fRatioFrame) + NowRot;
+        }
+        else
+        {//ブレンド処理
+            DecisionPos = (DifferencePos * s_fMotionBrend_Speed) + NowPos;
+            DecisionRot = (DifferenceRot * s_fMotionBrend_Speed) + NowRot;
+        }
         //位置と向きを設定
         m_VecModelParts[nCntParts]->GetPosInfo().SetPos(DecisionPos);
         m_VecModelParts[nCntParts]->GetRotInfo().SetRot(DecisionRot);
     }
 
-    m_NowMotionInfo.nCntFrame++;//フレーム数を＋１
+    if (m_NowMotionInfo.bNowBrending == false)
+    {//モーションブレンドが終わるまではフレーム数をカウントしない
+        m_NowMotionInfo.nCntFrame++;//フレーム数を＋１
+        if (m_NowMotionInfo.nCntFrame >= s_VecMotionInfo[m_nIdxCharacter].VecMotion[nNowMotion].VecKeySet[nNowKey].nFrame)
+        {//フレーム数が現在のモーションの最大に達したら、キーを次に進め、フレーム数を０にする
+            m_NowMotionInfo.nCntKey++;
+            m_NowMotionInfo.nCntFrame = 0;
 
-    if (m_NowMotionInfo.nCntFrame >= s_VecMotionInfo[m_nIdxCharacter].VecMotion[nNowMotion].VecKeySet[nNowKey].nFrame)
-    {//フレーム数が現在のモーションの最大に達したら、キーを次に進め、フレーム数を０にする
-        m_NowMotionInfo.nCntKey++;
-        m_NowMotionInfo.nCntFrame = 0;
+            if (m_NowMotionInfo.nCntKey >= s_VecMotionInfo[m_nIdxCharacter].VecMotion[nNowMotion].nNumKey)
+            {//キーが現在のモーションの最大に達したらキーを０にする
+                m_NowMotionInfo.nCntKey = 0;
 
-        if (m_NowMotionInfo.nCntKey >= s_VecMotionInfo[m_nIdxCharacter].VecMotion[nNowMotion].nNumKey)
-        {//キーが現在のモーションの最大に達したらキーを０にする
-            m_NowMotionInfo.nCntKey = 0;
-
-            if (s_VecMotionInfo[m_nIdxCharacter].VecMotion[nNowMotion].bLoop == false)
-            {//ループしないなら初期モーションに戻す
-                m_NowMotionInfo.nNextMotion = 0;
+                if (s_VecMotionInfo[m_nIdxCharacter].VecMotion[nNowMotion].bLoop == false)
+                {//ループしないなら初期モーションに戻す
+                    m_NowMotionInfo.nNextMotion = 0;
+                }
             }
+        }
+    }
+    else
+    {
+        if (nBrendCheck == nSize)
+        {//全てのパーツのモーションブレンドが完了した場合、モーションブレンドを終了する
+            m_NowMotionInfo.bNowBrending = false;
         }
     }
 }

@@ -61,6 +61,8 @@ private:
 	//静的メンバ
 	//=======================
 	static vector<CHARACTERMOTIONDATA> s_VecMotionInfo;//モーション情報のベクター
+	static constexpr float s_fMotionBrend_Speed = 0.4f;//モーションブレンドの速度を設定
+	static constexpr float s_fMotionBrend_CheckDefference = 0.1f;//モーションブレンドのするときの目的の値までの差分がこの値以下なら完了
 	//===================================================================================
 
 	//=======================
@@ -74,6 +76,7 @@ private:
 
 		int nCntFrame = 0; //現在のフレーム数
 		int nCntKey = 0;   //現在のキーをカウントする
+		bool bNowBrending = false;//モーションブレンド中かどうか
 	};
 	//===================================================================================
 
