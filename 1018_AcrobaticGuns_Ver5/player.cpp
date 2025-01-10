@@ -27,7 +27,7 @@
 #include "particle.h"
 #include "ui.h"
 #include "particle2d.h"
-#include "debugproc.h"
+#include "debugtext.h"
 #include "tutorial.h"
 #include "collision.h"
 //==========================================================================================================
@@ -46,7 +46,7 @@ CPlayer::CPlayer(CPlayerMove* pPlayerMove, CPlayerAttack* pPlayerAttack, CPlayer
     , m_pMove(pPlayerMove), m_pAttack(pPlayerAttack), m_pEffect(pPlayerEffect), m_pWireShot(pPlayerWireShot),
     m_pMeshOrbit(nullptr),
     m_fRotAim(0.0f), m_pLockOn(nullptr), m_NowActionMode(ACTIONMODE::SHOT), m_pModeDisp(nullptr), m_bCollision(false),m_pWire(nullptr),
-    m_pHpGauge(nullptr),m_pAbnormalState(DBG_NEW CPlayerAbnormalState()),m_pDiveGauge(nullptr), m_pDivePossibleNum(nullptr)
+    m_pHpGauge(nullptr),m_pAbnormalState(DBG_NEW CPlayerAbnormalState()),m_pDiveGauge(nullptr), m_pDivePossibleNum(nullptr),m_bDamage(false)
 {
 
 }
@@ -176,13 +176,19 @@ void CPlayer::Update()
 
         m_pWireShot->WireShotProcess(this);//ワイヤー発射状態処理
 
-        CManager::GetDebugProc()->PrintDebugProc("プレイヤーの位置：%f %f %f\n", GetPosInfo().GetPos().x, GetPosInfo().GetPos().y, GetPosInfo().GetPos().z);
-        CManager::GetDebugProc()->PrintDebugProc("プレイヤーの体力：%d\n", GetLifeInfo().GetLife());
+        CManager::GetDebugText()->PrintDebugText("プレイヤーの位置：%f %f %f\n", GetPosInfo().GetPos().x, GetPosInfo().GetPos().y, GetPosInfo().GetPos().z);
+        CManager::GetDebugText()->PrintDebugText("プレイヤーの体力：%d\n", GetLifeInfo().GetLife());
 
         if (GetLifeInfo().GetLife() < 1)
         {
             CManager::GetSceneFade()->SetSceneFade(CFade::FADEMODE_IN, CScene::MODE_RESULT);
         }
+    }
+
+    if (m_bDamage == true)
+    {
+        SetNextMotion(3);
+        m_bDamage = false;
     }
 
     MotionProcess();//モーション処理を行う
@@ -586,6 +592,9 @@ void CPlayer::SetDamage(int nDamage, int nHitStopTime)
     pGauge->SetUseAddScale(D3DXVECTOR2(0.1f, 0.1f), true);
     pGauge->SetUseScale(true);
     pGauge->SetScale(D3DXVECTOR2(1.0f, 1.0f));
+
+    m_bDamage = true;//ダメージを受けた状態を明示的に示す
+    SetNextMotion(2);
 }
 //==========================================================================================================
 

@@ -49,7 +49,7 @@ HRESULT CDebugProc::Init()
 	memset(&m_aStrDebug[0], NULL, sizeof(m_aStrDebug));
 
 	//初期表示設定
-#if _DEBUG
+#ifdef _DEBUG
 	m_bDispDebug = true;
 #else NDEBUG
 	m_bDispDebug = false;
@@ -207,7 +207,5 @@ void CDebugProc::PrintDebugProc(const char* fmt, ...)
 void CDebugProc::SetManual()
 {
 	//デバッグ変更とFPS
-    //PrintDebugProc("【デバッグ表示】【F1】【FPS】 %d\n", GetFPS());
-    //PrintDebugProc("【現在の画面】[%s]\n", c_apMode[GetMode()]);
 }
 //====================================================================================================================================

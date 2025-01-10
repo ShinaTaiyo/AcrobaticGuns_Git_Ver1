@@ -13,7 +13,6 @@
 #include "player.h"
 #include "renderer.h"
 #include "manager.h"
-#include "debugproc.h"
 #include "input.h"
 #include "sound.h"
 #include "camera.h"
@@ -21,6 +20,7 @@
 #include "object3d.h"
 #include "texture.h"
 #include "eventmanager.h"
+#include "debugtext.h"
 #include "objectXInfo.h"
 #include "main.h"
 #include "fade.h"
@@ -40,8 +40,8 @@ CTexture* CManager::m_pTexture = nullptr;
 CObjectXInfo* CManager::m_pObjectXInfo = nullptr;
 CScene* CManager::m_pScene = nullptr;
 CSceneFade* CManager::m_pSceneFade = nullptr;
-CDebugProc* CManager::m_pDebugProc = nullptr;
 CInputMouse* CManager::m_pInputMouse = nullptr;
+CDebugText* CManager::m_pDebugText = nullptr;
 //===================================================
 
 //=======================
@@ -130,17 +130,11 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	m_pObjectXInfo = DBG_NEW CObjectXInfo;
 	//======================================================
 
-	//===================================
-	//デバッグプロシージャクラスを生成
-	//===================================
-	m_pDebugProc = DBG_NEW CDebugProc;
-	m_pDebugProc->Init();
-	//======================================================
-
-	//===================================
-	//イベントマネージャークラスを生成
-	//===================================
-	//=====================================================
+	//============================
+	//デバッグテキストを生成
+	//============================
+	m_pDebugText = DBG_NEW CDebugText;
+	m_pDebugText->Init();
 
 	//===================================
 	//モードの設定
@@ -286,15 +280,16 @@ void CManager::Uninit()
 	//===============================================
 
 	//================================
-	//デバッグプロシージャ情報
+	//デバッグテキスト情報
 	//================================
-	if (m_pDebugProc != nullptr)
+	if (m_pDebugText != nullptr)
 	{
-		m_pDebugProc->Uninit();
-		delete m_pDebugProc;
-		m_pDebugProc = nullptr;
+		m_pDebugText->Uninit();
+		delete m_pDebugText;
+		m_pDebugText = nullptr;
 	}
 	//===============================================
+
 
 	//最後に残ったオブジェクトをここで全部破棄
 	CObject::ReleaseProcess();//リストの破棄をする処理
@@ -312,9 +307,6 @@ void CManager::Update()
 	m_pInputMouse->Update();   //マウス入力
 	m_pCamera->Update();       //カメラ
 	m_pLight->Update();        //ライト
-#ifdef _DEBUG
-	m_pDebugProc->Update();    //デバッグプロシージャ
-#endif // _DEBUG
 	if (m_pScene != nullptr)
 	{
 		m_pScene->Update();        //シーンの更新処理

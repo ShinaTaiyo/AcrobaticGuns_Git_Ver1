@@ -10,7 +10,7 @@
 //=========================
 #include "input.h"
 #include "main.h"
-#include "debugproc.h"
+#include "debugtext.h"
 #include "manager.h"
 //=========================================================
 
@@ -557,11 +557,6 @@ bool CInputJoypad::GetRStickPress(const int nDivisionRot)
 		normalizedMagnitude = 0.0;
 		bActive = false;
 	}
-
-	//CManager::GetDebugProc()->PrintDebugProc("RX：%f\n", normalizedRX);
-	//CManager::GetDebugProc()->PrintDebugProc("RY：%f\n", normalizedRY);
-	//CManager::GetDebugProc()->PrintDebugProc("if文判定：%d\n", bActive);
-	//CManager::GetDebugProc()->PrintDebugProc("スティックの角度：%f\n", fAimRot);
 
 	return bActive;
 }

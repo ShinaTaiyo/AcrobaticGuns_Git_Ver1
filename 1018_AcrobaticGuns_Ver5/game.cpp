@@ -19,9 +19,9 @@
 #include "enemy.h"
 #include "input.h"
 #include "attack.h"
-#include "debugproc.h"
 #include "calculation.h"
 #include "particle.h"
+#include "debugtext.h"
 #include "wire.h"
 //=========================================================================================================================
 
@@ -158,12 +158,14 @@ void CGame::Uninit()
 //=============================================================
 void CGame::Update()
 {
+	CManager::GetDebugText()->PrintDebugText("こんにちは！数値：%d、倍率：%f\n", 7095110, 3.14f);//デバッグ表示の確認
+	CManager::GetDebugText()->PrintDebugText("野獣先輩イキスギイクイクｱｧｯｱｧｯｱｧｯヤリマスネー：%d、名前：%s\n",114514,"田所浩二");//デバッグ表示の確認
 #ifdef _DEBUG
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_RETURN) == true || CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::START) == true)
 	{
 		CManager::GetSceneFade()->SetSceneFade(CFade::FADEMODE_IN, CScene::MODE_RESULT);
 	}
-	CManager::GetDebugProc()->PrintDebugProc("現在の敵の数；%d\n", CEnemy::GetNumEnemy());
+	CManager::GetDebugText()->PrintDebugText("現在の敵の数；%d\n", CEnemy::GetNumEnemy());
 #else
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_1) == true || CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::START) == true)
 	{

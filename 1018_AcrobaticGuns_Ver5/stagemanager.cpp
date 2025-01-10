@@ -17,7 +17,7 @@
 #include "object.h"
 #include "camera.h"
 #include "calculation.h"
-#include "debugproc.h"
+#include "debugtext.h"
 #include "bgModel.h"
 #include "enemy.h"
 #include <stdio.h>
@@ -405,16 +405,16 @@ void CStageManager::DispInfo()
 		strcpy(&aMapModeString[0], "新しいステージを編集");
 	}
 
-	CManager::GetDebugProc()->PrintDebugProc("//=================================\n");
-	CManager::GetDebugProc()->PrintDebugProc("//マップエディタの情報\n");
-	CManager::GetDebugProc()->PrintDebugProc("//=================================\n");
-	CManager::GetDebugProc()->PrintDebugProc("現在のステージマネージャー管理オブジェクトの数：%d\n", m_StgObjList.size());
-	CManager::GetDebugProc()->PrintDebugProc("現在のマップ番号(F2、F3で変更）：%d\n", m_nMapIndex);
-	CManager::GetDebugProc()->PrintDebugProc("現在のマップモード（F4）：%s\n",&aMapModeString[0]);
-	CManager::GetDebugProc()->PrintDebugProc("スポーンポイント（P）：%f %f %f\n",m_SpawnPoint.x,m_SpawnPoint.y,m_SpawnPoint.z);
-	CManager::GetDebugProc()->PrintDebugProc("ステート変更 : 8\n");
-	CManager::GetDebugProc()->PrintDebugProc("：末尾のオブジェクトを消去：BACKSPACE\n");
-	CManager::GetDebugProc()->PrintDebugProc("//=================================\n");
+	CManager::GetDebugText()->PrintDebugText("//=================================\n");
+	CManager::GetDebugText()->PrintDebugText("//マップエディタの情報\n");
+	CManager::GetDebugText()->PrintDebugText("//=================================\n");
+	CManager::GetDebugText()->PrintDebugText("現在のステージマネージャー管理オブジェクトの数：%d\n", m_StgObjList.size());
+	CManager::GetDebugText()->PrintDebugText("現在のマップ番号(F2、F3で変更）：%d\n", m_nMapIndex);
+	CManager::GetDebugText()->PrintDebugText("現在のマップモード（F4）：%s\n",&aMapModeString[0]);
+	CManager::GetDebugText()->PrintDebugText("スポーンポイント（P）：%f %f %f\n",m_SpawnPoint.x,m_SpawnPoint.y,m_SpawnPoint.z);
+	CManager::GetDebugText()->PrintDebugText("ステート変更 : 8\n");
+	CManager::GetDebugText()->PrintDebugText("：末尾のオブジェクトを消去：BACKSPACE\n");
+	CManager::GetDebugText()->PrintDebugText("//=================================\n");
 
 }
 //=======================================================================================================================

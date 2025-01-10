@@ -19,7 +19,7 @@
 #include "calculation.h"
 #include "objectX.h"
 #include "game.h"
-#include "debugproc.h"
+#include "debugtext.h"
 #include "player.h"
 #include "ui.h"
 //==============================================================================================================
@@ -175,8 +175,8 @@ void CLockon::CalcRay()
 		CManager::GetCamera()->GetMtxView(), CManager::GetCamera()->GetMtxProjection());//手前
 
 	//m_FrontPos = CManager::GetCamera()->GetPosV();
-	CManager::GetDebugProc()->PrintDebugProc("カメラ手前座標：%f %f %f\n", m_FrontPos.x, m_FrontPos.y, m_FrontPos.z);
-	CManager::GetDebugProc()->PrintDebugProc("カメラ支点：%f %f %f\n", pCamera->GetPosV().x, pCamera->GetPosV().y, pCamera->GetPosV().z);
+	CManager::GetDebugText()->PrintDebugText("カメラ手前座標：%f %f %f\n", m_FrontPos.x, m_FrontPos.y, m_FrontPos.z);
+	CManager::GetDebugText()->PrintDebugText("カメラ支点：%f %f %f\n", pCamera->GetPosV().x, pCamera->GetPosV().y, pCamera->GetPosV().z);
 	CCalculation::CalcScreenToWorld(&FarPos,GetPos().x,GetPos().y, 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT,
 		CManager::GetCamera()->GetMtxView(), CManager::GetCamera()->GetMtxProjection());//奥
 	//============================================================================================================================

@@ -11,7 +11,7 @@
 #include "player_actionmode.h"
 #include "texture.h"
 #include "calculation.h"
-#include "debugproc.h"
+#include "debugtext.h"
 #include "manager.h"
 #include "collision.h"
 #include "effect.h"
@@ -196,7 +196,6 @@ void CPlayerMove_PrepDive::MoveProcess(CPlayer* pPlayer)
 	CLockon* pLockon = pPlayer->GetLockOn();//ロックオンへのポインタ
 	pWireHead->GetPosInfo().SetPos(pPlayer->GetPosInfo().GetPos());//ダイブ準備中なのでワイヤーヘッドをプレイヤーの位置に固定
 
-	//CManager::GetDebugProc()->PrintDebugProc("移動量：%f %f %f\n", Move.x, Move.y, Move.z);
 	if ((CManager::GetInputJoypad()->GetRT_Trigger() || CManager::GetInputMouse()->GetMouseLeftClickTrigger()) && pLockon->GetSuccessRayCollision())
 	{//ワイヤー発射移動モードにチェンジ
 		CPlayerWireShot::StartWireShotProcess(pPlayer);

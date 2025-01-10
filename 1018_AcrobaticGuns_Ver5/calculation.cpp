@@ -373,15 +373,11 @@ D3DXVECTOR3* CCalculation::CalcScreenToXZ(D3DXVECTOR3* pout,float Sx,float Sy, i
 	//	float LP0 = D3DXVec3Dot(&nearpos, &Pos1);
 	//	*pout = nearpos + (LP0 / Lray) * ray;
 	//	bCross = true;
-	//	//CManager::GetDebugProc()->PrintDebugProc("Lray:%f\n", Lray);
-	//	//CManager::GetDebugProc()->PrintDebugProc("LP0:%f\n",LP0);
 	//}
 	//else {
 	* pout = farpos;
 	bCross = false;
 	//}
-	//CManager::GetDebugProc()->PrintDebugProc("レイの向き：%f %f %f\n", ray.x, ray.y, ray.z);
-	//CManager::GetDebugProc()->PrintDebugProc("レイが床と交差しているかどうか：%d\n", bCross);
 
 	return pout;
 }

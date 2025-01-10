@@ -10,7 +10,7 @@
 //=================================================================================================================
 #include "meshcylinder.h"
 #include "manager.h"
-#include "debugproc.h"
+#include "debugtext.h"
 #include "renderer.h"
 #include "particle.h"
 #include "input.h"
@@ -361,9 +361,9 @@ void CMeshCylinder::ChengeNumPolygon()
 		m_nNumPolygon--;
 	}
 
-	CManager::GetDebugProc()->PrintDebugProc("ポリゴン数：%d\n", m_nNumPolygon);
-	CManager::GetDebugProc()->PrintDebugProc("頂点数：%d\n", m_nNumVtx);
-	CManager::GetDebugProc()->PrintDebugProc("インデックス数：%d\n", m_nNumIdx);
+	CManager::GetDebugText()->PrintDebugText("ポリゴン数：%d\n", m_nNumPolygon);
+	CManager::GetDebugText()->PrintDebugText("頂点数：%d\n", m_nNumVtx);
+	CManager::GetDebugText()->PrintDebugText("インデックス数：%d\n", m_nNumIdx);
 }
 //=========================================================================================================================================
 
@@ -398,7 +398,7 @@ void CMeshCylinder::CheckMeshInfo()
 		m_nCheckVtx = m_nNumVtx - 1;
 	}
 	//デバッグ表示
-	CManager::GetDebugProc()->PrintDebugProc("確認している頂点番号：%d、頂点の位置：%f %f %f\n",
+	CManager::GetDebugText()->PrintDebugText("確認している頂点番号：%d、頂点の位置：%f %f %f\n",
 		m_nCheckVtx, pVtx[m_nCheckVtx].pos.x, pVtx[m_nCheckVtx].pos.y, pVtx[m_nCheckVtx].pos.z);
 
 	//CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 60, 40.0f, 40.0f, 100, 10, true, pVtx[m_nCheckVtx].pos, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), true);
@@ -433,7 +433,7 @@ void CMeshCylinder::CheckMeshInfo()
 
 	int nCheck = pIdx[m_nCheckIdx];
 
-	CManager::GetDebugProc()->PrintDebugProc("確認しているインデックス番号：%d、頂点の位置：%f %f %f\n", m_nCheckIdx, pVtx[nCheck].pos.x, pVtx[nCheck].pos.y, pVtx[nCheck].pos.z);
+	CManager::GetDebugText()->PrintDebugText("確認しているインデックス番号：%d、頂点の位置：%f %f %f\n", m_nCheckIdx, pVtx[nCheck].pos.x, pVtx[nCheck].pos.y, pVtx[nCheck].pos.z);
 
 	//CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 60, 40.0f, 40.0f, 100, 10, false, pVtx[nCheck].pos, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
 

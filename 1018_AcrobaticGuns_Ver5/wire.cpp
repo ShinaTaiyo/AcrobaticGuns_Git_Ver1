@@ -14,7 +14,7 @@
 #include "player.h"
 #include "manager.h"
 #include "particle.h"
-#include "debugproc.h"
+#include "debugtext.h"
 #include "calculation.h"
 //===================================================================================================================
 
@@ -102,7 +102,6 @@ void CWire::Update()
 
 	float fLength = CCalculation::CalculationLength(m_pPlayer->GetPosInfo().GetPos(), m_pWireHead->GetPosInfo().GetPos());
 	SetHeight(fLength);
-	//CManager::GetDebugProc()->PrintDebugProc("‹——£F%f\n", fLength);
 
 	D3DXVECTOR3 RotMove = m_pWireHead->GetPosInfo().GetPos() - m_pPlayer->GetPosInfo().GetPos();
 	D3DXVec3Normalize(&RotMove, &RotMove);

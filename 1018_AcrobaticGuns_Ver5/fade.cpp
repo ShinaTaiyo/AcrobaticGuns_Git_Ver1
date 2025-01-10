@@ -9,7 +9,7 @@
 //インクルード
 //======================================================
 #include "fade.h"
-#include "debugproc.h"
+#include "debugtext.h"
 #include "manager.h"
 #include "scene.h"
 //========================================================================================================
@@ -94,7 +94,7 @@ void CFade::Update()
 		break;
 	}
 
-	CManager::GetDebugProc()->PrintDebugProc("フェードを開始するかどうか：%d\n", m_bStartFade);
+	CManager::GetDebugText()->PrintDebugText("フェードを開始するかどうか：%d\n", m_bStartFade);
 
 	if (bModeChenge == false)
 	{

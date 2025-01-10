@@ -13,7 +13,7 @@
 #include "objectXInfo.h"
 #include "game.h"
 #include "calculation.h"
-#include "debugproc.h"
+#include "debugtext.h"
 #include "collision.h"
 #include "damage.h"
 #include "particle.h"
@@ -528,7 +528,7 @@ void CEnemy::SetMoveAiPoint()
 	}
 
 	GetMoveInfo().SetMove(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-	CManager::GetDebugProc()->PrintDebugProc("移動AIの設置位置の移動：IKLJ\n");
+	CManager::GetDebugText()->PrintDebugText("移動AIの設置位置の移動：IKLJ\n");
 
 	if (bMove == true)
 	{
@@ -543,9 +543,9 @@ void CEnemy::SetMoveAiPoint()
 
 	D3DXVECTOR3 NowPos = m_MoveAiSavePos + GetPosInfo().GetPos();
 
-	CManager::GetDebugProc()->PrintDebugProc("移動AIの位置：%f %f %f\n", NowPos.x,NowPos.y,NowPos.z);
+	CManager::GetDebugText()->PrintDebugText("移動AIの位置：%f %f %f\n", NowPos.x,NowPos.y,NowPos.z);
 
-	CManager::GetDebugProc()->PrintDebugProc("移動AIを保存：O\n");
+	CManager::GetDebugText()->PrintDebugText("移動AIを保存：O\n");
 
 	if (Input->GetPress(DIK_LSHIFT))
 	{
@@ -742,7 +742,7 @@ void CEnemy::PhaseNumDecision()
 			m_nPhaseNum--;
 		}
 	}
-	CManager::GetDebugProc()->PrintDebugProc("フェーズ番号の変更：%d\n", m_nPhaseNum);
+	CManager::GetDebugText()->PrintDebugText("フェーズ番号の変更：%d\n", m_nPhaseNum);
 }
 //============================================================================================================================================
 
@@ -833,7 +833,7 @@ void CEnemy::EditNormalSpeed()
 		}
 	}
 
-	CManager::GetDebugProc()->PrintDebugProc("通常移動速度変更（５）：%f\n",m_fNormalSpeed);
+	CManager::GetDebugText()->PrintDebugText("通常移動速度変更（５）：%f\n",m_fNormalSpeed);
 }
 //============================================================================================================================================
 
@@ -873,7 +873,7 @@ void CEnemy::EditSensingRange()
 		}
 	}
 
-	CManager::GetDebugProc()->PrintDebugProc("索敵範囲変更（６）：%f\n", m_fSensingRange);
+	CManager::GetDebugText()->PrintDebugText("索敵範囲変更（６）：%f\n", m_fSensingRange);
 }
 //============================================================================================================================================
 
@@ -1777,7 +1777,7 @@ void CDiveWeakEnemy::ManagerChooseControlInfo()
 		}
 	}
 
-	CManager::GetDebugProc()->PrintDebugProc("分裂回数(U)：%d\n", m_nDivisionNum);
+	CManager::GetDebugText()->PrintDebugText("分裂回数(U)：%d\n", m_nDivisionNum);
 
 	CEnemy::ManagerChooseControlInfo();
 }

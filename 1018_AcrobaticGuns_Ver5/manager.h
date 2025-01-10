@@ -28,8 +28,8 @@ class CTexture;         //テクスチャクラスを前方宣言
 class CObjectXInfo;     //オブジェクトXクラスを前方宣言
 class CSceneFade;            //フェードクラスを前方宣言
 class CText;            //テキストクラスを前方宣言
-class CDebugProc;       //デバッグプロシージャクラスを前方宣言
 class CInputMouse;      //マウス
+class CDebugText;       //デバッグ文字クラス
 //==========================================
 
 //==========================================
@@ -54,8 +54,8 @@ public:
 	static CObjectXInfo* GetObjectXInfo() { return m_pObjectXInfo; }    //オブジェクトXクラスを取得する
 	static CSceneFade* GetSceneFade() { return m_pSceneFade; }                         //フェードクラスを取得する
 	static CScene* GetScene() { return m_pScene; }                      //シーンクラスを取得する
-	static CDebugProc* GetDebugProc() { return m_pDebugProc; }          //デバッグプロシージャクラスを取得する
 	static CInputMouse* GetInputMouse() { return m_pInputMouse; }       //マウス入力情報を取得する
+	static CDebugText* GetDebugText() { return m_pDebugText; }          //デバッグテキスト情報
 	static void SetMode(CScene::MODE mode);                             //モードを設定する
 private:
 	static CRenderer* m_pRenderer;                                      //レンダラー
@@ -67,9 +67,9 @@ private:
 	static CTexture* m_pTexture;                                        //テクスチャ情報
 	static CObjectXInfo* m_pObjectXInfo;                                //オブジェクトX情報
 	static CScene* m_pScene;                                            //シーン情報
-	static CSceneFade* m_pSceneFade;                                              //フェード情報	
-	static CDebugProc* m_pDebugProc;                                    //デバッグプロシージャ情報
+	static CSceneFade* m_pSceneFade;                                    //フェード情報	
 	static CInputMouse* m_pInputMouse;                                  //マウス情報
+	static CDebugText* m_pDebugText;                                    //デバッグテキスト情報
 }; 
 //=======================================================================================
 

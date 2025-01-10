@@ -13,7 +13,7 @@
 #include "game.h"
 #include "objectXInfo.h"
 #include "manager.h"
-#include "debugproc.h"
+#include "debugtext.h"
 #include "collision.h"
 //===================================================================================================================================
 
@@ -62,7 +62,7 @@ void CWireHead::Update()
 {
 	CObjectX::Update();
 
-	CManager::GetDebugProc()->PrintDebugProc("ワイヤーヘッドの位置：%f %f %f\n", GetPosInfo().GetPos().x, GetPosInfo().GetPos().y, GetPosInfo().GetPos().z);
+	CManager::GetDebugText()->PrintDebugText("ワイヤーヘッドの位置：%f %f %f\n", GetPosInfo().GetPos().x, GetPosInfo().GetPos().y, GetPosInfo().GetPos().z);
 
 	if (m_nCoolTime == 0)
 	{//０距離で当たらないようにするためにクールタイムを設定（０除算回避）
@@ -143,7 +143,7 @@ bool CWireHead::CollisionSquare()
 				CObjectX* pObjX = static_cast<CObjectX*>(pObj);
 				if (CCollision::CollisionSquare(GetPosInfo().GetPos(), GetSizeInfo().GetVtxMax(), GetSizeInfo().GetVtxMin(), pObjX->GetPosInfo().GetPos(), pObjX->GetSizeInfo().GetVtxMax(), pObjX->GetSizeInfo().GetVtxMin()) == true)
 				{
-					CManager::GetDebugProc()->PrintDebugProc("ワイヤーヘッドの当たり判定成功！\n");
+					CManager::GetDebugText()->PrintDebugText("ワイヤーヘッドの当たり判定成功！\n");
 					return true;
 				}
 			}
@@ -151,7 +151,7 @@ bool CWireHead::CollisionSquare()
 		}
 	}
 
-	CManager::GetDebugProc()->PrintDebugProc("正方形の当たり判定失敗！\n");
+	CManager::GetDebugText()->PrintDebugText("正方形の当たり判定失敗！\n");
 
 	return false;
 }

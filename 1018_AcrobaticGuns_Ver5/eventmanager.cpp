@@ -14,7 +14,7 @@
 #include "object.h"
 #include "sound.h"
 #include "fade.h"
-#include "debugproc.h"
+#include "debugtext.h"
 #include "manager.h"
 #include "calculation.h"
 #include "particle2d.h"
@@ -215,7 +215,7 @@ void CNowEvent_NextPhase::Process(CEventManager* pEventManager)
 {
     CEventManager::EventProgressInfo& eventProgressInfo = pEventManager->GetEventProgressInfo();
 
-	CManager::GetDebugProc()->PrintDebugProc("UIの死亡フラグ：%d\n",m_PhaseText->GetUseDeath());
+	CManager::GetDebugText()->PrintDebugText("UIの死亡フラグ：%d\n",m_PhaseText->GetUseDeath());
 	switch (eventProgressInfo.nEventPattern)
 	{
 	case 0:

@@ -16,7 +16,7 @@
 #include "object.h"
 #include "particle.h"
 #include "game.h"
-#include "debugproc.h"
+#include "debugtext.h"
 #include "edit.h"
 #include "calculation.h"
 #include "collision.h"
@@ -109,10 +109,10 @@ void CCamera::Update()
 
 	m_Rot.y = CCalculation::CorrectionRot(m_Rot.y);
 
-	CManager::GetDebugProc()->PrintDebugProc("カメラの向き：%f %f %f\n", m_Rot.x, m_Rot.y, m_Rot.z);
-	CManager::GetDebugProc()->PrintDebugProc("カメラの視点：%f %f %f\n", m_PosV.x, m_PosV.y, m_PosV.z);
-	CManager::GetDebugProc()->PrintDebugProc("カメラの注視点：%f %f %f\n", m_PosR.x, m_PosR.y, m_PosR.z);
-	CManager::GetDebugProc()->PrintDebugProc("カメラとの距離：%f\n",m_fAddLength);
+	CManager::GetDebugText()->PrintDebugText("カメラの向き：%f %f %f\n", m_Rot.x, m_Rot.y, m_Rot.z);
+	CManager::GetDebugText()->PrintDebugText("カメラの視点：%f %f %f\n", m_PosV.x, m_PosV.y, m_PosV.z);
+	CManager::GetDebugText()->PrintDebugText("カメラの注視点：%f %f %f\n", m_PosR.x, m_PosR.y, m_PosR.z);
+	CManager::GetDebugText()->PrintDebugText("カメラとの距離：%f\n",m_fAddLength);
 
 	//カメラの通常の注視点を設定し続ける
 	NormalCameraMove();
@@ -352,7 +352,7 @@ void CCameraState_TurnAround::Process(CCamera* pCamera)
 	fRotDiffX = CCalculation::CorrectionRot(fRotDiffX);
 	fRotDiffY = CCalculation::CorrectionRot(fRotDiffY);
 
-	CManager::GetDebugProc()->PrintDebugProc("カメラの向きの差分:%f\n");
+	CManager::GetDebugText()->PrintDebugText("カメラの向きの差分:%f\n");
 
 	//加算する向きの量を補正して求める
 	float fAddRotX = fRotDiffX * m_fAdjustTurnSpeed;

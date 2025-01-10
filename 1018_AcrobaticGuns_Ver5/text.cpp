@@ -135,8 +135,6 @@ void CText::DrawSet(D3DXVECTOR3 DrawPos, int FontSize, FONT Font, D3DXCOLOR RGBA
 	// テキストの描画
 	m_pFont_Comment[Font]->DrawText(NULL, aStr, -1, &rect, DT_LEFT | DT_WORDBREAK, RGBA);
 
-
-
 	//使用例！！
 
 	//	DrawTextSet(　座標　, フォントサイズ　, フォント名（ｈ.で作ったラベル的な）, カラー, "打ちたい文字(任意で%d.%f,%s)",(任意で変数));

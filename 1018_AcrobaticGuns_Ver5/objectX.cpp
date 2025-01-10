@@ -16,7 +16,7 @@
 #include "manager.h"
 #include "camera.h"
 #include "input.h"
-#include "debugproc.h"
+#include "debugtext.h"
 #include <stdio.h>
 #include <string.h>
 #include <iostream>
@@ -493,7 +493,7 @@ void CObjectX::ChengeEditScale()
 
 	ChengeEditScaleZ();
 
-	CManager::GetDebugProc()->PrintDebugProc("拡大率(RTYキー) %f %f %f\n", Scale.x,Scale.y,Scale.z);
+	CManager::GetDebugText()->PrintDebugText("拡大率(RTYキー) %f %f %f\n", Scale.x,Scale.y,Scale.z);
 }
 //================================================================================================================================================
 
@@ -661,8 +661,8 @@ void CObjectX::ChengeEditPos()
 	//支点も一緒に移動
 	m_PosInfo.Pos += Move;
 	m_PosInfo.SupportPos = m_PosInfo.Pos;
-	CManager::GetDebugProc()->PrintDebugProc("支点位置(矢印キー) %f %f %f\n", m_PosInfo.SupportPos.x,m_PosInfo.SupportPos.y, m_PosInfo.SupportPos.z);
-	CManager::GetDebugProc()->PrintDebugProc("向きZ(FGキー) %f\n", m_RotInfo.Rot.z);
+	CManager::GetDebugText()->PrintDebugText("支点位置(矢印キー) %f %f %f\n", m_PosInfo.SupportPos.x,m_PosInfo.SupportPos.y, m_PosInfo.SupportPos.z);
+	CManager::GetDebugText()->PrintDebugText("向きZ(FGキー) %f\n", m_RotInfo.Rot.z);
 	CManager::GetCamera()->SetPosR(m_PosInfo.Pos);
 	//================================================================================================================================================
 
@@ -703,7 +703,7 @@ void CObjectX::EditLife()
 		}
 	}
 
-	CManager::GetDebugProc()->PrintDebugProc("最大体力(3)：%d\n", m_LifeInfo.nMaxLife);
+	CManager::GetDebugText()->PrintDebugText("最大体力(3)：%d\n", m_LifeInfo.nMaxLife);
 }
 //================================================================================================================================================
 
@@ -719,7 +719,7 @@ void CObjectX::ChengeEditSwapVtxXZ()
 		m_SizeInfo.bSwapVtxXZ = m_SizeInfo.bSwapVtxXZ ? false : true;
 	}
 
-	CManager::GetDebugProc()->PrintDebugProc("頂点のXZを入れ替えるかどうか（７）：%d\n", m_SizeInfo.bSwapVtxXZ);
+	CManager::GetDebugText()->PrintDebugText("頂点のXZを入れ替えるかどうか（７）：%d\n", m_SizeInfo.bSwapVtxXZ);
 }
 //================================================================================================================================================
 

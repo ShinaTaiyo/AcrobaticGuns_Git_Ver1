@@ -20,7 +20,7 @@
 #include "camera.h"
 #include "scene.h"
 #include "game.h"
-#include "debugproc.h"
+#include "debugtext.h"
 #include "edit.h"
 //==========================================
 
@@ -221,11 +221,8 @@ void CRenderer::Draw()
 		//FPSの表示
 		CObject::DrawAll();//全てのオブジェクトの描画処理
 
-		
-#ifdef _DEBUG
-		//デバッグ表示
-		CManager::GetDebugProc()->Draw();
-#endif
+				//デバッグ表示
+		CManager::GetDebugText()->Draw();
 
 //#ifdef _DEBUG
 		DrawFPS();
@@ -266,9 +263,9 @@ void CRenderer::DrawFPS()
     }
 
 	//文字列に代入
-	CManager::GetDebugProc()->PrintDebugProc("【デバッグ表示】【F1】【FPS】 %d\n", GetFPS());
-	CManager::GetDebugProc()->PrintDebugProc("現在のモード：%s\n",&aMode[0]);
-	CManager::GetDebugProc()->PrintDebugProc("現在のオブジェクト総数：%d\n", nNumObject);
+	CManager::GetDebugText()->PrintDebugText("【デバッグ表示】【F1】【FPS】 %d\n", GetFPS());
+	CManager::GetDebugText()->PrintDebugText("現在のモード：%s\n",&aMode[0]);
+	CManager::GetDebugText()->PrintDebugText("現在のオブジェクト総数：%d\n", nNumObject);
 
 
 	//}

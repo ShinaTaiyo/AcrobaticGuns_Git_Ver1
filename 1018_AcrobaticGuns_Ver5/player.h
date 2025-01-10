@@ -110,6 +110,7 @@ private:
 	//================================================
 	float m_fRotAim;                    //目的の向き
 	bool m_bCollision;                  //当たり判定が成功したかどうか
+	bool m_bDamage;                     //ダメージを受けたかどうか
 
 	//他クラスインスタンス
 	CLockon* m_pLockOn;                 //ロックオンカーソル

@@ -11,7 +11,7 @@
 #include "character.h"
 #include "manager.h"
 #include "objectXInfo.h"
-#include "debugproc.h"
+#include "debugtext.h"
 #include "calculation.h"
 //===================================================================================================================
 
@@ -152,7 +152,7 @@ void CCharacter::MotionProcess()
         m_NowMotionInfo.nCntFrame = 0;
         m_NowMotionInfo.nCntKey = 0;
         m_NowMotionInfo.bNowBrending = true;
-        CManager::GetDebugProc()->PrintDebugProc("フレーム数、キーカウントリセット！\n");
+        CManager::GetDebugText()->PrintDebugText("フレーム数、キーカウントリセット！\n");
     }
 
     //参照する値を変数に格納しておく
