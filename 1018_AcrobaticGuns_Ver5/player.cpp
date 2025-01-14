@@ -151,6 +151,11 @@ void CPlayer::Update()
 {
     if (CScene::GetMode() == CScene::MODE_GAME)
     {
+        if (GetLanding())
+        {//地面にいるなら重力を最小限に
+            GetMoveInfo().SetMove(D3DXVECTOR3(GetMoveInfo().GetMove().x, -0.1f, GetMoveInfo().GetMove().z));
+        }
+
         m_pMove->MoveProcess(this);//現在のアクションモードの移動処理を実行
 
         m_pAbnormalState->Process(this);//状態異常の処理を実行
@@ -162,13 +167,13 @@ void CPlayer::Update()
 
     CCharacter::Update();//更新処理
 
+    CObjectX::UpdatePos();
+
+    CollisionProcess();
+
     if (CScene::GetMode() == CScene::MODE_GAME)
     {
-        AdjustPos();//位置調整処理
-
         m_pEffect->EffectProcess(this);//エフェクト処理
-
-        CollisionProcess();
 
         m_pAttack->AttackProcess(this);//現在のアクションモードの攻撃処理を実装
 
@@ -201,8 +206,6 @@ void CPlayer::Update()
 void CPlayer::Draw()
 {
     CCharacter::Draw();
-    //CManager::GetText()->DrawSet(D3DXVECTOR3(SCREEN_WIDTH - 350.0f, SCREEN_HEIGHT / 2, 0.0f), 30, CText::FONT_KEIFONT, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f),
-    //    "操作方法\n移動：左スティック\n視点：左スティック\n射撃、ダイブ：Rトリガー\nダッシュ：Lトリガー\nジャンプ：A\nモード切替：X");
 }
 //==========================================================================================================
 
@@ -299,6 +302,7 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
             pPlayer->GetDrawInfo().SetUseDraw(false);                                                     //描画しない
             pPlayer->GetPosInfo().SetPos(pos);                                                            //位置の設定
             pPlayer->GetPosInfo().SetPosOld(pos);                                                         //1f前の位置を設定
+            pPlayer->GetPosInfo().SetPosFuture(pos);                                                      //1f後の位置を設定
             pPlayer->GetPosInfo().SetSupportPos(pos);                                                     //設置位置
             pPlayer->GetRotInfo().SetRot(rot);                                                            //向きの設定
             pPlayer->GetSizeInfo().SetScale(Scale);                                                        //拡大率の設定
@@ -475,24 +479,21 @@ void CPlayer::ChengeWireShotMode(CPlayerWireShot* pPlayerWireShot)
 //========================================================
 void CPlayer::CollisionProcess()
 {
-    D3DXVECTOR3 MyPos = GetPosInfo().GetPos();
-    D3DXVECTOR3 MyPosOld = GetPosInfo().GetPosOld();
-    D3DXVECTOR3 MyVtxMax = GetSizeInfo().GetVtxMax();
-    D3DXVECTOR3 MyVtxMin = GetSizeInfo().GetVtxMin();
-    const D3DXVECTOR3 Move = GetMoveInfo().GetMove();
-    bool bCollisionXOld = GetExtrusionCollisionSquareX();
-    bool bCollisionYOld = GetExtrusionCollisionSquareY();
-    bool bCollisionZOld = GetExtrusionCollisionSquareZ();
+    const D3DXVECTOR3 & MyPos = GetPosInfo().GetPos();
+    const D3DXVECTOR3 & MyPosOld = GetPosInfo().GetPosOld();
+    const D3DXVECTOR3 & MyVtxMax = GetSizeInfo().GetVtxMax();
+    const D3DXVECTOR3 & MyVtxMin = GetSizeInfo().GetVtxMin();
+    const D3DXVECTOR3 & MyMove = GetMoveInfo().GetMove();
+    const D3DXVECTOR3& MyPosFuture = MyPos + MyMove;//1f後の位置を計算する
 
-    bool bCollisionX = false;
-    bool bCollisionY = false;
-    bool bCollisionZ = false;
-    bool bIsLanding = false;
+    D3DXVECTOR3 MathPosFuture = { 0.0f,0.0f,0.0f };//計算用の未来位置
+    SetIsLanding(false);                           //地面に乗っているかどうかのフラグをリセット
 
-    SetIsLanding(false);
+    bool bPushOutFirstX = false;                   //X軸を先に判定するかどうか
+    bool bPushOutFirstY = false;                   //Y軸を先に判定するかどうか
+    bool bPushOutFirstZ = false;                   //Z軸を先に判定するかどうか
 
     m_bCollision = false;//判定状態をリセット
-    bool bSuccessCollision = false;//当たり判定が成功したかどうか
     for (int nCntPri = 0; nCntPri < CObject::m_nMAXPRIORITY; nCntPri++)
     {
         CObject* pObj = CObject::GetTopObject(nCntPri);
@@ -507,40 +508,155 @@ void CPlayer::CollisionProcess()
 
             if (type == CObject::TYPE::BLOCK || type == CObject::TYPE::BGMODEL)
             {
-                D3DXVECTOR3 ComPos = static_cast<CObjectX*>(pObj)->GetPosInfo().GetPos();
-                D3DXVECTOR3 ComVtxMax = static_cast<CObjectX*>(pObj)->GetSizeInfo().GetVtxMax();
-                D3DXVECTOR3 ComVtxMin = static_cast<CObjectX*>(pObj)->GetSizeInfo().GetVtxMin();
-
-                bSuccessCollision = CCollision::ExtrusionCollisionSquare(MyPos, bCollisionX, bCollisionY, bCollisionZ, Move, MyPosOld, MyVtxMax, MyVtxMin,
-                    ComPos, ComVtxMax, ComVtxMin, bCollisionXOld, bCollisionYOld, bCollisionZOld, bIsLanding);
-
-                if (bSuccessCollision == true)
-                {
-                    GetPosInfo().SetPos(MyPos);
-                    m_bCollision = true;
-                    SetSuccessCollision(true);
+                CObjectX* pObjX = static_cast<CObjectX*>(pObj);//オブジェクトXにダウンキャスト
+                const D3DXVECTOR3& ComPos = pObjX->GetPosInfo().GetPos();
+                const D3DXVECTOR3& ComVtxMax = pObjX->GetSizeInfo().GetVtxMax();
+                const D3DXVECTOR3& ComVtxMin = pObjX->GetSizeInfo().GetVtxMin();
+                //============================================================
+                //どの軸を先に判定するかを決める
+                //============================================================
+                //上
+                if (MyPosFuture.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
+                    && MyPosFuture.x + MyVtxMin.x < ComPos.x + ComVtxMax.x
+                    && MyPosFuture.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
+                    && MyPosOld.y + MyVtxMin.y >= ComPos.y + ComVtxMax.y
+                    && MyPosFuture.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
+                    && MyPosFuture.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
+                {//1f後にオブジェクトに乗るなら
+                    bPushOutFirstY = true;
+                    bPushOutFirstX = false;
+                    bPushOutFirstZ = false;
                 }
-
-                if (bCollisionY == true)
-                {
-                    if (bIsLanding == true)
-                    {
-                        GetMoveInfo().SetMove(D3DXVECTOR3(GetMoveInfo().GetMove().x,0.0f, GetMoveInfo().GetMove().z));
-                        SetIsLanding(true);
-                    }
+                //下
+                else if (MyPosFuture.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
+                    && MyPosFuture.x + MyVtxMin.x < ComPos.x + ComVtxMax.x
+                    && MyPosFuture.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
+                    && MyPosOld.y + MyVtxMax.y <= ComPos.y + ComVtxMin.y
+                    && MyPosFuture.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
+                    && MyPosFuture.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
+                {//1f後にオブジェクトの下に当たるなら
+                    bPushOutFirstY = true;
+                    bPushOutFirstX = false;
+                    bPushOutFirstZ = false;
                 }
-
+                if (MyPosFuture.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
+                    && MyPosOld.x + MyVtxMax.x <= ComPos.x + ComVtxMin.x
+                    && MyPosFuture.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
+                    && MyPosFuture.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
+                    && MyPosFuture.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
+                    && MyPosFuture.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
+                {//1f後にオブジェクトのX軸の右側に当たるなら
+                    bPushOutFirstX = true;
+                    bPushOutFirstZ = false;
+                }
+                else if (MyPosFuture.x + MyVtxMin.x < ComPos.x + ComVtxMax.x
+                    && MyPosOld.x + MyVtxMin.x >= ComPos.x + ComVtxMax.x
+                    && MyPosFuture.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
+                    && MyPosFuture.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
+                    && MyPosFuture.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
+                    && MyPosFuture.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
+                {//1f後にオブジェクトのX軸の左側に当たるなら
+                    bPushOutFirstX = true;
+                    bPushOutFirstZ = false;
+                }
+                //前
+                if (MyPosFuture.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
+                    && MyPosOld.z + MyVtxMax.z <= ComPos.z + ComVtxMin.z
+                    && MyPosFuture.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
+                    && MyPosFuture.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
+                    && MyPosFuture.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
+                    && MyPosFuture.x + MyVtxMin.x < ComPos.x + ComVtxMax.x)
+                {//1f後にオブジェクトの手前側に当たるなら
+                    bPushOutFirstZ = true;
+                    bPushOutFirstX = false;
+                }
+                //奥
+                else if (MyPosFuture.z + MyVtxMin.z < ComPos.z + ComVtxMax.z
+                    && MyPosOld.z + MyVtxMin.z >= ComPos.z + ComVtxMax.z
+                    && MyPosFuture.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
+                    && MyPosFuture.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
+                    && MyPosFuture.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
+                    && MyPosFuture.x + MyVtxMin.x < ComPos.x + ComVtxMax.x)
+                {//1f後にオブジェクトの奥側に当たるなら
+                    bPushOutFirstZ = true;
+                    bPushOutFirstX = false;
+                }
+                //=======================================================================================================
             }
-
             //オブジェクトを次に進める
             pObj = pNext;
         }
-
     }
 
-    SetExtrusionCollisionSquareX(bCollisionX);
-    SetExtrusionCollisionSquareY(bCollisionY);
-    SetExtrusionCollisionSquareZ(bCollisionZ);
+    if (bPushOutFirstX == true)
+    {
+        CManager::GetDebugText()->PrintDebugText("X軸の判定を優先\n");
+    }
+    if (bPushOutFirstY == true)
+    {
+        CManager::GetDebugText()->PrintDebugText("Y軸の判定を優先\n");
+    }
+    if (bPushOutFirstZ == true)
+    {
+        CManager::GetDebugText()->PrintDebugText("Z軸の判定を優先\n");
+    }
+
+    //============================================================
+    //押し出し判定開始
+    //============================================================
+    for (int nCntPri = 0; nCntPri < CObject::m_nMAXPRIORITY; nCntPri++)
+    {
+        CObject* pObj = CObject::GetTopObject(nCntPri);
+
+        while (pObj != nullptr)
+        {
+            //次のオブジェクトを格納
+            CObject* pNext = pObj->GetNextObject();
+
+            //種類の取得（敵なら当たり判定）
+            CObject::TYPE type = pObj->GetType();
+
+            if (type == CObject::TYPE::BLOCK || type == CObject::TYPE::BGMODEL)
+            {
+                CObjectX* pObjX = static_cast<CObjectX*>(pObj);//オブジェクトXにダウンキャスト
+
+                if (bPushOutFirstX == true)
+                {//X軸を先に判定（壁ずりで落ちていく時に引っ掛からないためにYは最後)
+                    CCollision::NewExtrusionCollisionSquareX(this, pObjX);
+                    CCollision::NewExtrusionCollisionSquareZ(this, pObjX);
+                    CCollision::NewExtrusionCollisionSquareY(this, pObjX);
+                }
+                else if (bPushOutFirstZ == true)
+                {//Z軸を先に判定（壁ずりで落ちていく時に引っ掛からないためにYは最後)
+                    CCollision::NewExtrusionCollisionSquareZ(this, pObjX);
+                    CCollision::NewExtrusionCollisionSquareX(this, pObjX);
+                    CCollision::NewExtrusionCollisionSquareY(this, pObjX);
+                }
+                else if (bPushOutFirstY == true)
+                {//Y軸を先に判定（歩いている時にオブジェクト同士の境界で引っ掛からないため)
+                    CCollision::NewExtrusionCollisionSquareY(this, pObjX);
+                    if (bPushOutFirstX == true)
+                    {//歩いている中でも横の壁づりで引っ掛からないために次にX軸を判定)
+                        CCollision::NewExtrusionCollisionSquareX(this, pObjX);
+                        CCollision::NewExtrusionCollisionSquareZ(this, pObjX);
+                    }
+                    else
+                    {//歩いている中でも横の壁づりで引っ掛からないために次にZ軸を判定)
+                        CCollision::NewExtrusionCollisionSquareZ(this, pObjX);
+                        CCollision::NewExtrusionCollisionSquareX(this, pObjX);
+                    }
+                }
+                else
+                {//どの軸も優先されないので普通に判定
+                    CCollision::NewExtrusionCollisionSquareX(this, pObjX);
+                    CCollision::NewExtrusionCollisionSquareY(this, pObjX);
+                    CCollision::NewExtrusionCollisionSquareZ(this, pObjX);
+                }
+            }
+
+            pObj = pNext;
+        }
+    }
 }
 //==========================================================================================================
 

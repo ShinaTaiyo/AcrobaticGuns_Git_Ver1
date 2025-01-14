@@ -134,6 +134,7 @@ CBlock* CBlock::Create(BLOCKTYPE type, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 r
 			pBlock->GetLifeInfo().SetAutoSubLife(false);                //自動的に体力を減らすかどうか
 			pBlock->GetPosInfo().SetSupportPos(pos);                   //設置位置
 			pBlock->GetDrawInfo().SetUseShadow(false);
+			pBlock->GetDrawInfo().SetUseDraw(true);          //描画する
 			pBlock->GetPosInfo().SetPos(pos);                //オブジェクトXの位置を設定
 			pBlock->GetPosInfo().SetPosOld(pos);                       //1f前の位置を設定
 			pBlock->CObject::SetType(CObject::TYPE::BLOCK);//オブジェクトの種類を決める

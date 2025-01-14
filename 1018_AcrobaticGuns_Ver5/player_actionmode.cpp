@@ -89,7 +89,7 @@ void CPlayerMove::JumpProcess(CPlayer* pPlayer)
 {
 	if (pPlayer->GetLanding())
 	{//’n–Ê‚É‚¢‚é‚È‚çƒWƒƒƒ“ƒv
-		pPlayer->GetMoveInfo().SetUseGravity(true, 1.0f);
+		pPlayer->GetMoveInfo().SetUseGravity(true, CObjectX::GetNormalGravity());
 		if (CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::A) || CManager::GetInputKeyboard()->GetTrigger(DIK_SPACE))
 		{
 			CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::JUMP);

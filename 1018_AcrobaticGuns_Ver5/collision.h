@@ -30,6 +30,9 @@ public:
 	static bool CollisionSquare(D3DXVECTOR3 MyPos, D3DXVECTOR3 MyVtxMax, D3DXVECTOR3 MyVtxMin,
 		D3DXVECTOR3 ComparisonPos, D3DXVECTOR3 ComparisonVtxMax, D3DXVECTOR3 ComparisonVtxMin);
 
+
+	static bool CollisionSquarePoint(const D3DXVECTOR3 & Point,CObjectX* pObjX);//点がAABBと当たったかどうかを判定
+
 	//円の当たり判定
 	static bool CollisionBall(D3DXVECTOR3 MySenterPos, D3DXVECTOR3 MySize,
 		D3DXVECTOR3 ComparisonSenterPos, D3DXVECTOR3 ComparisonSize);
@@ -52,6 +55,11 @@ public:
 		const D3DXVECTOR3 MyMove,const D3DXVECTOR3 MyPosOld,const D3DXVECTOR3 MyVtxMax,const D3DXVECTOR3 MyVtxMin,
 		const D3DXVECTOR3 ComPos,const D3DXVECTOR3 ComVtxMax,const D3DXVECTOR3 ComVtxMin,
 		const bool bCollisionXOld,const bool bCollisionYOld,const bool bCollisionZOld,bool & bIsLanding);
+
+	//正方形の新しいX押し出し判定
+	static bool NewExtrusionCollisionSquareX(CObjectX* pObjX, CObjectX* pComObjX);
+	static bool NewExtrusionCollisionSquareY(CObjectX* pObjX, CObjectX* pComObjX);
+	static bool NewExtrusionCollisionSquareZ(CObjectX* pObjX, CObjectX* pComObjX);
 
 	//X押し出し
 	static bool ExtrusionCollisionSquareX(D3DXVECTOR3& MyPos,const D3DXVECTOR3 MyMove,const D3DXVECTOR3 MyPosOld,const D3DXVECTOR3 MyVtxMax, const D3DXVECTOR3 MyVtxMin, 

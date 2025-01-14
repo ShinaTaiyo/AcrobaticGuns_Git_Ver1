@@ -142,7 +142,7 @@ void CObjectX::Update()
 	m_MoveInfo.AddSpeedProcess();                //加速処理
 	m_MoveInfo.GravityProcess();                 //重力処理
 
-	UpdatePos();//位置の更新を行う
+	//UpdatePos();//位置の更新を行う
 
 	CObject::Update();
 }
@@ -398,7 +398,10 @@ void CObjectX::UpdatePos()
 		}
 
 		//位置の設定
-		GetPosInfo().SetPos(Pos + m_MoveInfo.Move + m_MoveInfo.AddMove);
+		GetPosInfo().SetPos(Pos + m_MoveInfo.Move);
+
+		//1f後の位置の設定
+		GetPosInfo().SetPosFuture(Pos + m_MoveInfo.Move);
 	}
 }
 //================================================================================================================================================

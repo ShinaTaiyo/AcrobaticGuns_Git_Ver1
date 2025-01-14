@@ -50,6 +50,23 @@ bool CCollision::CollisionSquare(D3DXVECTOR3 MyPos, D3DXVECTOR3 MyVtxMax, D3DXVE
 	}
 	return false;
 }
+
+//================================================================
+//点と正方形の当たり判定を取る
+//================================================================
+bool CCollision::CollisionSquarePoint(const D3DXVECTOR3 & Point,CObjectX* pObjX)
+{
+	if (Point.x <= pObjX->GetPosInfo().GetPos().x + pObjX->GetSizeInfo().GetVtxMax().x &&
+		Point.x >= pObjX->GetPosInfo().GetPos().x + pObjX->GetSizeInfo().GetVtxMin().x &&
+		Point.y <= pObjX->GetPosInfo().GetPos().y + pObjX->GetSizeInfo().GetVtxMax().y &&
+		Point.y >= pObjX->GetPosInfo().GetPos().y + pObjX->GetSizeInfo().GetVtxMin().y &&
+		Point.z <= pObjX->GetPosInfo().GetPos().z + pObjX->GetSizeInfo().GetVtxMax().z &&
+		Point.z >= pObjX->GetPosInfo().GetPos().z + pObjX->GetSizeInfo().GetVtxMin().z)
+	{
+		return true;
+	}
+	return false;
+}
 //====================================================================================================================
 
 //================================================================
@@ -476,6 +493,143 @@ bool CCollision::ExtrusionCollisionSquare(D3DXVECTOR3& MyPos, bool& bCollisionX,
 
 	if (bCollisionX == true || bCollisionY == true || bCollisionZ == true)
 	{
+		return true;
+	}
+	return false;
+}
+
+//================================================================
+//新しい正方形の押し出し判定X
+//================================================================
+bool CCollision::NewExtrusionCollisionSquareX(CObjectX* pObjX, CObjectX* pComObjX)
+{
+	const D3DXVECTOR3& MyPos = pObjX->GetPosInfo().GetPos();
+	const D3DXVECTOR3& MyMove = pObjX->GetMoveInfo().GetMove();
+	const D3DXVECTOR3& MyPosOld = pObjX->GetPosInfo().GetPosOld();
+	const D3DXVECTOR3& MyVtxMax = pObjX->GetSizeInfo().GetVtxMax();
+	const D3DXVECTOR3& MyVtxMin = pObjX->GetSizeInfo().GetVtxMin();
+
+	const D3DXVECTOR3& ComPos = pComObjX->GetPosInfo().GetPos();
+	const D3DXVECTOR3& ComVtxMax = pComObjX->GetSizeInfo().GetVtxMax();
+	const D3DXVECTOR3& ComVtxMin = pComObjX->GetSizeInfo().GetVtxMin();
+
+	if (MyPos.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
+		&& MyPosOld.x + MyVtxMax.x <= ComPos.x + ComVtxMin.x
+		&& MyPos.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
+		&& MyPos.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
+		&& MyPos.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
+		&& MyPos.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
+	{//対象の右端がブロックの左端に当たった時の処理
+		//MyPos.x = ComPos.x + ComVtxMin.x - MyVtxMax.x - 0.1f;
+		pObjX->GetPosInfo().SetPos(D3DXVECTOR3(ComPos.x + ComVtxMin.x - MyVtxMax.x - 0.1f,
+			pObjX->GetPosInfo().GetPos().y,
+			pObjX->GetPosInfo().GetPos().z));
+		return true;
+	}
+	else if (MyPos.x + MyVtxMin.x < ComPos.x + ComVtxMax.x
+		&& MyPosOld.x + MyVtxMin.x >= ComPos.x + ComVtxMax.x
+		&& MyPos.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
+		&& MyPos.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
+		&& MyPos.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
+		&& MyPos.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
+	{//対象の左端がブロックの右端に当たった時の処理
+		//MyPos.x = ComPos.x + ComVtxMax.x - MyVtxMin.x + 0.1f;
+		pObjX->GetPosInfo().SetPos(D3DXVECTOR3(ComPos.x + ComVtxMax.x - MyVtxMin.x + 0.1f,
+			pObjX->GetPosInfo().GetPos().y,
+			pObjX->GetPosInfo().GetPos().z));
+		return true;
+	}
+	return false;
+}
+
+//================================================================
+//新しい正方形の押し出し判定Y
+//================================================================
+bool CCollision::NewExtrusionCollisionSquareY(CObjectX* pObjX, CObjectX* pComObjX)
+{
+	const D3DXVECTOR3& MyPos = pObjX->GetPosInfo().GetPos();
+	const D3DXVECTOR3& MyMove = pObjX->GetMoveInfo().GetMove();
+	const D3DXVECTOR3& MyPosOld = pObjX->GetPosInfo().GetPosOld();
+	const D3DXVECTOR3& MyVtxMax = pObjX->GetSizeInfo().GetVtxMax();
+	const D3DXVECTOR3& MyVtxMin = pObjX->GetSizeInfo().GetVtxMin();
+
+	const D3DXVECTOR3& ComPos = pComObjX->GetPosInfo().GetPos();
+	const D3DXVECTOR3& ComVtxMax = pComObjX->GetSizeInfo().GetVtxMax();
+	const D3DXVECTOR3& ComVtxMin = pComObjX->GetSizeInfo().GetVtxMin();
+	//上
+	if (MyPos.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
+		&& MyPos.x + MyVtxMin.x < ComPos.x + ComVtxMax.x
+		&& MyPos.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
+		&& MyPosOld.y + MyVtxMin.y - MyMove.y >= ComPos.y + ComVtxMax.y
+		&& MyPos.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
+		&& MyPos.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
+	{//対象の下端がモデルの上端に当たった時の処理
+		float fPosY = fabsf(MyVtxMin.y);
+		//MyPos.y = ComPos.y + ComVtxMax.y + fPosY + 0.1f;
+		pObjX->GetPosInfo().SetPos(D3DXVECTOR3(pObjX->GetPosInfo().GetPos().x,
+			ComPos.y + ComVtxMax.y + fPosY + 0.1f,
+			pObjX->GetPosInfo().GetPos().z));
+		pObjX->SetIsLanding(true);
+		return true;
+	}
+	//下
+	else if (MyPos.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
+		&& MyPos.x + MyVtxMin.x < ComPos.x + ComVtxMax.x
+		&& MyPos.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
+		&& MyPosOld.y + MyVtxMax.y <= ComPos.y + ComVtxMin.y
+		&& MyPos.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
+		&& MyPos.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
+	{//対象の上端がモデルの下端に当たった時の処理
+		//MyPos.y = ComPos.y + ComVtxMin.y - MyVtxMax.y;
+		pObjX->GetPosInfo().SetPos(D3DXVECTOR3(pObjX->GetPosInfo().GetPos().x,
+			ComPos.y + ComVtxMin.y - MyVtxMax.y,
+			pObjX->GetPosInfo().GetPos().z));
+		return true;
+	}
+
+	return false;
+}
+//====================================================================================================================
+
+//================================================================
+//新しい正方形の押し出し判定Z
+//================================================================
+bool CCollision::NewExtrusionCollisionSquareZ(CObjectX* pObjX, CObjectX* pComObjX)
+{
+	const D3DXVECTOR3& MyPos = pObjX->GetPosInfo().GetPos();
+	const D3DXVECTOR3& MyMove = pObjX->GetMoveInfo().GetMove();
+	const D3DXVECTOR3& MyPosOld = pObjX->GetPosInfo().GetPosOld();
+	const D3DXVECTOR3& MyVtxMax = pObjX->GetSizeInfo().GetVtxMax();
+	const D3DXVECTOR3& MyVtxMin = pObjX->GetSizeInfo().GetVtxMin();
+
+	const D3DXVECTOR3& ComPos = pComObjX->GetPosInfo().GetPos();
+	const D3DXVECTOR3& ComVtxMax = pComObjX->GetSizeInfo().GetVtxMax();
+	const D3DXVECTOR3& ComVtxMin = pComObjX->GetSizeInfo().GetVtxMin();
+
+	if (MyPos.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
+		&& MyPosOld.z + MyVtxMax.z <= ComPos.z + ComVtxMin.z
+		&& MyPos.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
+		&& MyPos.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
+		&& MyPos.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
+		&& MyPos.x + MyVtxMin.x < ComPos.x + ComVtxMax.x)
+	{//対象の右端がブロックの左端に当たった時の処理
+		//MyPos.z = ComPos.z + ComVtxMin.z - MyVtxMax.z - 0.1f;
+		pObjX->GetPosInfo().SetPos(D3DXVECTOR3(pObjX->GetPosInfo().GetPos().x,
+			pObjX->GetPosInfo().GetPos().y,
+			ComPos.z + ComVtxMin.z - MyVtxMax.z - 0.1f));
+		return true;
+	}
+	else if (MyPos.z + MyVtxMin.z < ComPos.z + ComVtxMax.z
+		&& MyPosOld.z + MyVtxMin.z >= ComPos.z + ComVtxMax.z
+		&& MyPos.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
+		&& MyPos.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
+		&& MyPos.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
+		&& MyPos.x + MyVtxMin.x < ComPos.x + ComVtxMax.x)
+	{//対象の左端がブロックの右端に当たった時の処理
+		//MyPos.z = ComPos.z + ComVtxMax.z - MyVtxMin.z + 0.1f;
+		pObjX->GetPosInfo().SetPos(D3DXVECTOR3(pObjX->GetPosInfo().GetPos().x,
+			pObjX->GetPosInfo().GetPos().y,
+			ComPos.z + ComVtxMax.z - MyVtxMin.z + 0.1f));
 		return true;
 	}
 	return false;

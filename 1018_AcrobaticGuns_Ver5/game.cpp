@@ -80,7 +80,7 @@ HRESULT CGame::Init()
 	m_pTutorial = CTutorial::Create();
 	m_pTutorial->SetUseDeath(false);
 
-	m_pPlayer = CPlayer::Create(m_pStageManager->GetSpawnPoint(), D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+	m_pPlayer = CPlayer::Create(D3DXVECTOR3(0.0f,200.0f,0.0f), D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 	m_pPlayer->SetUseDeath(false);
 	m_pPlayer->SetVecAxis(D3DXVECTOR3(0.0f, 1.0f, 0.0f));
 	return S_OK;
@@ -158,8 +158,6 @@ void CGame::Uninit()
 //=============================================================
 void CGame::Update()
 {
-	CManager::GetDebugText()->PrintDebugText("こんにちは！数値：%d、倍率：%f\n", 7095110, 3.14f);//デバッグ表示の確認
-	CManager::GetDebugText()->PrintDebugText("野獣先輩イキスギイクイクｱｧｯｱｧｯｱｧｯヤリマスネー：%d、名前：%s\n",114514,"田所浩二");//デバッグ表示の確認
 #ifdef _DEBUG
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_RETURN) == true || CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::START) == true)
 	{

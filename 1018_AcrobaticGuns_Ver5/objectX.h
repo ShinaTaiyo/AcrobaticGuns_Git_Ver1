@@ -118,27 +118,33 @@ public:
 		//==========================================================
         //位置
         //==========================================================
-		D3DXVECTOR3 Pos = { 0.0f,0.0f,0.0f };                              //位置!
-		D3DXVECTOR3 SupportPos = { 0.0f,0.0f,0.0f };                       //最初に設置された位置!
+		D3DXVECTOR3 Pos = { 0.0f,0.0f,0.0f };                              //位置
+		D3DXVECTOR3 PosOld = { 0.0f,0.0f,0.0f };                           //1f前の位置
+		D3DXVECTOR3 PosFuture = { 0.0f,0.0f,0.0f };                        //1f後の位置
+		D3DXVECTOR3 SupportPos = { 0.0f,0.0f,0.0f };                       //最初に設置された位置
 		D3DXVECTOR3 WorldPos = { 0.0f,0.0f,0.0f };                         //ワールド座標を求める
-		D3DXVECTOR3 PosOld = { 0.0f,0.0f,0.0f };                           //1f前の位置!
 		D3DXVECTOR3 SenterPos = { 0.0f,0.0f,0.0f };                        //中心点の位置
 		//=================================================================================================================
     
 	    //位置
-		void SetPos(D3DXVECTOR3 CopyPos) { Pos = CopyPos; }                                           //位置の設定
+		void SetPos(D3DXVECTOR3 CopyPos) { Pos = CopyPos; }                                   //位置の設定
 		const D3DXVECTOR3& GetPos() const { return Pos; }                                     //位置の取得
 
 		//1f前の位置
-		void SetPosOld(D3DXVECTOR3 CopyPosOld) { PosOld = CopyPosOld; }                               //1f前の位置の設定
-		const D3DXVECTOR3& GetPosOld() const { return PosOld; }                                            //1f前の位置を設定
+		void SetPosOld(D3DXVECTOR3 CopyPosOld) { PosOld = CopyPosOld; }                       //1f前の位置の設定
+		const D3DXVECTOR3& GetPosOld() const { return PosOld; }                               //1f前の位置を設定
 
 		//初期位置
-		void SetSupportPos(D3DXVECTOR3 CopySupportPos) { SupportPos = CopySupportPos; }               //設置位置を設定する
-		D3DXVECTOR3& GetSupportPos() { return SupportPos; }                                  //設置位置を取得する
+		void SetSupportPos(D3DXVECTOR3 CopySupportPos) { SupportPos = CopySupportPos; }       //設置位置を設定する
+		D3DXVECTOR3& GetSupportPos() { return SupportPos; }                                   //設置位置を取得する
 
 		//中心点の位置
 		D3DXVECTOR3& GetSenterPos() { return SenterPos; }                                     //中心点を取得する
+
+		//1f後の位置
+		void SetPosFuture(D3DXVECTOR3 CopyPosFuture) { PosFuture = CopyPosFuture; }           //1f後の位置を設定する
+		const D3DXVECTOR3& GetPosFuture() const { return PosFuture; }                         //1f後の位置を取得する
+
 		//============================================================================================================
 	};
 
@@ -353,6 +359,7 @@ public:
 	void SetDeath() override;                                             //死亡フラグ設定処理
 	void BindObjectXInfo(LPD3DXMESH pMesh, LPD3DXBUFFER pBuffMat, DWORD dwNumMat, LPDIRECT3DTEXTURE9* pTexture,D3DCOLORVALUE * pDiffuse);//モデル情報を割り当てる
 
+	void UpdatePos();
 	//==========================================================
 	//静的メンバ宣言
 	//==========================================================
@@ -509,7 +516,6 @@ private:
 	//===================================
 	//位置更新関係
 	//===================================
-	void UpdatePos();
 	//==================================================================================================================
 
 	//===================================
