@@ -57,6 +57,9 @@ public:
 		const bool bCollisionXOld,const bool bCollisionYOld,const bool bCollisionZOld,bool & bIsLanding);
 
 	//正方形の新しいX押し出し判定
+	static void ResolveExtrusionCollisionSquare(CObjectX* pObjX, CObjectX* pComObjX); //正方形の当たり判定を解決する
+	static void ExtrusionCollisionSquarePushOutFirstDecide(CObjectX* pObjX, CObjectX* pComObjX);//正方形の押し出し判定のそれぞれの軸の押し出しの優先度を決める
+
 	static bool NewExtrusionCollisionSquareX(CObjectX* pObjX, CObjectX* pComObjX);
 	static bool NewExtrusionCollisionSquareY(CObjectX* pObjX, CObjectX* pComObjX);
 	static bool NewExtrusionCollisionSquareZ(CObjectX* pObjX, CObjectX* pComObjX);

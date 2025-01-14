@@ -99,13 +99,17 @@ void CEnemy::Update()
 
 		m_nCntTime++;//時間をカウントする
 
+		if (GetLanding() == true)
+		{
+			GetMoveInfo().SetMove(D3DXVECTOR3(GetMoveInfo().GetMove().x, -0.1f, GetMoveInfo().GetMove().z));
+		}
 		AttackProcess();//攻撃処理
-
-		CollisionDetectionProcess();
 
 		CObjectX::Update();
 
 	    CollisionProcess();//当たり判定処理
+
+		CollisionDetectionProcess();
 
 		if (GetPosInfo().GetPos().y < -100.0f)
 		{
@@ -403,21 +407,8 @@ void CEnemy::SetVecMoveAiInfo(vector<CAIModel*>& vec)
 //====================================================================================
 void CEnemy::CollisionProcess()
 {
-	D3DXVECTOR3 MyPos = GetPosInfo().GetPos();
-	D3DXVECTOR3 MyPosOld = GetPosInfo().GetPosOld();
-	D3DXVECTOR3 MyVtxMax = GetSizeInfo().GetVtxMax();
-	D3DXVECTOR3 MyVtxMin = GetSizeInfo().GetVtxMin();
-	const D3DXVECTOR3 Move = GetMoveInfo().GetMove();
-	bool bCollisionXOld = GetExtrusionCollisionSquareX();
-	bool bCollisionYOld = GetExtrusionCollisionSquareY();
-	bool bCollisionZOld = GetExtrusionCollisionSquareZ();
-
-	bool bCollisionX = false;
-	bool bCollisionY = false;
-	bool bCollisionZ = false;
-	bool bIsLanding = false;
-
-	bool bSuccessCollision = false;//当たり判定が成功したかどうか
+	GetCollisionInfo().GetSquareInfo().ResetPushOutFirstFlag();//それぞれの軸の押し出し判定の優先フラグをリセット
+	SetIsLanding(false);
 	for (int nCntPri = 0; nCntPri < CObject::m_nMAXPRIORITY; nCntPri++)
 	{
 		CObject* pObj = CObject::GetTopObject(nCntPri);
@@ -432,48 +423,41 @@ void CEnemy::CollisionProcess()
 
 			if (type == CObject::TYPE::BLOCK || type == CObject::TYPE::BGMODEL)
 			{
-				D3DXVECTOR3 ComPos = static_cast<CObjectX*>(pObj)->GetPosInfo().GetPos();
-				D3DXVECTOR3 ComVtxMax = static_cast<CObjectX*>(pObj)->GetSizeInfo().GetVtxMax();
-				D3DXVECTOR3 ComVtxMin = static_cast<CObjectX*>(pObj)->GetSizeInfo().GetVtxMin();
-
-				bSuccessCollision = CCollision::ExtrusionCollisionSquare(MyPos, bCollisionX, bCollisionY, bCollisionZ, Move, MyPosOld, MyVtxMax, MyVtxMin,
-					ComPos, ComVtxMax, ComVtxMin, bCollisionXOld, bCollisionYOld, bCollisionZOld,bIsLanding);
-
-				if (bSuccessCollision == true)
-				{
-					GetPosInfo().SetPos(MyPos);
-				}
-
-				if (bCollisionY == true)
-				{
-					if (bIsLanding == true)
-					{
-						GetMoveInfo().SetMove(D3DXVECTOR3(GetMoveInfo().GetMove().x,0.1f, GetMoveInfo().GetMove().z));
-						SetIsLanding(true);
-					}
-				}
-
+				CObjectX* pObjX = static_cast<CObjectX*>(pObj);//オブジェクトXにダウンキャスト
+				CCollision::ExtrusionCollisionSquarePushOutFirstDecide(this, pObjX);//正方形の押し出し判定のそれぞれの軸の順序の優先度を決める
 			}
-
 			//オブジェクトを次に進める
 			pObj = pNext;
 		}
-
 	}
+	//=======================================================================================
 
-
-	if (bCollisionX == true || bCollisionZ == true)
+	//============================================================
+	//押し出し判定開始
+	//============================================================
+	for (int nCntPri = 0; nCntPri < CObject::m_nMAXPRIORITY; nCntPri++)
 	{
-		m_bCollisionWall = true;
-	}
-	else
-	{
-		m_bCollisionWall = false;
-	}
+		CObject* pObj = CObject::GetTopObject(nCntPri);
 
-	SetExtrusionCollisionSquareX(bCollisionX);
-	SetExtrusionCollisionSquareY(bCollisionY);
-	SetExtrusionCollisionSquareZ(bCollisionZ);
+		while (pObj != nullptr)
+		{
+			//次のオブジェクトを格納
+			CObject* pNext = pObj->GetNextObject();
+
+			//種類の取得（敵なら当たり判定）
+			CObject::TYPE type = pObj->GetType();
+
+			if (type == CObject::TYPE::BLOCK || type == CObject::TYPE::BGMODEL)
+			{
+				CObjectX* pObjX = static_cast<CObjectX*>(pObj);//オブジェクトXにダウンキャスト
+
+				CCollision::ResolveExtrusionCollisionSquare(this, pObjX);//正方形の押し出し判定をする
+			}
+
+			pObj = pNext;
+		}
+	}
+	//=======================================================================================
 
 }
 //============================================================================================================================================

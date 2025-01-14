@@ -36,7 +36,7 @@ bool CObjectX::s_bCOMMON_DRAWSHADOW = true;
 //================================================
 CObjectX::CObjectX(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject(nPri, bUseintPri, type, ObjType)
 , m_ObjectXInfo(), m_nIndexObjectX(0), m_nManagerType(0), m_nObjXType(OBJECTXTYPE_BLOCK), m_fAxis(0.0f), m_VecAxis(D3DXVECTOR3(0.0f, 1.0f, 0.0f)),
-m_nTypeNum(0), m_PosInfo({}), m_DrawInfo({}), m_RotInfo({}), m_SizeInfo({}), m_MoveInfo({}), m_LifeInfo({})
+m_nTypeNum(0), m_PosInfo({}), m_DrawInfo({}), m_RotInfo({}), m_SizeInfo({}), m_MoveInfo({}), m_LifeInfo({}), m_CollisionInfo({})
 {
 	SetObjectType(CObject::OBJECTTYPE::OBJECTTYPE_X);
 }
@@ -81,7 +81,7 @@ void CObjectX::Uninit()
 
 	if (m_ObjectXInfo.FormarDiffuse != nullptr)
 	{
-		delete[] m_ObjectXInfo.FormarDiffuse;//色合いの動的メモリを開放
+		delete[] m_ObjectXInfo.FormarDiffuse;//元の色合いの動的メモリを開放
 		m_ObjectXInfo.FormarDiffuse = nullptr;
 	}
 
@@ -104,9 +104,6 @@ void CObjectX::Uninit()
 //================================================
 void CObjectX::Update()
 {
-
-	//m_fAxis += 0.01f;
-
 	//==============================================
 	//中心点を求める
 	//==============================================
@@ -142,7 +139,7 @@ void CObjectX::Update()
 	m_MoveInfo.AddSpeedProcess();                //加速処理
 	m_MoveInfo.GravityProcess();                 //重力処理
 
-	//UpdatePos();//位置の更新を行う
+	UpdatePos();//位置の更新を行う
 
 	CObject::Update();
 }
@@ -397,6 +394,12 @@ void CObjectX::UpdatePos()
 			m_MoveInfo.Move.z += (0.0f - m_MoveInfo.Move.z) * m_MoveInfo.fInertia;
 		}
 
+		if (GetType() == CObject::TYPE::ENEMY)
+		{
+			CManager::GetDebugText()->PrintDebugText("位置：%f %f %f\n", GetPosInfo().GetPos().x, GetPosInfo().GetPos().y, GetPosInfo().GetPos().z);
+			CManager::GetDebugText()->PrintDebugText("1f前の位置：%f %f %f\n", GetPosInfo().GetPosOld().x, GetPosInfo().GetPosOld().y, GetPosInfo().GetPosOld().z);
+			CManager::GetDebugText()->PrintDebugText("移動量：%f %f %f\n", GetMoveInfo().GetMove().x, GetMoveInfo().GetMove().y, GetMoveInfo().GetMove().z);
+		}
 		//位置の設定
 		GetPosInfo().SetPos(Pos + m_MoveInfo.Move);
 

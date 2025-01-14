@@ -497,6 +497,139 @@ bool CCollision::ExtrusionCollisionSquare(D3DXVECTOR3& MyPos, bool& bCollisionX,
 	}
 	return false;
 }
+//====================================================================================================================
+
+//==============================================================
+//正方形の全ての押し出し判定を解決する関数
+//==============================================================
+void CCollision::ResolveExtrusionCollisionSquare(CObjectX* pObjX, CObjectX* pComObjX)
+{
+	if (pObjX->GetCollisionInfo().GetSquareInfo().GetPushOutFlag(AXIS::X) == true)
+	{//X軸を先に判定（壁ずりで落ちていく時に引っ掛からないためにYは最後)
+		CCollision::NewExtrusionCollisionSquareX(pObjX, pComObjX);
+		CCollision::NewExtrusionCollisionSquareZ(pObjX, pComObjX);
+		CCollision::NewExtrusionCollisionSquareY(pObjX, pComObjX);
+	}
+	else if (pObjX->GetCollisionInfo().GetSquareInfo().GetPushOutFlag(AXIS::Z) == true)
+	{//Z軸を先に判定（壁ずりで落ちていく時に引っ掛からないためにYは最後)
+		CCollision::NewExtrusionCollisionSquareZ(pObjX, pComObjX);
+		CCollision::NewExtrusionCollisionSquareX(pObjX, pComObjX);
+		CCollision::NewExtrusionCollisionSquareY(pObjX, pComObjX);
+	}
+	else if (pObjX->GetCollisionInfo().GetSquareInfo().GetPushOutFlag(AXIS::Y) == true)
+	{//Y軸を先に判定（歩いている時にオブジェクト同士の境界で引っ掛からないため)
+		CCollision::NewExtrusionCollisionSquareY(pObjX, pComObjX);
+		if (pObjX->GetCollisionInfo().GetSquareInfo().GetPushOutFlag(AXIS::X) == true)
+		{//歩いている中でも横の壁づりで引っ掛からないために次にX軸を判定)
+			CCollision::NewExtrusionCollisionSquareX(pObjX, pComObjX);
+			CCollision::NewExtrusionCollisionSquareZ(pObjX, pComObjX);
+		}
+		else
+		{//歩いている中でも横の壁づりで引っ掛からないために次にZ軸を判定)
+			CCollision::NewExtrusionCollisionSquareZ(pObjX, pComObjX);
+			CCollision::NewExtrusionCollisionSquareX(pObjX, pComObjX);
+		}
+	}
+	else
+	{//どの軸も優先されないので普通に判定
+		CCollision::NewExtrusionCollisionSquareX(pObjX, pComObjX);
+		CCollision::NewExtrusionCollisionSquareY(pObjX, pComObjX);
+		CCollision::NewExtrusionCollisionSquareZ(pObjX, pComObjX);
+	}
+}
+//====================================================================================================================
+
+//==============================================================
+//正方形の押し出し判定のそれぞれの軸の優先度を決める
+//==============================================================
+void CCollision::ExtrusionCollisionSquarePushOutFirstDecide(CObjectX* pObjX, CObjectX* pComObjX)
+{
+	//*変数
+
+	//自分
+	const D3DXVECTOR3& MyPos = pObjX->GetPosInfo().GetPos();              //自分の位置
+	const D3DXVECTOR3& MyPosOld = pObjX->GetPosInfo().GetPosOld();        //自分の1f前の位置
+	const D3DXVECTOR3& MyMove = pObjX->GetMoveInfo().GetMove();           //自分の移動量
+	const D3DXVECTOR3& MyPosFuture = MyPos + MyMove;                      //自分の1f後の位置
+	const D3DXVECTOR3& MyVtxMax = pObjX->GetSizeInfo().GetVtxMax();       //自分の最大頂点
+	const D3DXVECTOR3& MyVtxMin = pObjX->GetSizeInfo().GetVtxMin();       //自分の最小頂点
+
+	//相手
+	const D3DXVECTOR3& ComPos = pComObjX->GetPosInfo().GetPos();          //相手の位置
+	const D3DXVECTOR3& ComVtxMax = pComObjX->GetSizeInfo().GetVtxMax();   //相手の最大頂点
+	const D3DXVECTOR3& ComVtxMin = pComObjX->GetSizeInfo().GetVtxMin();   //相手の最小頂点
+
+	//*処理開始
+
+	//上
+	if (MyPosFuture.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
+		&& MyPosFuture.x + MyVtxMin.x < ComPos.x + ComVtxMax.x
+		&& MyPosFuture.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
+		&& MyPosOld.y + MyVtxMin.y >= ComPos.y + ComVtxMax.y
+		&& MyPosFuture.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
+		&& MyPosFuture.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
+	{//1f後にオブジェクトに乗るなら
+		pObjX->GetCollisionInfo().GetSquareInfo().SetPushOutFirstFlag(AXIS::Y, true);
+		pObjX->GetCollisionInfo().GetSquareInfo().SetPushOutFirstFlag(AXIS::X, false);
+		pObjX->GetCollisionInfo().GetSquareInfo().SetPushOutFirstFlag(AXIS::Z, false);
+		pObjX->SetIsLanding(true);//地面に乗っているフラグをオンにする
+	}
+	//下
+	else if (MyPosFuture.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
+		&& MyPosFuture.x + MyVtxMin.x < ComPos.x + ComVtxMax.x
+		&& MyPosFuture.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
+		&& MyPosOld.y + MyVtxMax.y <= ComPos.y + ComVtxMin.y
+		&& MyPosFuture.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
+		&& MyPosFuture.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
+	{//1f後にオブジェクトの下に当たるなら
+		pObjX->GetCollisionInfo().GetSquareInfo().SetPushOutFirstFlag(AXIS::Y, true);
+		pObjX->GetCollisionInfo().GetSquareInfo().SetPushOutFirstFlag(AXIS::X, false);
+		pObjX->GetCollisionInfo().GetSquareInfo().SetPushOutFirstFlag(AXIS::Z, false);
+	}
+	if (MyPosFuture.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
+		&& MyPosOld.x + MyVtxMax.x <= ComPos.x + ComVtxMin.x
+		&& MyPosFuture.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
+		&& MyPosFuture.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
+		&& MyPosFuture.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
+		&& MyPosFuture.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
+	{//1f後にオブジェクトのX軸の右側に当たるなら
+		pObjX->GetCollisionInfo().GetSquareInfo().SetPushOutFirstFlag(AXIS::X, true);
+		pObjX->GetCollisionInfo().GetSquareInfo().SetPushOutFirstFlag(AXIS::Z, false);
+	}
+	else if (MyPosFuture.x + MyVtxMin.x < ComPos.x + ComVtxMax.x
+		&& MyPosOld.x + MyVtxMin.x >= ComPos.x + ComVtxMax.x
+		&& MyPosFuture.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
+		&& MyPosFuture.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
+		&& MyPosFuture.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
+		&& MyPosFuture.z + MyVtxMin.z < ComPos.z + ComVtxMax.z)
+	{//1f後にオブジェクトのX軸の左側に当たるなら
+		pObjX->GetCollisionInfo().GetSquareInfo().SetPushOutFirstFlag(AXIS::X, true);
+		pObjX->GetCollisionInfo().GetSquareInfo().SetPushOutFirstFlag(AXIS::Z, false);
+	}
+	//前
+	if (MyPosFuture.z + MyVtxMax.z > ComPos.z + ComVtxMin.z
+		&& MyPosOld.z + MyVtxMax.z <= ComPos.z + ComVtxMin.z
+		&& MyPosFuture.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
+		&& MyPosFuture.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
+		&& MyPosFuture.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
+		&& MyPosFuture.x + MyVtxMin.x < ComPos.x + ComVtxMax.x)
+	{//1f後にオブジェクトの手前側に当たるなら
+		pObjX->GetCollisionInfo().GetSquareInfo().SetPushOutFirstFlag(AXIS::Z, true);
+		pObjX->GetCollisionInfo().GetSquareInfo().SetPushOutFirstFlag(AXIS::X, false);
+	}
+	//奥
+	else if (MyPosFuture.z + MyVtxMin.z < ComPos.z + ComVtxMax.z
+		&& MyPosOld.z + MyVtxMin.z >= ComPos.z + ComVtxMax.z
+		&& MyPosFuture.y + MyVtxMax.y > ComPos.y + ComVtxMin.y
+		&& MyPosFuture.y + MyVtxMin.y < ComPos.y + ComVtxMax.y
+		&& MyPosFuture.x + MyVtxMax.x > ComPos.x + ComVtxMin.x
+		&& MyPosFuture.x + MyVtxMin.x < ComPos.x + ComVtxMax.x)
+	{//1f後にオブジェクトの奥側に当たるなら
+		pObjX->GetCollisionInfo().GetSquareInfo().SetPushOutFirstFlag(AXIS::Z, true);
+		pObjX->GetCollisionInfo().GetSquareInfo().SetPushOutFirstFlag(AXIS::X, false);
+	}
+}
+//====================================================================================================================
 
 //================================================================
 //新しい正方形の押し出し判定X
@@ -541,6 +674,7 @@ bool CCollision::NewExtrusionCollisionSquareX(CObjectX* pObjX, CObjectX* pComObj
 	}
 	return false;
 }
+//====================================================================================================================
 
 //================================================================
 //新しい正方形の押し出し判定Y

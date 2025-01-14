@@ -66,6 +66,8 @@ void CCharacter::Update()
 {
     CObjectX::Update();
 
+    CManager::GetDebugText()->PrintDebugText("重力を使用するかどうか：%d\n", GetMoveInfo().GetUseGravity());
+
     for (auto it : m_VecModelParts)
     {
         it->ExtraUpdate();//それぞれのモデルパーツの更新処理を呼ぶ

@@ -295,6 +295,7 @@ public:
 		//=================================================================================================================
 	};
 
+	//体力構造体
 	struct LifeInfo
 	{
 		//*変数
@@ -347,6 +348,48 @@ public:
 
 		//体力が０になったら自動的に死亡フラグを発動する処理
 		void AutoDeathProcess(CObjectX* pObjX);
+	};
+
+	//当たり判定構造体
+	struct CollisionInfo
+	{
+		//正方形
+		struct Square
+		{
+			//変数
+			bool bPushOutFirst[static_cast<int>(AXIS::MAX)] = {};                  
+
+			//関数
+			void ResetPushOutFirstFlag() //それぞれの軸の判定を優先するフラグをリセットする
+			{
+				for (int nCnt = 0; nCnt < static_cast<int>(AXIS::MAX); nCnt++)
+				{
+					bPushOutFirst[nCnt] = false;
+				}
+			}
+			void SetPushOutFirstFlag(AXIS Axis,bool bFlag)//それぞれの軸の判定を優先するかどうかを設定
+			{
+				bPushOutFirst[static_cast<int>(Axis)] = bFlag;
+			}
+			const bool& GetPushOutFlag(AXIS Axis)//それぞれの軸の判定を優先するかどうかを取得
+			{ 
+				return bPushOutFirst[static_cast<int>(Axis)];
+			}
+		};
+
+		//状態
+		struct State
+		{
+			bool bIsLanding = false;                     //地面にいるかどうか
+		};
+
+		//変数
+		State StateInfo = {};                            //判定状態
+		Square SquareInfo = {};                          //正方形の当たり判定
+
+		//関数
+		State & GetState() { return StateInfo; }         //判定状態の取得
+		Square & GetSquareInfo() { return SquareInfo; }  //正方形の判定情報の取得
 	};
 
 
@@ -450,6 +493,9 @@ public:
 	//体力情報の取得
 	LifeInfo& GetLifeInfo() { return m_LifeInfo; }
 
+	//当たり判定情報の取得
+	CollisionInfo& GetCollisionInfo() { return m_CollisionInfo; }
+
 	//=================================================================================================================
 
 	//==========================================================
@@ -527,12 +573,13 @@ private:
 	//===================================
 	//各構造体
 	//===================================
-	DrawInfo m_DrawInfo;   //描画情報
-	PosInfo m_PosInfo;     //位置情報
-	RotInfo m_RotInfo;     //向き情報
-	SizeInfo m_SizeInfo;   //サイズ情報
-	MoveInfo m_MoveInfo;   //移動量情報
-	LifeInfo m_LifeInfo;   //体力情報
+	DrawInfo m_DrawInfo;           //描画情報
+	PosInfo m_PosInfo;             //位置情報
+	RotInfo m_RotInfo;             //向き情報
+	SizeInfo m_SizeInfo;           //サイズ情報
+	MoveInfo m_MoveInfo;           //移動量情報
+	LifeInfo m_LifeInfo;           //体力情報
+	CollisionInfo m_CollisionInfo; //当たり判定情報
 	//==================================================================================================================
 
 	//===================================
