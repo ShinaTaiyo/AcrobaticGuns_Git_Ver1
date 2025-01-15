@@ -71,7 +71,7 @@ HRESULT CSound::InitSound(HWND hWnd)
 
 		return E_FAIL;
 	}
-
+	
 	// サウンドデータの初期化
 	for (int nCntSound = 0; nCntSound < SOUND_LABEL_MAX; nCntSound++)
 	{
@@ -178,6 +178,7 @@ HRESULT CSound::InitSound(HWND hWnd)
 //================================================
 void CSound::UninitSound(void)
 {
+
 	// 一時停止
 	for (int nCntSound = 0; nCntSound < SOUND_LABEL_MAX; nCntSound++)
 	{

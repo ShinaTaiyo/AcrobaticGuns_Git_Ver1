@@ -113,18 +113,7 @@ void CObjectX::Update()
 	m_SizeInfo.MultiScaleProcess();//拡大率乗算処理
 	m_SizeInfo.DecideVtxMaxMinProcess();//頂点の最大最小を決める処理
 
-	if (m_DrawInfo.bColorChenge == true)
-	{
-		m_DrawInfo.nChengeColorTime--;
-	}
-
-	if (m_DrawInfo.nChengeColorTime <= 0 && m_DrawInfo.bColorChenge == true )
-	{
-		m_DrawInfo.nChengeColorTime = 0;
-		SetFormarColor();//元の色合いに戻す
-		m_DrawInfo.bColorChenge = false;
-	}
-
+	m_DrawInfo.ChengeColorProcess(this);//色を変える処理
 	if (m_RotInfo.bUseAddRot == true)
 	{//向きの加算処理
 		m_RotInfo.Rot += m_RotInfo.AddRot;
@@ -200,7 +189,6 @@ void CObjectX::Draw()
 	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
 	pDevice->SetRenderState(D3DRS_ALPHAREF,50);
 	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
-
 
 	//法線の長さを１にする。（スケールなどを使った時は、必ず使う。)
 	pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);
@@ -1071,6 +1059,25 @@ void CObjectX::LifeInfo::AutoDeathProcess(CObjectX* pObjX)
 	if (nLife < 1 && bAutoDeath == true)
 	{
 		pObjX->SetDeath();
+	}
+}
+//================================================================================================================================================
+
+//==============================================
+//自動的に死亡フラグを発動する処理
+//==============================================
+void CObjectX::DrawInfo::ChengeColorProcess(CObjectX* pObjX)
+{
+	if (bColorChenge == true)
+	{
+		nChengeColorTime--;
+	}
+
+	if (nChengeColorTime <= 0 && bColorChenge == true)
+	{
+		nChengeColorTime = 0;
+		pObjX->SetFormarColor();//元の色合いに戻す
+		bColorChenge = false;
 	}
 }
 //================================================================================================================================================

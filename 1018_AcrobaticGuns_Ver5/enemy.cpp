@@ -126,6 +126,8 @@ void CEnemy::Update()
 
 	if (CScene::GetMode() == CScene::MODE_EDIT)
 	{
+		GetDrawInfo().ChengeColorProcess(this);
+
 		for (auto it : m_VecMoveAi)
 		{
 			if (it->GetDrawInfo().GetUseDraw())
@@ -388,6 +390,11 @@ void CEnemy::ManagerChooseControlInfo()
 		it->GetDrawInfo().SetUseDraw(true);
 	}
 
+	if (CObject::GetType() == CObject::TYPE::ENEMY)
+	{
+		CManager::GetDebugText()->PrintDebugText("敵が呼ばれている！\n");
+	}
+
 	SetMoveAiPoint();//移動AIの設定を行う
 
 	PhaseNumDecision();//フェーズ番号の決定を行う
@@ -395,6 +402,7 @@ void CEnemy::ManagerChooseControlInfo()
 	EditNormalSpeed();//通常移動速度を編集
 
 	EditSensingRange();//索敵範囲を編集
+
 	CObjectX::ManagerChooseControlInfo();
 }
 //============================================================================================================================================

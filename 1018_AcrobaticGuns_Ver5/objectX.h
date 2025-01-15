@@ -106,6 +106,9 @@ public:
 		//カリングするかどうか
 		void SetUseCulling(bool bUse) { bUseCulling = bUse; }
 
+		//色を指定時間変え続ける処理
+		void ChengeColorProcess(CObjectX * pObjX);
+
         //ワールド変換行列
 		void SetMtxParent(D3DXMATRIX* pCopyMtxParent) {pMtxParent = pCopyMtxParent; }              //親マトリックスを取得                   
 		D3DXMATRIX& GetMatrixWorld() { return mtxWorld; }                     //ワールド変換行列の取得
