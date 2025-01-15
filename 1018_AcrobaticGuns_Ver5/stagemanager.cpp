@@ -485,7 +485,7 @@ void CStageManager::ResetScale()
 //===========================================================
 CStageManagerState_NewObject::CStageManagerState_NewObject() : m_pManagerObject(nullptr)
 {
-	m_pManagerObject = CBlock::Create(CBlock::BLOCKTYPE::NORMAL, 1, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f),false);
+	m_pManagerObject = CBlock::Create(CBlock::BLOCKTYPE::NORMAL,10, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f),false);
 	m_pManagerObject->SetUseDeath(false);
 }
 //=======================================================================================================================

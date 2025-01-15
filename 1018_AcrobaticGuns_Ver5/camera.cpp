@@ -230,7 +230,7 @@ void CCamera::NormalCameraMove()
 	switch (CScene::GetMode())
 	{
 	case CScene::MODE_TITLE:
-		m_PosR = CTitle::GetPlayer()->GetPosInfo().GetSenterPos() + D3DXVECTOR3(0.0f,50.0f,0.0f);
+		m_PosR = CTitle::GetPlayer()->GetPosInfo().GetPos() + D3DXVECTOR3(0.0f,50.0f,0.0f);
 		m_PosV = m_PosR + RotVec * m_fLength;
 		break;
 	case CScene::MODE_GAME:
@@ -254,32 +254,36 @@ void CCamera::NormalCameraMove()
 //====================================================================
 void CCamera::MakeTransparent()
 {
-	D3DXVECTOR3 Ray = m_PosR - m_PosV;
-	D3DXVec3Normalize(&Ray, &Ray);
-	D3DXVECTOR3 RayCollisionPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	float fLength = 0.0f;//レイが当たった場所の距離
-	for (int nCntPri = 0; nCntPri < CObject::m_nMAXPRIORITY; nCntPri++)
+	if (CScene::GetMode() == CScene::MODE_EDIT)
 	{
-		CObject* pObj = CObject::GetTopObject(nCntPri);
-
-		while (pObj != nullptr)
+		D3DXVECTOR3 Ray = m_PosR - m_PosV;
+		D3DXVec3Normalize(&Ray, &Ray);
+		D3DXVECTOR3 RayCollisionPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		float fLength = 0.0f;//レイが当たった場所の距離
+		for (int nCntPri = 0; nCntPri < CObject::m_nMAXPRIORITY; nCntPri++)
 		{
-			CObject* pNext = pObj->GetNextObject();
-			if (pObj->GetObjectType() == CObject::OBJECTTYPE::OBJECTTYPE_X && pObj->GetType() != CObject::TYPE::PLAYER && pObj->GetType() != CObject::TYPE::ENEMY)
-			{
-				CObjectX* pObjX = static_cast<CObjectX*>(pObj);//オブジェクトXの機能を使う
-				if (CCollision::RayIntersectsAABBCollisionPos(m_PosV, Ray, pObjX->GetPosInfo().GetPos() + pObjX->GetSizeInfo().GetVtxMin(), pObjX->GetPosInfo().GetPos() + pObjX->GetSizeInfo().GetVtxMax(), RayCollisionPos))
-				{
-					fLength = CCalculation::CalculationLength(m_PosV,RayCollisionPos);
+			CObject* pObj = CObject::GetTopObject(nCntPri);
 
-					if (m_fLength > fLength)
-					{//カメラの距離よりもオブジェクトとレイが当たった位置が近い場合は透明にする
-						pObjX->SetColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.5f), 3, true, true);
+			while (pObj != nullptr)
+			{
+				CObject* pNext = pObj->GetNextObject();
+				if (pObj->GetObjectType() == CObject::OBJECTTYPE::OBJECTTYPE_X && pObj->GetType() != CObject::TYPE::PLAYER && pObj->GetType() != CObject::TYPE::ENEMY &&
+					pObj->GetType() != CObject::TYPE::MODELPARTS)
+				{
+					CObjectX* pObjX = static_cast<CObjectX*>(pObj);//オブジェクトXの機能を使う
+					if (CCollision::RayIntersectsAABBCollisionPos(m_PosV, Ray, pObjX->GetPosInfo().GetPos() + pObjX->GetSizeInfo().GetVtxMin(), pObjX->GetPosInfo().GetPos() + pObjX->GetSizeInfo().GetVtxMax(), RayCollisionPos))
+					{
+						fLength = CCalculation::CalculationLength(m_PosV, RayCollisionPos);
+
+						if (m_fLength > fLength)
+						{//カメラの距離よりもオブジェクトとレイが当たった位置が近い場合は透明にする
+							pObjX->SetColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.5f), 3, true, true);
+						}
 					}
 				}
-			}
 
-			pObj = pNext;//リストを進める
+				pObj = pNext;//リストを進める
+			}
 		}
 	}
 }

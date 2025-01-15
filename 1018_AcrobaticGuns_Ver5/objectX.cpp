@@ -205,7 +205,7 @@ void CObjectX::Draw()
 	//法線の長さを１にする。（スケールなどを使った時は、必ず使う。)
 	pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);
 
-	if (m_DrawInfo.Color.a < 1.0f)
+	if (m_DrawInfo.Color.a < 1.0f && CScene::GetMode() == CScene::MODE_GAME)
 	{
 		//Zバッファに書き込まない
 		pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
@@ -220,8 +220,8 @@ void CObjectX::Draw()
 
 	if (m_DrawInfo.bUseDraw == true)
 	{
-	//マテリアルへのポインタを取得
-	pMat = (D3DXMATERIAL*)m_ObjectXInfo.pBuffMat->GetBufferPointer();
+	    //マテリアルへのポインタを取得
+	    pMat = (D3DXMATERIAL*)m_ObjectXInfo.pBuffMat->GetBufferPointer();
 
 		//==========================================================================
 		//マテリアルの数分、テクスチャを読み込む。

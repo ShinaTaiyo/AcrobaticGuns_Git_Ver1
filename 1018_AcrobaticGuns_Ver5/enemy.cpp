@@ -959,13 +959,11 @@ void CShotWeakEnemy::Uninit()
 void CShotWeakEnemy::Update()
 {
 	CEnemy::Update();
-
-	if (CScene::GetMode() == CScene::MODE_GAME)
+	if (m_pMagicSword != nullptr)
 	{
 		m_pMagicSword->GetPosInfo().SetPos(GetPosInfo().GetPos());
-
-		SwordCollision();//剣の当たり判定を行う
 	}
+	SwordCollision();//剣の当たり判定を行う
 }
 //============================================================================================================================================
 
@@ -1023,7 +1021,10 @@ CShotWeakEnemy* CShotWeakEnemy::Create(SHOTWEAKENEMYTYPE Type, int nLife, int nP
 	pShotWeakEnemy->SetSensingRange(1250.0f);//感知射程
 	pShotWeakEnemy->SetNormalSpeed(10.0f);//通常移動速度
 	pShotWeakEnemy->GetMoveInfo().SetUseInteria(false, GetNormalInertia());
-	pShotWeakEnemy->m_pMagicSword->GetSizeInfo().SetScale(Scale * 0.5f);
+	if (CScene::GetMode() == CScene::MODE_GAME)
+	{//ゲームモードの時だけ剣を出す
+		pShotWeakEnemy->m_pMagicSword->GetSizeInfo().SetScale(Scale * 0.5f);
+	}
 	pShotWeakEnemy->GetLifeInfo().SetAutoDeath(true);
 
 	pShotWeakEnemy->SetSize();//モデルサイズを設定
@@ -1352,15 +1353,19 @@ void CShotWeakEnemy::AttackProcess()
 //====================================================================================
 void CShotWeakEnemy::SwordCollision()
 {
-	if (CCollision::RectAngleCollisionXZ(m_pMagicSword,CGame::GetPlayer()))
+	if (m_pMagicSword != nullptr && CGame::GetPlayer() != nullptr)
 	{
-		D3DXVECTOR3 Aim = D3DXVECTOR3(CGame::GetPlayer()->GetPosInfo().GetPos().x,0.0f,CGame::GetPlayer()->GetPosInfo().GetPos().z) - D3DXVECTOR3(GetPosInfo().GetPos().x, 0.0f, GetPosInfo().GetPos().z);
 
-		CGame::GetPlayer()->SetDamage(5, 45);
+		if (CCollision::RectAngleCollisionXZ(m_pMagicSword, CGame::GetPlayer()))
+		{
+			D3DXVECTOR3 Aim = D3DXVECTOR3(CGame::GetPlayer()->GetPosInfo().GetPos().x, 0.0f, CGame::GetPlayer()->GetPosInfo().GetPos().z) - D3DXVECTOR3(GetPosInfo().GetPos().x, 0.0f, GetPosInfo().GetPos().z);
 
-		D3DXVec3Normalize(&Aim, &Aim);
+			CGame::GetPlayer()->SetDamage(5, 45);
 
-		CGame::GetPlayer()->ChengeAbnormalState(DBG_NEW CPlayerAbnormalState_KnockBack(CGame::GetPlayer(), Aim * 100.0f, 0.1f));
+			D3DXVec3Normalize(&Aim, &Aim);
+
+			CGame::GetPlayer()->ChengeAbnormalState(DBG_NEW CPlayerAbnormalState_KnockBack(CGame::GetPlayer(), Aim * 100.0f, 0.1f));
+		}
 	}
 }
 //============================================================================================================================================
