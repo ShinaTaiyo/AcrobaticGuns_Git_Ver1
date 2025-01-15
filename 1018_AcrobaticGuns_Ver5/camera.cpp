@@ -470,8 +470,11 @@ void CCameraState_Normal::Process(CCamera* pCamera)
 		{
 			CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::CAMERACONTROLL);
 		}
-		CManager::GetCamera()->SetRot(pCamera->GetRot() + D3DXVECTOR3(cosf(fAngle) * 0.06f,
-			sinf(fAngle) * 0.06f, 0.0f));
+		if (CScene::GetMode() != CScene::MODE_TITLE)
+		{//タイトルではEnterしか押さないので、タイトルではマウスでカメラを動かさない
+			CManager::GetCamera()->SetRot(pCamera->GetRot() + D3DXVECTOR3(cosf(fAngle) * 0.06f,
+				sinf(fAngle) * 0.06f, 0.0f));
+		}
 	}
 
 	//===========================

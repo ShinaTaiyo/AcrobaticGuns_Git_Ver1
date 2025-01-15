@@ -556,14 +556,6 @@ CPlayerEffect_Dive::~CPlayerEffect_Dive()
 //=====================================================================================================
 void CPlayerEffect_Dive::EffectProcess(CPlayer* pPlayer)
 {
-	CMeshOrbit* pMeshOrbit = pPlayer->GetMeshOrbit();
-
-	//c‚ÉƒƒbƒVƒ…‚Ì‹OÕ‚ð“WŠJ
-	pMeshOrbit->SetPos1(pPlayer->GetPosInfo().GetPos());
-	pMeshOrbit->SetPos2(pPlayer->GetPosInfo().GetPos() + D3DXVECTOR3(0.0f, pPlayer->GetSizeInfo().GetVtxMax().y, 0.0f));
-
-	//Œ»Ý‚ÌˆÊ’u‚ÉƒVƒŠƒ“ƒ_[‚ð“WŠJ
-	//pWire->SetPos(pPlayer->GetPos());
 
 }
 //======================================================================================================================================================

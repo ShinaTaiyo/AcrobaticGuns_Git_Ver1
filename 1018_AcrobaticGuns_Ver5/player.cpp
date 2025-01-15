@@ -44,7 +44,6 @@ const int CPlayer::s_nNORMAL_MAXLIFE = 100;
 CPlayer::CPlayer(CPlayerMove* pPlayerMove, CPlayerAttack* pPlayerAttack, CPlayerEffect* pPlayerEffect, CPlayerWireShot* pPlayerWireShot,
     int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CCharacter(nPri, bUseintPri, type, ObjType)
     , m_pMove(pPlayerMove), m_pAttack(pPlayerAttack), m_pEffect(pPlayerEffect), m_pWireShot(pPlayerWireShot),
-    m_pMeshOrbit(nullptr),
     m_fRotAim(0.0f), m_pLockOn(nullptr), m_NowActionMode(ACTIONMODE::SHOT), m_pModeDisp(nullptr), m_bCollision(false),m_pWire(nullptr),
     m_pHpGauge(nullptr),m_pAbnormalState(DBG_NEW CPlayerAbnormalState()),m_pDiveGauge(nullptr), m_pDivePossibleNum(nullptr),m_bDamage(false)
 {
@@ -77,9 +76,6 @@ HRESULT CPlayer::Init()
         m_pLockOn->SetUseDeath(false);
         m_pLockOn->SetPolygonRotSpeed(0.01f);
 
-        m_pMeshOrbit = CMeshOrbit::Create(CMeshOrbit::MESHORBITTYPE::DEATHENAGA);
-        m_pMeshOrbit->SetUseDeath(false);
-
         m_pModeDisp = CUi::Create(CUi::UITYPE::ACTIONMODE_GUN, CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, 1, false, D3DXVECTOR3(50.0f, 50.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
             D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
         m_pModeDisp->SetUseDeath(false);
@@ -95,7 +91,7 @@ HRESULT CPlayer::Init()
         m_pDivePossibleNum->SetNumericState(0, 50.0f, 50.0f);
         m_pDivePossibleNum->SetUseDeath(false);
 
-        m_pWire = CWire::Create(CWire::WIRETYPE::NORMAL, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 15.0f, 20.0f, 4, 5);
+        m_pWire = CWire::Create(CWire::WIRETYPE::ROPE, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 15.0f, 20.0f, 4, 5);
         m_pWire->SetUseDeath(false);
         m_pWire->SetPlayerPointer(this);//プレイヤーのポインタを設定
         m_pWire->SetUseDraw(false);
@@ -227,13 +223,6 @@ void CPlayer::SetDeath()
             m_pModeDisp->SetUseDeath(true);
             m_pModeDisp->SetDeath();
             m_pModeDisp = nullptr;
-        }
-
-        if (m_pMeshOrbit != nullptr)
-        {
-            m_pMeshOrbit->SetUseDeath(true);
-            m_pMeshOrbit->SetDeath();
-            m_pMeshOrbit = nullptr;
         }
 
         if (m_pWire != nullptr)

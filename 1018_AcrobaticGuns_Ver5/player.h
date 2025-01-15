@@ -54,7 +54,6 @@ public:
 	//================================================
 	//メッシュ
 	//================================================
-	CMeshOrbit* GetMeshOrbit() { return m_pMeshOrbit; }//軌跡を取得
 	CWire* GetWire() { return m_pWire; }//ワイヤーを取得
 	//===============================================================================================
 
@@ -116,7 +115,6 @@ private:
 	CLockon* m_pLockOn;                 //ロックオンカーソル
 	ACTIONMODE m_NowActionMode;         //現在のアクションモード
 	CUi* m_pModeDisp;                   //モード表示UI
-	CMeshOrbit* m_pMeshOrbit;           //軌跡
 	CWire* m_pWire;                     //ワイヤー
 	CGauge* m_pHpGauge;                 //体力ゲージ
 	CGauge* m_pDiveGauge;               //ダイブゲージ

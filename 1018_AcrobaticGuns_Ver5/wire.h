@@ -27,6 +27,7 @@ public:
 	enum class WIRETYPE
 	{
 		NORMAL = 0,
+		ROPE,
 		MAX
 	};
 
