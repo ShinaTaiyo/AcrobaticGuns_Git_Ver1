@@ -218,11 +218,11 @@ void CObjectX::Draw()
 	}
 	//================================================================================================================
 
+	if (m_DrawInfo.bUseDraw == true)
+	{
 	//マテリアルへのポインタを取得
 	pMat = (D3DXMATERIAL*)m_ObjectXInfo.pBuffMat->GetBufferPointer();
 
-	if (m_DrawInfo.bUseDraw == true)
-	{
 		//==========================================================================
 		//マテリアルの数分、テクスチャを読み込む。
 		//==========================================================================
@@ -875,28 +875,32 @@ void CObjectX::DrawShadow()
 	pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);
 	//================================================================================================================
 
-	//マテリアルへのポインタを取得
-	pMat = (D3DXMATERIAL*)m_ObjectXInfo.pBuffMat->GetBufferPointer();
-
-	//==========================================================================
-	//マテリアルの数分、テクスチャを読み込む。
-	//==========================================================================
-	for (int nCntMat = 0; nCntMat < (int)m_ObjectXInfo.dwNumMat; nCntMat++)
+	if (GetDrawInfo().GetUseDraw() == true)
 	{
-		//色合いの設定
-		pMat[nCntMat].MatD3D.Diffuse = D3DXCOLOR(0.0f,0.0f,0.0f,m_ObjectXInfo.Diffuse[nCntMat].a);
+		CObject::TYPE Type = GetType();
 
-		//マテリアルの設定
-		pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+		//マテリアルへのポインタを取得
+		pMat = (D3DXMATERIAL*)m_ObjectXInfo.pBuffMat->GetBufferPointer();
 
-		//テクスチャを設定する
-		pDevice->SetTexture(0,NULL);
+		//==========================================================================
+		//マテリアルの数分、テクスチャを読み込む。
+		//==========================================================================
+		for (int nCntMat = 0; nCntMat < (int)m_ObjectXInfo.dwNumMat; nCntMat++)
+		{
+			//色合いの設定
+			pMat[nCntMat].MatD3D.Diffuse = D3DXCOLOR(0.0f, 0.0f, 0.0f, m_ObjectXInfo.Diffuse[nCntMat].a);
 
-		//モデル（パーツ）の描画
-		m_ObjectXInfo.pMesh->DrawSubset(nCntMat);
+			//マテリアルの設定
+			pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+
+			//テクスチャを設定する
+			pDevice->SetTexture(0, NULL);
+
+			//モデル（パーツ）の描画
+			m_ObjectXInfo.pMesh->DrawSubset(nCntMat);
+		}
+		//================================================================================================================
 	}
-	//================================================================================================================
-
 	//=======================================
 	//描画の調整を元に戻す
 	//=======================================

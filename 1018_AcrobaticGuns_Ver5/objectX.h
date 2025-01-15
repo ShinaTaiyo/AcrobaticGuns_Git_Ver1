@@ -145,6 +145,9 @@ public:
 		void SetPosFuture(D3DXVECTOR3 CopyPosFuture) { PosFuture = CopyPosFuture; }           //1f後の位置を設定する
 		const D3DXVECTOR3& GetPosFuture() const { return PosFuture; }                         //1f後の位置を取得する
 
+		//ワールド座標
+		const D3DXVECTOR3& GetWorldPos() const { return WorldPos; }                           //ワールド座標を取得する
+
 		//============================================================================================================
 	};
 
@@ -431,7 +434,7 @@ public:
 	//サイズ
 	//==========================================================
 	void CalculateSenterPos();
-	void SetSize();                                                                         //サイズを設定する 
+	virtual void SetSize();                                                                         //サイズを設定する 
 	//============================================================================================================
 
 	//==========================================================

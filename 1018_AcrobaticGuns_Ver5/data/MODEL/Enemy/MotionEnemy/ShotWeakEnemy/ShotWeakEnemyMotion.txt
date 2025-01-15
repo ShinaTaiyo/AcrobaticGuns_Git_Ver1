@@ -14,17 +14,17 @@ NUM_MODEL = 11
 #------------------------------------------------------------------------------
 # モデルファイル名
 #------------------------------------------------------------------------------
-MODEL_FILENAME = data/MODEL/ShotWeakEnemy/Parts/00_Body.x		# [0]体
-MODEL_FILENAME = data/MODEL/ShotWeakEnemy/Parts/01_Face.x		# [1]頭
-MODEL_FILENAME = data/MODEL/ShotWeakEnemy/Parts/02_LeftArm.x    # [2]左腕
-MODEL_FILENAME = data/MODEL/ShotWeakEnemy/Parts/03_LeftHand.x   # [3]左手
-MODEL_FILENAME = data/MODEL/ShotWeakEnemy/Parts/04_RightArm.x   # [4]右腕
-MODEL_FILENAME = data/MODEL/ShotWeakEnemy/Parts/05_RightHand.x  # [5]右手
-MODEL_FILENAME = data/MODEL/ShotWeakEnemy/Parts/06_LeftKnee.x   # [6]左膝
-MODEL_FILENAME = data/MODEL/ShotWeakEnemy/Parts/07_LeftFoot.x   # [7]左足
-MODEL_FILENAME = data/MODEL/ShotWeakEnemy/Parts/08_RightKnee.x  # [8]右膝
-MODEL_FILENAME = data/MODEL/ShotWeakEnemy/Parts/09_RightFoot.x  # [9]右足
-MODEL_FILENAME = data/MODEL/ShotWeakEnemy/Parts/10_Sword.x      # [10]剣
+MODEL_FILENAME = data/MODEL/Enemy/MotionEnemy/ShotWeakEnemy/Parts/00_Body.x		# [0]体
+MODEL_FILENAME = data/MODEL/Enemy/MotionEnemy/ShotWeakEnemy/Parts/01_Face.x		# [1]頭
+MODEL_FILENAME = data/MODEL/Enemy/MotionEnemy/ShotWeakEnemy/Parts/02_LeftArm.x    # [2]左腕
+MODEL_FILENAME = data/MODEL/Enemy/MotionEnemy/ShotWeakEnemy/Parts/03_LeftHand.x   # [3]左手
+MODEL_FILENAME = data/MODEL/Enemy/MotionEnemy/ShotWeakEnemy/Parts/04_RightArm.x   # [4]右腕
+MODEL_FILENAME = data/MODEL/Enemy/MotionEnemy/ShotWeakEnemy/Parts/05_RightHand.x  # [5]右手
+MODEL_FILENAME = data/MODEL/Enemy/MotionEnemy/ShotWeakEnemy/Parts/06_LeftKnee.x   # [6]左膝
+MODEL_FILENAME = data/MODEL/Enemy/MotionEnemy/ShotWeakEnemy/Parts/07_LeftFoot.x   # [7]左足
+MODEL_FILENAME = data/MODEL/Enemy/MotionEnemy/ShotWeakEnemy/Parts/08_RightKnee.x  # [8]右膝
+MODEL_FILENAME = data/MODEL/Enemy/MotionEnemy/ShotWeakEnemy/Parts/09_RightFoot.x  # [9]右足
+MODEL_FILENAME = data/MODEL/Enemy/MotionEnemy/ShotWeakEnemy/Parts/10_Sword.x      # [10]剣
 
 #------------------------------------------------------------------------------
 # キャラクター情報

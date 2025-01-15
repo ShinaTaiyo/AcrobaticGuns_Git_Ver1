@@ -38,7 +38,7 @@ int CEnemy::m_nNumEnemy = 0;
 CEnemy::CEnemy(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectX(nPri, bUseintPri, type, ObjType),
 m_Type(ENEMYTYPE::SHOTWEAK), m_VecMoveAi(), m_MoveAiSavePos(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),m_nCntTime(0),m_nIdxMoveAi(0), m_nPhaseNum(0),m_pEnemyMove(DBG_NEW CEnemyMove_AI()),
 m_fRotMove(0.0f),m_fSensingRange(0.0f),m_fNormalSpeed(0.0f),m_Pattern(),m_bCollisoinDetection(true),m_bActivateCollisionDetection(false),m_bCollisionWall(false),
-m_DefeatAttackType(CAttack::ATTACKTYPE::EXPLOSION)
+m_DefeatAttackType(CAttack::ATTACKTYPE::EXPLOSION),m_nAttackCoolTime(0),m_bPossibleAttack(true),m_State(CEnemy::STATE::NORMAL)
 {
 	m_nNumEnemy++;//敵総数カウントアップ
 }
@@ -95,21 +95,27 @@ void CEnemy::Update()
 		//SetRot(D3DXVECTOR3(fElevaRot, atan2f(PlayerPos.x - Pos.x, PlayerPos.z - Pos.z) + D3DX_PI,0.0f));
 
 		float fLength = CCalculation::CalculationLength(Pos, PlayerPos);
-		m_pEnemyMove->Process(this);
 
 		m_nCntTime++;//時間をカウントする
+		m_nAttackCoolTime++;//クールタイムをカウントする
 
 		if (GetLanding() == true)
 		{
-			GetMoveInfo().SetMove(D3DXVECTOR3(GetMoveInfo().GetMove().x, -0.1f, GetMoveInfo().GetMove().z));
+			GetMoveInfo().SetMove(D3DXVECTOR3(GetMoveInfo().GetMove().x,0.0f, GetMoveInfo().GetMove().z));
 		}
-		AttackProcess();//攻撃処理
 
-		CObjectX::Update();
+		m_pEnemyMove->Process(this);
 
-	    CollisionProcess();//当たり判定処理
+		if (m_bPossibleAttack == true)
+		{
+			AttackProcess();//攻撃処理
+		}
 
 		CollisionDetectionProcess();
+
+	    CObjectX::Update();
+
+	    CollisionProcess();//当たり判定処理
 
 		if (GetPosInfo().GetPos().y < -100.0f)
 		{
@@ -706,6 +712,21 @@ void CEnemy::RayCollision()
 }
 //============================================================================================================================================
 
+//====================================================================================
+//攻撃パターンを終了する
+//====================================================================================
+void CEnemy::EndAttackPattern()
+{
+	m_Pattern.nPattern = 0;
+	m_Pattern.nPatternTime = 0; 
+	m_Pattern.bAction = false;
+	m_Pattern.nSubPattern = 0;
+	m_nAttackCoolTime = 0;
+	GetMoveInfo().SetUseGravity(true, GetNormalGravity());
+	GetMoveInfo().SetUseInteria(true, GetNormalInertia());
+}
+//============================================================================================================================================
+
 
 //====================================================================================
 //フェーズ番号を決定する
@@ -770,8 +791,7 @@ void CEnemy::CollisionDetectionProcess()
 						GetPosInfo().GetPos().y + GetSizeInfo().GetVtxMax().y >= pObjX->GetPosInfo().GetPos().y + pObjX->GetSizeInfo().GetVtxMin().y &&
 						GetPosInfo().GetPos().y + GetSizeInfo().GetVtxMin().y <= pObjX->GetPosInfo().GetPos().y + pObjX->GetSizeInfo().GetVtxMax().y)
 					{
-						GetMoveInfo().SetMove(-AimVec * (fTotalLength - fLength) + GetMoveInfo().GetMove());//攻撃時の動きよりも優先的にこの移動量を割り当てる
-						break;
+						GetMoveInfo().SetMove(D3DXVECTOR3(GetMoveInfo().GetMove().x -AimVec.x * (fTotalLength - fLength) * 1.0f,GetMoveInfo().GetMove().y, GetMoveInfo().GetMove().z - AimVec.z * (fTotalLength - fLength) * 1.0f));//攻撃時の動きよりも優先的にこの移動量を割り当てる
 					}
 				}
 			}
@@ -881,7 +901,7 @@ const int CShotWeakEnemy::s_nATTACK_COOLTIME = 60;//攻撃のクールタイム
 //コンストラクタ
 //====================================================================================
 CShotWeakEnemy::CShotWeakEnemy(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CEnemy(nPri,bUseintPri,type,ObjType),
-m_ShotWeakEnemyType(SHOTWEAKENEMYTYPE::NORMAL),m_pMagicSword(nullptr), m_SaveAimPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_nAttackCoolTime(0)
+m_ShotWeakEnemyType(SHOTWEAKENEMYTYPE::NORMAL),m_pMagicSword(nullptr), m_SaveAimPos(D3DXVECTOR3(0.0f,0.0f,0.0f))
 {
 
 }
@@ -904,11 +924,21 @@ HRESULT CShotWeakEnemy::Init()
 	CEnemy::Init();
 
 	float fRatioRot = static_cast<float>(rand() % 200 - 100) / 100;
-	float fRotSpeed = static_cast<float>(rand() % 40 - 20) / 100;
+	bool bAim = rand() % 2;
 	m_pMagicSword = CAttackEnemy::Create(CAttack::ATTACKTYPE::MAGICSWORD, CAttack::TARGETTYPE::PLAYER, CAttack::COLLISIONTYPE::RECTANGLE_XZ,
 		false,false,1, 60, 200, GetPosInfo().GetPos(), D3DXVECTOR3(0.0f,D3DX_PI * fRatioRot, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 	m_pMagicSword->SetUseDeath(false);
-	m_pMagicSword->GetRotInfo().SetUseAddRot(true,D3DXVECTOR3(0.0f,fRotSpeed, 0.0f));
+
+	//剣を回す方向を決める
+	if (bAim == false)
+	{
+		m_pMagicSword->GetRotInfo().SetUseAddRot(true, D3DXVECTOR3(0.0f,0.1f, 0.0f));
+	}
+	else
+	{
+		m_pMagicSword->GetRotInfo().SetUseAddRot(true, D3DXVECTOR3(0.0f,-0.1f, 0.0f));
+
+	}
 	SetEnemyType(CEnemy::ENEMYTYPE::SHOTWEAK);//敵タイプを設定
 	return S_OK;
 }
@@ -1270,8 +1300,7 @@ void CShotWeakEnemy::AttackProcess()
 	const bool& bAction = GetAction();
 	const int& nPatternTime = GetPatternTime();
 	const int& nPattern = GetPattern();
-	m_nAttackCoolTime++;//クールタイムをカウントする
-	if (fLength < s_fATTACKSTART_LENGTH && bAction == false && m_nAttackCoolTime > s_nATTACK_COOLTIME)
+	if (fLength < s_fATTACKSTART_LENGTH && bAction == false && GetAttackCoolTime() > s_nATTACK_COOLTIME)
 	{//攻撃が開始されていなければ
 		ChengeMove(DBG_NEW CEnemyMove_None());//AI移動と攻撃処理を入れ替える
 		SetAction(true);
@@ -1306,12 +1335,8 @@ void CShotWeakEnemy::AttackProcess()
 		case 2:
 			if (nPatternTime == 60)
 			{
-				SetAction(false);
-				GetMoveInfo().SetUseInteria(true, CObjectX::GetNormalInertia());
-				ChengeMove(DBG_NEW CEnemyMove_Battle());
-				SetPattern(0);
-				SetPatternTime(0);
-				m_nAttackCoolTime = 0;
+				EndAttackPattern();//攻撃パターンを終了する
+				ChengeMove(DBG_NEW CEnemyMove_AI());//AI移動処理に変える
 			}
 			break;
 		default:
@@ -1939,8 +1964,13 @@ CEnemyMove_Frightened::CEnemyMove_Frightened(CEnemy* pEnemy, D3DXVECTOR3 StopPos
 	ScreenPos = CCalculation::CalcWorldToScreenNoViewport(pEnemy->GetPosInfo().GetSenterPos(), *CManager::GetCamera()->GetMtxView(), *CManager::GetCamera()->GetMtxProjection(),
 		SCREEN_WIDTH,SCREEN_HEIGHT);
 
+	pEnemy->SetState(CEnemy::STATE::FRIGHTENDED);//怯え状態にする
+
 	m_pLockOn = CUi::Create(CUi::UITYPE::TARGET_000, CObject2D::POLYGONTYPE::SENTERROLLING, 200.0f, 200.0f, 100, true, D3DXVECTOR3(ScreenPos.x, ScreenPos.y, 0.0f),
 		D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f));
+
+	pEnemy->SetAction(false);
+	pEnemy->SetPossibleAttack(false);//攻撃を不能にする
 
 	m_pLockOn->SetPolygonRotSpeed(0.1f);
 	m_pLockOn->SetUseAddScale(D3DXVECTOR2(-0.01f, -0.01f), true);
@@ -1967,19 +1997,20 @@ CEnemyMove_Frightened::~CEnemyMove_Frightened()
 //====================================================================================
 void CEnemyMove_Frightened::Process(CEnemy* pEnemy)
 {
-	float fX = static_cast<float>(rand() % 10 - 5);
-	float fY = static_cast<float>(rand() % 10 - 5);
-	float fZ = static_cast<float>(rand() % 10 - 5);
+	float fX = static_cast<float>(rand() % 50 - 25);
+	float fY = static_cast<float>(rand() % 50 - 25);
+	float fZ = static_cast<float>(rand() % 50 - 25);
 	pEnemy->GetPosInfo().SetPos(m_StopPos + D3DXVECTOR3(fX, fY, fZ));//震えさせる
-	pEnemy->GetMoveInfo().SetMove(D3DXVECTOR3(0.0f, 0.0f,0.0f));
+	pEnemy->GetMoveInfo().SetMove(D3DXVECTOR3(0.0f,0.0f,0.0f));
 	m_nStateTime--;
+	pEnemy->EndAttackPattern();//怯え状態の時は行動不能にしたいので、攻撃パターンを終了させつづける
 
 	if (m_pLockOn != nullptr)
 	{
 		D3DXVECTOR3 ScreenPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		ScreenPos = CCalculation::CalcWorldToScreenNoViewport(pEnemy->GetPosInfo().GetSenterPos(), *CManager::GetCamera()->GetMtxView(), *CManager::GetCamera()->GetMtxProjection(),
 			SCREEN_WIDTH, SCREEN_HEIGHT);
-		m_pLockOn->SetPos(ScreenPos);
+		m_pLockOn->SetPos(ScreenPos);//怯え状態にした敵のスクリーン座標にUIを表示
 		if (m_pLockOn->GetScale().x < 0.0f && m_pLockOn->GetScale().y < 0.0f)
 		{
 			m_pLockOn->SetUseDeath(true);
@@ -1989,7 +2020,9 @@ void CEnemyMove_Frightened::Process(CEnemy* pEnemy)
 	}
 	if (m_nStateTime < 1)
 	{
-		pEnemy->GetPosInfo().SetPos(m_StopPos + D3DXVECTOR3(0.0f,50.0f,0.0f));
+		pEnemy->SetPossibleAttack(true);//攻撃を可能に戻す
+		pEnemy->GetPosInfo().SetPos(m_StopPos);
+		pEnemy->SetState(CEnemy::STATE::NORMAL);//状態異常を普通に戻す
 		pEnemy->ChengeMove(DBG_NEW CEnemyMove_AI());//AI移動処理に戻す
 	}
 }

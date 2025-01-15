@@ -700,8 +700,8 @@ void CPlayerWireShot_Do::FrightenedEnemy(CPlayer* pPlayer)
 
 		CEnemy* pEnemy = static_cast<CEnemy*>(pObj);
 		if (pEnemy->GetEnemyType() == CEnemy::ENEMYTYPE::DIVEWEAK)
-		{//ダイブに弱い敵だけ処理をする6
-			if (CCollision::RayIntersectsAABBCollisionPos(FrontPos, Ray, pEnemy->GetPosInfo().GetPos() + pEnemy->GetSizeInfo().GetVtxMin(), pEnemy->GetPosInfo().GetPos() + pEnemy->GetSizeInfo().GetVtxMax(), CollisionPos))
+		{//ダイブに弱い敵だけ処理をする。怯え状態じゃないときに怯え状態にする
+			if (pEnemy->GetState() != CEnemy::STATE::FRIGHTENDED && CCollision::RayIntersectsAABBCollisionPos(FrontPos, Ray, pEnemy->GetPosInfo().GetPos() + pEnemy->GetSizeInfo().GetVtxMin(), pEnemy->GetPosInfo().GetPos() + pEnemy->GetSizeInfo().GetVtxMax(), CollisionPos))
 			{
 				pEnemy->ChengeMove(DBG_NEW CEnemyMove_Frightened(pEnemy, pEnemy->GetPosInfo().GetPos(),90));//1秒間怯え状態にする
 			}

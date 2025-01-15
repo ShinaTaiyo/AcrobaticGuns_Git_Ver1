@@ -277,53 +277,41 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
 
     bool bSuccess = pPlayer->CObject::GetCreateSuccess();
     int nIdx = 0;//テクスチャのインデックス
-    if (bSuccess == true)
+    pPlayer->Init();                                                                 //初期化処理
+    pPlayer->GetMoveInfo().SetMove(move);//移動量
+    pPlayer->CObject::SetType(CObject::TYPE::PLAYER);                                 //オブジェクトの種類を決める
+    pPlayer->SetObjXType(CObjectX::OBJECTXTYPE_PLAYER);                    //オブジェクトXのタイプを設定
+    pPlayer->SetTypeNum(0);                                                //オブジェクトXごとのタイプ番号を設定
+    //pPlayer->SetUseGravity(true,1.0f);//重力
+    //モデル情報を割り当てる
+    //nIdx = CManager::GetObjectXInfo()->Regist("data\\MODEL\\Enemy\\MotionEnemy\\DiveWeakEnemy\\DiveWeakEnemy00_Source.x");
+    //pPlayer->BindObjectXInfo(CManager::GetObjectXInfo()->GetMesh(nIdx),
+    //    CManager::GetObjectXInfo()->GetBuffMat(nIdx),
+    //    CManager::GetObjectXInfo()->GetdwNumMat(nIdx),
+    //    CManager::GetObjectXInfo()->GetTexture(nIdx),
+    //    CManager::GetObjectXInfo()->GetColorValue(nIdx));
+
+    pPlayer->RegistMotion("data\\MODEL\\Enemy\\MotionEnemy\\DiveWeakEnemy\\DiveWeakEnemyMotion.txt",pPlayer);//モーションファイルを割り当てる
+    pPlayer->GetDrawInfo().SetUseDraw(false);                                                     //描画しない
+    pPlayer->GetPosInfo().SetPos(pos);                                                            //位置の設定
+    pPlayer->GetPosInfo().SetPosOld(pos);                                                         //1f前の位置を設定
+    pPlayer->GetPosInfo().SetPosFuture(pos);                                                      //1f後の位置を設定
+    pPlayer->GetPosInfo().SetSupportPos(pos);                                                     //設置位置
+    pPlayer->GetRotInfo().SetRot(rot);                                                            //向きの設定
+    pPlayer->GetSizeInfo().SetScale(Scale);                                                        //拡大率の設定
+    pPlayer->GetSizeInfo().SetFormarScale(Scale);                                                  //元の拡大率を設定する
+    pPlayer->GetLifeInfo().SetAutoDeath(false);                                                    //死亡フラグを自動で発動するかどうか
+    pPlayer->GetDrawInfo().SetUseShadow(true);
+
+    //体力
+    pPlayer->GetLifeInfo().SetLife(s_nNORMAL_MAXLIFE);
+    pPlayer->GetLifeInfo().SetMaxLife(s_nNORMAL_MAXLIFE);
+
+    if (CScene::GetMode() == CScene::MODE::MODE_GAME)
     {
-        if (pPlayer != nullptr)
-        {
-            pPlayer->Init();                                                                 //初期化処理
-            pPlayer->GetMoveInfo().SetMove(move);//移動量
-            pPlayer->CObject::SetType(CObject::TYPE::PLAYER);                                 //オブジェクトの種類を決める
-            pPlayer->SetObjXType(CObjectX::OBJECTXTYPE_PLAYER);                    //オブジェクトXのタイプを設定
-            pPlayer->SetTypeNum(0);                                                //オブジェクトXごとのタイプ番号を設定
-            //pPlayer->SetUseGravity(true,1.0f);//重力
-            //モデル情報を割り当てる
-            nIdx = CManager::GetObjectXInfo()->Regist("data\\MODEL\\Enemy\\MotionEnemy\\DiveWeakEnemy\\DiveWeakEnemy00_Source.x");
-            pPlayer->BindObjectXInfo(CManager::GetObjectXInfo()->GetMesh(nIdx),
-                CManager::GetObjectXInfo()->GetBuffMat(nIdx),
-                CManager::GetObjectXInfo()->GetdwNumMat(nIdx),
-                CManager::GetObjectXInfo()->GetTexture(nIdx),
-                CManager::GetObjectXInfo()->GetColorValue(nIdx));
-
-            pPlayer->Regist("data\\MODEL\\Enemy\\MotionEnemy\\DiveWeakEnemy\\DiveWeakEnemyMotion.txt",pPlayer);//モーションファイルを割り当てる
-            pPlayer->SetSize();
-            pPlayer->GetDrawInfo().SetUseDraw(false);                                                     //描画しない
-            pPlayer->GetPosInfo().SetPos(pos);                                                            //位置の設定
-            pPlayer->GetPosInfo().SetPosOld(pos);                                                         //1f前の位置を設定
-            pPlayer->GetPosInfo().SetPosFuture(pos);                                                      //1f後の位置を設定
-            pPlayer->GetPosInfo().SetSupportPos(pos);                                                     //設置位置
-            pPlayer->GetRotInfo().SetRot(rot);                                                            //向きの設定
-            pPlayer->GetSizeInfo().SetScale(Scale);                                                        //拡大率の設定
-            pPlayer->GetSizeInfo().SetFormarScale(Scale);                                                  //元の拡大率を設定する
-            pPlayer->GetLifeInfo().SetAutoDeath(false);                                                    //死亡フラグを自動で発動するかどうか
-            pPlayer->GetDrawInfo().SetUseShadow(true);
-            //体力
-            pPlayer->GetLifeInfo().SetLife(s_nNORMAL_MAXLIFE);
-            pPlayer->GetLifeInfo().SetMaxLife(s_nNORMAL_MAXLIFE);
-
-            if (CScene::GetMode() == CScene::MODE::MODE_GAME)
-            {
-                pPlayer->m_pHpGauge = CGauge::Create(CGauge::GAUGETYPE::PLAYERHP, s_nNORMAL_MAXLIFE, 600.0f, 50.0f, D3DXVECTOR3(50.0f, SCREEN_HEIGHT - 50.0f, 0.0f));
-                pPlayer->m_pHpGauge->SetUseDeath(false);
-            }
-        }
+        pPlayer->m_pHpGauge = CGauge::Create(CGauge::GAUGETYPE::PLAYERHP, s_nNORMAL_MAXLIFE, 600.0f, 50.0f, D3DXVECTOR3(50.0f, SCREEN_HEIGHT - 50.0f, 0.0f));
+        pPlayer->m_pHpGauge->SetUseDeath(false);
     }
-    else
-    {//オブジェクトに空きがなかったので破棄する
-        delete pPlayer;
-        pPlayer = nullptr;
-    }
-
 	return pPlayer;
 }
 //==========================================================================================================

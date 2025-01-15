@@ -45,6 +45,13 @@ public:
 		MAX
 	};
 
+	enum class STATE
+	{
+		NORMAL = 0,
+		FRIGHTENDED,
+		MAX
+	};
+
 	CEnemy(int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::ENEMY, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_X);                   //コンストラクタ
 	~CEnemy();                  //デストラクタ
 	HRESULT Init() override;    //初期化処理
@@ -99,10 +106,20 @@ public:
 
 	const bool& GetCollisionWall() const { return m_bCollisionWall; }
 	//パターン
-    
-	//=================================================================================================================
+	void SetAction(bool bAction) { m_Pattern.bAction = bAction; }
+	const bool& GetAction() const { return m_Pattern.bAction; }
 
+	void EndAttackPattern();
+
+	//=================================================================================================================
+	const int GetAttackCoolTime() { return m_nAttackCoolTime; }
+	void SetAttackCoolTime(int nTime) { m_nAttackCoolTime = nTime; }
 	static int GetNumEnemy() { return m_nNumEnemy; }
+
+	void SetState(STATE State) { m_State = State; }//状態異常を設定する
+	const STATE& GetState() { return m_State; }    //状態異常を取得する
+
+	void SetPossibleAttack(bool bPossible) { m_bPossibleAttack = bPossible; }
 protected:
 
 	struct Pattern
@@ -131,13 +148,9 @@ protected:
 	void SetPatternTime(int nPatternTime) { m_Pattern.nPatternTime = nPatternTime; }
 	const int& GetPatternTime() const { return m_Pattern.nPatternTime; }
 
-	void SetAction(bool bAction) { m_Pattern.bAction = bAction; }
-	const bool& GetAction() const { return m_Pattern.bAction; }
-
 	void SetUseCollisionDetection(bool bUse) { m_bCollisoinDetection = bUse; }
 
 	const bool& GetCollisionDetection() const { return m_bActivateCollisionDetection; }
-
 	//===============================================================================================
 
 private:
@@ -170,7 +183,11 @@ private:
 	CAttack::ATTACKTYPE m_DefeatAttackType;//倒された攻撃
 
 	bool m_bCollisionWall;
+	int m_nAttackCoolTime;
 
+	bool m_bPossibleAttack;//攻撃可能かどうか
+
+	STATE m_State;         //状態列挙型
 	//===============================================================================================
 
 	//================================================
@@ -235,7 +252,6 @@ private:
 	SHOTWEAKENEMYTYPE m_ShotWeakEnemyType;//敵の種類
 	CAttackEnemy* m_pMagicSword;//魔法剣
 	D3DXVECTOR3 m_SaveAimPos;//目的の位置保存用
-	int m_nAttackCoolTime;//攻撃のクールタイム
 	//===============================================================================================
 
 	//================================================
