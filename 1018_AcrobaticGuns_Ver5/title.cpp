@@ -42,7 +42,7 @@ CTitle::CTitle() : m_bMoveSwitch(true)
 
 	CManager::GetCamera()->SetRot(D3DXVECTOR3(-D3DX_PI * 0.5f, 0.0f, 0.0f));
 
-	m_pTitleLogo = CUi::Create(CUi::UITYPE::TITLELOGO_000, CObject2D::POLYGONTYPE::SENTERROLLING, 1000.0f, 500.0f, 10, false, D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 200.0f, 0.0f),
+	m_pTitleLogo = CUi::Create(CUi::UITYPE::TITLELOGO_000, CObject2D::POLYGONTYPE::SENTERROLLING, 1000.0f, 500.0f, 10, false, D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 110.0f, 0.0f),
 		D3DXVECTOR3(0.0f, 0.0f, 0.0f),D3DXVECTOR3(0.0f,0.0f,0.0f),D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 	m_pTitleLogo->SetUseDeath(false);
 }
@@ -66,6 +66,10 @@ HRESULT CTitle::Init()
 
 	//ƒ^ƒCƒgƒ‹”wŒi‚ð¶¬
 
+	CUi* pUi = CUi::Create(CUi::UITYPE::PRESSENTER_000, CObject2D::POLYGONTYPE::SENTERROLLING, 200.0f, 200.0f, 100, false, D3DXVECTOR3(SCREEN_WIDTH - 200.0f,
+		SCREEN_HEIGHT - 100.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	pUi->SetUseBlinking(true, 45, 0.0f);
+	pUi->SetUseDeath(true);
 	CObjectX::SetCommonDraw(false);
 	return S_OK;
 }

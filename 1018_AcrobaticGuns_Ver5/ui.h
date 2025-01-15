@@ -67,6 +67,7 @@ public:
 		TUTORIAL_TEX,           //チュートリアル用テクスチャ
 		CHECKMARK_000,   //チェックマーク
 		TITLELOGO_000,   //タイトルロゴ
+		PRESSENTER_000,  //エンターキーを押す
 		MAX
 	};
 

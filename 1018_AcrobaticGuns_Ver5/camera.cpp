@@ -230,7 +230,7 @@ void CCamera::NormalCameraMove()
 	switch (CScene::GetMode())
 	{
 	case CScene::MODE_TITLE:
-		m_PosR = CTitle::GetPlayer()->GetPosInfo().GetPos() + D3DXVECTOR3(0.0f,50.0f,0.0f);
+		m_PosR = CTitle::GetPlayer()->GetPosInfo().GetPos() + D3DXVECTOR3(100.0f,75.0f,0.0f);
 		m_PosV = m_PosR + RotVec * m_fLength;
 		break;
 	case CScene::MODE_GAME:
