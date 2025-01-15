@@ -254,7 +254,7 @@ void CCamera::NormalCameraMove()
 //====================================================================
 void CCamera::MakeTransparent()
 {
-	if (CScene::GetMode() == CScene::MODE_EDIT)
+	if (CScene::GetMode() != CScene::MODE_EDIT)
 	{
 		D3DXVECTOR3 Ray = m_PosR - m_PosV;
 		D3DXVec3Normalize(&Ray, &Ray);
