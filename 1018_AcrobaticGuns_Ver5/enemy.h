@@ -62,7 +62,6 @@ public:
 	//static CEnemy* Create(ENEMYTYPE Type,int nLife,D3DXVECTOR3 pos, D3DXVECTOR3 rot,D3DXVECTOR3 Scale);
 
 	const ENEMYTYPE& GetEnemyType() const { return m_Type; }
-
 	//==========================================================
     //エディタ関係
     //==========================================================
@@ -110,7 +109,6 @@ public:
 	const bool& GetAction() const { return m_Pattern.bAction; }
 
 	void EndAttackPattern();
-
 	//=================================================================================================================
 	const int GetAttackCoolTime() { return m_nAttackCoolTime; }
 	void SetAttackCoolTime(int nTime) { m_nAttackCoolTime = nTime; }
@@ -153,6 +151,7 @@ protected:
 	const bool& GetCollisionDetection() const { return m_bActivateCollisionDetection; }
 	//===============================================================================================
 
+	virtual void DefeatStaging();//倒されたときの演出
 private:
 	//================================================
 	//静的メンバ
@@ -262,6 +261,7 @@ private:
 	void BattleMoveProcess() override;//バトル移動処理
 	void AttackProcess() override;
 	void SwordCollision();//剣の当たり判定を行う
+	void DefeatStaging() override;//倒されたときの演出
 	//===============================================================================================
 };
 
@@ -333,8 +333,7 @@ private:
 
 	//AI移動
 	void AIMoveProcess() override;
-
-
+	void DefeatStaging() override;//倒されたときの演出
 	//===============================================================================================
 };
 

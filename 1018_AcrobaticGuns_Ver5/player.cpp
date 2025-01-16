@@ -346,7 +346,7 @@ void CPlayer::ActionModeChenge()
                 D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
             break;
         case ACTIONMODE::DIVE://ダイブモード
-            ChengeMoveMode(DBG_NEW CPlayerMove_PrepDive());//ダイブ準備モードにする
+            ChengeMoveMode(DBG_NEW CPlayerMove_PrepDive(this));//ダイブ準備モードにする
             ChengeAttackMode(DBG_NEW CPlayerAttack_Dont);  //攻撃不能モードにする
             ChengeEffectMode(DBG_NEW CPlayerEffect_None()); //エフェクトなしモードにする
             ChengeWireShotMode(DBG_NEW CPlayerWireShot_Dont);//ワイヤー発射状態をオフにする

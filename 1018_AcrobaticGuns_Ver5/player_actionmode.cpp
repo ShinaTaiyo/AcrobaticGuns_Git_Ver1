@@ -166,7 +166,7 @@ void CPlayerMove_Normal::MoveProcess(CPlayer* pPlayer)
 //=====================================================================================================
 //コンストラクタ
 //=====================================================================================================
-CPlayerMove_PrepDive::CPlayerMove_PrepDive()
+CPlayerMove_PrepDive::CPlayerMove_PrepDive(CPlayer* pPlayer)
 {
 
 }
@@ -251,12 +251,10 @@ void CPlayerMove_Dive::MoveProcess(CPlayer* pPlayer)
 	{//ダイブ時に判定したら移動モードと攻撃モードを通常に戻す
 		if (bInput == false)
 		{//攻撃→射撃モード
-			pCamera->SetRot(D3DXVECTOR3(-D3DX_PI * 0.5f, pCamera->GetRot().y, 0.0f));//向きの基準を元に戻す
 			pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_Dive());
 			pPlayer->GetWire()->SetUseDraw(false);
-			pPlayer->ChengeMoveMode(DBG_NEW CPlayerMove_PrepDive());
+			pPlayer->ChengeMoveMode(DBG_NEW CPlayerMove_PrepDive(pPlayer));
 			pPlayer->GetRotInfo().SetRot(D3DXVECTOR3(0.0f, pCamera->GetRot().y, 0.0f));
-			//pPlayer->SetRot(D3DXVECTOR3(0.0f, pPlayer->GetRot().y, 0.0f));//向きを前に傾ける
 		}
 		else
 		{//引っ付き→ダイブ
@@ -485,7 +483,7 @@ void CPlayerAttack_Dive::AttackProcess(CPlayer* pPlayer)
 		CAttackPlayer* pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::ENEMY, CAttack::COLLISIONTYPE::SQUARE, false,true, 50,30, 100, pPlayer->GetPosInfo().GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.1f, 0.1f, 0.1f),
 			D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 		pAttackPlayer->GetSizeInfo().SetUseAddScale(D3DXVECTOR3(0.4f, 0.4f, 0.4f), true);
-		pAttackPlayer->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), 200, false, false);
+		pAttackPlayer->SetColor(D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f), 200, false, false);
 		pAttackPlayer->GetLifeInfo().SetUseRatioLifeAlpha(true);
 		pAttackPlayer->SetCollisionRelease(false);
 		pDivePossibleNum->SetNumericState(pDivePossibleNum->GetValue() - 1, 50.0f, 50.0f);
@@ -493,8 +491,14 @@ void CPlayerAttack_Dive::AttackProcess(CPlayer* pPlayer)
 		CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::TAKEDIVE);
 
 		CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL::SE_EXPLOSION_000);
+
+		//目的の向きまで少しづつ動かす（カメラの前は-D3DX_PI * 0.5f,プレイヤーはデフォルトの向きが異なるので、Rot.y + D3DX_PI)
+		CManager::GetCamera()->ChengeState(DBG_NEW CCameraState_TurnAround(D3DXVECTOR3(-D3DX_PI * 0.5f, pPlayer->GetRotInfo().GetRot().y + D3DX_PI, 0.0f), 0.1f));
+
+		//爆発を見せたいので、カメラと注視点の距離を一定時間変える
+		CManager::GetCamera()->ChengeLengthState(DBG_NEW CCameraLengthState_Gradually(300.0f, 0.1f, 60));
 	}
-	pPlayer->ChengeMoveMode(DBG_NEW CPlayerMove_PrepDive());
+	pPlayer->ChengeMoveMode(DBG_NEW CPlayerMove_PrepDive(pPlayer));
 	pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_Dont());
 
 	pPlayer->ChengeEffectMode(DBG_NEW CPlayerEffect_None());

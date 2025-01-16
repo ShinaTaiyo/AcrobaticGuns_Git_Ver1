@@ -17,7 +17,7 @@
 //前方宣言
 //==========================================================================
 class CCameraState;
-
+class CCameraLengthState;
 //==========================================================================
 //カメラクラス
 //==========================================================================
@@ -92,8 +92,11 @@ public:
 	void SetCustomMode(bool bActive) { m_bCustom = bActive; }
 
 	void ChengeState(CCameraState * pCameraState);//ステートを変える
+	void ChengeLengthState(CCameraLengthState* pCameraLengthState);//カメラの距離の状態を変える
 
 	const float& GetPosRToPosVLength() const { return m_fLength; }//中止点と視点の距離を取得する
+
+	static const float & GetInitialLength() { return s_fINITIAL_LENGTH; }//最初の距離を取得する
 
 	//======================================
 	//マトリックス系
@@ -127,6 +130,7 @@ private:
 
 	CAMERASTATE m_State;                          //状態名
 	CCameraState* m_pCameraState;                 //カメラの状態クラス
+	CCameraLengthState* m_pCameraLengthState;     //カメラの距離の状態クラス
 
 	float m_fLength;                              //距離!
 	float m_fAddLength;                           //追加距離!
@@ -138,6 +142,8 @@ private:
 	float m_fShakePower;                          //カメラを揺らす力!
 
 	bool m_bCustom;                               //カメラの挙動をカスタムにするかどうか
+
+
 	//==========================================================================================================================================
 
 	//======================================
@@ -158,7 +164,7 @@ public:
 	virtual void Process(CCamera* pCamera) {};  //処理
 };
 
-//普通の上チア
+//普通の状態
 class CCameraState_Normal : public CCameraState
 {
 public:
@@ -180,5 +186,35 @@ private:
 
 	const D3DXVECTOR3 m_AimRot;     //目的の向き
 	const float m_fAdjustTurnSpeed; //向きを変える速度の補正度
+};
+
+//距離を変える状態
+class CCameraLengthState
+{
+public:
+	CCameraLengthState();
+	virtual ~CCameraLengthState();
+	virtual void Process(CCamera * pCamera);
+};
+
+class CCameraLengthState_Gradually : public CCameraLengthState
+{
+public:
+	CCameraLengthState_Gradually(float fLength,float fAdjustAddSpeed,int nChengeFrame);
+	~CCameraLengthState_Gradually();
+	void Process(CCamera* pCamera) override;
+private:
+	//*変数
+	float m_fAimLength;//距離
+	float m_fAdjustAddSpeed;//距離を増やす速度
+	int m_nChengeLengthFrame;//カメラの距離を増やしている状態にするフレーム数
+	bool m_bNowAddLength;    //カメラの距離を増やしているかどうか
+	bool m_bStartReturnLength;//カメラの距離を戻す処理を開始するかどうか
+	int m_nChengeFrameCnt;   //カメラの距離を増やしたままにするフレーム数をカウントする
+
+	//*関数
+	void AddLengthProcess(CCamera * pCamera);//距離を増やす処理
+	void MaintainLengthFrameCntProcess();    //距離を維持するフレーム数をカウントする
+	void ReturnLengthProcess(CCamera* pCamera);//距離を元に戻す処理
 };
 #endif

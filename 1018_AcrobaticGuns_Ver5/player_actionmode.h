@@ -127,7 +127,7 @@ private:
 class CPlayerMove_PrepDive : public CPlayerMove
 {
 public:
-	CPlayerMove_PrepDive();                      //コンストラクタ
+	CPlayerMove_PrepDive(CPlayer * pPlayer);                      //コンストラクタ
 	~CPlayerMove_PrepDive() override;            //デストラクタ
 	void MoveProcess(CPlayer* pPlayer) override; //移動処理
 };

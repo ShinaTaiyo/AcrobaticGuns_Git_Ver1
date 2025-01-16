@@ -115,16 +115,9 @@ void CEnemy::Update()
 
 	    CObjectX::Update();
 
-		if (GetLifeInfo().GetLife() < 1)
-		{
-			for (int nCnt = 0; nCnt < 60; nCnt++)
-			{
-				CParticle* pParticle = CParticle::Create(CParticle::TYPE::TYPE00_NORMAL, 120, 80.0f, 80.0f, GetPosInfo().GetPos(), CCalculation::Rand3DVec(200, 10),
-					D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f), true);
-				pParticle->SetUseAddSpeed(true, true, 0.9f);
-			}
-		}
-	    CollisionProcess();//当たり判定処理
+		CollisionProcess();//当たり判定処理
+
+		DefeatStaging();//倒されたときの演出を行う（派生クラスごとに変わる）
 
 		if (GetPosInfo().GetPos().y < -100.0f)
 		{
@@ -132,7 +125,6 @@ void CEnemy::Update()
 		}
 
 	}
-
 	if (CScene::GetMode() == CScene::MODE_EDIT)
 	{
 		GetDrawInfo().ChengeColorProcess(this);
@@ -422,6 +414,15 @@ void CEnemy::ManagerChooseControlInfo()
 void CEnemy::SetVecMoveAiInfo(vector<CAIModel*>& vec)
 {
 	m_VecMoveAi = vec;
+}
+//============================================================================================================================================
+
+//====================================================================================
+//敵が倒されたときの演出
+//====================================================================================
+void CEnemy::DefeatStaging()
+{
+
 }
 //============================================================================================================================================
 
@@ -1387,6 +1388,23 @@ void CShotWeakEnemy::SwordCollision()
 }
 //============================================================================================================================================
 
+//====================================================================================
+//倒されたときの演出
+//====================================================================================
+void CShotWeakEnemy::DefeatStaging()
+{
+	if (GetLifeInfo().GetLife() < 1)
+	{
+		for (int nCnt = 0; nCnt < 60; nCnt++)
+		{
+			CParticle* pParticle = CParticle::Create(CParticle::TYPE::TYPE00_NORMAL, 120, 80.0f, 80.0f, GetPosInfo().GetPos(), CCalculation::Rand3DVec(200, 10),
+				D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f), true);
+			pParticle->SetUseAddSpeed(true, true, 0.9f);
+		}
+	}
+}
+//============================================================================================================================================
+
 //********************************************************************************************************************************************
 //ダイブに弱い敵クラス
 //********************************************************************************************************************************************
@@ -1845,6 +1863,23 @@ void CDiveWeakEnemy::AIMoveProcess()
 	if (CScene::GetMode() == CScene::MODE_GAME)
 	{
 		CEnemy::AIMoveProcess();
+	}
+}
+//============================================================================================================================================
+
+//====================================================================================
+//倒されたときの演出
+//====================================================================================
+void CDiveWeakEnemy::DefeatStaging()
+{
+	if (GetLifeInfo().GetLife() < 1)
+	{
+		for (int nCnt = 0; nCnt < 60; nCnt++)
+		{
+			CParticle* pParticle = CParticle::Create(CParticle::TYPE::TYPE00_NORMAL, 120, 80.0f, 80.0f, GetPosInfo().GetPos(), CCalculation::Rand3DVec(200, 10),
+				D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
+			pParticle->SetUseAddSpeed(true, true, 0.9f);
+		}
 	}
 }
 //============================================================================================================================================

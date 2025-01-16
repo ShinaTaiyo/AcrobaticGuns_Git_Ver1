@@ -39,7 +39,7 @@ const float CCamera::s_fINITIAL_LENGTH = 200.0f;   //カメラとの最初の距離
 CCamera::CCamera() : m_SupportPos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_fLength(s_fINITIAL_LENGTH), m_fTurningRotSpeed(0.0f),m_fTurningSpeedY(0.0f),m_PosV(D3DXVECTOR3(0.0f,0.0f,0.0f)),
 m_PosR(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_VecU(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_Rot(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_mtxProjection(),m_mtxView(),m_CameraType(CAMERATYPE_BIRD),m_DifferenceLength(D3DXVECTOR3(0.0f,0.0f,0.0f)),
 m_ZoomSpeed(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_nShakeFrame(0),m_ModeTime(0),m_fShakePower(0.0f),m_fAddLength(0.0f),m_AddPosR(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_AddPosV(D3DXVECTOR3(0.0f,0.0f,0.0f))
-,m_bCustom(false),m_State(CAMERASTATE::NORMAL),m_pCameraState(DBG_NEW CCameraState_Normal())
+,m_bCustom(false),m_State(CAMERASTATE::NORMAL),m_pCameraState(DBG_NEW CCameraState_Normal()),m_pCameraLengthState(DBG_NEW CCameraLengthState())
 {
 
 }
@@ -85,6 +85,12 @@ void CCamera::Uninit()
 		delete m_pCameraState;
 		m_pCameraState = nullptr;
 	}
+
+	if (m_pCameraLengthState != nullptr)
+	{
+		delete m_pCameraLengthState;
+		m_pCameraLengthState = nullptr;
+	}
 }
 //====================================================================================================
 
@@ -94,7 +100,8 @@ void CCamera::Uninit()
 //====================================================================
 void CCamera::Update()
 {
-	m_pCameraState->Process(this);
+	m_pCameraState->Process(this);      //カメラの角度に関する処理
+	m_pCameraLengthState->Process(this);//カメラの距離に関する処理
 	//========================================
 	//カメラの向きを補正する
 	//========================================
@@ -107,7 +114,10 @@ void CCamera::Update()
 		m_Rot.x = -0.01f;
 	}
 
+	//向きが3.14と-3.14の境界をまたぐときの補正
+	m_Rot.x = CCalculation::CorrectionRot(m_Rot.x);
 	m_Rot.y = CCalculation::CorrectionRot(m_Rot.y);
+	m_Rot.z = CCalculation::CorrectionRot(m_Rot.z);
 
 	CManager::GetDebugText()->PrintDebugText("カメラの向き：%f %f %f\n", m_Rot.x, m_Rot.y, m_Rot.z);
 	CManager::GetDebugText()->PrintDebugText("カメラの視点：%f %f %f\n", m_PosV.x, m_PosV.y, m_PosV.z);
@@ -221,6 +231,16 @@ void CCamera::ChengeState(CCameraState* pCameraState)
 //====================================================================================================
 
 //====================================================================
+//カメラの距離の状態を変える
+//====================================================================
+void CCamera::ChengeLengthState(CCameraLengthState* pCameraLengthState)
+{
+	delete m_pCameraLengthState;
+	m_pCameraLengthState = pCameraLengthState;
+}
+//====================================================================================================
+
+//====================================================================
 //普通のカメラの位置を設定し続ける
 //====================================================================
 void CCamera::NormalCameraMove()
@@ -233,7 +253,7 @@ void CCamera::NormalCameraMove()
 		m_PosR = CTitle::GetPlayer()->GetPosInfo().GetPos() + D3DXVECTOR3(100.0f,75.0f,0.0f);
 		m_PosV = m_PosR + RotVec * m_fLength;
 		break;
-	case CScene::MODE_GAME:
+	case CScene::MODE_GAME://通常はプレイヤーの位置を軸に動く(カメラの向きを使い旋回する）
 		if (CGame::GetPlayer() != nullptr)
 		{
 			m_PosR = CGame::GetPlayer()->GetPosInfo().GetPos() + D3DXVECTOR3(sinf(m_Rot.y + D3DX_PI * 0.5f) * 30.0f, 60.0f,cosf(m_Rot.y + D3DX_PI * 0.5f) * 30.0f) + m_AddPosR;
@@ -528,5 +548,125 @@ void CCameraState_Normal::Process(CCamera* pCamera)
 		pCamera->ChengeState(DBG_NEW CCameraState_TurnAround(pCamera->GetRot() + D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), 0.15f));
 	}
 
+}
+//===================================================================================================================================================
+
+//*****************************************************************
+//カメラの距離を変える状態のクラス
+//*****************************************************************
+
+//=================================================================
+//コンストラクタ
+//=================================================================
+CCameraLengthState::CCameraLengthState()
+{
+
+}
+//===================================================================================================================================================
+
+//=================================================================
+//デストラクタ
+//=================================================================
+CCameraLengthState::~CCameraLengthState()
+{
+
+}
+//===================================================================================================================================================
+
+//=================================================================
+//処理
+//=================================================================
+void CCameraLengthState::Process(CCamera* pCamera)
+{
+
+}
+//===================================================================================================================================================
+
+//*****************************************************************
+//カメラの距離を目的の位置に徐々に変える状態のクラス
+//*****************************************************************
+
+//=================================================================
+//コンストラクタ
+//=================================================================
+CCameraLengthState_Gradually::CCameraLengthState_Gradually(float fLength, float fAdjustAddSpeed, int nChengeFrame) : m_fAimLength(fLength),m_fAdjustAddSpeed(fAdjustAddSpeed),
+m_nChengeLengthFrame(nChengeFrame),m_bNowAddLength(true),m_nChengeFrameCnt(0),m_bStartReturnLength(false)
+{
+
+}
+//===================================================================================================================================================
+
+//=================================================================
+//デストラクタ
+//=================================================================
+CCameraLengthState_Gradually::~CCameraLengthState_Gradually()
+{
+
+}
+//===================================================================================================================================================
+
+//=================================================================
+//処理
+//=================================================================
+void CCameraLengthState_Gradually::Process(CCamera* pCamera)
+{
+	if (m_bNowAddLength == true)
+	{
+		AddLengthProcess(pCamera);//カメラとの距離を増やす処理
+	}
+	else
+	{
+		MaintainLengthFrameCntProcess();//距離を維持する時間をカウントする処理
+	}
+	if (m_bStartReturnLength == true)
+	{
+		ReturnLengthProcess(pCamera);//カメラとの距離と状態を戻す処理
+	}
+}
+//===================================================================================================================================================
+
+//=================================================================
+//カメラとの距離を増やす処理
+//=================================================================
+void CCameraLengthState_Gradually::AddLengthProcess(CCamera* pCamera)
+{
+	float fLengthDiff = m_fAimLength - pCamera->GetLength();
+	float fAddLength = fLengthDiff * m_fAdjustAddSpeed;//加算する距離を求める
+	pCamera->SetLength(pCamera->GetLength() + fAddLength);//距離を加算する
+
+	if (fLengthDiff < 1.0f)
+	{
+		m_bNowAddLength = false;//距離を増やす状態をオフにする
+	}
+}
+//===================================================================================================================================================
+
+//=================================================================
+//カメラとの距離を維持する処理
+//=================================================================
+void CCameraLengthState_Gradually::MaintainLengthFrameCntProcess()
+{
+	m_nChengeFrameCnt++;
+
+	if (m_nChengeFrameCnt > m_nChengeLengthFrame)
+	{//距離を維持する時間を超えたら
+		m_bStartReturnLength = true;
+	}
+}
+//===================================================================================================================================================
+
+//=================================================================
+//カメラの距離を元に戻す処理
+//=================================================================
+void CCameraLengthState_Gradually::ReturnLengthProcess(CCamera* pCamera)
+{
+	float fLengthDiff = CCamera::GetInitialLength() - pCamera->GetLength();
+	float fSubLength = fLengthDiff * 0.1f;//加算する距離を求める
+	pCamera->SetLength(pCamera->GetLength() + fSubLength);//距離を加算する
+
+	if (fabsf(fLengthDiff) < 1.0f)//距離が絶対値で1.0fより下回ったら状態を戻す
+	{//距離が元に戻ったので状態を解除
+		pCamera->ChengeLengthState(DBG_NEW CCameraLengthState());
+	}
 }
 //===================================================================================================================================================
