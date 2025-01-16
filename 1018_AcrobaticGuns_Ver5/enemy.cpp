@@ -115,6 +115,15 @@ void CEnemy::Update()
 
 	    CObjectX::Update();
 
+		if (GetLifeInfo().GetLife() < 1)
+		{
+			for (int nCnt = 0; nCnt < 60; nCnt++)
+			{
+				CParticle* pParticle = CParticle::Create(CParticle::TYPE::TYPE00_NORMAL, 120, 80.0f, 80.0f, GetPosInfo().GetPos(), CCalculation::Rand3DVec(200, 10),
+					D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f), true);
+				pParticle->SetUseAddSpeed(true, true, 0.9f);
+			}
+		}
 	    CollisionProcess();//“–‚½‚è”»’èˆ—
 
 		if (GetPosInfo().GetPos().y < -100.0f)

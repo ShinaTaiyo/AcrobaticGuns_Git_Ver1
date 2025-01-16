@@ -281,6 +281,36 @@ D3DXVECTOR3 CCalculation::Calculation3DVec(D3DXVECTOR3 MyPos, D3DXVECTOR3 AimPos
 //===========================================================================================================
 
 //=========================================================
+//ランダムな３次元空間の速度を求める
+//=========================================================
+D3DXVECTOR3 CCalculation::Rand3DVec(int nMathSpeed, int nDivisionSpeed)
+{
+	D3DXVECTOR3 Speed = { 0.0f,0.0f,0.0f };
+	bool bMinus = false;
+
+	bMinus = rand() % 2;
+	Speed.x = static_cast<float>(rand() % nMathSpeed) / nDivisionSpeed;
+	if (bMinus == true)
+	{
+		Speed.x *= -1;
+	}
+	bMinus = rand() % 2;
+	Speed.y = static_cast<float>(rand() % nMathSpeed) / nDivisionSpeed;
+	if (bMinus == true)
+	{
+		Speed.y *= -1;
+	}
+	bMinus = rand() % 2;
+	Speed.z = static_cast<float>(rand() % nMathSpeed) / nDivisionSpeed;
+	if (bMinus == true)
+	{
+		Speed.z *= -1;
+	}
+	return Speed;
+}
+//===========================================================================================================
+
+//=========================================================
 //虹色を計算する
 //=========================================================
 D3DXCOLOR CCalculation::CalRaibowColor()
