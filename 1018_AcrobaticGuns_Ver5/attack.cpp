@@ -37,7 +37,8 @@ const string CAttack::ATTACK_FILENAME[static_cast<int>(CAttack::ATTACKTYPE::MAX)
 //==================================================================
 CAttack::CAttack(int nPower, int nSetHitStopTime, int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectX(nPri, bUseintPri, type, ObjType),
 m_Type(ATTACKTYPE::BULLET), m_nPower(nPower), m_HitStop({0,nSetHitStopTime}),m_bCollisionRelease(true),m_CollisionType(CAttack::COLLISIONTYPE::NONE),
-m_TargetType(CAttack::TARGETTYPE::NONE),m_bHitOtherThanLiving(false),m_bAutoCollision(true),m_bCollisionSuccess(false)
+m_TargetType(CAttack::TARGETTYPE::NONE),m_bHitOtherThanLiving(false),m_bAutoCollision(true),m_bCollisionSuccess(false),m_bExtrusionCollision(false),
+m_BoundInfo(), m_bCollision(false)
 {
 
 }
@@ -82,33 +83,25 @@ void CAttack::Update()
 	{
 		Collision();
 	}
-	bool bCollision = false;
+	m_bCollision = false;
 
 	if (m_bHitOtherThanLiving == true)
 	{
-		for (int nCntPri = 0; nCntPri < m_nMAXPRIORITY; nCntPri++)
-		{
-			CObject* pObj = GetTopObject(nCntPri);
-			while (pObj != nullptr)
-			{
-				bool bNowCollision = false;
-				CObject* pNext = pObj->GetNextObject();
+		HitOtherCollisionProcess();
+	}
+	else
+	{
+		if (m_bExtrusionCollision == true)
+		{//押し出し判定を行う
+			ExtrusionCollisionProcess();
 
-				if (pObj->GetType() == CObject::TYPE::BGMODEL || pObj->GetType() == CObject::TYPE::BLOCK)
-				{
-					CObjectX* pObjX = static_cast<CObjectX*>(pObj);
-
-					if (CCollision::CollisionSquare(GetPosInfo().GetPos(), GetSizeInfo().GetVtxMax(), GetSizeInfo().GetVtxMin(), pObjX->GetPosInfo().GetPos(), pObjX->GetSizeInfo().GetVtxMax(), pObjX->GetSizeInfo().GetVtxMin()))
-					{
-						bCollision = true;
-					}
-				}
-
-				pObj = pNext;
+			if (m_BoundInfo.GetActive() == true)
+			{//バウンドするならバウンドさせる
+				m_BoundInfo.BoundProcess(this);
 			}
 		}
 	}
-	if (bCollision == true && GetCollisionRelease() == true)
+	if (m_bCollision == true && GetCollisionRelease() == true)
 	{
 		SetDeath();
 	}
@@ -172,6 +165,96 @@ void CAttack::Collision()
 		SetDeath();
 	}
 
+}
+//======================================================================================================================
+
+//==================================================================
+//他のオブジェクトにも当てる処理
+//==================================================================
+void CAttack::HitOtherCollisionProcess()
+{
+	for (int nCntPri = 0; nCntPri < m_nMAXPRIORITY; nCntPri++)
+	{
+		CObject* pObj = GetTopObject(nCntPri);
+		while (pObj != nullptr)
+		{
+			bool bNowCollision = false;
+			CObject* pNext = pObj->GetNextObject();
+
+			if (pObj->GetType() == CObject::TYPE::BGMODEL || pObj->GetType() == CObject::TYPE::BLOCK)
+			{
+				CObjectX* pObjX = static_cast<CObjectX*>(pObj);
+
+				if (CCollision::CollisionSquare(GetPosInfo().GetPos(), GetSizeInfo().GetVtxMax(), GetSizeInfo().GetVtxMin(), pObjX->GetPosInfo().GetPos(), pObjX->GetSizeInfo().GetVtxMax(), pObjX->GetSizeInfo().GetVtxMin()))
+				{
+					m_bCollision = true;
+				}
+			}
+
+			pObj = pNext;
+		}
+	}
+
+}
+//======================================================================================================================
+
+//==================================================================
+//他のオブジェクトとの押し出し判定を行う処理
+//==================================================================
+void CAttack::ExtrusionCollisionProcess()
+{
+	GetCollisionInfo().GetSquareInfo().ResetPushOutFirstFlag();//それぞれの軸の押し出し判定の優先フラグをリセット
+	SetIsLanding(false);
+
+	for (int nCntPri = 0; nCntPri < CObject::m_nMAXPRIORITY; nCntPri++)
+	{
+		CObject* pObj = CObject::GetTopObject(nCntPri);
+
+		while (pObj != nullptr)
+		{
+			//次のオブジェクトを格納
+			CObject* pNext = pObj->GetNextObject();
+
+			//種類の取得（敵なら当たり判定）
+			CObject::TYPE type = pObj->GetType();
+
+			if (type == CObject::TYPE::BLOCK || type == CObject::TYPE::BGMODEL)
+			{
+				CObjectX* pObjX = static_cast<CObjectX*>(pObj);//オブジェクトXにダウンキャスト
+				CCollision::ExtrusionCollisionSquarePushOutFirstDecide(this, pObjX);//正方形の押し出し判定のそれぞれの軸の順序の優先度を決める
+			}
+			//オブジェクトを次に進める
+			pObj = pNext;
+		}
+	}
+	//=======================================================================================
+
+	//============================================================
+	//押し出し判定開始
+	//============================================================
+	for (int nCntPri = 0; nCntPri < CObject::m_nMAXPRIORITY; nCntPri++)
+	{
+		CObject* pObj = CObject::GetTopObject(nCntPri);
+
+		while (pObj != nullptr)
+		{
+			//次のオブジェクトを格納
+			CObject* pNext = pObj->GetNextObject();
+
+			//種類の取得（敵なら当たり判定）
+			CObject::TYPE type = pObj->GetType();
+
+			if (type == CObject::TYPE::BLOCK || type == CObject::TYPE::BGMODEL)
+			{
+				CObjectX* pObjX = static_cast<CObjectX*>(pObj);//オブジェクトXにダウンキャスト
+
+				CCollision::ResolveExtrusionCollisionSquare(this, pObjX);//正方形の押し出し判定をする
+			}
+
+			pObj = pNext;
+		}
+	}
+	//=======================================================================================
 }
 //======================================================================================================================
 
@@ -427,5 +510,22 @@ CAttackEnemy* CAttackEnemy::Create(ATTACKTYPE AttackType, TARGETTYPE TargetType,
 		CManager::GetObjectXInfo()->GetColorValue(nIdx));
 	pAttackEnemy->SetSize();
 	return pAttackEnemy;
+}
+//======================================================================================================================
+
+//==================================================================
+//バウンド処理
+//==================================================================
+void CAttack::BoundInfo::BoundProcess(CAttack* pAttack)
+{
+	if (pAttack->GetLanding() == true)
+	{
+		pAttack->GetMoveInfo().SetMove(D3DXVECTOR3(pAttack->GetMoveInfo().GetMove().x, Power.y, pAttack->GetMoveInfo().GetMove().z));
+
+		if (bGravity == true)
+		{//重力をONにする場合
+			pAttack->GetMoveInfo().SetUseGravity(true, fGravity);
+		}
+	}
 }
 //======================================================================================================================

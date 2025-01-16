@@ -1850,7 +1850,10 @@ void CDiveWeakEnemy::AttackProcess()
 	{
 		D3DXVECTOR3 Aim = CCalculation::Calculation3DVec(GetPosInfo().GetPos() + D3DXVECTOR3(0.0f, GetSizeInfo().GetVtxMax().y + GetSizeInfo().GetVtxMax().y / 2, 0.0f), CGame::GetPlayer()->GetPosInfo().GetSenterPos(), 20.0f);
 
-		CAttackEnemy::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::PLAYER, CAttack::COLLISIONTYPE::SQUARE, true, true, 1, 60, 200, GetPosInfo().GetPos() + D3DXVECTOR3(0.0f, GetSizeInfo().GetVtxMax().y, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), Aim, GetSizeInfo().GetScale() * 0.5f);
+		CAttackEnemy * pAttackEnemy = CAttackEnemy::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::PLAYER, CAttack::COLLISIONTYPE::SQUARE, true, true, 1, 60, 200, GetPosInfo().GetPos() + D3DXVECTOR3(0.0f, GetSizeInfo().GetVtxMax().y, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), Aim, GetSizeInfo().GetScale() * 0.5f);
+		pAttackEnemy->GetBoundInfo().SetActive(true,D3DXVECTOR3(0.0f,10.0f,0.0f),true,0.5f);//バウンドさせる
+		pAttackEnemy->SetExtrusionCollisioin(true);//押し出し判定を行い、
+		pAttackEnemy->SetHitOtherThanLibing(false);//敵やプレイヤー以外との当たり判定は行わない
 	}
 }
 //============================================================================================================================================

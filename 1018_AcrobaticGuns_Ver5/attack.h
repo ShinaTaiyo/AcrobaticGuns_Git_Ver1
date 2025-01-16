@@ -45,11 +45,31 @@ public:
 		MAX
 	};
 
+	//ヒットストップ情報
 	struct HitStop
 	{
 		int nCntTime;
 		const int nSetTime;
 	};
+
+	//バウンド情報
+	struct BoundInfo
+	{
+		//関数
+		void SetActive(bool bCopyActive, D3DXVECTOR3 CopyPower, bool bCopyGravity, float fCopyGravity)
+		{
+			bActive = bCopyActive; Power = CopyPower; bGravity = bCopyGravity; fGravity = fCopyGravity;
+		};//バウンドをするかどうか
+		void BoundProcess(CAttack * pAttack);//バウンド処理
+		const D3DXVECTOR3& GetPower() const { return Power; }//バウンド力を取得
+		const bool& GetActive() const { return bActive; }    //バウンドするかどうかを取得
+	private:
+		D3DXVECTOR3 Power = { 0.0f,0.0f,0.0f }; //バウンド力
+		bool bActive = false;//バウンドするかどうか
+		bool bGravity = false;//バウンド時に重力をONにするかどうか
+		float fGravity = 0.0f;//バウンド時に重力をONにする場合に設定する重力
+	};
+
 	CAttack(int nPower,int nSetHitStopTime,int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::ATTACK, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_X);                  //コンストラクタ
 	~CAttack();                 //デストラクタ
 	HRESULT Init() override;    //初期化処理
@@ -78,6 +98,12 @@ public:
 	void SetAutoCollision(bool bAuto) { m_bAutoCollision = bAuto; }
 	const bool& GetAutoCollision() { return m_bAutoCollision; }
 
+	//押し出し判定を使うかどうか
+	void SetExtrusionCollisioin(bool bUse) { m_bExtrusionCollision = bUse; }
+	const bool& GetExtrusionCollisioin() { return m_bExtrusionCollision; }
+
+	//構造体
+	BoundInfo& GetBoundInfo() { return m_BoundInfo; }//バウンド情報を取得
 
 protected:
 	void SetAttackType(ATTACKTYPE AttackType) { m_Type = AttackType;}//攻撃の種類を設定する
@@ -89,19 +115,23 @@ private:
 	//================================================
 	//変数宣言
 	//================================================
-	int m_nPower;     //攻撃力
+	int m_nPower;            //攻撃力
 
 	bool m_bCollisionRelease;//衝突時に消すかどうか
 
 	bool m_bHitOtherThanLiving;//生きているオブジェクト以外にも当たるかどうか
 	bool m_bAutoCollision;     //当たり判定を攻撃クラスに任せるかどうか
 
+	bool m_bExtrusionCollision;        //押し出し判定を使うかどうか
 	bool m_bCollisionSuccess; //判定が成功したかどうか
+
+	bool m_bCollision;//当たったかどうか
 
 	HitStop m_HitStop;//ヒットストップ
 	ATTACKTYPE m_Type;//タイプ
 	COLLISIONTYPE m_CollisionType;//判定タイプ
 	TARGETTYPE m_TargetType;//狙うオブジェクトの種類
+	BoundInfo m_BoundInfo;  //バウンド情報
 	//==========================================================================================
 
 	//================================================
@@ -109,6 +139,8 @@ private:
 	//================================================
 	void Collision();//当たり判定を行う処理
 	void CollisionProcess(bool& bCollision,bool & bNowCollision,CObjectX * pObjX);
+	void HitOtherCollisionProcess();//他のオブジェクトとも判定する処理
+	void ExtrusionCollisionProcess();//他のオブジェクトとの押し出し判定を行う処理
 	//==========================================================================================
 };
 //==================================================================================================================================================
@@ -146,7 +178,6 @@ public:
 	void SetDeath() override;         //死亡フラグを設定
 	static CAttackEnemy* Create(ATTACKTYPE AttackType, TARGETTYPE TargetType, COLLISIONTYPE CollisionType,bool bHitOtherThanLiving,bool bAutoCollision, int nPower, int nSetHitStopTime, int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale);//生成処理
 private:
-
 };
 //==================================================================================================================================================
 #endif
