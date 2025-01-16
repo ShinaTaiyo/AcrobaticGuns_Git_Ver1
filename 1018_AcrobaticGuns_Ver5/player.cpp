@@ -28,6 +28,7 @@
 #include "ui.h"
 #include "particle2d.h"
 #include "debugtext.h"
+#include "sound.h"
 #include "tutorial.h"
 #include "collision.h"
 //==========================================================================================================
@@ -186,6 +187,7 @@ void CPlayer::Update()
 
     if (m_bDamage == true)
     {
+        CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL::SE_DAMAGE_000);
         SetNextMotion(3);
         m_bDamage = false;
     }

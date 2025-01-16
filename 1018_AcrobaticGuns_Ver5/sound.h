@@ -18,11 +18,14 @@ public:
 	//==============================================================================
 	// サウンド一覧
     //==============================================================================
-	typedef enum
+    enum class SOUND_LABEL
 	{
-		SOUND_LABEL_BGM_NOESIS,       //Noesis
-		SOUND_LABEL_MAX,
-	} SOUND_LABEL;
+		BGM_NOESIS,       //Noesis
+	    SE_SHOT_000,      //射撃０
+	    SE_EXPLOSION_000, //爆発０
+		SE_DAMAGE_000,    //ダメージ０
+		MAX,
+	};
 	//=================================================================================================================================
 
 	//*****************************************************************************
@@ -57,16 +60,19 @@ private:
 		//*****************************************************************************
 		// グローバル変数
 		//*****************************************************************************
-		IXAudio2* m_pXAudio2 = NULL;								// XAudio2オブジェクトへのインターフェイス!
-		IXAudio2MasteringVoice* m_pMasteringVoice = NULL;			// マスターボイス!
-		IXAudio2SourceVoice* m_apSourceVoice[SOUND_LABEL_MAX] = {};	// ソースボイス!
-		BYTE* m_apDataAudio[SOUND_LABEL_MAX] = {};					// オーディオデータ!
-		DWORD m_aSizeAudio[SOUND_LABEL_MAX] = {};					// オーディオデータサイズ!
+		IXAudio2* m_pXAudio2 = NULL;								                // XAudio2オブジェクトへのインターフェイス!
+		IXAudio2MasteringVoice* m_pMasteringVoice = NULL;			                // マスターボイス!
+		IXAudio2SourceVoice* m_apSourceVoice[static_cast<int>(SOUND_LABEL::MAX)];	// ソースボイス!
+		BYTE* m_apDataAudio[static_cast<int>(SOUND_LABEL::MAX)];					// オーディオデータ!
+		DWORD m_aSizeAudio[static_cast<int>(SOUND_LABEL::MAX)];					    // オーディオデータサイズ!
 
 		// サウンドの情報
-		static constexpr SOUNDINFO m_aSoundInfo[SOUND_LABEL_MAX] =
+		SOUNDINFO m_aSoundInfo[static_cast<int>(SOUND_LABEL::MAX)] =
 		{
-			{"data/BGM/TitleBgm_Noesis.wav", -1},   //Noesis
+			{"data/BGM/TitleBgm_Noesis.wav", -1},   //BGM_Noesis
+			{"data/SE/Shot_000.wav",  0},           //SE_射撃０
+			{"data/SE/Explosion_000.wav",  0},      //SE_爆発０
+			{"data/SE/Damage_000.wav",  0},         //SE_ダメージ０
 		};
 
 };

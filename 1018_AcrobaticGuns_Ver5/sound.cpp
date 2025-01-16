@@ -16,7 +16,7 @@
 //==========================================
 //コンストラクタ
 //==========================================
-CSound::CSound() : m_pXAudio2(), m_pMasteringVoice(), m_apSourceVoice(), m_apDataAudio(), m_aSizeAudio()
+CSound::CSound()
 {
 
 }
@@ -73,7 +73,7 @@ HRESULT CSound::InitSound(HWND hWnd)
 	}
 	
 	// サウンドデータの初期化
-	for (int nCntSound = 0; nCntSound < SOUND_LABEL_MAX; nCntSound++)
+	for (int nCntSound = 0; nCntSound < static_cast<int>(SOUND_LABEL::MAX); nCntSound++)
 	{
 		HANDLE hFile;
 		DWORD dwChunkSize = 0;
@@ -180,7 +180,7 @@ void CSound::UninitSound(void)
 {
 
 	// 一時停止
-	for (int nCntSound = 0; nCntSound < SOUND_LABEL_MAX; nCntSound++)
+	for (int nCntSound = 0; nCntSound < static_cast<int>(SOUND_LABEL::MAX); nCntSound++)
 	{
 		if (m_apSourceVoice[nCntSound] != NULL)
 		{
@@ -223,27 +223,27 @@ HRESULT CSound::PlaySound(SOUND_LABEL label)
 
 	// バッファの値設定
 	memset(&buffer, 0, sizeof(XAUDIO2_BUFFER));
-	buffer.AudioBytes = m_aSizeAudio[label];
-	buffer.pAudioData = m_apDataAudio[label];
+	buffer.AudioBytes = m_aSizeAudio[static_cast<int>(label)];
+	buffer.pAudioData = m_apDataAudio[static_cast<int>(label)];
 	buffer.Flags = XAUDIO2_END_OF_STREAM;
-	buffer.LoopCount = m_aSoundInfo[label].nCntLoop;
+	buffer.LoopCount = m_aSoundInfo[static_cast<int>(label)].nCntLoop;
 
 	// 状態取得
-	m_apSourceVoice[label]->GetState(&xa2state);
+	m_apSourceVoice[static_cast<int>(label)]->GetState(&xa2state);
 	if (xa2state.BuffersQueued != 0)
 	{// 再生中
 		// 一時停止
-		m_apSourceVoice[label]->Stop(0);
+		m_apSourceVoice[static_cast<int>(label)]->Stop(0);
 
 		// オーディオバッファの削除
-		m_apSourceVoice[label]->FlushSourceBuffers();
+		m_apSourceVoice[static_cast<int>(label)]->FlushSourceBuffers();
 	}
 
 	// オーディオバッファの登録
-	m_apSourceVoice[label]->SubmitSourceBuffer(&buffer);
+	m_apSourceVoice[static_cast<int>(label)]->SubmitSourceBuffer(&buffer);
 
 	// 再生
-	m_apSourceVoice[label]->Start(0);
+	m_apSourceVoice[static_cast<int>(label)]->Start(0);
 
 	return S_OK;
 }
@@ -257,14 +257,14 @@ void CSound::StopSound(SOUND_LABEL label)
 	XAUDIO2_VOICE_STATE xa2state;
 
 	// 状態取得
-	m_apSourceVoice[label]->GetState(&xa2state);
+	m_apSourceVoice[static_cast<int>(label)]->GetState(&xa2state);
 	if (xa2state.BuffersQueued != 0)
 	{// 再生中
 		// 一時停止
-		m_apSourceVoice[label]->Stop(0);
+		m_apSourceVoice[static_cast<int>(label)]->Stop(0);
 
 		// オーディオバッファの削除
-		m_apSourceVoice[label]->FlushSourceBuffers();
+		m_apSourceVoice[static_cast<int>(label)]->FlushSourceBuffers();
 	}
 }
 //====================================================================================================================
@@ -275,7 +275,7 @@ void CSound::StopSound(SOUND_LABEL label)
 void CSound::StopSound(void)
 {
 	// 一時停止
-	for (int nCntSound = 0; nCntSound < SOUND_LABEL_MAX; nCntSound++)
+	for (int nCntSound = 0; nCntSound < static_cast<int>(SOUND_LABEL::MAX); nCntSound++)
 	{
 		if (m_apSourceVoice[nCntSound] != NULL)
 		{
@@ -286,9 +286,6 @@ void CSound::StopSound(void)
 }
 //====================================================================================================================
 
-//================================================================
-//チャンクのチェック
-//================================================================
 HRESULT CSound::CheckChunk(HANDLE hFile, DWORD format, DWORD* pChunkSize, DWORD* pChunkDataPosition)
 {
 	HRESULT hr = S_OK;

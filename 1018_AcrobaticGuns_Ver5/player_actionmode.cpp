@@ -25,6 +25,7 @@
 #include "game.h"
 #include "tutorial.h"
 #include "particle.h"
+#include "sound.h"
 #include "wire_head.h"
 #include "camera.h"
 //===================================================================================================================
@@ -408,6 +409,7 @@ void CPlayerAttack_Shot::AttackProcess(CPlayer* pPlayer)
 		pAttackPlayer->GetMoveInfo().SetUseInteria(false, CObjectX::GetNormalInertia());
 		pAttackPlayer->GetLifeInfo().SetAutoSubLife(true);
 
+		CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL::SE_SHOT_000);//ŽËŒ‚Œø‰Ê‰¹‚ðo‚·
 		CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::SHOT);		
 	}
 
@@ -489,6 +491,8 @@ void CPlayerAttack_Dive::AttackProcess(CPlayer* pPlayer)
 		pDivePossibleNum->SetNumericState(pDivePossibleNum->GetValue() - 1, 50.0f, 50.0f);
 
 		CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::TAKEDIVE);
+
+		CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL::SE_EXPLOSION_000);
 	}
 	pPlayer->ChengeMoveMode(DBG_NEW CPlayerMove_PrepDive());
 	pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_Dont());
