@@ -542,6 +542,16 @@ void CPlayer::ChengeAbnormalState(CPlayerAbnormalState* pAbnormalState)
 }
 
 //========================================================
+//射撃モードの初期状態にモードを戻す
+//========================================================
+void CPlayer::SetInitialShotState()
+{
+    ChengeMoveMode(DBG_NEW CPlayerMove_Normal());
+    ChengeAttackMode(DBG_NEW CPlayerAttack_Shot());
+}
+//==========================================================================================================
+
+//========================================================
 //ダメージを与える
 //========================================================
 void CPlayer::SetDamage(int nDamage, int nHitStopTime)

@@ -407,7 +407,7 @@ void CPlayerAttack_Shot::AttackProcess(CPlayer* pPlayer)
 		pAttackPlayer->GetMoveInfo().SetUseInteria(false, CObjectX::GetNormalInertia());
 		pAttackPlayer->GetLifeInfo().SetAutoSubLife(true);
 
-		CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL::SE_SHOT_000);//ŽËŒ‚Œø‰Ê‰¹‚ðo‚·
+		CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL::SE_SHOT_001);//ŽËŒ‚Œø‰Ê‰¹‚ðo‚·
 		CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::SHOT);		
 	}
 

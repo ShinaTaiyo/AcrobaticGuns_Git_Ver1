@@ -22,6 +22,7 @@ public:
 	{
 		BGM_NOESIS,       //Noesis
 	    SE_SHOT_000,      //ËŒ‚‚O
+		SE_SHOT_001,      //ËŒ‚‚P
 	    SE_EXPLOSION_000, //”š”­‚O
 		SE_DAMAGE_000,    //ƒ_ƒ[ƒW‚O
 		MAX,
@@ -71,6 +72,7 @@ private:
 		{
 			{"data/BGM/TitleBgm_Noesis.wav", -1},   //BGM_Noesis
 			{"data/SE/Shot_000.wav",  0},           //SE_ËŒ‚‚O
+			{"data/SE/Shot_001.wav",  0},           //SE_ËŒ‚‚O
 			{"data/SE/Explosion_000.wav",  0},      //SE_”š”­‚O
 			{"data/SE/Damage_000.wav",  0},         //SE_ƒ_ƒ[ƒW‚O
 		};

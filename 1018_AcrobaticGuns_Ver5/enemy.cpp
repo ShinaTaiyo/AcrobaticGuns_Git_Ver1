@@ -1797,6 +1797,8 @@ CObject* CDiveWeakEnemy::ManagerSaveObject()
 //====================================================================================
 void CDiveWeakEnemy::ManagerChooseControlInfo()
 {
+	CInputKeyboard* pKeyboard = CManager::GetInputKeyboard();
+
 	if (CManager::GetInputKeyboard()->GetPress(DIK_LCONTROL) == true)
 	{//Lコントロールキーを押しながら
 		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
