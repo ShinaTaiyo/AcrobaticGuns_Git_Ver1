@@ -187,7 +187,7 @@ void CPlayer::Update()
 
     if (m_bDamage == true)
     {
-        CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL::SE_DAMAGE_000);
+        //CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL::SE_DAMAGE_000);
         SetNextMotion(3);
         m_bDamage = false;
     }

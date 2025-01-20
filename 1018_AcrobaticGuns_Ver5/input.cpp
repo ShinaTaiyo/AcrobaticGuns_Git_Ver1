@@ -233,6 +233,15 @@ bool CInputKeyboard::GetRepeat(int nKey)
 }
 //===============================================================
 
+//*************************************
+//ジョイパッドクラス
+//*************************************
+
+//=====================================
+//静的メンバ宣言
+//=====================================
+const BYTE CInputJoypad::s_bRightTrigger_DeadZone = 10;//右トリガーボタンの微小な値の入力を無視する
+
 //=====================================
 //コンストラクタ（ジョイパッドクラス）
 //=====================================
@@ -292,19 +301,26 @@ void CInputJoypad::Update()
 	//ジョイパッドの状態を取得
 	if (XInputGetState(0, &joykeyState) == ERROR_SUCCESS)
 	{
+		//WORD型はunsigined short(符号なし)なので、基本的に代入される値が（0～65535)なので、オーバーフローや範囲外のあたいが代入されることはない。
+		//エラーは起きないので例外処理は必要ない
 		WORD Button = joykeyState.Gamepad.wButtons;
 		WORD OldButton = m_joykeyStatePress.Gamepad.wButtons;
-		m_joykeyStateTrigger.Gamepad.wButtons = ~OldButton & Button;//トリガー処理（1f前と同じだったら）（絶対に１になる）
+		m_joykeyStateTrigger.Gamepad.wButtons = ~OldButton & Button;//1f前の入力状態を反転。現在押されているボタンと&演算（どちらも１なら１）するので、1f前おしていない場合、アクティブになり、トリガー処理が実現する
 
 		BYTE RTTrigger = joykeyState.Gamepad.bRightTrigger;
-		BYTE OldRTrigger = m_joykeyStatePress.Gamepad.bRightTrigger;
-		m_joykeyStateTrigger.Gamepad.bRightTrigger = ~OldRTrigger & RTTrigger;//トリガー処理（1f前と同じだったら）（絶対に１になる）
+		CManager::GetDebugText()->PrintDebugText("現在のジョイパッドの右トリガー情報の値：%d\n", RTTrigger);
+		BYTE OldRTrigger = m_joykeyStatePress.Gamepad.bRightTrigger;	
+		m_joykeyStateTrigger.Gamepad.bRightTrigger = ~OldRTrigger & RTTrigger;//1f前の入力状態を反転。現在押されているボタンと&演算（どちらも１なら１）するので、1f前おしていない場合、アクティブになり、トリガー処理が実現する
 
 		BYTE LTTrigger = joykeyState.Gamepad.bLeftTrigger;
 		BYTE OldLTrigger = m_joykeyStatePress.Gamepad.bLeftTrigger;
-		m_joykeyStateTrigger.Gamepad.bLeftTrigger = ~OldLTrigger & LTTrigger;//トリガー処理（1f前と同じだったら）（絶対に１になる）
-
-		m_joykeyStatePress = joykeyState;//ジョイパッドのプレス情報を保存
+		m_joykeyStateTrigger.Gamepad.bLeftTrigger = ~OldLTrigger & LTTrigger;//1f前の入力状態を反転。現在押されているボタンと&演算（どちらも１なら１）するので、1f前おしていない場合、アクティブになり、トリガー処理が実現する
+		m_joykeyStatePress = joykeyState;//ジョイパッドのプレス状態を保存
+	}
+	else
+	{//状態取得失敗時の処理
+	   ZeroMemory(&m_joykeyStatePress,sizeof(XINPUT_STATE));//値を初期化
+	   ZeroMemory(&m_joykeyStateTrigger,sizeof(XINPUT_STATE));//値を初期化
 	}
 }
 //================================================================
@@ -332,7 +348,7 @@ bool CInputJoypad::GetTrigger(JOYKEY key)
 //=====================================
 bool CInputJoypad::GetRT_Press()
 {
-	return m_joykeyStatePress.Gamepad.bRightTrigger != 0;//0x0004（JOYKEY_LEFT)なら0x01<<2 = 00000111 = 0x0004;
+	return m_joykeyStatePress.Gamepad.bRightTrigger > s_bRightTrigger_DeadZone;//自然に微小な値が入力されることがあるので、デッドゾーンを超えた値が入力されていたらtrueni
 }
 //========================================================================================================================================================
 
@@ -345,6 +361,7 @@ bool CInputJoypad::GetRT_Repeat(const int nRepeatLoop)
 	{
 		if (GetRT_Trigger() == true)
 		{
+
 			m_nRTTrigger_RepeatCnt = 0;
 			return true;
 		}
@@ -567,7 +584,7 @@ bool CInputJoypad::GetRStickPress(const int nDivisionRot)
 //=====================================
 bool CInputJoypad::GetRT_Trigger()
 {
-	return  m_joykeyStateTrigger.Gamepad.bRightTrigger != 0;//0x0004（JOYKEY_LEFT)なら0x01<<2 = 00000111 = 0x0004
+	return m_joykeyStateTrigger.Gamepad.bRightTrigger > s_bRightTrigger_DeadZone;//自然に微小な値が入力されることがあるので、デッドゾーンを超えた値が入力されていたらtrueにする
 }
 //================================================================
 

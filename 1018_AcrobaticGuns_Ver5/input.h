@@ -112,6 +112,9 @@ public:
 	const float & GetLStickAimRot() const { return m_fLSitckAimRot; }     //Lスティックの目的の角度を取得する
 	const float & GetRStickAimRot() const { return m_fRStickAimRot; }     //Rスティックの目的の角度を取得する
 private:
+	//*静的メンバ
+	static const BYTE s_bRightTrigger_DeadZone;
+
 	XINPUT_STATE m_joykeyStatePress;      //ジョイパッドのプレス情報!
 	XINPUT_STATE m_joykeyStateTrigger;    //ジョイパッドのトリガー情報!
 

@@ -100,7 +100,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//ƒTƒEƒ“ƒh‚Ì¶¬
 	//============================
 	m_pSound = DBG_NEW CSound;
-	m_pSound->InitSound(hWnd);
+	m_pSound->Init(hWnd);
 	//======================================================
 
 	//============================
@@ -218,7 +218,7 @@ void CManager::Uninit()
 	//================================
 	if (m_pSound != nullptr)
 	{
-		m_pSound->UninitSound();
+		m_pSound->Uninit();
 		delete m_pSound;
 		m_pSound = nullptr;
 	}

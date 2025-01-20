@@ -50,8 +50,6 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hInstancePrev, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)//大文字が小文字かで、反応しなくなる場合があるのでしっかり書こう。引き数の前に_In_をつけるとWinmainの破線を消せる。
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	//lpCmdLine = {};//仮置き
-	//_CrtMemCheckpoint(&s1);
 	//int* buf = DBG_NEW int;
 	//*buf = 10;
 	//delete buf;

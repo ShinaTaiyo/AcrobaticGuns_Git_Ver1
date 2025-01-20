@@ -407,7 +407,7 @@ void CPlayerAttack_Shot::AttackProcess(CPlayer* pPlayer)
 		pAttackPlayer->GetMoveInfo().SetUseInteria(false, CObjectX::GetNormalInertia());
 		pAttackPlayer->GetLifeInfo().SetAutoSubLife(true);
 
-		CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL::SE_SHOT_001);//射撃効果音を出す
+		//CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL::SE_SHOT_001);//射撃効果音を出す
 		CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::SHOT);		
 	}
 
@@ -490,7 +490,7 @@ void CPlayerAttack_Dive::AttackProcess(CPlayer* pPlayer)
 
 		CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::TAKEDIVE);
 
-		CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL::SE_EXPLOSION_000);
+		//CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL::SE_EXPLOSION_000);
 
 		//目的の向きまで少しづつ動かす（カメラの前は-D3DX_PI * 0.5f,プレイヤーはデフォルトの向きが異なるので、Rot.y + D3DX_PI)
 		CManager::GetCamera()->ChengeState(DBG_NEW CCameraState_TurnAround(D3DXVECTOR3(-D3DX_PI * 0.5f, pPlayer->GetRotInfo().GetRot().y + D3DX_PI, 0.0f), 0.1f));

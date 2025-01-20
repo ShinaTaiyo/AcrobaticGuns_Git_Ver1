@@ -32,43 +32,35 @@ public:
 	//*****************************************************************************
 	// プロトタイプ宣言
 	//*****************************************************************************
-	CSound();                            //コンストラクタ
-	~CSound();                           //デストラクタ
-	HRESULT InitSound(HWND hWnd);        //初期化処理
-	void UninitSound(void);              //終了処理
-	HRESULT PlaySound(SOUND_LABEL label);//サウンド再生処理
-	void StopSound(SOUND_LABEL label);   //サウンドストップ処理
-	void StopSound(void);                //サウンドストップ処理（オーバーロード）
-	//=================================================================================================================================
+	//メンバ関数
+	CSound();//コンストラクタ
+	~CSound();//デストラクタ
+	HRESULT Init(HWND hWnd);//初期化処理
+	void Uninit();//終了処理
+	HRESULT PlaySound(SOUND_LABEL label);// セグメント再生(再生中なら停止)
+	void Stop(SOUND_LABEL label);// セグメント停止(ラベル指定)
+	void Stop();// セグメント停止(全て)
 
 private:
-	//*****************************************************************************
-	// プロトタイプ宣言
-	//*****************************************************************************
-	HRESULT CheckChunk(HANDLE hFile, DWORD format, DWORD* pChunkSize, DWORD* pChunkDataPosition);
-	HRESULT ReadChunkData(HANDLE hFile, void* pBuffer, DWORD dwBuffersize, DWORD dwBufferoffset);
-	//=================================================================================================================================
+	// サウンド情報の構造体定義
+	typedef struct
+	{
+		const char* pFilename;	// ファイル名
+		int nCntLoop;		// ループカウント
+	} SOUNDINFO;
 
-		//*****************************************************************************
-        // サウンド情報の構造体定義
-        //*****************************************************************************
-		typedef struct
-		{
-			const char* pFilename;	// ファイル名
-			int nCntLoop;		// ループカウント
-		} SOUNDINFO;
+	//メンバ関数
+	HRESULT CheckChunk(HANDLE hFile, DWORD format, DWORD* pChunkSize, DWORD* pChunkDataPosition);// チャンクのチェック
+	HRESULT ReadChunkData(HANDLE hFile, void* pBuffer, DWORD dwBuffersize, DWORD dwBufferoffset);// チャンクデータの読み込み
 
-		//*****************************************************************************
-		// グローバル変数
-		//*****************************************************************************
-		IXAudio2* m_pXAudio2 = NULL;								                // XAudio2オブジェクトへのインターフェイス!
-		IXAudio2MasteringVoice* m_pMasteringVoice = NULL;			                // マスターボイス!
-		IXAudio2SourceVoice* m_apSourceVoice[static_cast<int>(SOUND_LABEL::MAX)];	// ソースボイス!
-		BYTE* m_apDataAudio[static_cast<int>(SOUND_LABEL::MAX)];					// オーディオデータ!
-		DWORD m_aSizeAudio[static_cast<int>(SOUND_LABEL::MAX)];					    // オーディオデータサイズ!
+	//メンバ変数
+	IXAudio2* m_pXAudio2 = NULL;								// XAudio2オブジェクトへのインターフェイス
+	IXAudio2MasteringVoice* m_pMasteringVoice = NULL;			// マスターボイス
+	IXAudio2SourceVoice* m_apSourceVoice[static_cast<int>(SOUND_LABEL::MAX)];	// ソースボイス
+	BYTE* m_apDataAudio[static_cast<int>(SOUND_LABEL::MAX)];					// オーディオデータ
+	DWORD m_aSizeAudio[static_cast<int>(SOUND_LABEL::MAX)];					// オーディオデータサイズ
 
-		// サウンドの情報
-		SOUNDINFO m_aSoundInfo[static_cast<int>(SOUND_LABEL::MAX)] =
+	SOUNDINFO m_aSoundInfo[static_cast<int>(SOUND_LABEL::MAX)] = // サウンドの情報
 		{
 			{"data/BGM/TitleBgm_Noesis.wav", -1},   //BGM_Noesis
 			{"data/SE/Shot_000.wav",  0},           //SE_射撃０

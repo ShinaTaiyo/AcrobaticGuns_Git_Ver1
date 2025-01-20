@@ -803,7 +803,7 @@ void CObjectX::DrawShadow()
 	D3DXMatrixMultiply(&mtxShadow, &mtxShadow, &mtxScale);
 
 	////Œü‚«‚ð”½‰f
-	//D3DXMatrixRotationYawPitchRoll(&mtxRot,m_Rot.y, m_Rot.x, m_Rot.z);
+	//D3DXMatrixRotationYawPitchRoll(&mtxRot,m_RotInfo.Rot.y,m_RotInfo.Rot.x, m_RotInfo.Rot.z);
 	//D3DXMatrixMultiply(&mtxShadow, &mtxShadow, &mtxRot);
 
 

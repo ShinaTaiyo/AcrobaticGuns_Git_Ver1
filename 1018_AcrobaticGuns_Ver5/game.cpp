@@ -147,7 +147,7 @@ void CGame::Uninit()
 	}
 	//=====================================================================
 
-	CManager::GetSound()->StopSound();
+	CManager::GetSound()->Stop();
 
 	CScene::Uninit();//ƒV[ƒ“I—¹ˆ—
 }

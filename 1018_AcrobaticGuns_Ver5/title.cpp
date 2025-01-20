@@ -72,7 +72,7 @@ HRESULT CTitle::Init()
 	pUi->SetUseDeath(true);
 	CObjectX::SetCommonDraw(false);
 
-	CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL::BGM_NOESIS);//タイトルBGMを流す
+	//CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL::BGM_NOESIS);//タイトルBGMを流す
 	return S_OK;
 }
 //=========================================================================================================================
@@ -105,7 +105,7 @@ void CTitle::Uninit()
 		m_pTitleLogo = nullptr;
 	}
 
-	CManager::GetSound()->StopSound();//全ての音を止める
+	CManager::GetSound()->Stop();//全ての音を止める
 }
 //=========================================================================================================================
 
