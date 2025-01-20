@@ -33,6 +33,17 @@ class CPlayerAbnormalState_KnockBack;
 class CPlayer : public CCharacter
 {
 public:
+	//================================================
+    //アクションモード列挙型
+    //================================================
+	enum class ACTIONMODE
+	{
+		SHOT = 0,
+		DIVE,
+		MAX
+	};
+	//===============================================================================================
+
 	CPlayer(CPlayerMove* pPlayerMove, CPlayerAttack* pPlayerAttack, CPlayerEffect* pPlayerEffect, CPlayerWireShot* pPlayer,
 		int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::PLAYER, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_X);                  //コンストラクタ
 	~CPlayer();                 //デストラクタ
@@ -72,13 +83,13 @@ public:
 	void ChengeEffectMode(CPlayerEffect* pPlayerEffect);//エフェクトモードを変える
 	void ChengeWireShotMode(CPlayerWireShot* pPlayerWireShot);//ワイヤー発射モードを変える
 	CPlayerWireShot* GetWireShotState() { return m_pWireShot; }//ワイヤー発射状態を取得
+	void SetInitialActionMode(ACTIONMODE ActionMode);          //アクションモードを設定する
 	//===============================================================================================
 
 	//================================================
 	//状態異常チェンジ
 	//================================================
 	void ChengeAbnormalState(CPlayerAbnormalState* pAbnormalState);//状態異常を変える
-	void SetInitialShotState();//射撃モードの初期状態に設定
 	//===============================================================================================
 
 	//=============================
@@ -87,17 +98,6 @@ public:
 	void SetDamage(int nDamage, int nHitStopTime) override; //ダメージを与える
 	//===============================================================================================
 private:
-	//================================================
-	//アクションモード列挙型
-	//================================================
-	enum class ACTIONMODE
-	{
-		SHOT = 0,
-		DIVE,
-		MAX
-	};
-	//===============================================================================================
-
 	//================================================
 	//静的メンバ
 	//================================================
@@ -147,7 +147,7 @@ private:
 	//=============================
 	//モードチェンジ
 	//=============================
-	void ActionModeChenge();//アクションモードを変更する
+	void ActionModeChengeProcess();//アクションモードを変更する
 	//==============================================================================================
 
 	//=============================

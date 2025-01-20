@@ -875,8 +875,14 @@ void CObjectX::DrawShadow()
 		//==========================================================================
 		for (int nCntMat = 0; nCntMat < (int)m_ObjectXInfo.dwNumMat; nCntMat++)
 		{
-			//色合いの設定
-			pMat[nCntMat].MatD3D.Diffuse = D3DXCOLOR(0.0f, 0.0f, 0.0f, m_ObjectXInfo.Diffuse[nCntMat].a);
+			if (m_ObjectXInfo.FormarDiffuse[nCntMat].a > 0.5f)
+			{//a値が0.5f異常なら0.5fに固定
+				pMat[nCntMat].MatD3D.Diffuse = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.5f);
+			}
+			else
+			{//a値が0.5f以下なら全体色合いのデータから直接a値を参照
+			    pMat[nCntMat].MatD3D.Diffuse = D3DXCOLOR(0.0f, 0.0f, 0.0f, m_ObjectXInfo.Diffuse[nCntMat].a);
+			}
 
 			//マテリアルの設定
 			pDevice->SetMaterial(&pMat[nCntMat].MatD3D);

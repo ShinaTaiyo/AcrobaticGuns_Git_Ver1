@@ -92,7 +92,7 @@ HRESULT CPlayer::Init()
         m_pDivePossibleNum->SetNumericState(0, 50.0f, 50.0f);
         m_pDivePossibleNum->SetUseDeath(false);
 
-        m_pWire = CWire::Create(CWire::WIRETYPE::ROPE, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 15.0f, 20.0f, 4, 5);
+        m_pWire = CWire::Create(CWire::WIRETYPE::ROPE, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 5.0f, 20.0f, 4, 5);
         m_pWire->SetUseDeath(false);
         m_pWire->SetPlayerPointer(this);//プレイヤーのポインタを設定
         m_pWire->SetUseDraw(false);
@@ -159,7 +159,7 @@ void CPlayer::Update()
 
         AdjustRot();//向き調整処理
 
-        ActionModeChenge(); //現在のアクションモードを変更する
+        ActionModeChengeProcess(); //現在のアクションモードを変更する
     }
 
     CCharacter::Update();//更新処理
@@ -310,59 +310,21 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
 //========================================================
 //攻撃開始
 //========================================================
-void CPlayer::ActionModeChenge()
+void CPlayer::ActionModeChengeProcess()
 {
     if (CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::X) || CManager::GetInputMouse()->GetMouseRightClickTrigger())
     {
-        if (m_pModeDisp != nullptr)
-        {
-            m_pModeDisp->SetUseDeath(true);
-            m_pModeDisp->SetDeath();
-            m_pModeDisp = nullptr;
-        }
         CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::MODECHENGE);
 
         //モードを切り替える
         if (m_NowActionMode == ACTIONMODE::SHOT)
         {//ショット→ダイブ
-            m_NowActionMode = ACTIONMODE::DIVE;
+            SetInitialActionMode(ACTIONMODE::DIVE);
         }
         else
         {//ダイブ→ショット
-            m_NowActionMode = ACTIONMODE::SHOT;
-            GetMoveInfo().SetUseInteria(true, GetNormalInertia());
-            GetMoveInfo().SetUseGravity(true, GetNormalGravity());
+            SetInitialActionMode(ACTIONMODE::SHOT);
         }
-
-        //モード生成
-        switch (m_NowActionMode)
-        {
-        case ACTIONMODE::SHOT://発射モード
-            ChengeMoveMode(DBG_NEW CPlayerMove_Normal()); //通常移動モードにする
-            ChengeAttackMode(DBG_NEW CPlayerAttack_Shot()); //攻撃可能モードにする
-            ChengeEffectMode(DBG_NEW CPlayerEffect_None()); //エフェクトなしモードにする
-            ChengeWireShotMode(DBG_NEW CPlayerWireShot_Dont);//ワイヤー発射状態をオフにする
-            m_pModeDisp = CUi::Create(CUi::UITYPE::ACTIONMODE_GUN, CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, 1, false, D3DXVECTOR3(50.0f, 50.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-                D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-            break;
-        case ACTIONMODE::DIVE://ダイブモード
-            ChengeMoveMode(DBG_NEW CPlayerMove_PrepDive(this));//ダイブ準備モードにする
-            ChengeAttackMode(DBG_NEW CPlayerAttack_Dont);  //攻撃不能モードにする
-            ChengeEffectMode(DBG_NEW CPlayerEffect_None()); //エフェクトなしモードにする
-            ChengeWireShotMode(DBG_NEW CPlayerWireShot_Dont);//ワイヤー発射状態をオフにする
-            m_pModeDisp = CUi::Create(CUi::UITYPE::ACTIONMODE_DIVE, CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, 1, false, D3DXVECTOR3(50.0f, 50.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-                D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-            break;
-        default:
-            break;
-        }
-
-        m_pWire->SetUseDraw(false);
-        m_pWire->GetWireHead()->GetDrawInfo().SetUseDraw(false);
-
-        m_pModeDisp->SetUseDeath(false);//死亡フラグを発動させない
-
-
     }
 }
 //==========================================================================================================
@@ -434,7 +396,7 @@ void CPlayer::ChengeEffectMode(CPlayerEffect* pPlayerEffect)
         m_pEffect = pPlayerEffect;
     }
 }
-
+//==========================================================================================================
 
 //========================================================
 //ワイヤー発射モードをチェンジ
@@ -448,6 +410,53 @@ void CPlayer::ChengeWireShotMode(CPlayerWireShot* pPlayerWireShot)
 
         m_pWireShot = pPlayerWireShot;
     }
+}
+//==========================================================================================================
+
+//========================================================
+//アクションモードの初期状態を設定する
+//========================================================
+void CPlayer::SetInitialActionMode(ACTIONMODE ActionMode)
+{
+    if (m_pModeDisp != nullptr)
+    {//モード表示を変えるために一旦消す
+        m_pModeDisp->SetUseDeath(true);
+        m_pModeDisp->SetDeath();
+        m_pModeDisp = nullptr;
+    }
+
+    m_NowActionMode = ActionMode;//アクションモードのデータを変える
+
+    //モード生成
+    switch (ActionMode)
+    {
+    case ACTIONMODE::SHOT://発射モード
+        ChengeMoveMode(DBG_NEW CPlayerMove_Normal()); //通常移動モードにする
+        ChengeAttackMode(DBG_NEW CPlayerAttack_Shot()); //攻撃可能モードにする
+        ChengeEffectMode(DBG_NEW CPlayerEffect_None()); //エフェクトなしモードにする
+        ChengeWireShotMode(DBG_NEW CPlayerWireShot_Dont);//ワイヤー発射状態をオフにする
+        GetMoveInfo().SetUseInteria(true, GetNormalInertia());//慣性を使用する
+        GetMoveInfo().SetUseGravity(true, GetNormalGravity());//重力を使用する
+        m_pModeDisp = CUi::Create(CUi::UITYPE::ACTIONMODE_GUN, CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, 1, false, D3DXVECTOR3(50.0f, 50.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+            D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));//モード表示を「射撃」に変える
+        break;
+    case ACTIONMODE::DIVE://ダイブモード
+        ChengeMoveMode(DBG_NEW CPlayerMove_PrepDive(this));//ダイブ準備モードにする
+        ChengeAttackMode(DBG_NEW CPlayerAttack_Dont);  //攻撃不能モードにする
+        ChengeEffectMode(DBG_NEW CPlayerEffect_None()); //エフェクトなしモードにする
+        ChengeWireShotMode(DBG_NEW CPlayerWireShot_Dont);//ワイヤー発射状態をオフにする
+        m_pModeDisp = CUi::Create(CUi::UITYPE::ACTIONMODE_DIVE, CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, 1, false, D3DXVECTOR3(50.0f, 50.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+            D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));//モード表示を「ダイブ」に変える
+        break;
+    default:
+        break;
+    }
+
+    m_pWire->SetUseDraw(false);
+    m_pWire->GetWireHead()->GetDrawInfo().SetUseDraw(false);
+
+    m_pModeDisp->SetUseDeath(false);//死亡フラグを発動させない
+
 }
 //==========================================================================================================
 
@@ -540,17 +549,6 @@ void CPlayer::ChengeAbnormalState(CPlayerAbnormalState* pAbnormalState)
         m_pAbnormalState = pAbnormalState;
     }
 }
-
-//========================================================
-//射撃モードの初期状態にモードを戻す
-//========================================================
-void CPlayer::SetInitialShotState()
-{
-    ChengeMoveMode(DBG_NEW CPlayerMove_Normal());
-    ChengeAttackMode(DBG_NEW CPlayerAttack_Shot());
-    ChengeWireShotMode(DBG_NEW CPlayerWireShot_Dont());
-    m_pWire->GetWireHead()->GetDrawInfo().SetUseDraw(false);//ワイヤーの頭は描画しない
-}
 //==========================================================================================================
 
 //========================================================
@@ -571,6 +569,8 @@ void CPlayer::SetDamage(int nDamage, int nHitStopTime)
     pGauge->SetUseAddScale(D3DXVECTOR2(0.1f, 0.1f), true);
     pGauge->SetUseScale(true);
     pGauge->SetScale(D3DXVECTOR2(1.0f, 1.0f));
+
+    SetInitialActionMode(ACTIONMODE::SHOT);//射撃モードに強制的に戻す
 
     m_bDamage = true;//ダメージを受けた状態を明示的に示す
     SetNextMotion(2);
