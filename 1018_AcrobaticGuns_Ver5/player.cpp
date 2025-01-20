@@ -36,7 +36,8 @@
 //====================================================
 //静的メンバ宣言
 //====================================================
-const int CPlayer::s_nNORMAL_MAXLIFE = 100;
+const int CPlayer::s_nNORMAL_MAXLIFE = 100;//プレイヤーの最大体力
+const int CPlayer::s_nMaxDiveNum = 5;      //プレイヤーの最大ダイブ数
 //==========================================================================================================
 
 //====================================================
@@ -175,6 +176,16 @@ void CPlayer::Update()
         DiveGaugeMaxEffect();//ダイブゲージがマックスになった時の演出
 
         m_pWireShot->WireShotProcess(this);//ワイヤー発射状態処理
+
+        if (m_pDivePossibleNum->GetValue() == s_nMaxDiveNum)
+        {//点滅をさせる
+            m_pDivePossibleNum->SetUseBlinking(true, 20, 0.0f);//点滅させる
+        }
+        else
+        {//点滅を止める
+            m_pDivePossibleNum->SetUseBlinking(false, 20, 0.0f);
+            m_pDivePossibleNum->SetColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), false, 1.0f);
+        }
 
         CManager::GetDebugText()->PrintDebugText("プレイヤーの位置：%f %f %f\n", GetPosInfo().GetPos().x, GetPosInfo().GetPos().y, GetPosInfo().GetPos().z);
         CManager::GetDebugText()->PrintDebugText("プレイヤーの体力：%d\n", GetLifeInfo().GetLife());
@@ -329,14 +340,16 @@ void CPlayer::ActionModeChengeProcess()
 }
 //==========================================================================================================
 
-
 //========================================================
 //ダイブゲージがマックスになった時の演出を行う
 //========================================================
 void CPlayer::DiveGaugeMaxEffect()
 {
+    CDebugText* pDebugText = CManager::GetDebugText();
+    pDebugText->PrintDebugText("ダイブゲージの値：%d\n", m_pDiveGauge->GetParam());
+    pDebugText->PrintDebugText("ダイブ可能回数：%d\n", m_pDivePossibleNum->GetValue());
     if (m_pDiveGauge->GetFullGaugeFlag() == true)
-    {
+    {//ゲージがマックスになった「瞬間」にフラグを発動＆＆最大ダイブ可能回数に達していなかったら
         CGauge* pGauge = CGauge::Create(CGauge::GAUGETYPE::PLAYERHP, m_pDiveGauge->GetParam(), m_pDiveGauge->GetWidth(), m_pDiveGauge->GetHeight(), m_pDiveGauge->GetPos());
         pGauge->SetUseLife(true, 50, 50);
         pGauge->SetPolygonType(m_pDiveGauge->GetPolygonType());
