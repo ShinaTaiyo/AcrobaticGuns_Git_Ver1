@@ -72,7 +72,7 @@ HRESULT CTitle::Init()
 	pUi->SetUseDeath(true);
 	CObjectX::SetCommonDraw(false);
 
-	//CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL::BGM_NOESIS);//タイトルBGMを流す
+	CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL::BGM_NOESIS);//タイトルBGMを流す
 	return S_OK;
 }
 //=========================================================================================================================

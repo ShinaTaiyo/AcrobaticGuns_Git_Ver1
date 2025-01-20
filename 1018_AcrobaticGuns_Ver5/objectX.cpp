@@ -781,7 +781,6 @@ void CObjectX::DrawShadow()
 
 	D3DXVECTOR3 RayCollisionPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	D3DXVECTOR3 CalcRayCollisionPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-
 	float fResultNearLength = 0.0f;
 
     //影のマトリックスを初期化
@@ -789,8 +788,10 @@ void CObjectX::DrawShadow()
 
 	//ライトの逆方向ベクトルを設定
 	vecLight = D3DXVECTOR4(-100.0f, 300.0f,300.0f, 0.0f);
-	ShadowPos = D3DXVECTOR3(0.0f,0.0f,0.0f);
-	ShadowNor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+
+	ShadowPos = D3DXVECTOR3(0.0f,0.0f,0.0f);   //影の位置
+	ShadowNor = D3DXVECTOR3(0.0f, 1.0f, 0.0f); //影の法線（Yが1.0fなので、水平なポリゴン)
+
 
 	//法線と平面上の一点から平面情報を作成
 	D3DXPlaneFromPointNormal(&plane, &ShadowPos, &ShadowNor);
@@ -802,10 +803,9 @@ void CObjectX::DrawShadow()
 	D3DXMatrixScaling(&mtxScale, m_SizeInfo.Scale.x, m_SizeInfo.Scale.y, m_SizeInfo.Scale.z);
 	D3DXMatrixMultiply(&mtxShadow, &mtxShadow, &mtxScale);
 
-	////向きを反映
-	//D3DXMatrixRotationYawPitchRoll(&mtxRot,m_RotInfo.Rot.y,m_RotInfo.Rot.x, m_RotInfo.Rot.z);
-	//D3DXMatrixMultiply(&mtxShadow, &mtxShadow, &mtxRot);
-
+	//回転を反映
+	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_RotInfo.Rot.y, 0.0f, 0.0f);
+	D3DXMatrixMultiply(&mtxShadow, &mtxShadow, &mtxRot);
 
 	//==================================================================================
 	//下にレイを飛ばし、当たったオブジェクトの中で一番近いオブジェクトの位置を求める
@@ -822,10 +822,10 @@ void CObjectX::DrawShadow()
 			if (pObj->GetType() == CObject::TYPE::BLOCK || pObj->GetType() == CObject::TYPE::BGMODEL)
 			{
 				CObjectX* pObjX = static_cast<CObjectX*>(pObj);
-				if (CCollision::RayIntersectsAABBCollisionPos(m_PosInfo.Pos + D3DXVECTOR3(0.0f,0.1f,0.0f), D3DXVECTOR3(0.0f, -1.0f, 0.0f),
+				if (CCollision::RayIntersectsAABBCollisionPos(m_PosInfo.WorldPos + D3DXVECTOR3(0.0f,0.1f,0.0f), D3DXVECTOR3(0.0f, -1.0f, 0.0f),
 					pObjX->GetPosInfo().GetPos() + pObjX->m_SizeInfo.GetVtxMin(),pObjX->GetPosInfo().GetPos() + pObjX->m_SizeInfo.GetVtxMax(), CalcRayCollisionPos))
 				{
-					float fLength = sqrtf(powf(CalcRayCollisionPos.y - m_PosInfo.Pos.y,2));//レイが当たった位置のY軸の距離を取る
+					float fLength = sqrtf(powf(CalcRayCollisionPos.y - m_PosInfo.WorldPos.y,2));//レイが当たった位置のY軸の距離を取る
 					nCntColRay++;
 					if (nCntColRay == 1)
 					{//最初の当たったオブジェクトなので、無条件で距離とレイが当たった位置を記録する
@@ -849,7 +849,7 @@ void CObjectX::DrawShadow()
 	//==================================================================================================================================================================
 
 	//位置を反映
-	D3DXMatrixTranslation(&mtxTrans,m_PosInfo.Pos.x,RayCollisionPos.y, m_PosInfo.Pos.z);
+	D3DXMatrixTranslation(&mtxTrans,m_PosInfo.WorldPos.x,RayCollisionPos.y, m_PosInfo.WorldPos.z);
 	D3DXMatrixMultiply(&mtxShadow, &mtxShadow, &mtxTrans);
 
 	//ワールドマトリックスの設定

@@ -71,7 +71,7 @@ void CObjectXInfo::Unload()
         {
             if (m_apObjectXList[nCntInfo].pTexture[nCntMat] != nullptr)
             {
-                m_apObjectXList[nCntInfo].pTexture[nCntMat]->Release(); //テクスチャへのポインタ
+                m_apObjectXList[nCntInfo].pTexture[nCntMat]->Release();
                 m_apObjectXList[nCntInfo].pTexture[nCntMat] = nullptr;
             }
         }
