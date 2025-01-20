@@ -407,7 +407,7 @@ void CPlayerAttack_Shot::AttackProcess(CPlayer* pPlayer)
 		pAttackPlayer->GetMoveInfo().SetUseInteria(false, CObjectX::GetNormalInertia());
 		pAttackPlayer->GetLifeInfo().SetAutoSubLife(true);
 
-		//CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL::SE_SHOT_001);//射撃効果音を出す
+		CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL::SE_SHOT_001);//射撃効果音を出す
 		CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::SHOT);		
 	}
 
@@ -478,6 +478,7 @@ void CPlayerAttack_Dive::AttackProcess(CPlayer* pPlayer)
 {
 	CGauge* pDiveGauge = pPlayer->GetDiveGauge();
 	CUi* pDivePossibleNum = pPlayer->GetDivePossibleNum();
+	CWireHead* pWireHead = pPlayer->GetWire()->GetWireHead();
 	if (pDivePossibleNum->GetValue() > 0)
 	{//ダイブゲージがたまっていたら爆発攻撃を発動
 		CAttackPlayer* pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::ENEMY, CAttack::COLLISIONTYPE::SQUARE, false,true, 50,30, 100, pPlayer->GetPosInfo().GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.1f, 0.1f, 0.1f),
@@ -490,7 +491,7 @@ void CPlayerAttack_Dive::AttackProcess(CPlayer* pPlayer)
 
 		CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::TAKEDIVE);
 
-		//CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL::SE_EXPLOSION_000);
+		CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL::SE_EXPLOSION_000);
 
 		//目的の向きまで少しづつ動かす（カメラの前は-D3DX_PI * 0.5f,プレイヤーはデフォルトの向きが異なるので、Rot.y + D3DX_PI)
 		CManager::GetCamera()->ChengeState(DBG_NEW CCameraState_TurnAround(D3DXVECTOR3(-D3DX_PI * 0.5f, pPlayer->GetRotInfo().GetRot().y + D3DX_PI, 0.0f), 0.1f));
@@ -498,6 +499,7 @@ void CPlayerAttack_Dive::AttackProcess(CPlayer* pPlayer)
 		//爆発を見せたいので、カメラと注視点の距離を一定時間変える
 		CManager::GetCamera()->ChengeLengthState(DBG_NEW CCameraLengthState_Gradually(300.0f, 0.1f, 60));
 	}
+	pWireHead->GetDrawInfo().SetUseDraw(false);//ワイヤーの頭の描画をオフにする
 	pPlayer->ChengeMoveMode(DBG_NEW CPlayerMove_PrepDive(pPlayer));
 	pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_Dont());
 

@@ -548,6 +548,8 @@ void CPlayer::SetInitialShotState()
 {
     ChengeMoveMode(DBG_NEW CPlayerMove_Normal());
     ChengeAttackMode(DBG_NEW CPlayerAttack_Shot());
+    ChengeWireShotMode(DBG_NEW CPlayerWireShot_Dont());
+    m_pWire->GetWireHead()->GetDrawInfo().SetUseDraw(false);//ƒƒCƒ„[‚Ì“ª‚Í•`‰æ‚µ‚È‚¢
 }
 //==========================================================================================================
 

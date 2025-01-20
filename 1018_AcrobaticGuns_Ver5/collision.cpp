@@ -400,9 +400,6 @@ bool CCollision::IsPointInsideAABB(const D3DXVECTOR3& Point, CObjectX* pComObjX)
 		Point.z >= pComObjX->GetPosInfo().GetPos().z + pComObjX->GetSizeInfo().GetVtxMin().z &&
 		Point.z <= pComObjX->GetPosInfo().GetPos().z + pComObjX->GetSizeInfo().GetVtxMax().z)
 	{
-		CManager::GetDebugText()->PrintDebugText("レイの支点とAABBの当たり判定が無効！位置：%f %f %f\n", pComObjX->GetPosInfo().GetPos().x, pComObjX->GetPosInfo().GetPos().y, pComObjX->GetPosInfo().GetPos().z);
-		CManager::GetDebugText()->PrintDebugText("最大頂点：%f %f %f\n", pComObjX->GetSizeInfo().GetVtxMax().x, pComObjX->GetSizeInfo().GetVtxMax().y, pComObjX->GetSizeInfo().GetVtxMax().z);
-		CManager::GetDebugText()->PrintDebugText("最小頂点：%f %f %f\n", pComObjX->GetSizeInfo().GetVtxMin().x, pComObjX->GetSizeInfo().GetVtxMin().y, pComObjX->GetSizeInfo().GetVtxMin().z);
 		return true;
 	}
 	return false;
