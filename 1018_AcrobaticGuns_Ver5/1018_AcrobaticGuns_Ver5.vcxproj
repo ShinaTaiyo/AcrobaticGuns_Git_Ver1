@@ -93,6 +93,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -144,66 +145,114 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="aimodel.cpp" />
+    <ClCompile Include="attack.cpp" />
     <ClCompile Include="bg.cpp" />
+    <ClCompile Include="bg3d.cpp" />
+    <ClCompile Include="bgModel.cpp" />
     <ClCompile Include="billboard.cpp" />
     <ClCompile Include="block.cpp" />
     <ClCompile Include="calculation.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="character.cpp" />
     <ClCompile Include="collision.cpp" />
-    <ClCompile Include="debugproc.cpp" />
+    <ClCompile Include="damage.cpp" />
+    <ClCompile Include="debugtext.cpp" />
     <ClCompile Include="edit.cpp" />
+    <ClCompile Include="effect.cpp" />
+    <ClCompile Include="enemy.cpp" />
+    <ClCompile Include="eventmanager.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="field.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="gauge.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="light.cpp" />
+    <ClCompile Include="lockon.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="manager.cpp" />
+    <ClCompile Include="meshcylinder.cpp" />
+    <ClCompile Include="meshorbit.cpp" />
+    <ClCompile Include="modelparts.cpp" />
+    <ClCompile Include="number.cpp" />
+    <ClCompile Include="number3d.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="object2d.cpp" />
     <ClCompile Include="object3d.cpp" />
     <ClCompile Include="objectX.cpp" />
     <ClCompile Include="objectXInfo.cpp" />
+    <ClCompile Include="particle.cpp" />
+    <ClCompile Include="particle2d.cpp" />
+    <ClCompile Include="phasemanager.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="player_actionmode.cpp" />
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="result.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="sound.cpp" />
     <ClCompile Include="stagemanager.cpp" />
-    <ClCompile Include="text.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="title.cpp" />
+    <ClCompile Include="tutorial.cpp" />
+    <ClCompile Include="ui.cpp" />
+    <ClCompile Include="ui3d.cpp" />
+    <ClCompile Include="wire.cpp" />
+    <ClCompile Include="wire_head.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="aimodel.h" />
+    <ClInclude Include="attack.h" />
     <ClInclude Include="bg.h" />
+    <ClInclude Include="bg3d.h" />
+    <ClInclude Include="bgModel.h" />
     <ClInclude Include="billboard.h" />
     <ClInclude Include="block.h" />
     <ClInclude Include="calculation.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="character.h" />
     <ClInclude Include="collision.h" />
-    <ClInclude Include="debugproc.h" />
+    <ClInclude Include="damage.h" />
+    <ClInclude Include="debugtext.h" />
     <ClInclude Include="edit.h" />
+    <ClInclude Include="effect.h" />
+    <ClInclude Include="enemy.h" />
+    <ClInclude Include="eventmanager.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="field.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="gauge.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="light.h" />
+    <ClInclude Include="lockon.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="manager.h" />
+    <ClInclude Include="meshcylinder.h" />
+    <ClInclude Include="meshorbit.h" />
+    <ClInclude Include="modelparts.h" />
+    <ClInclude Include="number.h" />
+    <ClInclude Include="number3d.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="object2d.h" />
     <ClInclude Include="object3d.h" />
     <ClInclude Include="objectX.h" />
     <ClInclude Include="objectXInfo.h" />
+    <ClInclude Include="particle.h" />
+    <ClInclude Include="particle2d.h" />
+    <ClInclude Include="phasemanager.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="player_actionmode.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="result.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="sound.h" />
     <ClInclude Include="stagemanager.h" />
-    <ClInclude Include="text.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="title.h" />
+    <ClInclude Include="tutorial.h" />
+    <ClInclude Include="ui.h" />
+    <ClInclude Include="ui3d.h" />
+    <ClInclude Include="wire.h" />
+    <ClInclude Include="wire_head.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
