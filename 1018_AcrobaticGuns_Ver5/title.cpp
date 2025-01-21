@@ -18,7 +18,6 @@
 #include "attack.h"
 #include "camera.h"
 #include "input.h"
-#include "debugproc.h"
 //=========================================================================================================================
 
 //=============================================================
@@ -72,7 +71,7 @@ HRESULT CTitle::Init()
 	pUi->SetUseDeath(true);
 	CObjectX::SetCommonDraw(false);
 
-	CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL::BGM_NOESIS);//タイトルBGMを流す
+	CManager::GetSound()->PlaySoundB(CSound::SOUND_LABEL::BGM_NOESIS);//タイトルBGMを流す
 	return S_OK;
 }
 //=========================================================================================================================

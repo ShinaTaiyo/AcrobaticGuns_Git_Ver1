@@ -24,7 +24,6 @@
 #include "objectXInfo.h"
 #include "main.h"
 #include "fade.h"
-#include "text.h"
 //===================================================
 
 //=======================

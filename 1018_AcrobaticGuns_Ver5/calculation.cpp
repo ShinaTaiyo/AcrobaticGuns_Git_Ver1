@@ -12,7 +12,6 @@
 #include "manager.h"
 #include "camera.h"
 #include "renderer.h"
-#include "debugproc.h"
 #include "particle.h"
 #include "attack.h"
 #include "input.h"

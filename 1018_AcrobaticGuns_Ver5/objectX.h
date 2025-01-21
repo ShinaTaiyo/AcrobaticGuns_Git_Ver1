@@ -86,7 +86,8 @@ public:
 
 		//色
 		int nChengeColorTime = 0;                    //色を変える時間!
-		bool bColorChenge = false;                       //色を変えているかどうか!
+		bool bColorChenge = false;                   //色を変えているかどうか!
+		bool bBlinkingColor = false;                 //色を点滅させるかどうか
 
 		//ワールド変換行列
 		D3DXMATRIX mtxWorld = {};                     //マトリックスワールド!
@@ -472,8 +473,7 @@ public:
 	void SetLockOnMatBindTexture(int nNumMat, LPDIRECT3DTEXTURE9 pTexture);
 
 	//色合い
-	void SetColor(D3DXCOLOR col, int nColChengeTime, bool bChoose, bool bSetAlpha);
-
+	void SetColor(D3DXCOLOR col, int nColChengeTime, bool bChoose, bool bSetAlpha,bool bBlinking);
 
 	//=================================================================================================================
 
@@ -563,6 +563,8 @@ private:
 	//描画関係
 	//===================================
 	void SetFormarColor();                     //元の色合いに戻す
+	void SetOnlyColor(D3DXCOLOR Col);          //色だけを設定する
+	void SetOnlyFormarColor();                 //データは変えずにアルファ値だけ設定する
 	//=================================================================================================================
 
 	//===================================

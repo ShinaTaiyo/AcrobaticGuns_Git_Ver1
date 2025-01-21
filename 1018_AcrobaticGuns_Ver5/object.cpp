@@ -194,6 +194,10 @@ void CObject::DrawAll()
 		pObj = m_pTop[nCntPriority];//トップオブジェクトを取得
 		while (pObj != nullptr)
 		{
+			//if (pObj->m_type == TYPE::PLAYER)
+			//{
+			//	int s = 0;
+			//}
 			//次のオブジェクトを格納
 			CObject* pNext = pObj->m_pNext;
 

@@ -297,7 +297,7 @@ void CCamera::MakeTransparent()
 
 						if (m_fLength > fLength)
 						{//カメラの距離よりもオブジェクトとレイが当たった位置が近い場合は透明にする
-							pObjX->SetColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.5f), 3, true, true);
+							pObjX->SetColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.5f), 3, true, true,false);
 						}
 					}
 				}

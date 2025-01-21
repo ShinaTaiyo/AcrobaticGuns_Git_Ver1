@@ -17,7 +17,6 @@
 #include "game.h"
 #include "edit.h"
 #include "input.h"
-#include "debugproc.h"
 #include <stdio.h>
 #include <string.h>
 //=================================================

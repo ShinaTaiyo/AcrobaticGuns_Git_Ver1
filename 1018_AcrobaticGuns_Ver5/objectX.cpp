@@ -286,13 +286,14 @@ void CObjectX::BindObjectXInfo(LPD3DXMESH pMesh, LPD3DXBUFFER pBuffMat, DWORD dw
 //================================================
 //色合いを設定する
 //================================================
-void CObjectX::SetColor(D3DXCOLOR col, int nColChengeTime, bool bChoose, bool bSetAlpha)
+void CObjectX::SetColor(D3DXCOLOR col, int nColChengeTime, bool bChoose, bool bSetAlpha, bool bBlinking)
 {
-	m_DrawInfo.bColorChenge = true;
-	m_DrawInfo.nChengeColorTime = nColChengeTime;
-	m_DrawInfo.Color = col;
+	m_DrawInfo.bColorChenge = true;//色を変えるかどうか
+	m_DrawInfo.nChengeColorTime = nColChengeTime;//色を変える時間
+	m_DrawInfo.Color = col; //色
+	m_DrawInfo.bBlinkingColor = bBlinking;//点滅
 	if (bChoose == true)
-	{
+	{//透明度だけを使用するかを選ぶ
 		if (bSetAlpha == false)
 		{
 			for (int nCnt = 0; nCnt < (int)(m_ObjectXInfo.dwNumMat); nCnt++)
@@ -311,7 +312,7 @@ void CObjectX::SetColor(D3DXCOLOR col, int nColChengeTime, bool bChoose, bool bS
 		}
 	}
 	else
-	{
+	{//普通に色を設定する
 		for (int nCnt = 0; nCnt < (int)(m_ObjectXInfo.dwNumMat); nCnt++)
 		{
 			m_ObjectXInfo.Diffuse[nCnt] = col;
@@ -356,6 +357,30 @@ void CObjectX::CalculateSenterPos()
 void CObjectX::SetFormarColor()
 {
 	m_DrawInfo.Color = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	for (int nCnt = 0; nCnt < (int)(m_ObjectXInfo.dwNumMat); nCnt++)
+	{
+		m_ObjectXInfo.Diffuse[nCnt] = m_ObjectXInfo.FormarDiffuse[nCnt];
+	}
+}
+//================================================================================================================================================
+
+//================================================
+//色合い「だけ」を設定する
+//================================================
+void CObjectX::SetOnlyColor(D3DXCOLOR Col)
+{
+	for (int nCnt = 0; nCnt < (int)(m_ObjectXInfo.dwNumMat); nCnt++)
+	{
+		m_ObjectXInfo.Diffuse[nCnt] = m_DrawInfo.Color;
+	}
+}
+//================================================================================================================================================
+
+//================================================
+//元の色合いに「だけ」設定する
+//================================================
+void CObjectX::SetOnlyFormarColor()
+{
 	for (int nCnt = 0; nCnt < (int)(m_ObjectXInfo.dwNumMat); nCnt++)
 	{
 		m_ObjectXInfo.Diffuse[nCnt] = m_ObjectXInfo.FormarDiffuse[nCnt];
@@ -612,7 +637,7 @@ void CObjectX::ChengeEditScaleZ()
 void CObjectX::ChengeEditPos()
 {
 	D3DXVECTOR3 Move = D3DXVECTOR3(0.0f,0.0f,0.0f);
-	SetColor(D3DXCOLOR(1.0f,0.0f,0.0f,0.5f),3,true,true);           //色を半透明にする
+	SetColor(D3DXCOLOR(1.0f,0.0f,0.0f,0.5f),3,true,true,false);           //色を半透明にする
 	CInputKeyboard* pInput = CManager::GetInputKeyboard();
 	//===========================
 	//位置を支点に固定
@@ -1052,7 +1077,7 @@ void CObjectX::LifeInfo::RatioLifeAlphaColorProcess(CObjectX* pObjX)
 	{
 		float fRatio;
 		fRatio = float(nLife) / float(nMaxLife);
-		pObjX->SetColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, fRatio), 3, true, true);
+		pObjX->SetColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, fRatio), 3, true, true,false);
 	}
 }
 //================================================================================================================================================
@@ -1077,6 +1102,19 @@ void CObjectX::DrawInfo::ChengeColorProcess(CObjectX* pObjX)
 	if (bColorChenge == true)
 	{
 		nChengeColorTime--;
+
+		if (bBlinkingColor == true)
+		{
+			//2fごとに設定された色と元の色合いを交互に変える
+			if (nChengeColorTime % 2 == 0)
+			{
+				pObjX->SetOnlyColor(Color);
+			}
+			else
+			{
+				pObjX->SetOnlyFormarColor();
+			}
+		}
 	}
 
 	if (nChengeColorTime <= 0 && bColorChenge == true)

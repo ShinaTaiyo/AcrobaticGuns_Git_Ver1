@@ -286,7 +286,7 @@ void CAttack::CollisionProcess(bool& bCollision, bool& bNowCollision, CObjectX* 
 	if (bNowCollision == true)
 	{
 		pObjX->SetDamage(GetPower(), m_HitStop.nSetTime);
-		pObjX->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), m_HitStop.nSetTime, false, false);
+		pObjX->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), m_HitStop.nSetTime, false, false,false);
 	}
 
 }

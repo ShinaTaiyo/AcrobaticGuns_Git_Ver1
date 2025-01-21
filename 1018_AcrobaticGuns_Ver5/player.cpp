@@ -19,7 +19,6 @@
 #include "objectXInfo.h"
 #include "calculation.h"
 #include "fade.h"
-#include "text.h"
 #include "game.h"
 #include "block.h"
 #include "enemy.h"
@@ -569,24 +568,28 @@ void CPlayer::ChengeAbnormalState(CPlayerAbnormalState* pAbnormalState)
 //========================================================
 void CPlayer::SetDamage(int nDamage, int nHitStopTime)
 {
-    CObjectX::SetDamage(nDamage, nHitStopTime);
+    if (GetLifeInfo().GetHitStop() == false)
+    {//ヒットストップ状態じゃなければ処理を実行する
+        CCharacter::SetDamage(nDamage, nHitStopTime);
+        
+        
+        m_pHpGauge->SetParam(GetLifeInfo().GetLife());
+        m_pHpGauge->SetShake(5.0f * nDamage, 30);
 
-    m_pHpGauge->SetParam(GetLifeInfo().GetLife());
-    m_pHpGauge->SetShake(5.0f * nDamage, 30);
+        CGauge* pGauge = CGauge::Create(CGauge::GAUGETYPE::PLAYERHP, m_pHpGauge->GetParam(), m_pHpGauge->GetWidth(), m_pHpGauge->GetHeight(), m_pHpGauge->GetPos());
+        pGauge->SetUseLife(true, 10, 10);
+        pGauge->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), false, 1.0f);
+        pGauge->SetUseLifeRatioColor(true);
+        pGauge->SetUseDeath(true);
+        pGauge->SetUseAddScale(D3DXVECTOR2(0.1f, 0.1f), true);
+        pGauge->SetUseScale(true);
+        pGauge->SetScale(D3DXVECTOR2(1.0f, 1.0f));
 
-    CGauge* pGauge = CGauge::Create(CGauge::GAUGETYPE::PLAYERHP, m_pHpGauge->GetParam(), m_pHpGauge->GetWidth(), m_pHpGauge->GetHeight(), m_pHpGauge->GetPos());
-    pGauge->SetUseLife(true, 10, 10);
-    pGauge->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), false, 1.0f);
-    pGauge->SetUseLifeRatioColor(true);
-    pGauge->SetUseDeath(true);
-    pGauge->SetUseAddScale(D3DXVECTOR2(0.1f, 0.1f), true);
-    pGauge->SetUseScale(true);
-    pGauge->SetScale(D3DXVECTOR2(1.0f, 1.0f));
+        SetInitialActionMode(ACTIONMODE::SHOT);//射撃モードに強制的に戻す
 
-    SetInitialActionMode(ACTIONMODE::SHOT);//射撃モードに強制的に戻す
-
-    m_bDamage = true;//ダメージを受けた状態を明示的に示す
-    SetNextMotion(2);
+        m_bDamage = true;//ダメージを受けた状態を明示的に示す
+        SetNextMotion(2);
+    }
 }
 //==========================================================================================================
 

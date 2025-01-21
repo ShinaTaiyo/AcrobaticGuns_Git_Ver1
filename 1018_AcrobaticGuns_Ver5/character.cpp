@@ -118,6 +118,20 @@ void CCharacter::SetNextMotion(int nNext)
 //===================================================================================================================
 
 //=============================================================
+//ダメージを与える
+//=============================================================
+void CCharacter::SetDamage(int nDamage, int nHitStopTime)
+{
+    for (auto ModelPartsIt : m_VecModelParts)
+    {//範囲ベースfor文
+        ModelPartsIt->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), nHitStopTime, false, false, true);//全てのモデルパーツの色合いを変える
+    }
+
+    CObjectX::SetDamage(nDamage, nHitStopTime);
+}
+//===================================================================================================================
+
+//=============================================================
 //モーション情報を割り当てる
 //=============================================================
 int CCharacter::RegistMotion(string String, CCharacter* pCharacter)

@@ -407,7 +407,7 @@ void CPlayerAttack_Shot::AttackProcess(CPlayer* pPlayer)
 		pAttackPlayer->GetMoveInfo().SetUseInteria(false, CObjectX::GetNormalInertia());
 		pAttackPlayer->GetLifeInfo().SetAutoSubLife(true);
 
-		CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL::SE_SHOT_001);//射撃効果音を出す
+		CManager::GetSound()->PlaySoundB(CSound::SOUND_LABEL::SE_SHOT_001);//射撃効果音を出す
 		CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::SHOT);		
 	}
 
@@ -476,6 +476,7 @@ CPlayerAttack_Dive::~CPlayerAttack_Dive()
 //=====================================================================================================
 void CPlayerAttack_Dive::AttackProcess(CPlayer* pPlayer)
 {
+
 	CGauge* pDiveGauge = pPlayer->GetDiveGauge();
 	CUi* pDivePossibleNum = pPlayer->GetDivePossibleNum();
 	CWireHead* pWireHead = pPlayer->GetWire()->GetWireHead();
@@ -484,14 +485,14 @@ void CPlayerAttack_Dive::AttackProcess(CPlayer* pPlayer)
 		CAttackPlayer* pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::ENEMY, CAttack::COLLISIONTYPE::SQUARE, false,true, 50,30, 100, pPlayer->GetPosInfo().GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.1f, 0.1f, 0.1f),
 			D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 		pAttackPlayer->GetSizeInfo().SetUseAddScale(D3DXVECTOR3(0.4f, 0.4f, 0.4f), true);
-		pAttackPlayer->SetColor(D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f), 200, false, false);
+		pAttackPlayer->SetColor(D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f), 200, false, false,false);
 		pAttackPlayer->GetLifeInfo().SetUseRatioLifeAlpha(true);
 		pAttackPlayer->SetCollisionRelease(false);
 		pDivePossibleNum->SetNumericState(pDivePossibleNum->GetValue() - 1, 50.0f, 50.0f);
 
 		CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::TAKEDIVE);
 
-		CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL::SE_EXPLOSION_000);
+		CManager::GetSound()->PlaySoundB(CSound::SOUND_LABEL::SE_EXPLOSION_000);
 
 		//目的の向きまで少しづつ動かす（カメラの前は-D3DX_PI * 0.5f,プレイヤーはデフォルトの向きが異なるので、Rot.y + D3DX_PI)
 		CManager::GetCamera()->ChengeState(DBG_NEW CCameraState_TurnAround(D3DXVECTOR3(-D3DX_PI * 0.5f, pPlayer->GetRotInfo().GetRot().y + D3DX_PI, 0.0f), 0.1f));

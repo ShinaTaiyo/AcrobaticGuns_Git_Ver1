@@ -316,7 +316,6 @@ void CObject2D::Draw()
 {
 	if (m_bUseDraw == true)
 	{
-
 		//レンダラークラスの情報を取得
 		CRenderer* pRenderer = CManager::GetRenderer();
 		//デバイスの取得

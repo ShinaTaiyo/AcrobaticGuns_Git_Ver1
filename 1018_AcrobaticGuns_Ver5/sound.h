@@ -37,7 +37,7 @@ public:
 	~CSound();//デストラクタ
 	HRESULT Init(HWND hWnd);//初期化処理
 	void Uninit();//終了処理
-	HRESULT PlaySound(SOUND_LABEL label);// セグメント再生(再生中なら停止)
+	HRESULT PlaySoundB(SOUND_LABEL label);// セグメント再生(再生中なら停止)
 	void Stop(SOUND_LABEL label);// セグメント停止(ラベル指定)
 	void Stop();// セグメント停止(全て)
 

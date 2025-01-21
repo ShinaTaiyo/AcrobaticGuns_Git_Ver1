@@ -17,7 +17,7 @@
 //静的メンバ宣言
 //==============================================================
 LPD3DXFONT CDebugText::s_pFont = nullptr;//フォントへのポインタ
-string CDebugText::s_DrawString = {};    //デバッグ表示用文字列
+string CDebugText::s_DrawString;    //デバッグ表示用文字列
 bool CDebugText::s_bDispDebug = false;   //デバッグ表示をするかどうか
 //====================================================================================================================
 
@@ -26,8 +26,7 @@ bool CDebugText::s_bDispDebug = false;   //デバッグ表示をするかどうか
 //==============================================================
 CDebugText::CDebugText()
 {
-    s_pFont = nullptr;
-    s_DrawString.clear();
+    s_DrawString.reserve(4096);//事前に必要な配列を確保しておく
     
 #ifndef _DEBUG
     s_bDispDebug = false;
@@ -67,13 +66,10 @@ HRESULT CDebugText::Init()
         &s_pFont                     // 作成したフォントオブジェクト
     );
 
-    if (hr == S_OK)
+    if (FAILED(hr))
     {
-
-    }
-    else
-    {
-        assert("フォントの作成に失敗！");
+        OutputDebugString("フォントの作成に失敗！");
+        return hr;
     }
 
 	return S_OK;

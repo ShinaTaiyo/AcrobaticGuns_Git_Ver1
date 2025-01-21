@@ -214,7 +214,7 @@ void CSound::Uninit(void)
 //==========================
 // ƒZƒOƒƒ“ƒgÄ¶(Ä¶’†‚È‚ç’â~)
 //==========================
-HRESULT CSound::PlaySound(SOUND_LABEL label)
+HRESULT CSound::PlaySoundB(SOUND_LABEL label)
 {
 	XAUDIO2_VOICE_STATE xa2state;
 	XAUDIO2_BUFFER buffer;
