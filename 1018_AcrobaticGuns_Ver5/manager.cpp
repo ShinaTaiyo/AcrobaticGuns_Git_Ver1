@@ -157,7 +157,8 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 void CManager::Uninit()
 {
 	//m_pStageManager->SaveMapTxt();//マップ情報をセーブする（それをしてから破棄する処理を開始）
-	//CObject::ReleaseAll();    //オブジェクトの開放
+	CObject::ReleaseAll();    //オブジェクトの開放
+	
 	//================================
 	//シーン
 	//================================

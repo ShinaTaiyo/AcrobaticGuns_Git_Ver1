@@ -162,12 +162,12 @@ private:
 	//================================================
 	//変数宣言
 	//================================================
-	ENEMYTYPE m_Type;//敵の種類
+	CEnemyMove* m_pEnemyMove;   //敵の移動ステート
 	vector<CAIModel*> m_VecMoveAi;//移動AIモデル
+	ENEMYTYPE m_Type;//敵の種類
 	D3DXVECTOR3 m_MoveAiSavePos;//移動AIの保存する位置
 	int m_nIdxMoveAi;           //移動AIの移動位置の配列を指定する
 	int m_nPhaseNum;            //フェーズ番号
-	CEnemyMove* m_pEnemyMove;   //敵の移動ステート
 	int m_nCntTime;             //時間を測る
 	float m_fRotMove;
 
@@ -248,8 +248,8 @@ private:
 	//================================================
 	//変数宣言
 	//================================================
-	SHOTWEAKENEMYTYPE m_ShotWeakEnemyType;//敵の種類
 	CAttackEnemy* m_pMagicSword;//魔法剣
+	SHOTWEAKENEMYTYPE m_ShotWeakEnemyType;//敵の種類
 	D3DXVECTOR3 m_SaveAimPos;//目的の位置保存用
 	//===============================================================================================
 

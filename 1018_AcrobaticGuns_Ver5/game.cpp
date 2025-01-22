@@ -39,7 +39,7 @@ bool CGame::s_bUseGamePad = false;
 //=============================================================
 //ƒRƒ“ƒXƒgƒ‰ƒNƒ^
 //=============================================================
-CGame::CGame(bool bUseGamePad) : m_pBgModel(nullptr)
+CGame::CGame(bool bUseGamePad)
 {
 	m_pPlayer = nullptr;
 	m_pStageManager = nullptr;
@@ -122,17 +122,6 @@ void CGame::Uninit()
 		m_pPhaseManager->SetUseDeath(true);
 		m_pPhaseManager->SetDeath();
 		m_pPhaseManager = nullptr;
-	}
-	//=====================================================================
-
-	//============================================
-	//”wŒiƒ‚ƒfƒ‹‚Ì”jŠü
-	//============================================
-	if (m_pBgModel != nullptr)
-	{
-		m_pBgModel->SetUseDeath(true);
-		m_pBgModel->SetDeath();
-		m_pBgModel = nullptr;
 	}
 	//=====================================================================
 

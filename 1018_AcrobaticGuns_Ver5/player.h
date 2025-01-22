@@ -120,8 +120,8 @@ private:
 	bool m_bDamage;                     //ダメージを受けたかどうか
 
 	//他クラスインスタンス
-	CLockon* m_pLockOn;                 //ロックオンカーソル
 	ACTIONMODE m_NowActionMode;         //現在のアクションモード
+	CLockon* m_pLockOn;                 //ロックオンカーソル
 	CUi* m_pModeDisp;                   //モード表示UI
 	CWire* m_pWire;                     //ワイヤー
 	CGauge* m_pHpGauge;                 //体力ゲージ

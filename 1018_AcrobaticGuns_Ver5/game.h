@@ -43,7 +43,6 @@ private:
 	static CStageManager* m_pStageManager;                                 //ステージマネージャー
 	static CPhaseManager* m_pPhaseManager;                                 //フェーズマネージャー
 	static CTutorial* m_pTutorial;                                         //チュートリアル
-	CBgModel* m_pBgModel;                                                  //背景モデル
 	static int s_nPhaseNum;                                                //フェーズ番号
 	static bool s_bUseGamePad;                                             //ゲームパッドを使用するかどうか
 

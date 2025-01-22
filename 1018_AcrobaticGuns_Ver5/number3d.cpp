@@ -107,7 +107,7 @@ void CNumber3D::ExtraDraw()
 //========================
 void CNumber3D::SetDeath()
 {
-	CObject::SetDeath();
+	CBillboard::SetDeath();
 }
 //===========================================================================================
 

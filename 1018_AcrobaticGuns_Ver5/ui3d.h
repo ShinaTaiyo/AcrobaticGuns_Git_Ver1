@@ -32,6 +32,7 @@ public:
 	void Uninit(void) override;                                              //終了処理
 	void Update(void) override;                                              //更新処理
 	void Draw(void) override;                                                //描画処理
+	void SetDeath() override;                                                //死亡フラグ設定処理
 	static CUi3D* Create(UI3DTYPE type,D3DXVECTOR3 Pos,D3DXVECTOR3 Move,int nLife,float fWidth,float fHeight); //生成処理
 protected:
 	static const string m_UI3D_FILENAME[static_cast<int>(UI3DTYPE::MAX)];

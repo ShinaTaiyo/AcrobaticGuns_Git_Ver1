@@ -94,13 +94,15 @@ void CCharacter::Draw()
 //=============================================================
 void CCharacter::SetDeath()
 {
-    CObject::SetDeath();
+    CObjectX::SetDeath();
 
     for (auto it : m_VecModelParts)
     {
         it->SetUseDeath(true);//死亡フラグをアクティブにする
         it->SetDeath();       //死亡フラグを設定する
     }
+
+    m_VecModelParts.clear();//全てのモデルパーツの死亡フラグの設定が終わったので、データをクリアする
 }
 //===================================================================================================================
 

@@ -21,10 +21,7 @@ int CObject::m_nNumAll = 0;//オブジェクト総数
 CObject* CObject::m_apObject[CObject::m_nMAXPRIORITY][CObject::m_nMAXOBJECT] = {};
 CObject* CObject::m_pTop[CObject::m_nMAXPRIORITY] = {};
 CObject* CObject::m_pCur[CObject::m_nMAXPRIORITY] = {};
-CObject* CObject::m_pStageManagerObj_Top = {};
-CObject* CObject::m_pStageManagerObj_Cur = {};
 
-int CObject::m_nNumStageManagerObject = 0;//ステージマネージャーで管理されているオブジェクトの総数
 bool CObject::m_bActivationReleaseAll = false;            //ReleaseAllを発動するかどうか
 //====================================================
 
@@ -32,14 +29,13 @@ bool CObject::m_bActivationReleaseAll = false;            //ReleaseAllを発動する
 //=====================================================
 //コンストラクタ（描画順設定用）
 //=====================================================
-CObject::CObject(int nPriority,bool bUseintPriority, TYPE Type, OBJECTTYPE ObjType) : m_type(Type), m_bUseInitialSound(true) ,m_ObjectType(ObjType),m_bIsStageManagerObj(false),m_nID(0),m_nStageManagerObjNum(0),m_pStageManagerObj_Next(nullptr),
-m_pStageManagerObj_Prev(nullptr), m_bStageManagerChooseState(false),m_bDeath(false), m_bUseDeath(false),m_pPrev(nullptr),m_pNext(nullptr),
+CObject::CObject(int nPriority,bool bUseintPriority, TYPE Type, OBJECTTYPE ObjType) : m_type(Type), m_bUseInitialSound(true) ,m_ObjectType(ObjType),
+m_bDeath(false), m_bUseDeath(false),m_pPrev(nullptr),m_pNext(nullptr),
 m_nPriority(nPriority),m_bCreateSuccess(false),m_nCntFrame(0),m_ManagerObjectType(MANAGEROBJECTTYPE::NONE)
 {
 	m_bCreateSuccess = false;                       //生成に成功したかどうか
 	m_bDeath = false;                               //死亡フラグ
 	m_bUseDeath = true;                             //死亡フラグを発動するかどうか
-	m_bStageManagerChooseState = false;             //ステージマネージャーに選択されているかどうか
 	CObject* pObj = nullptr;                        //オブジェクト取得用
 
 	if (bUseintPriority == true)
@@ -194,10 +190,6 @@ void CObject::DrawAll()
 		pObj = m_pTop[nCntPriority];//トップオブジェクトを取得
 		while (pObj != nullptr)
 		{
-			//if (pObj->m_type == TYPE::PLAYER)
-			//{
-			//	int s = 0;
-			//}
 			//次のオブジェクトを格納
 			CObject* pNext = pObj->m_pNext;
 
@@ -332,74 +324,8 @@ void CObject::Release()
 	}
 	//=========================================================================================================================================
 	
-	if (m_bIsStageManagerObj == true)
-	{//ステージマネージャー管理オブジェクトなら
-		ReleaseStageManagerObj();
-	}
-	else
-	{
-		//自分自身を破棄
-		delete this;
-	}
-}
-//=============================================================================================================================================
-
-//=========================================================================
-//ステージマネージャーで管理するオブジェクトに設定
-//=========================================================================
-void CObject::SetStageManagerObj()
-{
-	m_bIsStageManagerObj = true;  //ステージマネージャーで管理されているオブジェクトにする                 
-	CObject* pObj = nullptr;      //オブジェクト取得用
-
-    //先頭がいなかったら登録
-	if (m_pStageManagerObj_Top == nullptr)
-	{//先頭いなかったら前も後ろもいない
-		m_pStageManagerObj_Top = this;//自分自信をトップオブジェクトに代入
-		m_pStageManagerObj_Cur = this;//自分自身をカレントオブジェクトに代入
-		m_pStageManagerObj_Prev = nullptr;         //前はいない
-		m_pStageManagerObj_Next = nullptr;         //次もいない
-		m_bCreateSuccess = true;//生成成功
-	}
-	else
-	{//先頭が存在している時
-		m_bCreateSuccess = true;//生成成功
-
-		pObj = m_pStageManagerObj_Cur;          //カレントオブジェクトを格納
-		pObj->m_pStageManagerObj_Next = this;
-		m_pStageManagerObj_Prev = pObj;
-		m_pStageManagerObj_Next = nullptr;
-		m_pStageManagerObj_Cur = this;          //カレントオブジェクトに自分自身を格納
-	}
-
-	m_nNumStageManagerObject++;//ステージマネージャーで管理しているオブジェクトの総数をインクリメント
-}
-//=============================================================================================================================================
-
-//=========================================================================
-//ステージマネージャーで管理しているオブジェクトを全て消す
-//=========================================================================
-void CObject::StageManagerObjectReleaseAll()
-{
-	CObject* pObj = nullptr;//オブジェクト格納用
-
-	for (int nCntPriority = 0; nCntPriority < m_nMAXPRIORITY; nCntPriority++)
-	{
-		pObj = m_pTop[nCntPriority];//トップオブジェクトを取得
-		while (pObj != nullptr)
-		{
-			//次のオブジェクトを格納
-			CObject* pNext = pObj->m_pNext;
-
-			if (pObj->m_bIsStageManagerObj == true)
-			{//ステージマネージャー管理オブジェクトなら
-				pObj->SetDeath();
-			}
-			//pObj->m_bDeath = true;
-			pObj = pNext;
-		}
-	}
-
+	//自分自身を破棄
+	delete this;
 }
 //=============================================================================================================================================
 
@@ -437,44 +363,4 @@ CObject* CObject::ManagerSaveObject()
 {
 	return this;
 }
-//=============================================================================================================================================
-
-//=======================================================================
-//ステージマネージャーで管理しているオブジェクトを破棄
-//=======================================================================
-void CObject::ReleaseStageManagerObj()
-{
-	CObject* PrevObj = nullptr;//前のオブジェクト格納用
-	CObject* NextObj = nullptr;//次のオブジェクト格納用
-
-	//前後のアドレスを格納
-	PrevObj = m_pStageManagerObj_Prev;//前のオブジェクトのアドレスを格納
-	NextObj = m_pStageManagerObj_Next;//次のオブジェクトのアドレスを格納
-
-	//==================================================
-	//消されたオブジェクトの両端をつなげる
-	//==================================================
-	if (PrevObj != nullptr)
-	{
-		PrevObj->m_pStageManagerObj_Next = NextObj;//前のオブジェクトの次のオブジェクトを設定
-	}
-	else
-	{//消えたオブジェクトの前のオブジェクトがなかったので、必然的に消えたオブジェクトの次のオブジェクトがトップオブジェクトになる
-		m_pStageManagerObj_Top = NextObj;
-	}
-
-	if (NextObj != nullptr)
-	{
-		NextObj->m_pStageManagerObj_Prev = PrevObj;//次のオブジェクトの前のオブジェクトを設定
-	}
-	else
-	{//消えたオブジェクトの次のオブジェクトがなかったので、必然的に消えたオブジェクトの前のオブジェクトが最後尾オブジェクトになる
-		m_pStageManagerObj_Cur = PrevObj;
-	}
-	//=========================================================================================================================================
-
-	m_nNumStageManagerObject--;//ステージマネージャーで管理しているオブジェクトの総数をデクリメント
-	//自分自身を破棄
-	delete this;
-}
-//=============================================================================================================================================
+//============================================================================================================================================

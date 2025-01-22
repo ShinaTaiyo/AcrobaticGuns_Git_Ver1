@@ -110,8 +110,6 @@ public:
 	TYPE GetType();                                      //タイプ取得
 	//==============================================================================================
 	void SetType(TYPE type);                             //タイプ設定
-	void SetStageManagerObjNum(int nNum) { m_nStageManagerObjNum = nNum; }            //ステージマネージャーで管理されているオブジェクトの番号を設定
-	int GetStageManagerObjNum() { return m_nStageManagerObjNum; }                     //ステージマネージャーで管理されているオブジェクトの番号を取得する
 	static const int m_nMAXOBJECT = 1024;                                             //オブジェクト最大数
 	static const int m_nMAXPRIORITY = static_cast<int>(TYPE::MAX);                    //描画順最大数
 	static void ReleaseProcess();                                                     //リストの破棄をする処理
@@ -126,15 +124,6 @@ public:
 	//==============================
 	//ステージマネージャー関係
 	//==============================
-	CObject* GetNextStageManagerObject() { return m_pStageManagerObj_Next; }          //ステージマネージャーで管理しているオブジェクトの次のオブジェクトを取得する
-	CObject* GetPrevStageManagerObject() { return m_pStageManagerObj_Prev; }          //ステージマネージャーで管理しているオブジェクトの前のオブジェクトを取得する
-	static CObject* GetTopStageManagerObject() { return m_pStageManagerObj_Top; }     //ステージマネージャーで管理しているオブジェクトのトップオブジェクトを取得する
-	static CObject* GetCurStageManagerObject() { return m_pStageManagerObj_Cur; }     //ステージマネージャーで管理しているオブジェクトのカレントオブジェクトを取得する
-	void SetStageManagerObj();                                                        //ステージマネージャーで管理するオブジェクトを設定
-
-	static int GetTotalStageManagerObjNum() { return m_nNumStageManagerObject; }      //ステージマネージャーで管理しているオブジェクトの総数を取得
-	static void StageManagerObjectReleaseAll();                                            //全てのマネージャー管理のオブジェクトを消す
-
 	//分類用
 	void SetManagerObjectType(MANAGEROBJECTTYPE Type) { m_ManagerObjectType = Type; }     //ステージマネージャー管理タイプを設定
 	const MANAGEROBJECTTYPE & GetManagerObjectType() const { return m_ManagerObjectType; }  //ステージマネージャー管理タイプを取得
@@ -145,8 +134,6 @@ public:
 	//==============================
 	static CObject* GetTopObject(int nPriority){ return m_pTop[nPriority];}           //トップオブジェクトを取得する
 	static CObject* GetCurrentObject(int nPriority) { return m_pCur[nPriority];}      //カレントオブジェクトを取得する
-	void SetStageManagerChoose(bool bChoose) { m_bStageManagerChooseState = bChoose; }//ステージマネージャーが選択しているかどうか
-	bool GetStageManagerChoose() { return m_bStageManagerChooseState; }               //ステージマネージャーが選択しているかどうかを取得する
 	//==============================================================================================
 
 	//=================================================
@@ -172,7 +159,6 @@ public:
 	//================================================================================================
 protected:
 private:
-	void ReleaseStageManagerObj();                             //ステージマネージャーで管理しているオブジェクトを破棄
 	static CObject* m_apObject[m_nMAXPRIORITY][m_nMAXOBJECT];//オブジェクト管理
 	static bool m_bActivationReleaseAll;                     //ReleaseAllを発動するかどうか
 
@@ -188,19 +174,6 @@ private:
 	bool m_bDeath;                                           //死亡フラグ!
 	bool m_bUseDeath;                                        //死亡フラグを発動するかどうか!
 	//===============================================================================================
-
-	//===============================================
-	//ステージマネージャー関係
-	//===============================================
-	static CObject* m_pStageManagerObj_Top;                  //ステージマネージャーで管理している先頭オブジェクトへのポインタ
-	static CObject* m_pStageManagerObj_Cur;                  //ステージマネージャーで管理してい最後尾オブジェクトへのポインタ
-	static int m_nNumStageManagerObject;                     //ステージマネージャーで管理されているオブジェクトの数
-
-	CObject* m_pStageManagerObj_Next;                        //ステージマネージャーで管理している次のオブジェクトへのポインタ!
-	CObject* m_pStageManagerObj_Prev;                        //ステージマネージャーで管理している前のオブジェクトへのポインタ!
-	bool m_bIsStageManagerObj;                               //ステージマネージャーで管理されているオブジェクトかどうか!
-	int m_nStageManagerObjNum;                               //ステージマネージャーで管理されているオブジェクトの番号!
-	bool m_bStageManagerChooseState;                         //ステージマネージャーが選択しているかどうか!
 
 	//分類用
 	MANAGEROBJECTTYPE m_ManagerObjectType;                   //管理番号判別用

@@ -99,8 +99,6 @@ void CTutorial::Draw()
 //======================================================
 void CTutorial::SetDeath()
 {
-	CObject::SetDeath();
-
 	if (GetUseDeath() == true)
 	{
 		for (int nCnt = 0; nCnt < static_cast<int>(CHECK::MAX); nCnt++)
@@ -119,6 +117,7 @@ void CTutorial::SetDeath()
 			m_pTutorialTex->SetDeath();
 			m_pTutorialTex = nullptr;
 		}
+		CObject::SetDeath();
 	}
 }
 //===================================================================================================
@@ -134,6 +133,11 @@ CTutorial* CTutorial::Create()
 
 	return pTutorial;
 }
+//===================================================================================================
+
+//======================================================
+//全てのチェックマークの描画をリセットする
+//======================================================
 void CTutorial::SetDrawReset()
 {
 	if (m_bSuccess == false)

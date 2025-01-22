@@ -210,7 +210,7 @@ void CParticle::Draw()
 //============================================
 void CParticle::SetDeath()
 {
-	CObject::SetDeath();
+	CBillboard::SetDeath();
 }
 //================================================================
 

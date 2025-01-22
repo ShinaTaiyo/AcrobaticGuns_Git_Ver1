@@ -53,6 +53,7 @@ CObjectXInfo::~CObjectXInfo()
 //===============================================
 void CObjectXInfo::Unload()
 {
+
     for (int nCntInfo = 0; nCntInfo < m_nMAX_INFO; nCntInfo++)
     {
         if (m_apObjectXList[nCntInfo].pMesh != nullptr)

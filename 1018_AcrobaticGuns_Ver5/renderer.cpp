@@ -345,8 +345,6 @@ void CRenderer::DrawFPS()
 void CRenderer::SetMode(MODE mode)
 {
 	m_mode = mode;//モードの設定
-
-	//CObject::ReleaseAll();  //オブジェクトの破棄
 }
 //=================================================================================
 

@@ -1087,7 +1087,7 @@ void CObjectX::LifeInfo::RatioLifeAlphaColorProcess(CObjectX* pObjX)
 //==============================================
 void CObjectX::LifeInfo::AutoDeathProcess(CObjectX* pObjX)
 {
-	if (nLife < 1 && bAutoDeath == true)
+	if (nLife < 1 && bAutoDeath == true && pObjX->GetUseDeath() == true)
 	{
 		pObjX->SetDeath();
 	}

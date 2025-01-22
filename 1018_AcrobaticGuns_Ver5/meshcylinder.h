@@ -23,6 +23,7 @@ public:
 	void Uninit() override;                        //終了処理
 	void Update() override;                        //更新処理
 	void Draw() override;                          //描画処理
+	void SetDeath() override;                      //死亡フラグ設定処理
 	void BindTexture(LPDIRECT3DTEXTURE9 pTexture); //テクスチャを割り当てる
 	void SetTextureIndex(int nIdx) { m_nTextureIndex = nIdx; }//テクスチャ番号を割り当てる4
 	int GetTextureIndex() { return m_nTextureIndex; }         //テクスチャ番号を取得する

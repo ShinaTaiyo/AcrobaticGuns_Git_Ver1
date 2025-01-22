@@ -27,6 +27,7 @@ public:
 	void Uninit(void) override;                                            //終了処理
 	void Update(void) override;                                            //更新処理
 	void Draw(void) override;                                              //描画処理
+	void SetDeath() override;                                              //死亡フラグ設定処理
 	void bindTexture(LPDIRECT3DTEXTURE9 pTexture);                         //テクスチャを割り当てる
 
 	void SetWidth(float fWidth) { m_fWidth = fWidth; }                     //横幅

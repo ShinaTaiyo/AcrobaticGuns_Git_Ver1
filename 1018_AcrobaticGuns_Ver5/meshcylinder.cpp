@@ -99,6 +99,11 @@ HRESULT CMeshCylinder::Init()
 			}
 			SetVertexInfo(&pVtx[nCntArray], fRatioXZ, fRatioY, nCntVtxXZ, nCntVtxY);
 
+			if (nCntArray >= m_nNumVtx || nCntArray < 0)
+			{
+				assert("配列外アクセス！");
+			}
+
 			//配列カウント
 			nCntArray++;
 
@@ -110,11 +115,6 @@ HRESULT CMeshCylinder::Init()
 				D3DXVec3Normalize(&MeasureNor, &MeasureNor);
 				pVtx[nCntArray].nor = MeasureNor;
 				pVtx[nCntArray].tex = D3DXVECTOR2(0.0f, fRatioY);
-			}
-
-			if (nCntArray >= m_nNumVtx)
-			{
-				assert(false);
 			}
 		}
 	}
@@ -139,19 +139,20 @@ HRESULT CMeshCylinder::Init()
 		nCntIdx = (m_nNumDivisionXZ + 1) * nCntVtxY + 1;//1,10,19・・・（上面→側面→側面→底面）
 		if (nCntVtxY == 0)
 		{//上面の中心
-			//pIdx[nCntArray2] = 0;//最初の頂点が上面の中心
 			bSide = false;
-			//nCntArray2++;
 		}
 		else if (nCntVtxY == m_nNumDivisionY)
 		{//底面の中心
 			bSide = false;
-			//pIdx[nCntArray2] = m_nNumIdx - m_nNumDivisionXZ;//(18 - 8)
-			//nCntArray2++;
 		}
 		else
 		{//側面
 			bSide = true;
+		}
+
+		if (nCntArray2 >= m_nNumIdx || nCntArray2 < 0)
+		{
+			assert("配列外アクセス！");
 		}
 
 		if (bSide == true)
@@ -200,12 +201,6 @@ HRESULT CMeshCylinder::Init()
 			}
 			nCntArray2 += 2;
 		}
-
-		//if (nCntArray2 >= m_nNumIdx)
-		//{
-		//	assert(false);
-		//}
-
 	}
 
 	//インデックスバッファのアンロック
@@ -235,19 +230,18 @@ void CMeshCylinder::Uninit()
 		m_pIdxBuff = nullptr;
 	}
 
-	//テクスチャの開放
+	//テクスチャの開放（別で開放する)
 	if (m_pTexture != nullptr)
 	{
 		m_pTexture = nullptr;
 	}
 
-	//それぞれの中心点の開放
+	//それぞれの中心点の開放（動的配列を破棄）
 	if (m_pSenterPos != nullptr)
 	{
 		delete[] m_pSenterPos;
 		m_pSenterPos = nullptr;
 	}
-
 }
 //=========================================================================================================================================
 
@@ -256,7 +250,9 @@ void CMeshCylinder::Uninit()
 //==================================================================================================================
 void CMeshCylinder::Update()
 {
+#ifdef _DEBUG
 	CheckMeshInfo();
+#endif
 }
 //=========================================================================================================================================
 
@@ -313,6 +309,15 @@ void CMeshCylinder::Draw()
 	}
 	//片面だけ描画する
 	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+}
+//=========================================================================================================================================
+
+//==================================================================================================================
+//死亡フラグ設定処理
+//==================================================================================================================
+void CMeshCylinder::SetDeath()
+{
+	CObject::SetDeath();
 }
 //=========================================================================================================================================
 
@@ -397,6 +402,11 @@ void CMeshCylinder::CheckMeshInfo()
 	{
 		m_nCheckVtx = m_nNumVtx - 1;
 	}
+
+	if (m_nCheckVtx >= m_nNumVtx || m_nCheckVtx < 0)
+	{
+		assert("配列外アクセス！");
+	}
 	//デバッグ表示
 	CManager::GetDebugText()->PrintDebugText("確認している頂点番号：%d、頂点の位置：%f %f %f\n",
 		m_nCheckVtx, pVtx[m_nCheckVtx].pos.x, pVtx[m_nCheckVtx].pos.y, pVtx[m_nCheckVtx].pos.z);
@@ -431,11 +441,13 @@ void CMeshCylinder::CheckMeshInfo()
 		m_nCheckIdx = m_nNumIdx - 1;
 	}
 
+	if (m_nCheckIdx >= m_nNumIdx || m_nCheckIdx < 0)
+	{
+		assert("配列外アクセス！");
+	}
+
 	int nCheck = pIdx[m_nCheckIdx];
-
 	CManager::GetDebugText()->PrintDebugText("確認しているインデックス番号：%d、頂点の位置：%f %f %f\n", m_nCheckIdx, pVtx[nCheck].pos.x, pVtx[nCheck].pos.y, pVtx[nCheck].pos.z);
-
-	//CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 60, 40.0f, 40.0f, 100, 10, false, pVtx[nCheck].pos, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
 
 	m_pIdxBuff->Unlock();
 

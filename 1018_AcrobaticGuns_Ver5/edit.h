@@ -29,10 +29,8 @@ public:
 	HRESULT Init() override;           //初期化処理
 	void Uninit() override;            //終了処理
 	void Update() override;            //更新処理
-	static CPlayer* GetPlayer() { return m_pPlayer; }           //プレイヤーを取得する
 	static CStageManager* GetStageManager() { return m_pStageManager; }//ステージマネージャーを取得する
 private:
-	static CPlayer* m_pPlayer;                                  //プレイヤー
 	static CStageManager* m_pStageManager;                      //ステージマネージャー
 };
 #endif

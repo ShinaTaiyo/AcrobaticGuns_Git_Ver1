@@ -121,7 +121,7 @@ void CFade::Draw()
 //======================================================
 void CFade::SetDeath()
 {
-	CObject::SetDeath();
+	CObject2D::SetDeath();
 }
 //========================================================================================================
 
@@ -151,24 +151,12 @@ void CFade::SetFade(FADEMODE FadeMode)
 CFade* CFade::Create()
 {
 	CFade* pFade = DBG_NEW CFade;                             //フェードを生成
-	bool bSuccess = pFade->CObject::GetCreateSuccess();       //生成が成功したかどうかを取得する
-	if (bSuccess == true)
-	{//生成が成功したら
-		if (pFade != nullptr)
-		{
-			pFade->Init();                                                                                                        //初期化処理
-			pFade->SetUseDeath(false);                                                   //死亡フラグを発動するかどうかを設定する
-			pFade->CObject2D::SetAnimInfo(1, 1, true);//ポリゴンとテクスチャ情報を設定
-			pFade->SetPos(D3DXVECTOR3(SCREEN_WIDTH / 2,SCREEN_HEIGHT / 2,0.0f));                                                                                        //中心に位置を設定
-			pFade->m_nMaxFadeCnt = 45;                                                                                           //フェードカウント最大値
-			pFade->CObject::SetType(CObject::TYPE::FADE);                                                                          //オブジェクトの種類を決める
-		}
-	}
-	else
-	{//オブジェクトに空きがなかったので破棄する
-		delete pFade;
-		pFade = nullptr;
-	}
+    pFade->Init();                                                                                                        //初期化処理
+    pFade->SetUseDeath(false);                                                   //死亡フラグを発動するかどうかを設定する
+    pFade->CObject2D::SetAnimInfo(1, 1, true);//ポリゴンとテクスチャ情報を設定
+    pFade->SetPos(D3DXVECTOR3(SCREEN_WIDTH / 2,SCREEN_HEIGHT / 2,0.0f));                                                                                        //中心に位置を設定
+    pFade->m_nMaxFadeCnt = 45;                                                                                           //フェードカウント最大値
+    pFade->CObject::SetType(CObject::TYPE::FADE);                                                                          //オブジェクトの種類を決める
 
 	return pFade;
 }

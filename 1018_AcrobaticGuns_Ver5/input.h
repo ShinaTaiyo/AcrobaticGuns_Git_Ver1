@@ -65,7 +65,7 @@ private:
 //==========================================
 //ジョイパッドクラス
 //==========================================
-class CInputJoypad : public CInput
+class CInputJoypad
 {
 public:
 	//==========================================
@@ -95,9 +95,9 @@ public:
 
 	CInputJoypad();                                                       //コンストラクタ
 	~CInputJoypad();                                                      //デストラクタ
-	HRESULT Init(HINSTANCE hInstance, HWND hWnd) override;                //初期化処理
-	void Uninit() override;                                               //終了処理
-	void Update() override;                                               //更新処理
+	HRESULT Init(HINSTANCE hInstance, HWND hWnd);                //初期化処理
+	void Uninit();                                               //終了処理
+	void Update();                                               //更新処理
  	bool GetPress(JOYKEY key);                                            //プレス状態獲得
 	bool GetTrigger(JOYKEY key);                                          //トリガー状態獲得
 	bool GetRT_Trigger();                                                 //Rトリガーボタンのトリガー情報
@@ -129,14 +129,14 @@ private:
 //==========================================
 //マウスクラス
 //==========================================
-class CInputMouse : public CInput
+class CInputMouse
 {
 public:
 	CInputMouse();//コンストラクタ
 	~CInputMouse();//デストラクタ
-	HRESULT Init(HINSTANCE hInstance, HWND hWnd) override;//初期化処理
-	void Uninit() override;//終了処理
-	void Update() override;//更新処理
+	HRESULT Init(HINSTANCE hInstance, HWND hWnd);//初期化処理
+	void Uninit();//終了処理
+	void Update();//更新処理
 	D3DXVECTOR2 GetMousePos();//カーソルの位置を取得
 	bool GetMouseMoveAngle(float & fAngle);//マウスが動いた角度を取得
 	bool GetMouseLeftClickPress();//クリックしたかどうか

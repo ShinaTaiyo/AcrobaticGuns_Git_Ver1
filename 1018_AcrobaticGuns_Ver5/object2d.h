@@ -49,6 +49,7 @@ public:
 	void Uninit() override;      //終了処理
 	void Update() override;      //更新処理
 	void Draw() override;        //描画処理
+	void SetDeath() override;    //死亡フラグ設定処理
 	void BindTexture(LPDIRECT3DTEXTURE9 pTex);  //テクスチャを割り当てる
 
 	//================================

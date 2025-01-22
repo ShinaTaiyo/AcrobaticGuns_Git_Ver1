@@ -17,6 +17,7 @@
 #include "object.h"
 #include "camera.h"
 #include "calculation.h"
+#include "bg3d.h"
 #include "debugtext.h"
 #include "bgModel.h"
 #include "enemy.h"
@@ -43,7 +44,7 @@ CStageManager::CStageManager(int nPri, bool bUseintPri, CObject::TYPE type, CObj
 m_nWorldIndex(0),m_pBg3D(nullptr), m_StgObjList(),m_SaveScale(D3DXVECTOR3(1.0f,1.0f,1.0f)),m_SavePos(D3DXVECTOR3(0.0f,0.0f,0.0f)),m_SaveRot(D3DXVECTOR3(0.0f,0.0f,0.0f)),
 m_SaveBeforeChoosePos(D3DXVECTOR3(0.0f,0.0f,0.0f)), m_nMapIndex(0), m_nMapNum(0), m_pChooseObject(nullptr),
 m_ManagerMode(MANAGERMODE::ALREADYSTAGE),m_bChooseObject(false),m_bMakeMapMode(false),m_bUseSizeMove(false),
-m_StgObjIt(),m_pState(nullptr),m_NowState(STATE::NEWOBJECT),m_SpawnPoint(D3DXVECTOR3(0.0f,0.0f,0.0f))
+m_pState(nullptr),m_NowState(STATE::NEWOBJECT),m_SpawnPoint(D3DXVECTOR3(0.0f,0.0f,0.0f))
 {
 
 }
@@ -170,11 +171,19 @@ void CStageManager::SetDeath()
 		m_StgObjList.clear();//vectorの中身をクリア
 
 		if (m_pState != nullptr)
-		{
+		{//ステート情報を破棄
 			delete m_pState;
 			m_pState = nullptr;
 		}
+
+		if (m_pBg3D != nullptr)
+		{//背景を破棄
+			m_pBg3D->SetUseDeath(true);
+			m_pBg3D->SetDeath();
+			m_pBg3D = nullptr;
+		}
 	}
+
 	CObject::SetDeath();
 }
 //============================================================================================================
@@ -287,7 +296,6 @@ void CStageManager::LoadMapFilePass(WORLDTYPE type)
 //============================================
 void CStageManager::SaveMapTxt(int nMapNum)
 {
-
 	fstream WritingFile;    //ファイル
 	string Writing_Buff;    //文字列
 	CObject::TYPE Type = {};//オブジェクト種類

@@ -24,60 +24,6 @@
 //============================================
 class CPlayer;
 
-////============================================
-////スーパークラス
-////============================================
-//
-////プレイヤーアクションモードクラス
-//class CPlayer_ActionMode
-//{
-//public:
-//	CPlayer_ActionMode();        //コンストラクタ
-//	virtual ~CPlayer_ActionMode(); //デストラクタ
-//	virtual void Attack(CPlayer* pPlayer) {};           //攻撃
-//	virtual void Move(CPlayer* pPlayer) {};             //移動量
-//	virtual void Collision(CPlayer* pPlayer) {};        //当たり判定処理
-//
-//protected:
-//	void PlayerControl(CPlayer* pPlayer);               //プレイヤーを動かす処理
-//private:
-//};
-////======================================================================================
-//
-////============================================
-////アクションモードクラス
-////============================================
-//
-////プレイヤーショットクラス
-//class CPlayerShot : public CPlayer_ActionMode
-//{
-//public:
-//	CPlayerShot();//コンストラクタ
-//	~CPlayerShot() override;//デストラクタ
-//	void Attack(CPlayer* pPlayer) override;       //攻撃
-//	void Move(CPlayer* pPlayer) override;         //移動
-//	void Collision(CPlayer* pPlayer) override;    //当たり判定処理
-//private:
-//};
-//
-////プレイヤーダイブクラス
-//class CPlayerDive : public CPlayer_ActionMode
-//{
-//public:
-//	CPlayerDive(); //コンストラクタ
-//	~CPlayerDive() override;//デストラクタ
-//	void Move(CPlayer* pPlayer) override;   //移動
-//	void Collision(CPlayer* pPlayer) override;    //当たり判定処理
-//private:
-//	bool m_bCollision;//判定したかどうかを取得
-//	bool m_bActiveDive;//ダイブ中かどうか
-//};
-//======================================================================================
-
-//==============================================
-//移動クラス
-//==============================================
-
 //スーパークラス
 class CPlayerMove
 {

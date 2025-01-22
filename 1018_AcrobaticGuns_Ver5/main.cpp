@@ -119,8 +119,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hInstancePrev, _
 	ShowWindow(hWnd, nCmdShow);//ウインドウの表示状態を設定。
 	UpdateWindow(hWnd);//クライアント領域を更新
 
-
-
 	//メッセージループ
 	while (1)
 	{

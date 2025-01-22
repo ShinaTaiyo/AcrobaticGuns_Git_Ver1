@@ -166,8 +166,12 @@ void CEnemy::SetDeath()
 	{
 		for (auto pObj : m_VecMoveAi)
 		{
-			pObj->SetUseDeath(true);
-			pObj->SetDeath();
+			if (pObj != nullptr)
+			{
+				pObj->SetUseDeath(true);
+				pObj->SetDeath();
+				pObj = nullptr;
+			}
 		}
 		m_VecMoveAi.clear();
 	}

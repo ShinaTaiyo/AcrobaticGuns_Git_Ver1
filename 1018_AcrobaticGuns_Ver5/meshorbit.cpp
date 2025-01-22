@@ -151,6 +151,7 @@ HRESULT CMeshOrbit::Init()
 //=============================================================
 void CMeshOrbit::Uninit()
 {
+
 	if (m_pVtxBuff != nullptr)
 	{
 		m_pVtxBuff->Release();
@@ -161,6 +162,11 @@ void CMeshOrbit::Uninit()
 	{
 		m_pIdxBuff->Release();
 		m_pIdxBuff = nullptr;
+	}
+
+	if (m_pTexture != nullptr)
+	{
+		m_pTexture = nullptr;
 	}
 }
 //===============================================================================================

@@ -110,7 +110,7 @@ void CUi::SetDeath()
 	if (GetUseDeath() == true)
 	{
 		if (m_pUiState != nullptr)
-		{
+		{//ステートの開放
 			delete m_pUiState;
 			m_pUiState = nullptr;
 		}

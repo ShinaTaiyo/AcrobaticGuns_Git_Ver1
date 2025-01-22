@@ -208,7 +208,6 @@ void CSound::Uninit(void)
 
 	// COMƒ‰ƒCƒuƒ‰ƒŠ‚ÌI—¹ˆ—
 	CoUninitialize();
-
 }
 
 //==========================

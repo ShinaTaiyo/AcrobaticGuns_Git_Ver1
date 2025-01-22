@@ -78,11 +78,6 @@ HRESULT CWire::Init()
 void CWire::Uninit()
 {
 	CMeshCylinder::Uninit();
-
-	if (m_pPlayer != nullptr)
-	{
-		m_pPlayer = nullptr;
-	}
 }
 //===================================================================================================================
 
@@ -111,7 +106,7 @@ void CWire::Update()
 	//頂点バッファをロックし、頂点情報へのポインタを取得
 	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
-	if (m_bUseUpdate == true)
+	if (m_bUseUpdate == true && m_pPlayer != nullptr)
 	{
 		int nCntArray = 0;
 		float fRatioXZ = 0.0f;
@@ -139,8 +134,15 @@ void CWire::Update()
 					D3DXVECTOR3 AdjustPos = RotMove * fLength * fRatioY;
 					pVtx[nCntArray].pos = pVtx[1 + nCntVtxXZ].pos - AdjustPos;
 				}
+
+
 				//配列カウント
 				nCntArray++;
+
+				if (nCntArray >= nNumVtx)
+				{
+					assert("配列外アクセス");
+				}
 
 				if (nCntArray < 0 || nCntArray >= nNumVtx)
 				{//配列外アクセスチェック
@@ -269,8 +271,11 @@ void CWire::SetDeath()
 		m_pWireHead->SetDeath();
 		m_pWireHead = nullptr;
 	}
-
-	CObject::SetDeath();
+	if (m_pPlayer != nullptr)
+	{//プレイヤーへのポインタを解除(ワイヤーからは開放しない）
+		m_pPlayer = nullptr;
+	}
+	CMeshCylinder::SetDeath();
 }
 //===================================================================================================================
 

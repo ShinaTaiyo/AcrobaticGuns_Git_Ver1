@@ -107,37 +107,6 @@ HRESULT CPlayer::Init()
 void CPlayer::Uninit()
 {
     CCharacter::Uninit();//Xオブジェクト終了
-
-    if (m_pMove != nullptr)
-    {
-        delete m_pMove;
-        m_pMove = nullptr;
-    }
-
-    if (m_pAttack != nullptr)
-    {
-        delete m_pAttack;
-        m_pAttack = nullptr;
-    }
-
-    if (m_pEffect != nullptr)
-    {
-        delete m_pEffect;
-        m_pEffect = nullptr;
-    }
-
-    if (m_pWireShot != nullptr)
-    {
-        delete m_pWireShot;
-        m_pWireShot = nullptr;
-    }
-
-    if (m_pAbnormalState != nullptr)
-    {
-        delete m_pAbnormalState;
-        m_pAbnormalState = nullptr;
-    }
-
 }
 //==========================================================================================================
 
@@ -153,10 +122,15 @@ void CPlayer::Update()
             GetMoveInfo().SetMove(D3DXVECTOR3(GetMoveInfo().GetMove().x,0.0f, GetMoveInfo().GetMove().z));
         }
 
-        m_pMove->MoveProcess(this);//現在のアクションモードの移動処理を実行
+        if (m_pMove != nullptr)
+        {
+            m_pMove->MoveProcess(this);//現在のアクションモードの移動処理を実行
+        }
 
-        m_pAbnormalState->Process(this);//状態異常の処理を実行
-
+        if (m_pAbnormalState != nullptr)
+        {
+            m_pAbnormalState->Process(this);//状態異常の処理を実行
+        }
         AdjustRot();//向き調整処理
 
         ActionModeChengeProcess(); //現在のアクションモードを変更する
@@ -168,13 +142,21 @@ void CPlayer::Update()
 
     if (CScene::GetMode() == CScene::MODE_GAME)
     {
-        m_pEffect->EffectProcess(this);//エフェクト処理
+        if (m_pEffect != nullptr)
+        {
+            m_pEffect->EffectProcess(this);//エフェクト処理
+        }
 
-        m_pAttack->AttackProcess(this);//現在のアクションモードの攻撃処理を実装
-
+        if (m_pAttack != nullptr)
+        {
+            m_pAttack->AttackProcess(this);//現在のアクションモードの攻撃処理を実装
+        }
         DiveGaugeMaxEffect();//ダイブゲージがマックスになった時の演出
 
-        m_pWireShot->WireShotProcess(this);//ワイヤー発射状態処理
+        if (m_pWireShot != nullptr)
+        {
+            m_pWireShot->WireShotProcess(this);//ワイヤー発射状態処理
+        }
 
         if (m_pDivePossibleNum->GetValue() == s_nMaxDiveNum)
         {//点滅をさせる
@@ -222,44 +204,73 @@ void CPlayer::SetDeath()
 {
     if (GetUseDeath() == true)
     {
-        //ロックオン
+        if (m_pMove != nullptr)
+        {//移動ステートの開放
+            delete m_pMove;
+            m_pMove = nullptr;
+        }
+
+        if (m_pAttack != nullptr)
+        {//攻撃ステートの開放
+            delete m_pAttack;
+            m_pAttack = nullptr;
+        }
+
+        if (m_pEffect != nullptr)
+        {//エフェクトステートの開放
+            delete m_pEffect;
+            m_pEffect = nullptr;
+        }
+
+        if (m_pWireShot != nullptr)
+        {//ワイヤー発射ステートの開放
+            delete m_pWireShot;
+            m_pWireShot = nullptr;
+        }
+
+        if (m_pAbnormalState != nullptr)
+        {//状態ステートの開放
+            delete m_pAbnormalState;
+            m_pAbnormalState = nullptr;
+        }
+
         if (m_pLockOn != nullptr)
-        {
+        {//ロックオン
             m_pLockOn->SetUseDeath(true);
             m_pLockOn->SetDeath();
             m_pLockOn = nullptr;
         }
 
         if (m_pModeDisp != nullptr)
-        {
+        {//モード表示の開放
             m_pModeDisp->SetUseDeath(true);
             m_pModeDisp->SetDeath();
             m_pModeDisp = nullptr;
         }
 
         if (m_pWire != nullptr)
-        {
+        {//ワイヤーの開放
             m_pWire->SetUseDeath(true);
             m_pWire->SetDeath();
             m_pWire = nullptr;
         }
 
         if (m_pHpGauge != nullptr)
-        {
+        {//体力ゲージの開放
             m_pHpGauge->SetUseDeath(true);
             m_pHpGauge->SetDeath();
             m_pHpGauge = nullptr;
         }
 
         if (m_pDiveGauge != nullptr)
-        {
+        {//ダイブゲージの開放
             m_pDiveGauge->SetUseDeath(true);
             m_pDiveGauge->SetDeath();
             m_pDiveGauge = nullptr;
         }
 
         if (m_pDivePossibleNum != nullptr)
-        {
+        {//ダイブ可能回数UIの開放
             m_pDivePossibleNum->SetUseDeath(true);
             m_pDivePossibleNum->SetDeath();
             m_pDivePossibleNum = nullptr;
