@@ -102,7 +102,7 @@ HRESULT CStageManager::Init()
 //================================
 void CStageManager::Uninit()
 {
-
+	CObject::Uninit();
 }
 //==========================================================
 
@@ -465,7 +465,7 @@ void CStageManager::ChengeState()
 			m_pState = DBG_NEW CStageManagerState_PlacedObject();
 			break;
 		default:
-			assert(false);
+			assert("‘z’èŠO‚Ì’l‚ª“ü‚Á‚Ä‚¢‚é");
 			break;
 		}
 	}

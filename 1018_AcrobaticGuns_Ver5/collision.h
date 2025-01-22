@@ -82,10 +82,6 @@ public:
 	//ƒŒƒC
 	//================================================
 	
-	//ƒŒƒC‚Æaabb‚Ì“–‚½‚è”»’è
-	static bool RayIntersectsAABB(const D3DXVECTOR3& rayOrigin, const D3DXVECTOR3& rayDir,
-		const D3DXVECTOR3& boxMin, const D3DXVECTOR3& boxMax);
-
 	//ƒŒƒC‚Æaabb‚Ì“–‚½‚è”»’è‚Æ”»’è‰ÓŠ‚ğ‹‚ß‚é
 	static bool RayIntersectsAABBCollisionPos(const D3DXVECTOR3& origin, const D3DXVECTOR3& direction, const D3DXVECTOR3& min, const D3DXVECTOR3& max,
 		D3DXVECTOR3 & CollisionPos);

@@ -21,6 +21,7 @@ public:
     enum class SOUND_LABEL
 	{
 		BGM_NOESIS,       //Noesis
+		BGM_FINALBATTLE,  //FinalBattle
 	    SE_SHOT_000,      //ËŒ‚‚O
 		SE_SHOT_001,      //ËŒ‚‚P
 	    SE_EXPLOSION_000, //”š”­‚O
@@ -62,11 +63,12 @@ private:
 
 	SOUNDINFO m_aSoundInfo[static_cast<int>(SOUND_LABEL::MAX)] = // ƒTƒEƒ“ƒh‚Ìî•ñ
 		{
-			{"data/BGM/TitleBgm_Noesis.wav", -1},   //BGM_Noesis
-			{"data/SE/Shot_000.wav",  0},           //SE_ËŒ‚‚O
-			{"data/SE/Shot_001.wav",  0},           //SE_ËŒ‚‚O
-			{"data/SE/Explosion_000.wav",  0},      //SE_”š”­‚O
-			{"data/SE/Damage_000.wav",  0},         //SE_ƒ_ƒ[ƒW‚O
+			{"data/BGM/TitleBgm_Noesis.wav", -1},        //BGM_Noesis
+			{"data/BGM/Waterflame_FinalBattle.wav", -1}, //BGM_Waterframe_FinalBattle.wav
+			{"data/SE/Shot_000.wav",  0},                //SE_ËŒ‚‚O
+			{"data/SE/Shot_001.wav",  0},                //SE_ËŒ‚‚O
+			{"data/SE/Explosion_000.wav",  0},           //SE_”š”­‚O
+			{"data/SE/Damage_000.wav",  0},              //SE_ƒ_ƒ[ƒW‚O
 		};
 
 };

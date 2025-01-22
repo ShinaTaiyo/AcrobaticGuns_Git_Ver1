@@ -329,7 +329,7 @@ void CObjectX::SetDamage(int nDamage, int nHitStopTime)
 	if (m_LifeInfo.bHitStop == false && nDamage > 0)
 	{//ヒットストップ状態じゃなければ
 		m_LifeInfo.bHitStop = true;              //ヒットストップ状態にする
-		nHitStopTime = nHitStopTime;  //ヒットストップ時間
+		m_LifeInfo.nHitStopTime = nHitStopTime;  //ヒットストップ時間
 		CDamage::Create(nDamage, GetPosInfo().GetSenterPos(), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), 30.0f + nDamage * 1.0f, 30.0f + nDamage * 1.0f, true);
 		for (int nCnt = 0; nCnt < 3; nCnt++)
 		{

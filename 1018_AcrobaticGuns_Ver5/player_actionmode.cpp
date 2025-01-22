@@ -611,26 +611,29 @@ void CPlayerWireShot::StartWireShotProcess(CPlayer* pPlayer)
 	D3DXVec3Normalize(&Rot, &Rot);
 	float fYaw = atan2f(Rot.x, Rot.z);
 	float fPitch = atan2f(Rot.y, sqrtf(powf(Rot.x, 2) + powf(Rot.z, 2)));
-	fPitch *= -1;
-	//ワイヤーの頭を飛ばす
-	pPlayer->GetWire()->GetWireHead()->GetMoveInfo().SetMove(Move);
-	pPlayer->GetWire()->GetWireHead()->ResetCoolTime();//当たるまでのクールタイムをリセット
-	pPlayer->GetWire()->GetWireHead()->GetMoveInfo().SetUseInteria(false, CObjectX::GetNormalInertia());
-	pPlayer->GetWire()->GetWireHead()->GetMoveInfo().SetUseGravity(false, 1.0f);
-	pPlayer->GetWire()->SetUseDraw(true);
-	pPlayer->GetWire()->GetWireHead()->GetRotInfo().SetRot(D3DXVECTOR3(D3DX_PI * 0.5f + fPitch, fYaw, 0.0f));//Xの意味は、前を基準にするという意味
+	fPitch *= -1.0f;
+	CWire* pWire = pPlayer->GetWire();//ワイヤーを取得する
+	CWireHead* pWireHead = pWire->GetWireHead();//ワイヤーの頭を取得する
+
+	////ワイヤーの頭
+	pWireHead->GetMoveInfo().SetMove(Move);//ワイヤーの頭の移動量を設定する
+	pWireHead->ResetCoolTime();//ワイヤーの頭が当たるまでのクールタイムをリセット
+	pWireHead->GetMoveInfo().SetUseInteria(false, CObjectX::GetNormalInertia());//ワイヤーの頭の慣性をオフにする
+	pWireHead->GetMoveInfo().SetUseGravity(false, 1.0f);//ワイヤーの頭の重力をオフにする
+	pWireHead->GetRotInfo().SetRot(D3DXVECTOR3(D3DX_PI * 0.5f + fPitch, fYaw, 0.0f));//前を基準にpitchを調整
+	pWireHead->GetDrawInfo().SetUseDraw(true);//ワイヤーの頭の描画を復活させる
+
+	//ワイヤー
+	//pWire->SetUseDraw(true);//ワイヤーの描画を復活させる
+	//pWire->SetUseUpdate(true);//ワイヤーの更新を復活させる
+
+	//プレイヤー
 	pPlayer->ChengeMoveMode(DBG_NEW CPlayerMove_Dont());//移動モード「なし」
 	pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_Dont());//攻撃モード「なし」
 	pPlayer->ChengeWireShotMode(DBG_NEW CPlayerWireShot_Do());//ワイヤーショットモード「する」
 	pPlayer->GetMoveInfo().SetUseInteria(false, CObjectX::GetNormalInertia());//慣性を使用しない
 	pPlayer->GetMoveInfo().SetUseGravity(false, CObjectX::GetNormalGravity());//重力を使用しない
-	pPlayer->GetMoveInfo().SetMove(Move);
-
-	//描画を復活させる
-	pPlayer->GetWire()->GetWireHead()->GetDrawInfo().SetUseDraw(true);
-
-	//ワイヤーの更新を復活させる
-	pPlayer->GetWire()->SetUseUpdate(true);
+	pPlayer->GetMoveInfo().SetMove(Move);//プレイヤーの移動量を設定する
 }
 //======================================================================================================================================================
 

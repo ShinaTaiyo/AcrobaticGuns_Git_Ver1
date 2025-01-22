@@ -250,14 +250,47 @@ void CCharacter::MotionProcess()
     int nMaxFrame = s_VecMotionInfo[m_nIdxCharacter].VecMotion[nNowMotion].VecKeySet[nNowKey].nFrame; //現在のキーセットの最大フレーム数を格納
     float fRatioFrame = static_cast<float>(nNowFrame) / static_cast<float>(nMaxFrame);                //現在のフレームの最大フレームに対しての割合を格納
 
+
     int nSize = m_VecModelParts.size();//配列の大きさを格納
     int nBrendCheck = 0;//モーションブレンドが発動している場合、モーションブレンドが完了したモデルパーツの数をカウントする
+    bool bOverArray = false;//配列外アクセスをしたかどうか
     for (int nCntParts = 0; nCntParts < nSize; nCntParts++)
     {
         D3DXVECTOR3 NowPos = { 0.0f,0.0f,0.0f };//現在のキーの位置
         D3DXVECTOR3 NextPos = { 0.0f,0.0f,0.0f };//次のキーの位置
         D3DXVECTOR3 NowRot = { 0.0f,0.0f,0.0f };//現在のキーの向き
         D3DXVECTOR3 NextRot = { 0.0f,0.0f,0.0f };//次のキーの向き
+
+        if (m_nIdxCharacter >= 0 && static_cast<unsigned int>(m_nIdxCharacter) < s_VecMotionInfo.size())
+        {
+            //配列外チェック
+            if (nNowMotion >= 0 && static_cast<unsigned int>(nNowMotion) < s_VecMotionInfo[m_nIdxCharacter].VecMotion.size())
+            {
+                if (nNowKey >= 0 && static_cast<unsigned int>(nNowKey) < s_VecMotionInfo[m_nIdxCharacter].VecMotion[nNowMotion].VecKeySet.size())
+                {
+                    if (nCntParts >= 0 && static_cast<unsigned int>(nCntParts) < s_VecMotionInfo[m_nIdxCharacter].VecMotion[nNowMotion].VecKeySet[nNowKey].VecKey.size())
+                    {
+
+                    }
+                    else
+                    {
+                        assert("モデルパーツが配列外アクセス");
+                    }
+                }
+                else
+                {
+                    assert("キーが配列外アクセス");
+                }
+            }
+            else
+            {
+                assert("モーションが配列外アクセス");
+            }
+        }
+        else
+        {
+            assert("キャラクターが配列外アクセス");
+        }
 
         //モーションブレンドをするかしないかによって参照する位置や向きが変わる
         if (m_NowMotionInfo.bNowBrending == false)
@@ -507,7 +540,6 @@ void CCharacter::LoadModelParts(string MotionFileName, CCharacter* pCharacter)
     D3DXVECTOR3 Rot = { 0.0f,0.0f,0.0f };//向き
     //ファイルを開く
     ReadingFile.open(MotionFileName, ios::in);//読み取りモードで開く
-
     while (!ReadingFile.eof())//EOFに到達するまで繰り返す
     {
         ReadingFile >> Reading_Buff;//単語を読み込む
@@ -554,11 +586,17 @@ void CCharacter::LoadModelParts(string MotionFileName, CCharacter* pCharacter)
                         {//親モデルパーツ番号
                             ReadingFile >> Reading_Buff;//イコール
                             ReadingFile >> nIdxParent;   //モデルパーツのインデックス
-
                             //親モデルパーツを設定
                             if (nIdxParent >= 0)
                             {//モデルパーツに親が存在する
-                                (*PartsIt)->GetDrawInfo().SetUseMatrixChild(true,&pCharacter->m_VecModelParts[nIdxParent]->GetDrawInfo().GetMatrixWorld());//モデルパーツごとのインデックスを設定
+                                if (static_cast<unsigned int>(nIdxParent) < pCharacter->m_VecModelParts.size())
+                                {
+                                    (*PartsIt)->GetDrawInfo().SetUseMatrixChild(true, &pCharacter->m_VecModelParts[nIdxParent]->GetDrawInfo().GetMatrixWorld());//モデルパーツごとのインデックスを設定
+                                }
+                                else
+                                {
+                                    assert("モデルパーツのインデックスが配列外アクセス");
+                                }
                             }
                             else
                             {//モデルパーツに親が存在しないので、キャラクターを親にする

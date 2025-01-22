@@ -863,36 +863,6 @@ bool CCollision::ExtrusionCollisionSquareZ(D3DXVECTOR3& MyPos, const D3DXVECTOR3
 //====================================================================================================================
 
 //================================================================
-//ÉåÉCÇ∆AABBÇÃìñÇΩÇËîªíË
-//================================================================
-bool CCollision::RayIntersectsAABB(const D3DXVECTOR3& rayOrigin, const D3DXVECTOR3& rayDir, const D3DXVECTOR3& boxMin, const D3DXVECTOR3& boxMax)
-{
-	float tMin = 0.0f;
-	float tMax = std::numeric_limits<float>::infinity();
-
-	for (int i = 0; i < 3; i++) {
-		if (rayDir[i] != 0) {
-			float t1 = (boxMin[i] - rayOrigin[i]) / rayDir[i];
-			float t2 = (boxMax[i] - rayOrigin[i]) / rayDir[i];
-			if (t1 > t2) std::swap(t1, t2);
-
-			tMin = (std::max)(tMin, t1);
-			tMax = (std::min)(tMax, t2);
-
-			if (tMin > tMax) {
-				return false; // No intersection
-			}
-		}
-		else if (rayOrigin[i] < boxMin[i] || rayOrigin[i] > boxMax[i]) {
-			return false; // No intersection if the ray is parallel and outside the box
-		}
-	}
-
-	return true; // The ray intersects the AABB}
-}
-//====================================================================================================================
-
-//================================================================
 //ÉåÉCÇ∆AABBÇÃìñÇΩÇËîªíËÅAîªíËâ”èäÇ‡ãÅÇﬂÇÈ
 //================================================================
 bool CCollision::RayIntersectsAABBCollisionPos(const D3DXVECTOR3& origin,const D3DXVECTOR3& direction, const D3DXVECTOR3& min, const D3DXVECTOR3& max,

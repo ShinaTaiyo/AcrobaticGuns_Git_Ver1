@@ -181,33 +181,23 @@ void CEffect::Create(EFFECTTYPE type, int nLife, float fWidth, float fHeight, D3
 {
 	CEffect* pEffect = DBG_NEW CEffect;   //エフェクトを生成
 	CTexture* pTexture = CManager::GetTexture();
-	bool bSuccess = pEffect->CObject::GetCreateSuccess();
-	if (bSuccess == true)
+	if (pEffect != nullptr)
 	{
-		if (pEffect != nullptr)
-		{
-			pEffect->Init();                                                              //初期化処理
-			pEffect->SetUseDeath(true);                                                   //死亡フラグを発動するかどうかを設定する
-			pEffect->CBillboard::SetFormarSize(fWidth, fHeight);                          //ポリゴンの元のサイズを設定
-			pEffect->m_Type = type;                                                       //エフェクトの種類
-			pEffect->SetLife(nLife);                                                      //体力
-			pEffect->SetMaxLife(nLife);                                                   //最大体力
-			pEffect->m_fReductionWidth = fWidth / (float)(nLife);                         //横幅縮小スピード
-			pEffect->m_fReductionHeight = fHeight / (float)(nLife);                       //高さ縮小スピード
-			pEffect->SetTextureIndex(pTexture->Regist(s_EffectFileName[static_cast<int>(type)]));  //テクスチャ割り当てとテクスチャ番号の設定
-			pEffect->bindTexture(pTexture->GetAddress(pEffect->GetTextureIndex()));       //テクスチャをセットする　
-			pEffect->SetPos(pos);                                                         //オブジェクト２Ｄの位置を設定[
-			pEffect->SetSupportPos(pos);                                                                 //召喚位置を設定
-			pEffect->SetSize(fWidth, fHeight);                                            //サイズを設定する
-			pEffect->SetColor(col);                                                       //色合いを設定
-			pEffect->SetAnimInfo(1, 1, col, false);                                       //アニメーション情報を設定
-		}
+		pEffect->Init();                                                              //初期化処理
+		pEffect->SetUseDeath(true);                                                   //死亡フラグを発動するかどうかを設定する
+		pEffect->CBillboard::SetFormarSize(fWidth, fHeight);                          //ポリゴンの元のサイズを設定
+		pEffect->m_Type = type;                                                       //エフェクトの種類
+		pEffect->SetLife(nLife);                                                      //体力
+		pEffect->SetMaxLife(nLife);                                                   //最大体力
+		pEffect->m_fReductionWidth = fWidth / (float)(nLife);                         //横幅縮小スピード
+		pEffect->m_fReductionHeight = fHeight / (float)(nLife);                       //高さ縮小スピード
+		pEffect->SetTextureIndex(pTexture->Regist(s_EffectFileName[static_cast<int>(type)]));  //テクスチャ割り当てとテクスチャ番号の設定
+		pEffect->bindTexture(pTexture->GetAddress(pEffect->GetTextureIndex()));       //テクスチャをセットする　
+		pEffect->SetPos(pos);                                                         //オブジェクト２Ｄの位置を設定[
+		pEffect->SetSupportPos(pos);                                                                 //召喚位置を設定
+		pEffect->SetSize(fWidth, fHeight);                                            //サイズを設定する
+		pEffect->SetColor(col);                                                       //色合いを設定
+		pEffect->SetAnimInfo(1, 1, col, false);                                       //アニメーション情報を設定
 	}
-	else
-	{//オブジェクトに空きがなかったので破棄する
-		delete pEffect;
-		pEffect = nullptr;
-	}
-
 }
-//================================================================
+//=======================================================================================================================================
