@@ -33,6 +33,7 @@ public:
 	void Uninit(void) override;                                                 //終了処理
 	void Update(void) override;                                                 //更新処理
 	void Draw(void) override;                                                   //描画処理
+	void SetDeath() override;                                                   //死亡フラグ設定処理
 	void bindTexture(LPDIRECT3DTEXTURE9 pTexture);                              //テクスチャを割り当てる
 
 	bool CollisionSquare(D3DXVECTOR3 pos,D3DXVECTOR3 VtxMax,D3DXVECTOR3 VtxMin);//正方形の当たり判定を取る
