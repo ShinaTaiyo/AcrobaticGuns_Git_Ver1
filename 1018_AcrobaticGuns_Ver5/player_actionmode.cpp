@@ -624,8 +624,8 @@ void CPlayerWireShot::StartWireShotProcess(CPlayer* pPlayer)
 	pWireHead->GetDrawInfo().SetUseDraw(true);//ワイヤーの頭の描画を復活させる
 
 	//ワイヤー
-	//pWire->SetUseDraw(true);//ワイヤーの描画を復活させる
-	//pWire->SetUseUpdate(true);//ワイヤーの更新を復活させる
+	pWire->SetUseDraw(true);//ワイヤーの描画を復活させる
+	pWire->SetUseUpdate(true);//ワイヤーの更新を復活させる
 
 	//プレイヤー
 	pPlayer->ChengeMoveMode(DBG_NEW CPlayerMove_Dont());//移動モード「なし」

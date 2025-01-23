@@ -24,7 +24,7 @@
 const string CWire::s_WIRE_FILENAME[static_cast<int>(CWire::WIRETYPE::MAX)] =
 {
 	"data\\TEXTURE\\Wire\\LakeField_000.png",
-	"data\\TEXTURE\\Wire\\Rope_000.jpg",
+	"data\\TEXTURE\\Wire\\Rope_000.png"
 };
 //===================================================================================================================
 

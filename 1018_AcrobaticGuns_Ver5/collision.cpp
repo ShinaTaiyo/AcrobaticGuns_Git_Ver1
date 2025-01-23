@@ -920,6 +920,7 @@ bool CCollision::RayIntersectsAABBCollisionPos(const D3DXVECTOR3& origin,const D
 
 	t = tmin;
 
+	//レイの支点より後ろに正方形（オブジェクト）がある場合は、意味がないので無視する
 	if (t < 0.0f) return false;
 
 	//衝突したことが確定したので、衝突位置を求める（tには、レイがAABBとの衝突点の最小距離が入っている）

@@ -208,26 +208,29 @@ void CObjectX::Draw()
 
 	if (m_DrawInfo.bUseDraw == true)
 	{
-	    //マテリアルへのポインタを取得
-	    pMat = (D3DXMATERIAL*)m_ObjectXInfo.pBuffMat->GetBufferPointer();
-
-		//==========================================================================
-		//マテリアルの数分、テクスチャを読み込む。
-		//==========================================================================
-		for (int nCntMat = 0; nCntMat < (int)m_ObjectXInfo.dwNumMat; nCntMat++)
+		if (m_ObjectXInfo.pBuffMat != nullptr && m_ObjectXInfo.pMesh != nullptr)
 		{
-			//色合いの設定
-			pMat[nCntMat].MatD3D.Diffuse = m_ObjectXInfo.Diffuse[nCntMat];
-			//マテリアルの設定
-			pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+			//マテリアルへのポインタを取得
+			pMat = (D3DXMATERIAL*)m_ObjectXInfo.pBuffMat->GetBufferPointer();
 
-			//テクスチャを設定する
-			pDevice->SetTexture(0, m_ObjectXInfo.pTexture[nCntMat]);
+			//==========================================================================
+			//マテリアルの数分、テクスチャを読み込む。
+			//==========================================================================
+			for (int nCntMat = 0; nCntMat < (int)m_ObjectXInfo.dwNumMat; nCntMat++)
+			{
+				//色合いの設定
+				pMat[nCntMat].MatD3D.Diffuse = m_ObjectXInfo.Diffuse[nCntMat];
+				//マテリアルの設定
+				pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
 
-			//モデル（パーツ）の描画
-			m_ObjectXInfo.pMesh->DrawSubset(nCntMat);
+				//テクスチャを設定する
+				pDevice->SetTexture(0, m_ObjectXInfo.pTexture[nCntMat]);
+
+				//モデル（パーツ）の描画
+				m_ObjectXInfo.pMesh->DrawSubset(nCntMat);
+			}
+			//================================================================================================================
 		}
-		//================================================================================================================
 	}
 
 	//=======================================
@@ -890,35 +893,38 @@ void CObjectX::DrawShadow()
 
 	if (GetDrawInfo().GetUseDraw() == true)
 	{
-		CObject::TYPE Type = GetType();
-
-		//マテリアルへのポインタを取得
-		pMat = (D3DXMATERIAL*)m_ObjectXInfo.pBuffMat->GetBufferPointer();
-
-		//==========================================================================
-		//マテリアルの数分、テクスチャを読み込む。
-		//==========================================================================
-		for (int nCntMat = 0; nCntMat < (int)m_ObjectXInfo.dwNumMat; nCntMat++)
+		if (m_ObjectXInfo.pMesh != nullptr && m_ObjectXInfo.pBuffMat != nullptr)
 		{
-			if (m_ObjectXInfo.FormarDiffuse[nCntMat].a > 0.5f)
-			{//a値が0.5f異常なら0.5fに固定
-				pMat[nCntMat].MatD3D.Diffuse = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.5f);
+			CObject::TYPE Type = GetType();
+
+			//マテリアルへのポインタを取得
+			pMat = (D3DXMATERIAL*)m_ObjectXInfo.pBuffMat->GetBufferPointer();
+
+			//==========================================================================
+			//マテリアルの数分、テクスチャを読み込む。
+			//==========================================================================
+			for (int nCntMat = 0; nCntMat < (int)m_ObjectXInfo.dwNumMat; nCntMat++)
+			{
+				if (m_ObjectXInfo.FormarDiffuse[nCntMat].a > 0.5f)
+				{//a値が0.5f異常なら0.5fに固定
+					pMat[nCntMat].MatD3D.Diffuse = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.5f);
+				}
+				else
+				{//a値が0.5f以下なら全体色合いのデータから直接a値を参照
+					pMat[nCntMat].MatD3D.Diffuse = D3DXCOLOR(0.0f, 0.0f, 0.0f, m_ObjectXInfo.Diffuse[nCntMat].a);
+				}
+
+				//マテリアルの設定
+				pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+
+				//テクスチャを設定する
+				pDevice->SetTexture(0, NULL);
+
+				//モデル（パーツ）の描画
+				m_ObjectXInfo.pMesh->DrawSubset(nCntMat);
 			}
-			else
-			{//a値が0.5f以下なら全体色合いのデータから直接a値を参照
-			    pMat[nCntMat].MatD3D.Diffuse = D3DXCOLOR(0.0f, 0.0f, 0.0f, m_ObjectXInfo.Diffuse[nCntMat].a);
-			}
-
-			//マテリアルの設定
-			pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
-
-			//テクスチャを設定する
-			pDevice->SetTexture(0, NULL);
-
-			//モデル（パーツ）の描画
-			m_ObjectXInfo.pMesh->DrawSubset(nCntMat);
+			//================================================================================================================
 		}
-		//================================================================================================================
 	}
 	//=======================================
 	//描画の調整を元に戻す

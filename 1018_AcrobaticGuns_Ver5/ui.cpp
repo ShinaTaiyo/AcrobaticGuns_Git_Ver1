@@ -23,8 +23,8 @@ const string CUi::UI_FILENAME[int(CUi::UITYPE::MAX)] =
 {
 	"data\\TEXTURE\\UI\\LockOn_001.png",
 	"data\\TEXTURE\\UI\\ActionModeWindow_000.png",
-	"data\\TEXTURE\\UI\\Gun_000.png",
-	"data\\TEXTURE\\UI\\Dive_000.png",
+	"data\\TEXTURE\\UI\\ShotModeDisp_000.png",
+	"data\\TEXTURE\\UI\\DiveModeDisp_000.png",
 	"data\\TEXTURE\\UI\\PhaseText_000.png",
 	"data\\TEXTURE\\UI\\StageText_000.png",
 	"data\\TEXTURE\\UI\\Target_000.png",
@@ -32,7 +32,7 @@ const string CUi::UI_FILENAME[int(CUi::UITYPE::MAX)] =
 	"data\\TEXTURE\\UI\\Tutorial_000.png",
 	"data\\TEXTURE\\UI\\CheckMark_000.png",
 	"data\\TEXTURE\\UI\\Title_001.png",
-	"data\\TEXTURE\\UI\\PressEnterOrStart_Logo.png",
+	"data\\TEXTURE\\UI\\PressEnterOrStart_Logo.png"
 };//テクスチャファイル名
 
 //====================================================
