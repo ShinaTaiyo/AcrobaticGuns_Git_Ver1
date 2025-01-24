@@ -15,6 +15,7 @@
 #include "particle.h"
 #include "attack.h"
 #include "input.h"
+#include "debugtext.h"
 //===========================================================================================================
 
 //=========================================================
@@ -175,18 +176,22 @@ bool CCalculation::CaluclationMove(bool bUseStick, D3DXVECTOR3& Move, float fSpe
 	}
 	else
 	{
-		bMove = CManager::GetInputJoypad()->GetLStickPress(8, 0.0f);
+		bMove = CManager::GetInputJoypad()->GetLStickPress(8,0.0f);
 	}
 	if (bMove == true)
 	{//移動状態なら
 		//カメラを基準に向きを決める
 		if (bUseStick == true)
 		{
-			fRot = fCameraRot + CManager::GetInputJoypad()->GetLStickAimRot();
+			fRot = CManager::GetInputJoypad()->GetLStickAimRot();
+			CManager::GetDebugText()->PrintDebugText("スティックの向き：%f\n",fRot);
+			CManager::GetDebugText()->PrintDebugText("カメラの向き：%f\n",fCameraRot);
+			fRot -= fCameraRot;
+			CManager::GetDebugText()->PrintDebugText("目的の向き：%f\n",fRot);
 		}
 		else
-		{
-			fRot = atan2f(fMoveX, fMoveZ) + fCameraRot;
+		{//比から角度を求める（Zベクトル、Xベクトル)
+			fRot = atan2f(fMoveZ, fMoveX) - fCameraRot;
 		}
 		switch (MoveAim)
 		{
@@ -195,8 +200,8 @@ bool CCalculation::CaluclationMove(bool bUseStick, D3DXVECTOR3& Move, float fSpe
 			Move.y = cosf(fRot) * fSpeed;
 			break;
 		case MOVEAIM_XZ:
-			Move.x = sinf(fRot) * fSpeed;
-			Move.z = cosf(fRot) * fSpeed;
+			Move.x = cosf(fRot) * fSpeed;
+			Move.z = sinf(fRot) * fSpeed;
 			break;
 		case MOVEAIM_ZY:
 			Move.z = sinf(fRot) * fSpeed;

@@ -428,19 +428,21 @@ bool CInputJoypad::GetLStickPress(const int nDivisionRot,float fDirectionRot)
 	float LX = m_joykeyStatePress.Gamepad.sThumbLX;
 	float LY = m_joykeyStatePress.Gamepad.sThumbLY;
 
+
 	bool bActive = false;//スティックを押しているかどうか
 	bool bSuccessDivision = false;//nDivisionRotで割った値の取得に成功したかどうか
 
 	//determine how far the controller is pushed
-	float magnitude = sqrt(LX * LX + LY * LY);
+	float magnitude = sqrt(LY * LY + LX * LX);
 
 	//上で求めた角度を正規化する
 	float normalizedLX = LX / magnitude;
 	float normalizedLY = LY / magnitude;
 
+	CManager::GetDebugText()->PrintDebugText("左スティックのX値：%f\n", normalizedLX);
+	CManager::GetDebugText()->PrintDebugText("左スティックのY値：%f\n", normalizedLY);
 	//正規化した角度で目的の角度を求める
-	float fAimRot = atan2f(normalizedLX, normalizedLY);
-
+	float fAimRot = atan2f(normalizedLY, normalizedLX);
 	//======================================
 	//大まかな方向を決める
 	//======================================
@@ -463,13 +465,11 @@ bool CInputJoypad::GetLStickPress(const int nDivisionRot,float fDirectionRot)
 	}
 
 	if (bSuccessDivision == false)
-	{
+	{//入力範囲、角度の補正
 		fAimRot = fDivRot * nDivisionRot - D3DX_PI + fDirectionRot;
 	}
 
 	//============================================================================================================
-
-
 
 	float normalizedMagnitude = 0.0f;
 
@@ -496,6 +496,7 @@ bool CInputJoypad::GetLStickPress(const int nDivisionRot,float fDirectionRot)
 		normalizedMagnitude = 0.0;
 		bActive = false;
 	}
+	CManager::GetDebugText()->PrintDebugText("正規化した角度：%f\n", m_fLSitckAimRot);
 	return bActive;
 }
 //===============================================================

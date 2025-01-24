@@ -609,18 +609,8 @@ void CPlayer::SetDamage(int nDamage, int nHitStopTime)
 //========================================================
 void CPlayer::AdjustRot()
 {
-    //D3DXVECTOR3& Rot = GetRot();
     const D3DXVECTOR3& CameraRot = CManager::GetCamera()->GetRot();
     GetRotInfo().SetRot(D3DXVECTOR3(GetRotInfo().GetRot().x,D3DX_PI + CameraRot.y, GetRotInfo().GetRot().z));
-
-    //CCamera* pCaemra = CManager::GetCamera();
-    //if (m_pLockOn->GetEndState() == CLockon::ENDSTATE::RIGHTEND)
-    //{
-
-    //}
-    //SetRot(D3DXVECTOR3(0.0f, D3DX_PI + CameraRot.y, 0.0f));
-
-    //SetAxis(CameraRot.y + D3DX_PI);
 }
 //==========================================================================================================
 
