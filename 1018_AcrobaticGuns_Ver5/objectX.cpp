@@ -409,13 +409,6 @@ void CObjectX::UpdatePos()
 			m_MoveInfo.Move.x += (0.0f - m_MoveInfo.Move.x) * m_MoveInfo.fInertia;
 			m_MoveInfo.Move.z += (0.0f - m_MoveInfo.Move.z) * m_MoveInfo.fInertia;
 		}
-
-		if (GetType() == CObject::TYPE::ENEMY)
-		{
-			CManager::GetDebugText()->PrintDebugText("位置：%f %f %f\n", GetPosInfo().GetPos().x, GetPosInfo().GetPos().y, GetPosInfo().GetPos().z);
-			CManager::GetDebugText()->PrintDebugText("1f前の位置：%f %f %f\n", GetPosInfo().GetPosOld().x, GetPosInfo().GetPosOld().y, GetPosInfo().GetPosOld().z);
-			CManager::GetDebugText()->PrintDebugText("移動量：%f %f %f\n", GetMoveInfo().GetMove().x, GetMoveInfo().GetMove().y, GetMoveInfo().GetMove().z);
-		}
 		//位置の設定
 		GetPosInfo().SetPos(Pos + m_MoveInfo.Move);
 

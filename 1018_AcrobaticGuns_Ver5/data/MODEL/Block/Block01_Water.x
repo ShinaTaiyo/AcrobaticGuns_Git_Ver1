@@ -177,7 +177,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\Block\\03_Water.png";
+    "data\\TEXTURE\\Block3D\\Water_000.png";
    }
   }
  }

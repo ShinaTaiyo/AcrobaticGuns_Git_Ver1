@@ -21,7 +21,7 @@ const char* CField::m_apFIELD_FILENAME[static_cast<int>(CField::FIELDTYPE::MAX)]
 {
 	"data\\TEXTURE\\Field\\Field_000.jpg",
 	"data\\TEXTURE\\Field\\Field_001.png",
-	"data\\TEXTURE\\Field\\Tile_000.jpg",
+	"data\\TEXTURE\\Field\\Tile_000.png"
 };
 
 //==========================================

@@ -177,7 +177,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\BgModel\\CreditRequired\\mrsiraphol\\OfficeBill_000.png";
+    "data\\TEXTURE\\BgModel\\BrueBill_000.png";
    }
   }
  }

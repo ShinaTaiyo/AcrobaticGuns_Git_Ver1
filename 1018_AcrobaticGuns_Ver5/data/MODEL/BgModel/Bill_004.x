@@ -177,7 +177,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\BgModel\\CreditRequired\\rawpixel.com\\BlueBill_000.png";
+    "data\\TEXTURE\\BgModel\\ModernBill_000.png";
    }
   }
  }

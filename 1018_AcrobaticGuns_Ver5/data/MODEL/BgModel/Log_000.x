@@ -339,7 +339,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\BgModel\\wood_000.jpg";
+    "data\\TEXTURE\\BgModel\\Wood_000.png";
    }
   }
  }

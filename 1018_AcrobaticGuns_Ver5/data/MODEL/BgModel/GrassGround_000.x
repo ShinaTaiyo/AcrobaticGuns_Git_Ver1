@@ -177,7 +177,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\BgModel\\Grass_000.jpg";
+    "data\\TEXTURE\\BgModel\\GrassGround_000.png";
    }
   }
  }
