@@ -186,12 +186,13 @@ bool CCalculation::CaluclationMove(bool bUseStick, D3DXVECTOR3& Move, float fSpe
 			fRot = CManager::GetInputJoypad()->GetLStickAimRot();
 			CManager::GetDebugText()->PrintDebugText("スティックの向き：%f\n",fRot);
 			CManager::GetDebugText()->PrintDebugText("カメラの向き：%f\n",fCameraRot);
-			fRot -= fCameraRot;
+			fRot += fCameraRot;
 			CManager::GetDebugText()->PrintDebugText("目的の向き：%f\n",fRot);
 		}
 		else
-		{//比から角度を求める（Zベクトル、Xベクトル)
-			fRot = atan2f(fMoveZ, fMoveX) - fCameraRot;
+		{//比から角度を求める（Z軸の正方向が前なので、Z軸を基準「右引数」にX方向の角度「左引数」を求める）
+			fRot = atan2f(fMoveX,fMoveZ) + fCameraRot;
+			CManager::GetDebugText()->PrintDebugText("目的の向き：%f\n", fRot);
 		}
 		switch (MoveAim)
 		{
@@ -200,8 +201,8 @@ bool CCalculation::CaluclationMove(bool bUseStick, D3DXVECTOR3& Move, float fSpe
 			Move.y = cosf(fRot) * fSpeed;
 			break;
 		case MOVEAIM_XZ:
-			Move.x = cosf(fRot) * fSpeed;
-			Move.z = sinf(fRot) * fSpeed;
+			Move.x = sinf(fRot) * fSpeed;
+			Move.z = cosf(fRot) * fSpeed;
 			break;
 		case MOVEAIM_ZY:
 			Move.z = sinf(fRot) * fSpeed;

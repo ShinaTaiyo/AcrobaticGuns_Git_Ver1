@@ -310,7 +310,7 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
     pPlayer->GetPosInfo().SetPosFuture(pos);                                                      //1fŒã‚ÌˆÊ’u‚ðÝ’è
     pPlayer->GetPosInfo().SetSupportPos(pos);                                                     //Ý’uˆÊ’u
     pPlayer->GetRotInfo().SetRot(rot);                                                            //Œü‚«‚ÌÝ’è
-    pPlayer->GetSizeInfo().SetScale(Scale);                                                        //Šg‘å—¦‚ÌÝ’è
+    pPlayer->GetSizeInfo().SetScale(Scale);                                                       //Šg‘å—¦‚ÌÝ’è
     pPlayer->GetSizeInfo().SetFormarScale(Scale);                                                  //Œ³‚ÌŠg‘å—¦‚ðÝ’è‚·‚é
     pPlayer->GetLifeInfo().SetAutoDeath(false);                                                    //Ž€–Sƒtƒ‰ƒO‚ðŽ©“®‚Å”­“®‚·‚é‚©‚Ç‚¤‚©
     pPlayer->GetDrawInfo().SetUseShadow(true);

@@ -240,6 +240,10 @@ void CStageManager::LoadMapTxt(int nMapNum)
 		{
 			CDiveWeakEnemy::LoadInfoTxt(ReadingFile, m_StgObjList, Reading_Buff);
 		}
+		else if (Reading_Buff == "SETIDLEENEMY")
+		{
+			CIdleEnemy::LoadInfoTxt(ReadingFile, m_StgObjList, Reading_Buff);
+		}
 	}
 
 	if (CScene::GetMode() == CScene::MODE_GAME)
@@ -658,6 +662,9 @@ void CStageManagerState_NewObject::ChengeObject(CStageManager* pStageManager)
 		break;
 	case CObject::MANAGEROBJECTTYPE::DIVEWEAKENEMY:
 		m_pManagerObject = CDiveWeakEnemy::Create(CDiveWeakEnemy::DIVEWEAKENEMYTYPE::NORMAL, 10, 0, pStageManager->GetSavePos(), pStageManager->GetSaveRot(), pStageManager->GetSaveScale(),0);
+		break;
+	case CObject::MANAGEROBJECTTYPE::IDLEENEMY:
+		m_pManagerObject = CIdleEnemy::Create(CIdleEnemy::IDLEENEMYTYPE::NORMAL, 10, 0, pStageManager->GetSavePos(), pStageManager->GetSaveRot(), pStageManager->GetSaveScale());
 		break;
 	default:
 		break;

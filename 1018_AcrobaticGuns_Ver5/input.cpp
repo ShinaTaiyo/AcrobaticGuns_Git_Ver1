@@ -433,7 +433,7 @@ bool CInputJoypad::GetLStickPress(const int nDivisionRot,float fDirectionRot)
 	bool bSuccessDivision = false;//nDivisionRotで割った値の取得に成功したかどうか
 
 	//determine how far the controller is pushed
-	float magnitude = sqrt(LY * LY + LX * LX);
+	float magnitude = sqrt(LX * LX + LY * LY);
 
 	//上で求めた角度を正規化する
 	float normalizedLX = LX / magnitude;
@@ -441,8 +441,9 @@ bool CInputJoypad::GetLStickPress(const int nDivisionRot,float fDirectionRot)
 
 	CManager::GetDebugText()->PrintDebugText("左スティックのX値：%f\n", normalizedLX);
 	CManager::GetDebugText()->PrintDebugText("左スティックのY値：%f\n", normalizedLY);
-	//正規化した角度で目的の角度を求める
-	float fAimRot = atan2f(normalizedLY, normalizedLX);
+
+	//今回のゲームは、Z軸の正方向が前なので、Z軸(右引数）を基準にX軸（左引数）の角度を求める
+	float fAimRot = atan2f(normalizedLX, normalizedLY);
 	//======================================
 	//大まかな方向を決める
 	//======================================

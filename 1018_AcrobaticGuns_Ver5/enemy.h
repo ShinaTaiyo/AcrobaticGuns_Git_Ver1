@@ -40,8 +40,9 @@ public:
 
 	enum class ENEMYTYPE
 	{
-		SHOTWEAK = 0,
-		DIVEWEAK,
+		SHOTWEAK = 0,//射撃に弱い敵
+		DIVEWEAK,    //ダイブに弱い敵
+		IDLE,        //何もしない敵
 		MAX
 	};
 
@@ -335,6 +336,74 @@ private:
 	void AIMoveProcess() override;
 	void DefeatStaging() override;//倒されたときの演出
 	//===============================================================================================
+};
+
+//===========================================
+//何もしない敵クラス
+//===========================================
+class CIdleEnemy : public CEnemy
+{
+public:
+
+	//タイプ列挙型
+	enum class IDLEENEMYTYPE
+	{
+		NORMAL = 0,
+		MAX
+	};
+
+	//==========================================================
+	//基本
+	//==========================================================
+	CIdleEnemy(int nPri = 0, bool bUseintPri = false, CObject::TYPE type = CObject::TYPE::ENEMY, CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_X);                   //コンストラクタ
+	~CIdleEnemy();                  //デストラクタ
+	HRESULT Init() override;            //初期化処理
+	void Uninit() override;             //終了処理
+	void Update() override;             //更新処理
+	void Draw() override;               //描画処理
+	void SetDeath() override;           //死亡フラグを設定
+	static CIdleEnemy* Create(IDLEENEMYTYPE Type, int nLife, int nPhaseNum, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 Scale);
+	//=================================================================================================================
+
+	//==========================================================
+    //エディタ関係
+    //==========================================================
+    //関数
+	void SaveInfoTxt(fstream& WritingFile) override;  //テキストファイルに情報を保存するための関数
+	static void LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveManager, string& Buff);  //テキストファイルから情報を読み込むための関数   
+	CObject* ManagerChengeObject(bool bAim) override; //ステージマネージャーに変更したオブジェクトを渡す
+	CObject* ManagerSaveObject() override;             //ステージマネージャーに今のオブジェクトを保存する
+	void ManagerChooseControlInfo() override;          //ステージマネージャーから操作する
+	//=================================================================================================================
+private:
+	//================================================
+    //静的メンバ
+    //================================================
+	static const string s_aIDLEENEMY_FILENAME[static_cast<int>(IDLEENEMYTYPE::MAX)];//敵のモデルファイル名
+	//===============================================================================================
+
+	//================================================
+	//変数宣言
+	//================================================
+	IDLEENEMYTYPE m_IdleEnemyType = IDLEENEMYTYPE::NORMAL;        //敵の種類
+	//===============================================================================================
+	
+	//================================================
+	//プロトタイプ宣言
+	//================================================
+	//*攻撃移動
+	void BattleMoveProcess() override;
+
+	//攻撃処理
+	void AttackProcess() override;
+
+	//AI移動
+	void AIMoveProcess() override;
+
+	//倒されたときの演出
+	void DefeatStaging() override;
+	//===============================================================================================
+
 };
 
 //**************************************************************************************
