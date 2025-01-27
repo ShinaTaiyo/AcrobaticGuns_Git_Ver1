@@ -173,7 +173,10 @@ void CPhaseManager::AdvancePhase()
 					pEnemy = CShotWeakEnemy::Create(static_cast<CShotWeakEnemy::SHOTWEAKENEMYTYPE>(it.nTypeNum), it.nLife, it.nPhaseNum, it.Pos, it.Rot, it.Scale);
 					break;
 				case CEnemy::ENEMYTYPE::DIVEWEAK:
-					pEnemy = CDiveWeakEnemy::Create(static_cast<CDiveWeakEnemy::DIVEWEAKENEMYTYPE>(it.nTypeNum), it.nLife, it.nPhaseNum, it.Pos, it.Rot, it.Scale,it.nNumDivision);
+					pEnemy = CDiveWeakEnemy::Create(static_cast<CDiveWeakEnemy::DIVEWEAKENEMYTYPE>(it.nTypeNum), it.nLife, it.nPhaseNum, it.Pos, it.Rot, it.Scale, it.nNumDivision);
+					break;
+				case CEnemy::ENEMYTYPE::IDLE:
+					pEnemy = CIdleEnemy::Create(static_cast<CIdleEnemy::IDLEENEMYTYPE>(it.nTypeNum), it.nLife, it.nPhaseNum, it.Pos, it.Rot, it.Scale);
 					break;
 				default:
 					break;

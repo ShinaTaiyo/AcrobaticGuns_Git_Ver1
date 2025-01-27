@@ -223,6 +223,9 @@ void CEnemy::SaveInfoTxt(fstream& WritingFile)
 	case ENEMYTYPE::DIVEWEAK:
 		WritingFile << " # DIVEWEAK" << endl;
 		break;
+	case ENEMYTYPE::IDLE:
+		WritingFile << " # IDLE" << endl;
+		break;
 	default:
 		assert(false);
 		break;
@@ -256,7 +259,6 @@ void CEnemy::SaveInfoTxt(fstream& WritingFile)
 
 		nCnt++;//カウントアップ
 	}
-
 	WritingFile << "END_SETMOVEAI" << endl;
 
 	CObjectX::SaveInfoTxt(WritingFile);
@@ -556,8 +558,9 @@ void CEnemy::SetMoveAiPoint()
 	D3DXVECTOR3 NowPos = m_MoveAiSavePos + GetPosInfo().GetPos();
 
 	CManager::GetDebugText()->PrintDebugText("移動AIの位置：%f %f %f\n", NowPos.x,NowPos.y,NowPos.z);
-
 	CManager::GetDebugText()->PrintDebugText("移動AIを保存：O\n");
+
+	CParticle::SummonParticle(CParticle::TYPE::TYPE00_NORMAL, 1, 30, 40.0f, 40.0f, 100, 10, false, NowPos, D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f), true);
 
 	if (Input->GetPress(DIK_LSHIFT))
 	{
@@ -605,7 +608,7 @@ void CEnemy::AIMoveProcess()
 			float fRot = atan2f((*it)->GetPosInfo().GetPos().x - GetPosInfo().GetPos().x, (*it)->GetPosInfo().GetPos().z - GetPosInfo().GetPos().z);
 			GetMoveInfo().SetMove(D3DXVECTOR3(sinf(fRot) * m_fNormalSpeed, GetMoveInfo().GetMove().y, cosf(fRot) * m_fNormalSpeed));
 
-			if (fLength < 30.0f)
+			if (fLength < m_fNormalSpeed + 50.0f)
 			{
 				m_nIdxMoveAi++;//目的地を次の位置に変更
 			}
@@ -642,6 +645,11 @@ void CEnemy::BattleMoveProcess()
 	GetMoveInfo().SetMove(D3DXVECTOR3(Move.x, GetMoveInfo().GetMove().y,Move.z));
 	CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 30, 20.0f, 20.0f, 100, 10, false, Pos, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
 	RayCollision();
+
+	if (fLengthPlayer > m_fSensingRange + 300.0f)
+	{//距離が索敵範囲の+300.0fより遠くなったら
+		ChengeMove(DBG_NEW CEnemyMove_AI());
+	}
 }
 //============================================================================================================================================
 
@@ -2220,22 +2228,23 @@ CIdleEnemy* CIdleEnemy::Create(IDLEENEMYTYPE Type, int nLife, int nPhaseNum, D3D
 		CManager::GetObjectXInfo()->GetColorValue(nIdx));
 
 	//ステータスを設定
-	pIdleEnemy->SetPhaseNum(nPhaseNum);              //フェーズ番号を設定する
-	pIdleEnemy->m_IdleEnemyType = Type;              //何もしない敵のタイプを設定する
-	pIdleEnemy->GetLifeInfo().SetLife(nLife);        //体力
-	pIdleEnemy->GetLifeInfo().SetMaxLife(nLife);     //最大体力
-	pIdleEnemy->GetPosInfo().SetPos(pos);            //位置
-	pIdleEnemy->GetPosInfo().SetSupportPos(pos);     //支点位置
-	pIdleEnemy->GetRotInfo().SetRot(rot);            //向き
-	pIdleEnemy->GetSizeInfo().SetScale(Scale);       //拡大率
-	pIdleEnemy->GetSizeInfo().SetFormarScale(Scale); //元の拡大率を設定
-	pIdleEnemy->SetSensingRange(550.0f);             //感知射程
-	pIdleEnemy->SetNormalSpeed(10.0f);               //通常移動速度
+	pIdleEnemy->SetPhaseNum(nPhaseNum);               //フェーズ番号を設定する
+	pIdleEnemy->SetEnemyType(CEnemy::ENEMYTYPE::IDLE);//敵の種類を設定する
+	pIdleEnemy->m_IdleEnemyType = Type;               //何もしない敵のタイプを設定する
+	pIdleEnemy->GetLifeInfo().SetLife(nLife);         //体力
+	pIdleEnemy->GetLifeInfo().SetMaxLife(nLife);      //最大体力
+	pIdleEnemy->GetPosInfo().SetPos(pos);             //位置
+	pIdleEnemy->GetPosInfo().SetSupportPos(pos);      //支点位置
+	pIdleEnemy->GetRotInfo().SetRot(rot);             //向き
+	pIdleEnemy->GetSizeInfo().SetScale(Scale);        //拡大率
+	pIdleEnemy->GetSizeInfo().SetFormarScale(Scale);  //元の拡大率を設定
+	pIdleEnemy->SetSensingRange(550.0f);              //感知射程
+	pIdleEnemy->SetNormalSpeed(10.0f);                //通常移動速度
 	pIdleEnemy->GetMoveInfo().SetUseInteria(false, GetNormalInertia());//慣性を設定（通常値）
-	pIdleEnemy->SetCntTime(rand() % 100 + 1);       //攻撃タイミングをずらす
-	pIdleEnemy->GetLifeInfo().SetAutoDeath(true);   //体力が０になったときに死亡フラグを発動
-	pIdleEnemy->GetLifeInfo().SetAutoSubLife(false);//体力を減らし続けない
-	pIdleEnemy->SetSize();                          //モデルサイズを設定
+	pIdleEnemy->SetCntTime(rand() % 100 + 1);         //攻撃タイミングをずらす
+	pIdleEnemy->GetLifeInfo().SetAutoDeath(true);     //体力が０になったときに死亡フラグを発動
+	pIdleEnemy->GetLifeInfo().SetAutoSubLife(false);  //体力を減らし続けない
+	pIdleEnemy->SetSize();                            //モデルサイズを設定
 	pIdleEnemy->SetManagerObjectType(CObject::MANAGEROBJECTTYPE::IDLEENEMY);//ステージマネージャーで呼び出す時の種類を設定
 
 	return pIdleEnemy;
@@ -2294,7 +2303,7 @@ void CIdleEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveManag
 
 	float fNormalSpeed = 0.0f;                               //通常速度
 	float fSensingRange = 0.0f;                              //索敵距離（攻撃モードに入る距離)
-	while (Buff != "END_SETDIVEWEAKENEMY")
+	while (Buff != "END_SETIDLEENEMY")
 	{
 		LoadingFile >> Buff;//単語を読み込む
 		if (Buff == "#")
@@ -2401,7 +2410,7 @@ void CIdleEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveManag
 								Info.Pos = MoveAiPos;//移動AIの位置
 								Info.Rot = MoveAiRot;//移動AIの向き
 								Info.Scale = MoveAiScale;//移動AIの拡大率
-								VecMoveAiInfo.push_back(Info);//移動AIの動的配列に格納
+								VecMoveAiInfo.push_back(Info);//移動AI情報の動的配列に格納
 							}
 							break;
 						}
