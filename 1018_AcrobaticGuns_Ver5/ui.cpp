@@ -39,8 +39,7 @@ const string CUi::UI_FILENAME[int(CUi::UITYPE::MAX)] =
 //コンストラクタ
 //====================================================
 CUi::CUi(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObject2D(nPri,bUseintPri,type,ObjType),
-m_MoveType(UIMOVETYPE_NORMAL),m_Type(UITYPE::LOCKON),m_bUseUiEffect(false),m_nSetUiEffectLife(0),m_SetUiEffectColor(D3DXCOLOR(1.0f,1.0f,1.0f,1.0f)),
-m_pUiState(DBG_NEW CUiState()),m_nValue(0)
+m_MoveType(UIMOVETYPE_NORMAL),m_Type(UITYPE::LOCKON),m_bUseUiEffect(false),m_nSetUiEffectLife(0),m_SetUiEffectColor(D3DXCOLOR(1.0f,1.0f,1.0f,1.0f))
 {
 
 }
@@ -86,9 +85,13 @@ void CUi::Update()
 		CUiEffect::Create(m_Type, GetPolygonType(), GetWidth(), GetHeight(), m_nSetUiEffectLife, GetPos(), D3DXVECTOR3(0.0f,0.0f,0.0f), GetRot(), m_SetUiEffectColor);
 	}
 
-	if (m_pUiState != nullptr)
-	{
-		m_pUiState->Process(this);
+
+	if (m_VecUiState.size() > 0)
+	{//UI状態の道程配列のデータがあれば
+		for (auto it = m_VecUiState.begin(); it != m_VecUiState.end(); ++it)
+		{
+			(*it)->Process(this);//それぞれの状態の処理を開始する
+		}
 	}
 }
 //===================================================================================================
@@ -109,11 +112,17 @@ void CUi::SetDeath()
 {
 	if (GetUseDeath() == true)
 	{
-		if (m_pUiState != nullptr)
-		{//ステートの開放
-			delete m_pUiState;
-			m_pUiState = nullptr;
+		for (auto it = m_VecUiState.begin(); it != m_VecUiState.end(); ++it)
+		{
+			if (*it != nullptr)
+			{//イテレータが指し示すUIステートへのポインタを破棄し、nullptrにする
+				delete* it;
+				*it = nullptr;
+			}
 		}
+		
+		m_VecUiState.clear();//メモリの中の情報をクリア
+		m_VecUiState.shrink_to_fit();//メモリを破棄
 	}
 	CObject::SetDeath();
 }
@@ -181,13 +190,30 @@ void CUi::SetUiType(UITYPE type)
 //====================================================
 void CUi::SetNumericState(int nValue, float fWidth, float fHeight)
 {
-	if (m_pUiState != nullptr)
+	for (auto it = m_VecUiState.begin(); it != m_VecUiState.end(); ++it)
 	{
-		delete m_pUiState;
-		m_pUiState = nullptr;
-
-		m_pUiState = DBG_NEW CUiState_Numeric(this, nValue, fWidth, fHeight);
+		if (CUiState::UISTATE::NUMERIC == (*it)->GetUiState())
+		{
+			return;//既に情報が存在しているので、保存せずに終了する
+		}
 	}
+	m_VecUiState.push_back(DBG_NEW CUiState_Numeric(this, nValue, fWidth, fHeight));
+}
+//===================================================================================================
+
+//====================================================
+//UIの状態を取得する
+//====================================================
+CUiState* CUi::GetUiState(CUiState::UISTATE UiState)
+{
+	for (auto it = m_VecUiState.begin(); it != m_VecUiState.end(); ++it)
+	{
+		if (UiState == (*it)->GetUiState())
+		{//指定した状態があれば取得する
+			return *it;
+		}
+	}
+	return nullptr;
 }
 //===================================================================================================
 
@@ -318,7 +344,7 @@ CUiEffect* CUiEffect::Create(UITYPE type, CObject2D::POLYGONTYPE PolygonType, fl
 //====================================================
 //コンストラクタ
 //====================================================
-CUiState::CUiState()
+CUiState::CUiState() : m_pUiState()
 {
 
 }
@@ -351,17 +377,19 @@ void CUiState::Process(CUi* pUi)
 //====================================================
 CUiState_Numeric::CUiState_Numeric(CUi* pUi, int nValue, float fWidth, float fHeight)
 {
-	pUi->SetValue(nValue);
-	int nDigit = CCalculation::CalculationDigit(pUi->GetValue());
-	if (pUi->GetValue() == 0)
-	{
+	SetUiState(CUiState::UISTATE::NUMERIC);
+	m_nValue = nValue;
+	m_fWidth = fWidth;//横幅の基準値
+	m_fHeight = fHeight;//高さの基準値
+	int nDigit = CCalculation::CalculationDigit(m_nValue);
+	if (m_nValue == 0)
+	{//桁数を０にするわけにはいかないので、桁数を１とする
 		nDigit = 1;
 	}
-
 	for (int nCnt = 0; nCnt < nDigit; nCnt++)
 	{
 		CNumber* pNumber = CNumber::Create(pUi->GetPos(), fWidth, fHeight);
-		int nNum = CCalculation::getDigit(pUi->GetValue(), nCnt);
+		int nNum = CCalculation::getDigit(m_nValue, nCnt);
 		pNumber->SetAnim(nNum);//指定した桁の数値を取得する
 		pNumber->SetUseDeath(false);//死亡フラグを発動させない
 		m_VecNum.push_back(pNumber);//Vectorに保存
@@ -400,5 +428,74 @@ void CUiState_Numeric::Process(CUi* pUi)
 	{//数字を横に並べ続ける
 		(*it)->SetPos(pUi->GetPos() + D3DXVECTOR3(pUi->GetWidth() / 2 + (*it)->GetWidth() / 2 + (*it)->GetWidth() * (nSize - 1) - ((*it)->GetWidth() * nCnt), 0.0f, 0.0f));
 	}
+}
+//===================================================================================================
+
+//====================================================
+//数値を設定する
+//====================================================
+void CUiState_Numeric::SetValue(int nValue,CUi * pUi)
+{
+	//数値の動的配列の中身を全て破棄
+	for (auto it = m_VecNum.begin(); it != m_VecNum.end(); ++it)
+	{
+		if ((*it) != nullptr)
+		{
+			(*it)->SetUseDeath(true);
+			(*it)->SetDeath();
+			(*it) = nullptr;
+		}
+	}
+
+	m_VecNum.clear();//メモリの中身を初期化
+
+	m_nValue = nValue;//数値を格納
+	int nDigit = CCalculation::CalculationDigit(m_nValue);//桁数を計算
+
+	if (m_nValue == 0)
+	{//桁数を０にするわけにはいかないので、桁数を１とする
+		nDigit = 1;
+	}
+
+	//桁数分数値の表示を生成し動的配列に格納する
+	for (int nCnt = 0; nCnt < nDigit; nCnt++)
+	{
+		CNumber* pNumber = CNumber::Create(pUi->GetPos(),m_fWidth,m_fHeight);
+		int nNum = CCalculation::getDigit(m_nValue, nCnt);//指定した桁の数値を取得する
+		pNumber->SetAnim(nNum);//アニメーションパターン
+		pNumber->SetUseDeath(false);//死亡フラグを発動させない
+		m_VecNum.push_back(pNumber);//動的配列に保存
+	}
+}
+//===================================================================================================
+
+//****************************************************
+//UIステート_ゲージ保持
+//****************************************************
+
+//====================================================
+//コンストラクタ
+//====================================================
+CUiState_Gauge::CUiState_Gauge(CUi* pUi, D3DXVECTOR3 GaugePos, float fMaxWidth, float fMaxHeight, int nValue, int nMaxValue) : m_pGauge(nullptr)
+{
+
+}
+//===================================================================================================
+
+//====================================================
+//デストラクタ
+//====================================================
+CUiState_Gauge::~CUiState_Gauge()
+{
+
+}
+//===================================================================================================
+
+//====================================================
+//処理
+//====================================================
+void CUiState_Gauge::Process(CUi* pUi)
+{
+
 }
 //===================================================================================================

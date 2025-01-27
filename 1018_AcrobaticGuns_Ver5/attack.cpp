@@ -343,10 +343,13 @@ void CAttackPlayer::Update()
 		if (CScene::GetMode() == CScene::MODE::MODE_GAME)
 		{
 			CGauge* pPlayerDiveGauge = CGame::GetPlayer()->GetDiveGauge();   //ダイブゲージを取得
-			CUi* pDivePossibleNum = CGame::GetPlayer()->GetDivePossibleNum();//ダイブ可能階数のUIの数値（ダイブ可能回数)を取得
-			if (pDivePossibleNum->GetValue() < CPlayer::GetMaxDiveNum())
-			{//最大ダイブ可能回数に達していない場合はダイブ可能階数を＋１する
-				pPlayerDiveGauge->SetParam(pPlayerDiveGauge->GetParam() + 1);
+			CUiState_Numeric * pUiState_Numeric = dynamic_cast<CUiState_Numeric*>(CGame::GetPlayer()->GetDivePossibleNum()->GetUiState(CUiState::UISTATE::NUMERIC));//ダイブ可能階数のUIの数値（ダイブ可能回数)を取得
+			if (pUiState_Numeric != nullptr)
+			{
+				if (pUiState_Numeric->GetValue() < CPlayer::GetMaxDiveNum())
+				{//最大ダイブ可能回数に達していない場合はダイブ可能回数を＋１する
+					pPlayerDiveGauge->SetParam(pPlayerDiveGauge->GetParam() + 1);
+				}
 			}
 		}
 	}

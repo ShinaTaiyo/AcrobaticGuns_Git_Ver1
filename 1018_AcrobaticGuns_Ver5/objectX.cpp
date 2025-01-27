@@ -898,7 +898,7 @@ void CObjectX::DrawShadow()
 			//==========================================================================
 			for (int nCntMat = 0; nCntMat < (int)m_ObjectXInfo.dwNumMat; nCntMat++)
 			{
-				if (m_ObjectXInfo.FormarDiffuse[nCntMat].a > 0.5f)
+				if (m_ObjectXInfo.Diffuse[nCntMat].a > 0.5f)
 				{//aílÇ™0.5fàŸèÌÇ»ÇÁ0.5fÇ…å≈íË
 					pMat[nCntMat].MatD3D.Diffuse = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.5f);
 				}
@@ -1077,6 +1077,7 @@ void CObjectX::LifeInfo::RatioLifeAlphaColorProcess(CObjectX* pObjX)
 		float fRatio;
 		fRatio = float(nLife) / float(nMaxLife);
 		pObjX->SetColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, fRatio), 3, true, true,false);
+		CManager::GetDebugText()->PrintDebugText("ìßñæìxäÑçáÅF%f\n", fRatio);
 	}
 }
 //================================================================================================================================================

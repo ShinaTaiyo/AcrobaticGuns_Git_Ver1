@@ -480,7 +480,8 @@ void CPlayerAttack_Dive::AttackProcess(CPlayer* pPlayer)
 	CGauge* pDiveGauge = pPlayer->GetDiveGauge();
 	CUi* pDivePossibleNum = pPlayer->GetDivePossibleNum();
 	CWireHead* pWireHead = pPlayer->GetWire()->GetWireHead();
-	if (pDivePossibleNum->GetValue() > 0)
+	CUiState_Numeric* pUiState_Numeric = dynamic_cast<CUiState_Numeric*>(pDivePossibleNum->GetUiState(CUiState::UISTATE::NUMERIC));
+	if (pUiState_Numeric->GetValue() > 0)
 	{//ダイブゲージがたまっていたら爆発攻撃を発動
 		CAttackPlayer* pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::ENEMY, CAttack::COLLISIONTYPE::SQUARE, false,true, 50,30, 100, pPlayer->GetPosInfo().GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.1f, 0.1f, 0.1f),
 			D3DXVECTOR3(1.0f, 1.0f, 1.0f));
@@ -488,12 +489,9 @@ void CPlayerAttack_Dive::AttackProcess(CPlayer* pPlayer)
 		pAttackPlayer->SetColor(D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f), 200, false, false,false);
 		pAttackPlayer->GetLifeInfo().SetUseRatioLifeAlpha(true);
 		pAttackPlayer->SetCollisionRelease(false);
-		pDivePossibleNum->SetNumericState(pDivePossibleNum->GetValue() - 1, 50.0f, 50.0f);
-
 		CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::TAKEDIVE);
-
+		pUiState_Numeric->SetValue(pUiState_Numeric->GetValue() - 1, pDivePossibleNum);
 		CManager::GetSound()->PlaySoundB(CSound::SOUND_LABEL::SE_EXPLOSION_000);
-
 		//目的の向きまで少しづつ動かす（カメラの前は-D3DX_PI * 0.5f,プレイヤーはデフォルトの向きが異なるので、Rot.y + D3DX_PI)
 		CManager::GetCamera()->ChengeState(DBG_NEW CCameraState_TurnAround(D3DXVECTOR3(-D3DX_PI * 0.5f, pPlayer->GetRotInfo().GetRot().y + D3DX_PI, 0.0f), 0.1f));
 

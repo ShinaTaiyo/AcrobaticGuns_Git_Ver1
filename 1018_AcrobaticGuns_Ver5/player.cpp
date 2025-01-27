@@ -142,6 +142,7 @@ void CPlayer::Update()
 
     if (CScene::GetMode() == CScene::MODE_GAME)
     {
+        CUiState_Numeric* pUiState_Numeric = dynamic_cast<CUiState_Numeric*>(m_pDivePossibleNum->GetUiState(CUiState::UISTATE::NUMERIC));//UIの数字情報取得
         if (m_pEffect != nullptr)
         {
             m_pEffect->EffectProcess(this);//エフェクト処理
@@ -158,8 +159,8 @@ void CPlayer::Update()
             m_pWireShot->WireShotProcess(this);//ワイヤー発射状態処理
         }
 
-        if (m_pDivePossibleNum->GetValue() == s_nMaxDiveNum)
-        {//点滅をさせる
+        if (pUiState_Numeric->GetValue() == s_nMaxDiveNum)
+        {//ダイブ可能回数が最大に達したら点滅をさせる
             m_pDivePossibleNum->SetUseBlinking(true, 20, 0.0f);//点滅させる
         }
         else
@@ -356,22 +357,25 @@ void CPlayer::ActionModeChengeProcess()
 void CPlayer::DiveGaugeMaxEffect()
 {
     CDebugText* pDebugText = CManager::GetDebugText();
+    CUiState_Numeric* pUiState_Numeric = dynamic_cast<CUiState_Numeric*>(m_pDivePossibleNum->GetUiState(CUiState::UISTATE::NUMERIC));//UIの数字状態を取得
     pDebugText->PrintDebugText("ダイブゲージの値：%d\n", m_pDiveGauge->GetParam());
-    pDebugText->PrintDebugText("ダイブ可能回数：%d\n", m_pDivePossibleNum->GetValue());
-    if (m_pDiveGauge->GetFullGaugeFlag() == true)
-    {//ゲージがマックスになった「瞬間」にフラグを発動＆＆最大ダイブ可能回数に達していなかったら
-        CGauge* pGauge = CGauge::Create(CGauge::GAUGETYPE::PLAYERHP, m_pDiveGauge->GetParam(), m_pDiveGauge->GetWidth(), m_pDiveGauge->GetHeight(), m_pDiveGauge->GetPos());
-        pGauge->SetUseLife(true, 50, 50);
-        pGauge->SetPolygonType(m_pDiveGauge->GetPolygonType());
-        pGauge->SetColor(m_pDiveGauge->GetColor(), false, 1.0f);
-        pGauge->SetUseLifeRatioColor(true);
-        pGauge->SetUseDeath(true);
-        pGauge->SetUseAddScale(D3DXVECTOR2(0.3f, 0.3f), true);
-        pGauge->SetUseScale(true);
-        pGauge->SetScale(D3DXVECTOR2(1.0f, 1.0f));
-
-        m_pDivePossibleNum->SetNumericState(m_pDivePossibleNum->GetValue() + 1, 50.0f, 50.0f);
-        m_pDiveGauge->SetParam(0);
+    if (pUiState_Numeric != nullptr)
+    {
+        pDebugText->PrintDebugText("ダイブ可能回数：%d\n", pUiState_Numeric->GetValue());
+        if (m_pDiveGauge->GetFullGaugeFlag() == true)
+        {//ゲージがマックスになった「瞬間」にフラグを発動＆＆最大ダイブ可能回数に達していなかったら
+            CGauge* pGauge = CGauge::Create(CGauge::GAUGETYPE::PLAYERHP, m_pDiveGauge->GetParam(), m_pDiveGauge->GetWidth(), m_pDiveGauge->GetHeight(), m_pDiveGauge->GetPos());
+            pGauge->SetUseLife(true, 50, 50);
+            pGauge->SetPolygonType(m_pDiveGauge->GetPolygonType());
+            pGauge->SetColor(m_pDiveGauge->GetColor(), false, 1.0f);
+            pGauge->SetUseLifeRatioColor(true);
+            pGauge->SetUseDeath(true);
+            pGauge->SetUseAddScale(D3DXVECTOR2(0.3f, 0.3f), true);
+            pGauge->SetUseScale(true);
+            pGauge->SetScale(D3DXVECTOR2(1.0f, 1.0f));
+            m_pDiveGauge->SetParam(0);//ダイブゲージをリセット
+            pUiState_Numeric->SetValue(pUiState_Numeric->GetValue() + 1,m_pDivePossibleNum);
+        }
     }
 }
 //==========================================================================================================

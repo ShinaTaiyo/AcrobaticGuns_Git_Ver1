@@ -14,6 +14,7 @@
 #include "main.h"
 #include "object2d.h"
 #include "number.h"
+#include "gauge.h"
 //==========================================
 
 //======================
@@ -23,19 +24,31 @@ class CObject2D;
 class CUi;
 
 //==========================================
-//UIステート
+//UIストラテジー
 //==========================================
 class CUiState
 {
 public:
+	//UIの状態列挙型
+	enum class UISTATE
+	{
+		NONE = 0,
+		NUMERIC,
+		GAUGE,
+		MAX
+	};
 	CUiState();                 //コンストラクタ
 	virtual ~CUiState();        //デストラクタ
-	virtual void Process(CUi* pUi);//処理         
+	virtual void Process(CUi* pUi);//処理      
+	void SetUiState(UISTATE pUiState) { m_pUiState = pUiState; }
+	UISTATE GetUiState() { return m_pUiState; }//UIの状態を取得する
+private:
+	UISTATE m_pUiState = UISTATE::NONE;//UIの状態を格納
 };
 //=======================================================================================
 
 //==========================================
-//UIステート：数字保持
+//UIストラテジー：数字保持
 //==========================================
 class CUiState_Numeric : public CUiState
 {
@@ -43,8 +56,28 @@ public:
 	CUiState_Numeric(CUi* pUi, int nValue, float fWidth, float fHeight);//コンストラクタ
 	~CUiState_Numeric() override;//デストラクタ
 	void Process(CUi* pUi) override;//処理
+	void SetValue(int nValue,CUi * pUi);//数値を設定する
+	int GetValue() { return m_nValue; };
 private:
 	vector<CNumber*> m_VecNum;//数字のベクター
+	int m_nValue = 0;         //数値
+	float m_fWidth = 0.0f;           //横幅基準値
+	float m_fHeight = 0.0f;          //高さ基準値
+};
+//=======================================================================================
+
+//==========================================
+//UIストラテジー：ゲージ保持
+//==========================================
+class CUiState_Gauge : public CUiState
+{
+public:
+	CUiState_Gauge(CUi* pUi, D3DXVECTOR3 GaugePos, float fMaxWidth, float fMaxHeight, int nValue, int nMaxValue);//コンストラクタ
+	~CUiState_Gauge() override;//デストラクタ
+	void Process(CUi* pUi);//処理
+	CGauge* GetGauge() { return m_pGauge;}//ゲージを取得
+private:
+	CGauge* m_pGauge;//ゲージ
 };
 //=======================================================================================
 
@@ -91,9 +124,8 @@ public:
 	UITYPE GetUiType() { return m_Type; }//UIの種類を取得
 	void SetNumericState(int nValue, float fWidth, float fHeight);//数字状態を設定する
 
-	void SetValue(int nValue) { m_nValue = nValue; }
-	const int & GetValue() const { return m_nValue; }
-
+	CUiState* GetUiState(CUiState::UISTATE UiState);//指定したUIの状態を取得する
+	void PushUiState(CUiState* pUiState) { m_VecUiState.push_back(pUiState);}//新しいUIの状態を動的配列に格納
 protected:
 	static const string UI_FILENAME[int(UITYPE::MAX)];//UIのテクスチャファイル名
 private:
@@ -103,9 +135,7 @@ private:
 
 	D3DXCOLOR m_SetUiEffectColor;  //UIで出すエフェクトの色合い設定用
 	int m_nSetUiEffectLife;        //UIのエフェクトの体力設定用
-	CUiState* m_pUiState;          //UIの状態
-
-	int m_nValue;                  //数字
+	vector<CUiState*> m_VecUiState;//UIの状態構造体
 };
 //=======================================================================================
 
