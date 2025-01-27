@@ -95,24 +95,41 @@ void CWire::Update()
 	const int& nNumIdx = GetNumIdx();              //インデックス数
 	const float& fRadius = GetRadius();            //半径
 	const float& fHeight = GetHeight();            //高さ
-
-	float fLength = CCalculation::CalculationLength(m_pPlayer->GetPosInfo().GetPos(), m_pWireHead->GetPosInfo().GetPos());
-	SetHeight(fLength);
-
-	D3DXVECTOR3 RotMove = m_pWireHead->GetPosInfo().GetPos() - m_pPlayer->GetPosInfo().GetPos();
-	D3DXVec3Normalize(&RotMove, &RotMove);
-	VERTEX_3D* pVtx;
-	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBufferPointer();
+	float fLength = CCalculation::CalculationLength(m_pWireHead->GetPosInfo().GetPos(),m_pPlayer->GetPosInfo().GetPos());//ワイヤーの頭とプレイヤーの距離を求める
+	SetHeight(fLength);//上の行で求めた距離を設定する
+	D3DXVECTOR3 Dir = m_pWireHead->GetPosInfo().GetPos() - m_pPlayer->GetPosInfo().GetPos();//ワイヤーの頭とプレイヤーのベクトルを求める
+	D3DXVec3Normalize(&Dir, &Dir);//ベクトルを正規化する
+	VERTEX_3D* pVtx;                    //3D頂点情報へのポインタ
+	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBufferPointer();//頂点バッファへのポインタを取得
 	//頂点バッファをロックし、頂点情報へのポインタを取得
 	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
+	D3DXVECTOR3 Up = { 0.0f,1.0f,0.0f };//基準となる上方向ベクトル（外積の処理で使う）
+
+	if (std::abs(Dir.x * Up.x + Dir.y * Up.y + Dir.z * Up.z) > 0.99f) {
+		Up = { 1.0f, 0.0f, 0.0f }; // 平行に近い場合は別の基準(X方向)
+	}
+
 	if (m_bUseUpdate == true && m_pPlayer != nullptr)
 	{
-		int nCntArray = 0;
-		float fRatioXZ = 0.0f;
-		float fRatioY = 0.0f;
-		D3DXVECTOR3 LastSenterPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		int nCntArray = 0;//配列数をカウント
+		float fRatioXZ = 0.0f;//XZ方向のカウント数の割合
+		float fRatioY = 0.0f; //Y方向のカウント数の割合
+		D3DXVECTOR3 LastSenterPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);//最後の中心点計算用
 		D3DXVECTOR3 MeasureNor = D3DXVECTOR3(0.0f, 0.0f, 0.0f);//法線計算用
+		D3DXVECTOR3 V1 = { 0.0f,0.0f,0.0f };
+		D3DXVECTOR3 V2 = { 0.0f,0.0f,0.0f };
+		float fMeasureAngle = 0.0f;//角度計算用
+		float fMeasureX = 0.0f;
+		float fMeasureY = 0.0f;
+
+		//円を展開する平面を求める基準ベクトルを計算する
+		D3DXVec3Cross(&V1, &Dir, &Up);//X方向
+		D3DXVec3Normalize(&V1, &V1);//ベクトル１を正規化
+		D3DXVec3Cross(&V2, &Dir, &V1);//Y方向
+		D3DXVec3Normalize(&V2, &V2);//ベクトル２を正規化
+
+		//頂点の位置の設定を開始
 		for (int nCntVtxY = 0; nCntVtxY < nNumDivisionY; nCntVtxY++)
 		{//Y方向のUVはそのまま使う
 			fRatioY = (1.0f / (nNumDivisionY - 1)) * nCntVtxY;
@@ -120,19 +137,23 @@ void CWire::Update()
 			{//X方向のUVは重なる頂点があるので、+ 1
 				fRatioXZ = (1.0f / (nNumDivisionXZ)) * nCntVtxXZ;
 				if (nCntVtxY == 0 && nCntVtxXZ == 0)
-				{//最初の周なので上面の中心点を設定する
-					pVtx[nCntArray].pos = m_pWireHead->GetPosInfo().GetPos();//Y方向分割数3つの場合、底面 = 1
+				{//最初の周なので底面の中心点を設定する
+					pVtx[nCntArray].pos = m_pPlayer->GetPosInfo().GetPos();
 					nCntArray++;
 				}
 
 				if (nCntVtxY == 0)
 				{//最初の周で基準点を決める（9,8,7,6,5,4,3,2,1)
-					pVtx[nCntArray].pos = m_VecMtxCircle[nCntVtxXZ].Pos;
+					fMeasureAngle = (D3DX_PI * 2) * fRatioXZ;//角度の割合を計算する
+					fMeasureX = fRadius * sinf(fMeasureAngle);//上を正としているので、sinfはX
+					fMeasureY = fRadius * cosf(fMeasureAngle);//上を正としているので、cosfはY
+					pVtx[nCntArray].pos = m_pPlayer->GetPosInfo().GetPos() + V1 * fMeasureX + V2 * fMeasureY;//sinfとcosfで平面のX方向とY方向に進む比を求めたので合っている
 				}
 				else
 				{//基準点に対して軌跡風に頂点を代入していく(18 = 27)
-					D3DXVECTOR3 AdjustPos = RotMove * fLength * fRatioY;
-					pVtx[nCntArray].pos = pVtx[1 + nCntVtxXZ].pos - AdjustPos;
+					//円を目的のベクトルを基準に平面に展開し基準点は求まったので、あとはそのベクトルに向かって値を足していくだけ
+					D3DXVECTOR3 AdjustPos = Dir * fLength * fRatioY;
+					pVtx[nCntArray].pos = pVtx[1 + nCntVtxXZ].pos + AdjustPos;
 				}
 
 
@@ -148,9 +169,10 @@ void CWire::Update()
 				{//配列外アクセスチェック
 					assert(false);
 				}
+
 				if (nCntVtxY == nNumDivisionY - 1 && nCntVtxXZ == nNumDivisionXZ)
-				{//最後
-					pVtx[nCntArray].pos = m_pPlayer->GetPosInfo().GetPos();//底面の中心に位置を設定
+				{//最後の頂点なので、中心点をワイヤーの頭に設定
+					pVtx[nCntArray].pos = m_pWireHead->GetPosInfo().GetPos();//底面の中心に位置を設定
 				}
 			}
 		}
@@ -190,47 +212,6 @@ void CWire::Draw()
 	//位置を反映
 	D3DXMatrixTranslation(&mtxTrans,0.0f,0.0f,0.0f);
 	D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxTrans);
-
-	//========================================================================================
-	//円状に点を配置するためのワールド座標を求める
-	//========================================================================================
-	if (m_pWireHead != nullptr && GetUseDraw() == true)
-	{
-		D3DXVECTOR3 PosZero = D3DXVECTOR3(0.0f, 0.0f, 0.0f);//ワールド座標代入処理で使用する
-		D3DXVECTOR3 WireHeadRot = m_pWireHead->GetRotInfo().GetRot();//ワイヤーヘッドの向き
-		D3DXVECTOR3 WireHeadPos = m_pWireHead->GetPosInfo().GetPos();//ワイヤーヘッドの位置
-		int Size = m_VecMtxCircle.size();
-
-		for (int nCnt = 0; nCnt < Size; nCnt++)
-		{
-			D3DXMATRIX mtxSenter;
-			D3DXMatrixIdentity(&mtxSenter);
-
-			//割合を求める
-			float fRatio = (2.0f / (Size - 1)) * nCnt;
-
-			//ワールドマトリックスの初期化
-			D3DXMatrixIdentity(&m_VecMtxCircle[nCnt].WorldMtx);
-
-			//向きを反映（ワイヤーヘッドが向いている方向に）
-			D3DXMatrixRotationYawPitchRoll(&mtxRot,0.0f,0.0f,0.0f);
-			D3DXMatrixMultiply(&m_VecMtxCircle[nCnt].WorldMtx, &m_VecMtxCircle[nCnt].WorldMtx, &mtxRot);
-
-			//位置を反映（ワイヤーヘッドを中心に円状に）
-			D3DXMatrixTranslation(&mtxTrans,
-				sinf(D3DX_PI * fRatio) * GetRadius(),
-				0.0f,
-				cosf(D3DX_PI * fRatio) * GetRadius());
-			D3DXMatrixMultiply(&m_VecMtxCircle[nCnt].WorldMtx, &m_VecMtxCircle[nCnt].WorldMtx, &mtxTrans);
-
-			//ワイヤーヘッドとワールド変換行列を掛け合わせる
-			D3DXMatrixMultiply(&m_VecMtxCircle[nCnt].WorldMtx, &m_VecMtxCircle[nCnt].WorldMtx,&m_pWireHead->GetDrawInfo().GetMatrixWorld());
-
-			//ワールド座標を代入
-			D3DXVec3TransformCoord(&m_VecMtxCircle[nCnt].Pos, &PosZero, &m_VecMtxCircle[nCnt].WorldMtx);
-		}
-	}
-	//=======================================================================================================================
 
 	//ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &mtxWorld);
