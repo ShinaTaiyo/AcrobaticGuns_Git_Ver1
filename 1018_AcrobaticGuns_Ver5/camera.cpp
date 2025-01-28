@@ -287,8 +287,8 @@ void CCamera::MakeTransparent()
 			while (pObj != nullptr)
 			{
 				CObject* pNext = pObj->GetNextObject();
-				if (pObj->GetObjectType() == CObject::OBJECTTYPE::OBJECTTYPE_X && pObj->GetType() != CObject::TYPE::PLAYER && pObj->GetType() != CObject::TYPE::ENEMY &&
-					pObj->GetType() != CObject::TYPE::MODELPARTS)
+				CObject::TYPE Type = pObj->GetType();
+				if (Type == CObject::TYPE::BGMODEL || Type == CObject::TYPE::BLOCK)
 				{
 					CObjectX* pObjX = static_cast<CObjectX*>(pObj);//オブジェクトXの機能を使う
 					if (CCollision::RayIntersectsAABBCollisionPos(m_PosV, Ray, pObjX->GetPosInfo().GetPos() + pObjX->GetSizeInfo().GetVtxMin(), pObjX->GetPosInfo().GetPos() + pObjX->GetSizeInfo().GetVtxMax(), RayCollisionPos))

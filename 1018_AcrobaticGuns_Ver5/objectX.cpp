@@ -120,9 +120,9 @@ void CObjectX::Update()
 	}
 
 	m_LifeInfo.AutoSubLifeProcess();             //体力を自動的に減らす処理
-	m_LifeInfo.RatioLifeAlphaColorProcess(this); //体力の割合に応じて透明度を変える処理
 	m_LifeInfo.AutoDeathProcess(this);           //体力が０になった場合に死亡フラグを発動する処理
 	m_LifeInfo.HitStopProcess();                 //無敵時間をカウントする処理
+	m_LifeInfo.RatioLifeAlphaColorProcess(this); //体力の割合に応じて透明度を変える処理
 
 	m_MoveInfo.MultiSpeedProcess();              //乗算加速処理
 	m_MoveInfo.AddSpeedProcess();                //加速処理
@@ -146,13 +146,12 @@ void CObjectX::Draw()
 	D3DMATERIAL9 matDef;                                              //現在のマテリアル保存用
 	D3DXMATERIAL* pMat;                                               //マテリアルデータへのポインタ
 
-	//現在のマテリアルを取得
-	pDevice->GetMaterial(&matDef);
-
 	if (m_DrawInfo.bUseShadow == true && s_bCOMMON_DRAWSHADOW == true)
 	{
 		DrawShadow();
 	}
+	//現在のマテリアルを取得
+	pDevice->GetMaterial(&matDef);
 
 	//ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_DrawInfo.mtxWorld);
@@ -187,7 +186,7 @@ void CObjectX::Draw()
 	//=======================================
 	//アルファテストを有効(アルファ値が０より大きい場合に描画する）
 	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-	pDevice->SetRenderState(D3DRS_ALPHAREF,50);
+	pDevice->SetRenderState(D3DRS_ALPHAREF,0);
 	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
 
 	//法線の長さを１にする。（スケールなどを使った時は、必ず使う。)
@@ -220,6 +219,7 @@ void CObjectX::Draw()
 			{
 				//色合いの設定
 				pMat[nCntMat].MatD3D.Diffuse = m_ObjectXInfo.Diffuse[nCntMat];
+
 				//マテリアルの設定
 				pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
 
@@ -310,6 +310,7 @@ void CObjectX::SetColor(D3DXCOLOR col, int nColChengeTime, bool bChoose, bool bS
 		{
 			for (int nCnt = 0; nCnt < (int)(m_ObjectXInfo.dwNumMat); nCnt++)
 			{
+
 				m_ObjectXInfo.Diffuse[nCnt].a = col.a;
 			}
 		}
@@ -803,6 +804,9 @@ void CObjectX::DrawShadow()
 	D3DXVECTOR3 RayCollisionPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	D3DXVECTOR3 CalcRayCollisionPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	float fResultNearLength = 0.0f;
+
+	//現在のマテリアルを取得
+	pDevice->GetMaterial(&matDef);
 
     //影のマトリックスを初期化
 	D3DXMatrixIdentity(&mtxShadow);
