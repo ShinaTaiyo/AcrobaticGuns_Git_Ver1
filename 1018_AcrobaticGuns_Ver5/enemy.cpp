@@ -1487,15 +1487,29 @@ void CDiveWeakEnemy::Draw()
 //====================================================================================
 void CDiveWeakEnemy::SetDeath()
 {
-	if (m_nDivisionNum > 0 && GetDefeatAttackType() == CAttack::ATTACKTYPE::BULLET && GetLifeInfo().GetLife() < 1)
+	if (m_nDivisionNum > 0 && GetDefeatAttackType() == CAttack::ATTACKTYPE::BULLET && GetLifeInfo().GetLife() < 1 && m_bStartDeath == false)
 	{ 
+		m_bStartDeath = true;
 		float fPosX = static_cast<float>(rand() % 30 - 15);
 		float fPosZ = static_cast<float>(rand() % 30 - 15);
 		m_nDivisionNum--;
-		CDiveWeakEnemy * pDiveWeakEnemy = CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE::NORMAL, GetLifeInfo().GetMaxLife()/ 2, 0, GetPosInfo().GetPos() + D3DXVECTOR3(fPosX, 100.0f, fPosZ), GetRotInfo().GetRot(), GetSizeInfo().GetScale() / 2, m_nDivisionNum);
-		pDiveWeakEnemy->SetSensingRange(9999.0f);
-		pDiveWeakEnemy = CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE::NORMAL, GetLifeInfo().GetMaxLife() / 2, 0, GetPosInfo().GetPos() + D3DXVECTOR3(fPosZ, 100.0f, fPosX), GetRotInfo().GetRot(), GetSizeInfo().GetScale() / 2, m_nDivisionNum);
-		pDiveWeakEnemy->SetSensingRange(9999.0f);
+		if (m_nDivisionNum == 1)
+		{//残り分裂回数が１の場合、だいぶ敵が増えてしまっているので、何もしない敵に分裂させる
+			CIdleEnemy* pIdleEnemy = CIdleEnemy::Create(CIdleEnemy::IDLEENEMYTYPE::NORMAL, GetLifeInfo().GetMaxLife() / 2, 0, GetPosInfo().GetPos() + D3DXVECTOR3(fPosZ, 100.0f, fPosX), GetRotInfo().GetRot(), GetSizeInfo().GetScale() / 2);
+			pIdleEnemy->SetSensingRange(9999.0f);
+			pIdleEnemy = CIdleEnemy::Create(CIdleEnemy::IDLEENEMYTYPE::NORMAL, GetLifeInfo().GetMaxLife() / 2, 0, GetPosInfo().GetPos() + D3DXVECTOR3(fPosZ, 100.0f, fPosX), GetRotInfo().GetRot(), GetSizeInfo().GetScale() / 2);
+			pIdleEnemy->SetSensingRange(9999.0f);
+		}
+		else
+		{//残り分裂回数がまだ多いので、そんなに分裂していないとみなし、ダイブに弱い敵に分裂させる
+			CDiveWeakEnemy* pDiveWeakEnemy = CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE::NORMAL, GetLifeInfo().GetMaxLife() / 2, 0, GetPosInfo().GetPos() + D3DXVECTOR3(fPosX, 100.0f, fPosZ), GetRotInfo().GetRot(), GetSizeInfo().GetScale() / 2, m_nDivisionNum);
+			pDiveWeakEnemy->SetSensingRange(9999.0f);
+			pDiveWeakEnemy->SetDivisionNum(m_nDivisionNum);
+			pDiveWeakEnemy = CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE::NORMAL, GetLifeInfo().GetMaxLife() / 2, 0, GetPosInfo().GetPos() + D3DXVECTOR3(fPosZ, 100.0f, fPosX), GetRotInfo().GetRot(), GetSizeInfo().GetScale() / 2, m_nDivisionNum);
+			pDiveWeakEnemy->SetSensingRange(9999.0f);
+			pDiveWeakEnemy->SetDivisionNum(m_nDivisionNum);
+			CParticle::SummonParticle(CParticle::TYPE::TYPE00_NORMAL, 30, 50, 30.0f, 30.0f, 100, 10, true, GetPosInfo().GetPos(), D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f), true);
+		}
 	}
 
 	CEnemy::SetDeath();
@@ -1530,7 +1544,7 @@ CDiveWeakEnemy* CDiveWeakEnemy::Create(DIVEWEAKENEMYTYPE Type, int nLife, int nP
 	pDiveWeakEnemy->SetNormalSpeed(s_fNORMAL_SPEED);//通常移動速度
 	pDiveWeakEnemy->GetMoveInfo().SetUseInteria(false, GetNormalInertia());
 	pDiveWeakEnemy->SetCntTime(rand() % 100 + 1);
-	pDiveWeakEnemy->SetDivisionNum(nDivisionNum);
+	pDiveWeakEnemy->SetDivisionNum(3);
 	pDiveWeakEnemy->GetLifeInfo().SetAutoDeath(true);
 
 	pDiveWeakEnemy->SetSize();//モデルサイズを設定
