@@ -2498,12 +2498,9 @@ CObject* CIdleEnemy::ManagerChengeObject(bool bAim)
 //===================================================================================
 CObject* CIdleEnemy::ManagerSaveObject()
 {
-	auto& Vec = GetVecAiModelInfo();
-	auto Vec2 = move(Vec);
 	CIdleEnemy* pIdleEnemy = CIdleEnemy::Create(m_IdleEnemyType, GetLifeInfo().GetMaxLife(), GetPhaseNum(), GetPosInfo().GetPos(), GetRotInfo().GetRot(), GetSizeInfo().GetScale());//生成したオブジェクトを返す
 	pIdleEnemy->SetSensingRange(GetSensingRange());//現在の敵の索敵範囲を保存する
 	pIdleEnemy->SetNormalSpeed(GetNormalSpeed());//現在の敵の通常速度を保存する
-	pIdleEnemy->SetVecMoveAiInfo(Vec2);
 	return pIdleEnemy;//生成したオブジェクトを返す
 }
 //============================================================================================================================================
