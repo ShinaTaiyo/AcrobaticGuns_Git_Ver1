@@ -143,7 +143,7 @@ CGauge * CGauge::Create(GAUGETYPE type, int nParam, float fWidth, float fHeight,
 	pGauge->Init();                                                                                 //初期化処理
 	pGauge->SetUseDeath(false);                                                                     //死亡フラグを発動するかどうかを設定する
 	pGauge->m_type = type;                                                                          //弾の種類
-	pGauge->m_nParam = nParam;                                                                      //パラメータ
+	pGauge->m_nParam = 0;                                                                      //パラメータ
 	pGauge->m_nMaxParam = nParam;                                                                   //最大パラメータ
 	pGauge->SetPos(pos);
 	pGauge->SetSupportPos(pos);

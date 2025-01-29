@@ -47,8 +47,8 @@ public:
 		NUMBER3D,        //数字3D
 	    PARTICLE2D,      //パーティクル２D
 		LOCKON,          //ロックオン
-		GAUGE,           //ゲージ
 		UI,              //UI
+		GAUGE,           //ゲージ
 		PHASEINFO,       //フェーズ情報
 		STAGEMANAGER,    //ステージマネージャー
 		PHASEMANAGER,    //フェーズマネージャー

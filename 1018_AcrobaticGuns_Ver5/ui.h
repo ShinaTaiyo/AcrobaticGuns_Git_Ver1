@@ -32,9 +32,9 @@ public:
 	//UIの状態列挙型
 	enum class UISTATE
 	{
-		NONE = 0,
-		NUMERIC,
-		GAUGE,
+		NONE = 0,//なし
+		NUMERIC, //数字保持
+		GAUGE,   //ゲージ保持
 		MAX
 	};
 	CUiState();                 //コンストラクタ
@@ -72,12 +72,12 @@ private:
 class CUiState_Gauge : public CUiState
 {
 public:
-	CUiState_Gauge(CUi* pUi, D3DXVECTOR3 GaugePos, float fMaxWidth, float fMaxHeight, int nValue, int nMaxValue);//コンストラクタ
+	CUiState_Gauge(D3DXVECTOR3 GaugePos,D3DXCOLOR Col,CObject2D::POLYGONTYPE PolygonType,CGauge::GAUGETYPE GaugeType,float fMaxWidth, float fMaxHeight, int nValue, int nMaxValue);//コンストラクタ
 	~CUiState_Gauge() override;//デストラクタ
 	void Process(CUi* pUi);//処理
 	CGauge* GetGauge() { return m_pGauge;}//ゲージを取得
 private:
-	CGauge* m_pGauge;//ゲージ
+	CGauge* m_pGauge = nullptr;//ゲージ
 };
 //=======================================================================================
 
@@ -101,6 +101,7 @@ public:
 		CHECKMARK_000,   //チェックマーク
 		TITLELOGO_000,   //タイトルロゴ
 		PRESSENTER_000,  //エンターキーを押す
+		DIVEGAUGEFRAME_000,  //ダイブゲージのフレーム
 		MAX
 	};
 

@@ -32,7 +32,8 @@ const string CUi::UI_FILENAME[int(CUi::UITYPE::MAX)] =
 	"data\\TEXTURE\\UI\\Tutorial_000.png",
 	"data\\TEXTURE\\UI\\CheckMark_000.png",
 	"data\\TEXTURE\\UI\\Title_001.png",
-	"data\\TEXTURE\\UI\\PressEnterOrStart_Logo.png"
+	"data\\TEXTURE\\UI\\PressEnterOrStart_Logo.png",
+	"data\\TEXTURE\\UI\\DiveGaugeFrame_000.png"
 };//テクスチャファイル名
 
 //====================================================
@@ -476,9 +477,13 @@ void CUiState_Numeric::SetValue(int nValue,CUi * pUi)
 //====================================================
 //コンストラクタ
 //====================================================
-CUiState_Gauge::CUiState_Gauge(CUi* pUi, D3DXVECTOR3 GaugePos, float fMaxWidth, float fMaxHeight, int nValue, int nMaxValue) : m_pGauge(nullptr)
+CUiState_Gauge::CUiState_Gauge(D3DXVECTOR3 GaugePos, D3DXCOLOR Col, CObject2D::POLYGONTYPE PolygonType, CGauge::GAUGETYPE GaugeType, float fMaxWidth, float fMaxHeight, int nValue, int nMaxValue)
 {
-
+	SetUiState(CUiState::UISTATE::GAUGE);//UIの状態を設定
+	m_pGauge = CGauge::Create(GaugeType, nMaxValue, fMaxWidth, fMaxHeight, GaugePos);//生成
+	m_pGauge->SetPolygonType(PolygonType);//ポリゴンの種類（中心点）を設定
+	m_pGauge->SetParam(nValue);//パラメータを設定
+	m_pGauge->SetColor(Col,false, 1.0f);//色合い
 }
 //===================================================================================================
 
@@ -487,7 +492,12 @@ CUiState_Gauge::CUiState_Gauge(CUi* pUi, D3DXVECTOR3 GaugePos, float fMaxWidth, 
 //====================================================
 CUiState_Gauge::~CUiState_Gauge()
 {
-
+	if (m_pGauge != nullptr)
+	{//死亡フラグを設定する
+		m_pGauge->SetUseDeath(true);
+		m_pGauge->SetDeath();
+		m_pGauge = nullptr;
+	}
 }
 //===================================================================================================
 

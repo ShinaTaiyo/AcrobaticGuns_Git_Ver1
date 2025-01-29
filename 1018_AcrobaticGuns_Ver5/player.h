@@ -71,7 +71,7 @@ public:
 	//================================================
 	//ゲージ
 	//================================================
-	CGauge* GetDiveGauge() { return m_pDiveGauge; }
+	CUi* GetDiveGaugeFrame() { return m_pDiveGaugeFrame; }
 	CUi* GetDivePossibleNum() { return m_pDivePossibleNum; }
 	//===============================================================================================
 	
@@ -125,8 +125,8 @@ private:
 	CUi* m_pModeDisp;                   //モード表示UI
 	CWire* m_pWire;                     //ワイヤー
 	CGauge* m_pHpGauge;                 //体力ゲージ
-	CGauge* m_pDiveGauge;               //ダイブゲージ
 	CUi* m_pDivePossibleNum;            //ダイブ可能回数UI
+	CUi* m_pDiveGaugeFrame;             //ダイブゲージのフレーム
 
 	//行動状態
 	CPlayerMove* m_pMove;               //移動処理

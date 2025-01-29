@@ -46,7 +46,7 @@ CPlayer::CPlayer(CPlayerMove* pPlayerMove, CPlayerAttack* pPlayerAttack, CPlayer
     int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CCharacter(nPri, bUseintPri, type, ObjType)
     , m_pMove(pPlayerMove), m_pAttack(pPlayerAttack), m_pEffect(pPlayerEffect), m_pWireShot(pPlayerWireShot),
     m_fRotAim(0.0f), m_pLockOn(nullptr), m_NowActionMode(ACTIONMODE::SHOT), m_pModeDisp(nullptr), m_bCollision(false),m_pWire(nullptr),
-    m_pHpGauge(nullptr),m_pAbnormalState(DBG_NEW CPlayerAbnormalState()),m_pDiveGauge(nullptr), m_pDivePossibleNum(nullptr),m_bDamage(false)
+    m_pHpGauge(nullptr),m_pAbnormalState(DBG_NEW CPlayerAbnormalState()), m_pDivePossibleNum(nullptr),m_bDamage(false),m_pDiveGaugeFrame(nullptr)
 {
 
 }
@@ -81,14 +81,14 @@ HRESULT CPlayer::Init()
             D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
         m_pModeDisp->SetUseDeath(false);
 
-        m_pDiveGauge = CGauge::Create(CGauge::GAUGETYPE::DIVE, 20, 200.0f, 25.0f, D3DXVECTOR3(SCREEN_WIDTH - 300.0f, 200.0f, 0.0f));
-        m_pDiveGauge->SetColor(D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f), false, 1.0f);
-        m_pDiveGauge->SetUseDeath(false);
-        m_pDiveGauge->SetParam(0);//初期値からスタート
-        m_pDiveGauge->SetPolygonType(CObject2D::POLYGONTYPE::LEFT);
+        //ダイブゲージのフレームを生成
+        m_pDiveGaugeFrame = CUi::Create(CUi::UITYPE::DIVEGAUGEFRAME_000, CObject2D::POLYGONTYPE::SENTERROLLING, 450.0f, 100.0f, 1, false, D3DXVECTOR3(SCREEN_WIDTH - 250.0f, 100.0f, 0.0f),
+            D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+        m_pDiveGaugeFrame->SetUseDeath(false);//死亡フラグを発動させない
+        m_pDiveGaugeFrame->PushUiState(DBG_NEW CUiState_Gauge(D3DXVECTOR3(SCREEN_WIDTH - 390.0f, 106.5f, 0.0f),D3DXCOLOR(1.0f,1.0f,0.0f,1.0f),CObject2D::POLYGONTYPE::LEFT, CGauge::GAUGETYPE::DIVE, 350.0f, 19.6f, 0, 20));//ゲージ保持の状態を付与する
 
         m_pDivePossibleNum = CUi::Create(CUi::UITYPE::POSSIBLEDIVENUMTEXT_000, CObject2D::POLYGONTYPE::SENTERROLLING, 200.0f, 100.0f, 1, false, D3DXVECTOR3(200.0f, 100.0f, 0.0f),
-            D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+            D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 61.0f, 1.0f, 1.0f));
         m_pDivePossibleNum->SetNumericState(0, 50.0f, 50.0f);
         m_pDivePossibleNum->SetUseDeath(false);
 
@@ -263,18 +263,18 @@ void CPlayer::SetDeath()
             m_pHpGauge = nullptr;
         }
 
-        if (m_pDiveGauge != nullptr)
-        {//ダイブゲージの開放
-            m_pDiveGauge->SetUseDeath(true);
-            m_pDiveGauge->SetDeath();
-            m_pDiveGauge = nullptr;
-        }
-
         if (m_pDivePossibleNum != nullptr)
         {//ダイブ可能回数UIの開放
             m_pDivePossibleNum->SetUseDeath(true);
             m_pDivePossibleNum->SetDeath();
             m_pDivePossibleNum = nullptr;
+        }
+
+        if (m_pDiveGaugeFrame != nullptr)
+        {//ダイブゲージのフレームUI
+            m_pDiveGaugeFrame->SetUseDeath(true);
+            m_pDiveGaugeFrame->SetDeath();
+            m_pDiveGaugeFrame = nullptr;
         }
     }
     CCharacter::SetDeath();
@@ -287,42 +287,37 @@ void CPlayer::SetDeath()
 CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale)
 {
     CPlayer* pPlayer = DBG_NEW CPlayer(DBG_NEW CPlayerMove_Normal(),DBG_NEW CPlayerAttack_Shot(),DBG_NEW CPlayerEffect(),DBG_NEW CPlayerWireShot_Dont());//プレイヤーを生成
-
     bool bSuccess = pPlayer->CObject::GetCreateSuccess();
     int nIdx = 0;//テクスチャのインデックス
+    CObjectX::PosInfo& PosInfo = pPlayer->GetPosInfo();
+    CObjectX::RotInfo& RotInfo = pPlayer->GetRotInfo();
+    CObjectX::SizeInfo& SizeInfo = pPlayer->GetSizeInfo();
+    CObjectX::LifeInfo& LifeInfo = pPlayer->GetLifeInfo();
     pPlayer->Init();                                                                 //初期化処理
     pPlayer->GetMoveInfo().SetMove(move);//移動量
     pPlayer->CObject::SetType(CObject::TYPE::PLAYER);                                 //オブジェクトの種類を決める
     pPlayer->SetObjXType(CObjectX::OBJECTXTYPE_PLAYER);                    //オブジェクトXのタイプを設定
     pPlayer->SetTypeNum(0);                                                //オブジェクトXごとのタイプ番号を設定
-    //pPlayer->SetUseGravity(true,1.0f);//重力
-    //モデル情報を割り当てる
-    //nIdx = CManager::GetObjectXInfo()->Regist("data\\MODEL\\Enemy\\MotionEnemy\\DiveWeakEnemy\\DiveWeakEnemy00_Source.x");
-    //pPlayer->BindObjectXInfo(CManager::GetObjectXInfo()->GetMesh(nIdx),
-    //    CManager::GetObjectXInfo()->GetBuffMat(nIdx),
-    //    CManager::GetObjectXInfo()->GetdwNumMat(nIdx),
-    //    CManager::GetObjectXInfo()->GetTexture(nIdx),
-    //    CManager::GetObjectXInfo()->GetColorValue(nIdx));
-
     pPlayer->RegistMotion("data\\MODEL\\Enemy\\MotionEnemy\\DiveWeakEnemy\\DiveWeakEnemyMotion.txt",pPlayer);//モーションファイルを割り当てる
     pPlayer->GetDrawInfo().SetUseDraw(false);                                                     //描画しない
-    pPlayer->GetPosInfo().SetPos(pos);                                                            //位置の設定
-    pPlayer->GetPosInfo().SetPosOld(pos);                                                         //1f前の位置を設定
-    pPlayer->GetPosInfo().SetPosFuture(pos);                                                      //1f後の位置を設定
-    pPlayer->GetPosInfo().SetSupportPos(pos);                                                     //設置位置
-    pPlayer->GetRotInfo().SetRot(rot);                                                            //向きの設定
-    pPlayer->GetSizeInfo().SetScale(Scale);                                                       //拡大率の設定
-    pPlayer->GetSizeInfo().SetFormarScale(Scale);                                                  //元の拡大率を設定する
+    PosInfo.SetPos(pos);                                                            //位置の設定
+    PosInfo.SetPosOld(pos);                                                         //1f前の位置を設定
+    PosInfo.SetPosFuture(pos);                                                      //1f後の位置を設定
+    PosInfo.SetSupportPos(pos);                                                     //設置位置
+    RotInfo.SetRot(rot);                                                            //向きの設定
+    SizeInfo.SetScale(Scale);                                                       //拡大率の設定
+    SizeInfo.SetFormarScale(Scale);                                                  //元の拡大率を設定する
     pPlayer->GetLifeInfo().SetAutoDeath(false);                                                    //死亡フラグを自動で発動するかどうか
     pPlayer->GetDrawInfo().SetUseShadow(true);
 
     //体力
-    pPlayer->GetLifeInfo().SetLife(s_nNORMAL_MAXLIFE);
-    pPlayer->GetLifeInfo().SetMaxLife(s_nNORMAL_MAXLIFE);
+    LifeInfo.SetLife(s_nNORMAL_MAXLIFE);
+    LifeInfo.SetMaxLife(s_nNORMAL_MAXLIFE);
 
     if (CScene::GetMode() == CScene::MODE::MODE_GAME)
     {
         pPlayer->m_pHpGauge = CGauge::Create(CGauge::GAUGETYPE::PLAYERHP, s_nNORMAL_MAXLIFE, 600.0f, 50.0f, D3DXVECTOR3(50.0f, SCREEN_HEIGHT - 50.0f, 0.0f));
+        pPlayer->m_pHpGauge->SetParam(s_nNORMAL_MAXLIFE);//最初から体力を最大値に設定
         pPlayer->m_pHpGauge->SetUseDeath(false);
     }
 	return pPlayer;
@@ -358,23 +353,27 @@ void CPlayer::DiveGaugeMaxEffect()
 {
     CDebugText* pDebugText = CManager::GetDebugText();
     CUiState_Numeric* pUiState_Numeric = dynamic_cast<CUiState_Numeric*>(m_pDivePossibleNum->GetUiState(CUiState::UISTATE::NUMERIC));//UIの数字状態を取得
-    pDebugText->PrintDebugText("ダイブゲージの値：%d\n", m_pDiveGauge->GetParam());
-    if (pUiState_Numeric != nullptr)
+    CUiState_Gauge* pUiState_Gauge = dynamic_cast<CUiState_Gauge*>(m_pDiveGaugeFrame->GetUiState(CUiState::UISTATE::GAUGE));//UIのゲージ情報を取得
+    if (pUiState_Gauge != nullptr)
     {
-        pDebugText->PrintDebugText("ダイブ可能回数：%d\n", pUiState_Numeric->GetValue());
-        if (m_pDiveGauge->GetFullGaugeFlag() == true)
-        {//ゲージがマックスになった「瞬間」にフラグを発動＆＆最大ダイブ可能回数に達していなかったら
-            CGauge* pGauge = CGauge::Create(CGauge::GAUGETYPE::PLAYERHP, m_pDiveGauge->GetParam(), m_pDiveGauge->GetWidth(), m_pDiveGauge->GetHeight(), m_pDiveGauge->GetPos());
-            pGauge->SetUseLife(true, 50, 50);
-            pGauge->SetPolygonType(m_pDiveGauge->GetPolygonType());
-            pGauge->SetColor(m_pDiveGauge->GetColor(), false, 1.0f);
-            pGauge->SetUseLifeRatioColor(true);
-            pGauge->SetUseDeath(true);
-            pGauge->SetUseAddScale(D3DXVECTOR2(0.3f, 0.3f), true);
-            pGauge->SetUseScale(true);
-            pGauge->SetScale(D3DXVECTOR2(1.0f, 1.0f));
-            m_pDiveGauge->SetParam(0);//ダイブゲージをリセット
-            pUiState_Numeric->SetValue(pUiState_Numeric->GetValue() + 1,m_pDivePossibleNum);
+        CGauge* pDiveGauge = pUiState_Gauge->GetGauge();//ダイブゲージを取得する
+        if (pUiState_Numeric != nullptr)
+        {
+            pDebugText->PrintDebugText("ダイブ可能回数：%d\n", pUiState_Numeric->GetValue());
+            if (pDiveGauge->GetFullGaugeFlag() == true)
+            {//ゲージがマックスになった「瞬間」にフラグを発動＆＆最大ダイブ可能回数に達していなかったら
+                CGauge* pGauge = CGauge::Create(CGauge::GAUGETYPE::PLAYERHP, pDiveGauge->GetParam(), pDiveGauge->GetWidth(), pDiveGauge->GetHeight(), pDiveGauge->GetPos());
+                pGauge->SetUseLife(true, 50, 50);
+                pGauge->SetPolygonType(pDiveGauge->GetPolygonType());
+                pGauge->SetColor(pDiveGauge->GetColor(), false, 1.0f);
+                pGauge->SetUseLifeRatioColor(true);
+                pGauge->SetUseDeath(true);
+                pGauge->SetUseAddScale(D3DXVECTOR2(0.3f, 0.3f), true);
+                pGauge->SetUseScale(true);
+                pGauge->SetScale(D3DXVECTOR2(1.0f, 1.0f));
+                pDiveGauge->SetParam(0);//ダイブゲージをリセット
+                pUiState_Numeric->SetValue(pUiState_Numeric->GetValue() + 1, m_pDivePossibleNum);
+            }
         }
     }
 }

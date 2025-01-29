@@ -477,32 +477,37 @@ CPlayerAttack_Dive::~CPlayerAttack_Dive()
 void CPlayerAttack_Dive::AttackProcess(CPlayer* pPlayer)
 {
 
-	CGauge* pDiveGauge = pPlayer->GetDiveGauge();
-	CUi* pDivePossibleNum = pPlayer->GetDivePossibleNum();
-	CWireHead* pWireHead = pPlayer->GetWire()->GetWireHead();
-	CUiState_Numeric* pUiState_Numeric = dynamic_cast<CUiState_Numeric*>(pDivePossibleNum->GetUiState(CUiState::UISTATE::NUMERIC));
-	if (pUiState_Numeric->GetValue() > 0)
-	{//ダイブゲージがたまっていたら爆発攻撃を発動
-		CAttackPlayer* pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::ENEMY, CAttack::COLLISIONTYPE::SQUARE, false,true, 50,30, 100, pPlayer->GetPosInfo().GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.1f, 0.1f, 0.1f),
-			D3DXVECTOR3(1.0f, 1.0f, 1.0f));
-		pAttackPlayer->GetSizeInfo().SetUseAddScale(D3DXVECTOR3(0.4f, 0.4f, 0.4f), true);
-		pAttackPlayer->SetColor(D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f), 2, false, false,false);
-		pAttackPlayer->GetLifeInfo().SetUseRatioLifeAlpha(true);
-		pAttackPlayer->SetCollisionRelease(false);
-		CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::TAKEDIVE);
-		pUiState_Numeric->SetValue(pUiState_Numeric->GetValue() - 1, pDivePossibleNum);
-		CManager::GetSound()->PlaySoundB(CSound::SOUND_LABEL::SE_EXPLOSION_000);
-		//目的の向きまで少しづつ動かす（カメラの前は-D3DX_PI * 0.5f,プレイヤーはデフォルトの向きが異なるので、Rot.y + D3DX_PI)
-		CManager::GetCamera()->ChengeState(DBG_NEW CCameraState_TurnAround(D3DXVECTOR3(-D3DX_PI * 0.5f, pPlayer->GetRotInfo().GetRot().y + D3DX_PI, 0.0f), 0.1f));
+	CUiState_Gauge* pUiState_Gauge = dynamic_cast<CUiState_Gauge*>(CGame::GetPlayer()->GetDiveGaugeFrame()->GetUiState(CUiState::UISTATE::GAUGE));//UIのゲージ情報を取得
+	if (pUiState_Gauge != nullptr)
+	{
+		CGauge* pDiveGauge = pUiState_Gauge->GetGauge();//ダイブゲージを取得する
 
-		//爆発を見せたいので、カメラと注視点の距離を一定時間変える
-		CManager::GetCamera()->ChengeLengthState(DBG_NEW CCameraLengthState_Gradually(300.0f, 0.1f, 60));
+		CUi* pDivePossibleNum = pPlayer->GetDivePossibleNum();//ダイブ可能回数のUIを取得する
+		CWireHead* pWireHead = pPlayer->GetWire()->GetWireHead();//ワイヤーの頭を取得する
+		CUiState_Numeric* pUiState_Numeric = dynamic_cast<CUiState_Numeric*>(pDivePossibleNum->GetUiState(CUiState::UISTATE::NUMERIC));//UIの数字情報を取得する
+		if (pUiState_Numeric->GetValue() > 0)
+		{//ダイブゲージがたまっていたら爆発攻撃を発動
+			CAttackPlayer* pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::ENEMY, CAttack::COLLISIONTYPE::SQUARE, false, true, 50, 30, 100, pPlayer->GetPosInfo().GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.1f, 0.1f, 0.1f),
+				D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+			pAttackPlayer->GetSizeInfo().SetUseAddScale(D3DXVECTOR3(0.4f, 0.4f, 0.4f), true);
+			pAttackPlayer->SetColor(D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f), 2, false, false, false);
+			pAttackPlayer->GetLifeInfo().SetUseRatioLifeAlpha(true);
+			pAttackPlayer->SetCollisionRelease(false);
+			CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::TAKEDIVE);
+			pUiState_Numeric->SetValue(pUiState_Numeric->GetValue() - 1, pDivePossibleNum);
+			CManager::GetSound()->PlaySoundB(CSound::SOUND_LABEL::SE_EXPLOSION_000);
+			//目的の向きまで少しづつ動かす（カメラの前は-D3DX_PI * 0.5f,プレイヤーはデフォルトの向きが異なるので、Rot.y + D3DX_PI)
+			CManager::GetCamera()->ChengeState(DBG_NEW CCameraState_TurnAround(D3DXVECTOR3(-D3DX_PI * 0.5f, pPlayer->GetRotInfo().GetRot().y + D3DX_PI, 0.0f), 0.1f));
+
+			//爆発を見せたいので、カメラと注視点の距離を一定時間変える
+			CManager::GetCamera()->ChengeLengthState(DBG_NEW CCameraLengthState_Gradually(300.0f, 0.1f, 60));
+		}
+		pWireHead->GetDrawInfo().SetUseDraw(false);//ワイヤーの頭の描画をオフにする
+		pPlayer->ChengeMoveMode(DBG_NEW CPlayerMove_PrepDive(pPlayer));
+		pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_Dont());
+
+		pPlayer->ChengeEffectMode(DBG_NEW CPlayerEffect_None());
 	}
-	pWireHead->GetDrawInfo().SetUseDraw(false);//ワイヤーの頭の描画をオフにする
-	pPlayer->ChengeMoveMode(DBG_NEW CPlayerMove_PrepDive(pPlayer));
-	pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_Dont());
-
-	pPlayer->ChengeEffectMode(DBG_NEW CPlayerEffect_None());
 
 }
 //======================================================================================================================================================

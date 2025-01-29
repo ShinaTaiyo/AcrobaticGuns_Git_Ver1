@@ -342,13 +342,17 @@ void CAttackPlayer::Update()
 	{
 		if (CScene::GetMode() == CScene::MODE::MODE_GAME)
 		{
-			CGauge* pPlayerDiveGauge = CGame::GetPlayer()->GetDiveGauge();   //ダイブゲージを取得
-			CUiState_Numeric * pUiState_Numeric = dynamic_cast<CUiState_Numeric*>(CGame::GetPlayer()->GetDivePossibleNum()->GetUiState(CUiState::UISTATE::NUMERIC));//ダイブ可能階数のUIの数値（ダイブ可能回数)を取得
-			if (pUiState_Numeric != nullptr)
+			CUiState_Gauge* pUiState_Gauge = dynamic_cast<CUiState_Gauge*>(CGame::GetPlayer()->GetDiveGaugeFrame()->GetUiState(CUiState::UISTATE::GAUGE));//UIのゲージ情報を取得
+			if (pUiState_Gauge != nullptr)
 			{
-				if (pUiState_Numeric->GetValue() < CPlayer::GetMaxDiveNum())
-				{//最大ダイブ可能回数に達していない場合はダイブ可能回数を＋１する
-					pPlayerDiveGauge->SetParam(pPlayerDiveGauge->GetParam() + 1);
+				CGauge* pDiveGauge = pUiState_Gauge->GetGauge();//ダイブゲージを取得する
+				CUiState_Numeric* pUiState_Numeric = dynamic_cast<CUiState_Numeric*>(CGame::GetPlayer()->GetDivePossibleNum()->GetUiState(CUiState::UISTATE::NUMERIC));//ダイブ可能階数のUIの数値（ダイブ可能回数)を取得
+				if (pUiState_Numeric != nullptr)
+				{
+					if (pUiState_Numeric->GetValue() < CPlayer::GetMaxDiveNum())
+					{//最大ダイブ可能回数に達していない場合はダイブ可能回数を＋１する
+						pDiveGauge->SetParam(pDiveGauge->GetParam() + 1);
+					}
 				}
 			}
 		}
