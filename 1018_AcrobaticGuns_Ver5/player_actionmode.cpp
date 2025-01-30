@@ -239,8 +239,6 @@ void CPlayerMove_Dive::MoveProcess(CPlayer* pPlayer)
 	CWireHead* pWireHead = pPlayer->GetWire()->GetWireHead();
 	bool bInput = CManager::GetInputJoypad()->GetRT_Press();
 
-
-
 	if (CManager::GetInputJoypad()->GetRT_Press() || CManager::GetInputMouse()->GetMouseLeftClickPress())
 	{
 		bInput = true;
@@ -289,6 +287,10 @@ CPlayerMove_Stuck::CPlayerMove_Stuck(CPlayer* pPlayer) : m_NowPos(pPlayer->GetPo
 	float fYaw = atan2f(ComRot.x, ComRot.z);
 	float fPitch = atan2f(ComRot.y, sqrtf(powf(ComRot.x, 2) + powf(ComRot.z, 2)));
 	D3DXVECTOR3 ResultRot = D3DXVECTOR3(-fPitch - D3DX_PI * 0.5f, fYaw, 0.0f);//カメラの向きを調整する（前方向を基準にする）
+
+	CSound* pSound = CManager::GetSound();
+
+	pSound->PlaySoundB(CSound::SOUND_LABEL::SE_LANDING_000);
 
 	if (pCamera->GetRot().x > ResultRot.x - 0.5f && pCamera->GetRot().x < ResultRot.x + 0.5f &&
 		pCamera->GetRot().y > ResultRot.y - 0.5f && pCamera->GetRot().y < ResultRot.y + 0.5f)

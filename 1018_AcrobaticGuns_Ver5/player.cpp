@@ -585,7 +585,7 @@ void CPlayer::SetDamage(int nDamage, int nHitStopTime)
     if (GetLifeInfo().GetHitStop() == false)
     {//ヒットストップ状態じゃなければ処理を実行する
         CCharacter::SetDamage(nDamage, nHitStopTime);
-        
+        CSound* pSound = CManager::GetSound();
         
         m_pHpGauge->SetParam(GetLifeInfo().GetLife());
         m_pHpGauge->SetShake(5.0f * nDamage, 30);
@@ -598,6 +598,8 @@ void CPlayer::SetDamage(int nDamage, int nHitStopTime)
         pGauge->SetUseAddScale(D3DXVECTOR2(0.1f, 0.1f), true);
         pGauge->SetUseScale(true);
         pGauge->SetScale(D3DXVECTOR2(1.0f, 1.0f));
+
+        pSound->PlaySoundB(CSound::SOUND_LABEL::SE_DAMAGE_000);
 
         SetInitialActionMode(ACTIONMODE::SHOT);//射撃モードに強制的に戻す
 

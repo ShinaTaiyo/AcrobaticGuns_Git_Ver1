@@ -33,12 +33,12 @@ public:
 		BGMODEL,         //背景モデル
 		AIMODEL,         //AIモデル
 		WIREHEAD,        //ワイヤー頭
-		WIRE,            //ワイヤー
 		PLAYER,          //プレイヤー
 		ENEMY,           //敵
 		BULLET,          //弾
 		ATTACK,          //攻撃
 		MODELPARTS,      //モデルパーツ
+		WIRE,            //ワイヤー
 		MESHORBIT,       //軌跡メッシュ
 		EFFECT,          //エフェクト
 		PARTICLE,        //パーティクル
