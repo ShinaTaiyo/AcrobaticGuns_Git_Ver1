@@ -21,7 +21,7 @@
 //コンストラクタ
 //=================================================================
 CWireHead::CWireHead(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectX(nPri, bUseintPri, type, ObjType),
-m_bCollision(false),m_nCoolTime(0)
+m_bCollision(false),m_nCoolTime(0), m_CollisionObjType(CObject::TYPE::NONE)
 {
 
 }
@@ -144,6 +144,7 @@ bool CWireHead::CollisionSquare()
 				if (CCollision::CollisionSquare(GetPosInfo().GetPos(), GetSizeInfo().GetVtxMax(), GetSizeInfo().GetVtxMin(), pObjX->GetPosInfo().GetPos(), pObjX->GetSizeInfo().GetVtxMax(), pObjX->GetSizeInfo().GetVtxMin()) == true)
 				{
 					CManager::GetDebugText()->PrintDebugText("ワイヤーヘッドの当たり判定成功！\n");
+					m_CollisionObjType = type;//衝突したので、衝突したオブジェクトのタイプを格納
 					return true;
 				}
 			}

@@ -198,24 +198,27 @@ void CPhaseManager::AdvancePhase()
 
 	}
 
-	if (CEnemy::GetNumEnemy() <= 0 && s_nNowPhase == s_MaxPhase + 1 && s_bStartFade == false)
+	if (s_nNowStage != static_cast<int>(CStageManager::WORLDTYPE::MAX))
 	{
-		s_PhaseList.clear();//ステージをクリアしたのでリセット
-		s_nNowPhase = 0;    //ステージをクリアしたのでリセット
-
-		s_nNowStage++;      //ステージ番号を次に進める
-
-		if (s_nNowStage != static_cast<int>(CStageManager::WORLDTYPE::MAX))
+		if (CEnemy::GetNumEnemy() <= 0 && s_nNowPhase == s_MaxPhase + 1 && s_bStartFade == false)
 		{
-			CGame::GetStageManager()->LoadMapTxt(s_nNowStage);//次のステージをロードする
-			CGame::GetPlayer()->GetPosInfo().SetPos(CGame::GetStageManager()->GetSpawnPoint());
-			CEventManager::Create(DBG_NEW CNowEvent_NextPhase(CUi::Create(CUi::UITYPE::STAGETEXT, CObject2D::POLYGONTYPE::SENTERROLLING, 200.0f, 100.0f, 100, false,
-				D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT / 2 - 180.0f, 0.0f), D3DXVECTOR3(sinf(D3DX_PI * -0.5f) * 15.0f, cosf(D3DX_PI * -0.5f) * 15.0f, 0.0f),
-				D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f)), s_nNowStage, 80.0f, 80.0f));
-		}
-		else
-		{
-			CManager::GetSceneFade()->SetSceneFade(CFade::FADEMODE_IN, CScene::MODE_RESULT);
+			s_PhaseList.clear();//ステージをクリアしたのでリセット
+			s_nNowPhase = 0;    //ステージをクリアしたのでリセット
+
+			s_nNowStage++;      //ステージ番号を次に進める
+
+			if (s_nNowStage == static_cast<int>(CStageManager::WORLDTYPE::MAX))
+			{
+				CManager::GetSceneFade()->SetSceneFade(CFade::FADEMODE_IN, CScene::MODE_RESULT);
+			}
+			else
+			{
+				CGame::GetStageManager()->LoadMapTxt(s_nNowStage);//次のステージをロードする
+				CGame::GetPlayer()->GetPosInfo().SetPos(CGame::GetStageManager()->GetSpawnPoint());
+				CEventManager::Create(DBG_NEW CNowEvent_NextPhase(CUi::Create(CUi::UITYPE::STAGETEXT, CObject2D::POLYGONTYPE::SENTERROLLING, 200.0f, 100.0f, 100, false,
+					D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT / 2 - 180.0f, 0.0f), D3DXVECTOR3(sinf(D3DX_PI * -0.5f) * 15.0f, cosf(D3DX_PI * -0.5f) * 15.0f, 0.0f),
+					D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f)), s_nNowStage, 80.0f, 80.0f));
+			}
 		}
 	}
 }

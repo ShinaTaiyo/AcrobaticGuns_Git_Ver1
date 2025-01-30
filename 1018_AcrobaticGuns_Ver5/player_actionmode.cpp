@@ -247,19 +247,19 @@ void CPlayerMove_Dive::MoveProcess(CPlayer* pPlayer)
 	CCamera* pCamera = CManager::GetCamera();
 	if (CCalculation::CalculationLength(pPlayer->GetPosInfo().GetPos(), pWireHead->GetPosInfo().GetPos()) < s_fCOLLISIONDIVEMOVELENGTH)
 	{//ダイブ時に判定したら移動モードと攻撃モードを通常に戻す
-		if (bInput == false)
+		if(bInput == true && pWireHead->GetCollisionObjType() != CObject::TYPE::ENEMY)
+		{//引っ付き→ダイブ（もしワイヤーヘッドが衝突したオブジェクトが敵の場合、敵には引っ付きたくないので、攻撃に移行する
+			//pPlayer->SetRot(pPlayer->GetRot());
+			CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::STUCKWALL);
+			pPlayer->ChengeMoveMode(DBG_NEW CPlayerMove_Stuck(pPlayer));
+			pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_Dont());
+		}
+		else
 		{//攻撃→射撃モード
 			pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_Dive());
 			pPlayer->GetWire()->SetUseDraw(false);
 			pPlayer->ChengeMoveMode(DBG_NEW CPlayerMove_PrepDive(pPlayer));
 			pPlayer->GetRotInfo().SetRot(D3DXVECTOR3(0.0f, pCamera->GetRot().y, 0.0f));
-		}
-		else
-		{//引っ付き→ダイブ
-			//pPlayer->SetRot(pPlayer->GetRot());
-			CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::STUCKWALL);
-			pPlayer->ChengeMoveMode(DBG_NEW CPlayerMove_Stuck(pPlayer));
-			pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_Dont());
 		}
 	}
 }
