@@ -353,13 +353,16 @@ D3DXCOLOR CCalculation::CalRaibowColor()
 //=========================================================
 D3DXVECTOR3* CCalculation::CalcScreenToWorld(D3DXVECTOR3* pout, float Sx, float Sy, float fZ, int Screen_w, int Screen_h, D3DXMATRIX* View, D3DXMATRIX* Prj)
 {
-	// 各行列の逆行列を算出
+	// 各行列の逆行列を算出（ビュー、プロジェクションマトリックスの逆行列をかけるのは、カメラの位置に2DのUIが出ていると定義できるから)
+	//逆行列とは、値に値-1をかけ、掛け合わされる前に戻すこと
 	D3DXMATRIX InvView, InvPrj, VP, InvViewport;
-	D3DXMatrixInverse(&InvView, NULL, View);//ビューマトリックスとの逆光列
-	D3DXMatrixInverse(&InvPrj, NULL, Prj);  //プロジェクションマトリックスとの逆光列
+	D3DXMatrixInverse(&InvView, NULL, View);//ビューマトリックスとの逆光列（カメラの視点、注視点などを踏まえて、変換されているので戻す）
+	D3DXMatrixInverse(&InvPrj, NULL, Prj);  //プロジェクションマトリックスとの逆行列（見え方（平行投影、視野角など）を変えているので、逆行列を掛け合わせ、もとに戻す必要がある）
 	D3DXMatrixIdentity(&VP);
-	VP._11 = Screen_w / 2.0f; VP._22 = -Screen_h / 2.0f;
-	VP._41 = Screen_w / 2.0f; VP._42 = Screen_h / 2.0f;
+
+	//スケーリングの値を変えている。スクリーン座標の中心を画面中央にする
+	VP._11 = Screen_w / 2.0f; VP._22 = -Screen_h / 2.0f;//スクリーン座標系では、通常上方向が正になるので、座標変換する際に-にしている
+	VP._41 = Screen_w / 2.0f; VP._42 = Screen_h / 2.0f;//スクリーン座標系では、通常上方向が正になるので、座標変換する際に-にしている
 	D3DXMatrixInverse(&InvViewport, NULL, &VP);
 
 	//自分

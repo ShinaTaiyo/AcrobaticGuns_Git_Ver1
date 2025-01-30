@@ -890,40 +890,52 @@ bool CCollision::RayIntersectsAABBCollisionPos(const D3DXVECTOR3& origin,const D
 		CopyDirection.z = 0.001f;//０除算を回避
 	}
 
-	//＊それぞれの軸の距離を求め、minやmaxにその単位ベクトルの方向なら、どれくらいの距離を進めば到達できるかを求める。
+	//＊それぞれの最大頂点、最小頂点（軸の平面）との交差範囲を求め、一番近い面との距離を求める
+
+	//X軸の面との交差範囲を求める
 	float tmin = (min.x - origin.x) / CopyDirection.x;
 	float tmax = (max.x - origin.x) / CopyDirection.x;
 
 	float t = 0.0f;
 
+	//tmaxよりもtminの方が距離が大きければ、最小最大の関係を崩さないために入れ替える
 	if (tmin > tmax) std::swap(tmin, tmax);
 
+	//Y軸方向の面との交差範囲を求める
 	float tymin = (min.y - origin.y) / CopyDirection.y;
 	float tymax = (max.y - origin.y) / CopyDirection.y;
 
+	//tymaxよりもtyminの方が距離が大きければ、最小最大の関係を崩さないために入れ替える
 	if (tymin > tymax) std::swap(tymin, tymax);
 
+	//現在の交差範囲がY軸の交差範囲内に収まっていなかったら、レイは当たっていない（AABBは軸が平行であり本質的に交差範囲の最大最小は同じになる）
 	if ((tmin > tymax) || (tymin > tmax)) return false;
 
+	//Y軸方向の面がX軸方向の面よりも近かったら、または遠いかったら、交差範囲を更新する
 	if (tymin > tmin) tmin = tymin;
 	if (tymax < tmax) tmax = tymax;
 
+	//Z軸方向の面との交差範囲を求める
 	float tzmin = (min.z - origin.z) / CopyDirection.z;
 	float tzmax = (max.z - origin.z) / CopyDirection.z;
 
+	//tzmaxよりもtzminの方が距離が大きければ、最小最大の関係を崩さないために入れ替える
 	if (tzmin > tzmax) std::swap(tzmin, tzmax);
 
+	//現在の交差範囲がZ軸の交差範囲内に収まっていなかったら、レイは当たっていない
 	if ((tmin > tzmax) || (tzmin > tmax)) return false;
 
+	//Z軸方向の面がXY軸方向の面よりも近かったら、または遠いかったら、交差範囲を更新する
 	if (tzmin > tmin) tmin = tzmin;
 	if (tzmax < tmax) tmax = tzmax;
 
+	//一番近い面を確定
 	t = tmin;
 
 	//レイの支点より後ろに正方形（オブジェクト）がある場合は、意味がないので無視する
 	if (t < 0.0f) return false;
 
-	//衝突したことが確定したので、衝突位置を求める（tには、レイがAABBとの衝突点の最小距離が入っている）
+	//一番近い面との距離をかけて、レイの衝突位置を求める）
 	CollisionPos = D3DXVECTOR3(origin.x + CopyDirection.x * t,
 		origin.y + CopyDirection.y * t,
 		origin.z + CopyDirection.z * t);
