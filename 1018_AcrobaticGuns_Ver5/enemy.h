@@ -186,7 +186,7 @@ private:
 	int m_nAttackCoolTime;
 
 	bool m_bPossibleAttack;//攻撃可能かどうか
-
+	bool m_bStartLanding;  //最初に地面についたかどうか
 	STATE m_State;         //状態列挙型
 	//===============================================================================================
 
@@ -198,6 +198,7 @@ private:
 	void PhaseNumDecision();//フェーズ番号を設定する
 	virtual void AttackProcess();//攻撃処理
 	void CollisionDetectionProcess();//衝突判定処理
+	void CheckGrroundDistance_AdjustPos();//地面との距離を求めて、一定以下なら1f前の位置に戻す
 
 	//*ステータスエディット
 	void EditNormalSpeed();//移動速度
@@ -336,6 +337,7 @@ private:
 	//AI移動
 	void AIMoveProcess() override;
 	void DefeatStaging() override;//倒されたときの演出
+
 	//===============================================================================================
 };
 

@@ -20,6 +20,7 @@
 #include "phasemanager.h"
 #include "input.h"
 #include "effect.h"
+#include "block.h"
 #include "camera.h"
 #include "attack.h"
 //============================================================================================================================================
@@ -39,7 +40,7 @@ int CEnemy::m_nNumEnemy = 0;
 CEnemy::CEnemy(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectX(nPri, bUseintPri, type, ObjType),
 m_Type(ENEMYTYPE::SHOTWEAK), m_VecMoveAi(), m_MoveAiSavePos(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),m_nCntTime(0),m_nIdxMoveAi(0), m_nPhaseNum(0),m_pEnemyMove(DBG_NEW CEnemyMove_AI()),
 m_fRotMove(0.0f),m_fSensingRange(0.0f),m_fNormalSpeed(0.0f),m_Pattern(),m_bCollisoinDetection(true),m_bActivateCollisionDetection(false),m_bCollisionWall(false),
-m_DefeatAttackType(CAttack::ATTACKTYPE::EXPLOSION),m_nAttackCoolTime(0),m_bPossibleAttack(true),m_State(CEnemy::STATE::NORMAL)
+m_DefeatAttackType(CAttack::ATTACKTYPE::EXPLOSION),m_nAttackCoolTime(0),m_bPossibleAttack(true),m_State(CEnemy::STATE::NORMAL),m_bStartLanding(false)
 {
 	m_nNumEnemy++;//敵総数カウントアップ
 }
@@ -113,11 +114,22 @@ void CEnemy::Update()
 
 		CollisionDetectionProcess();
 
+		if (m_Type == ENEMYTYPE::DIVEWEAK && m_bStartLanding == true)
+		{//ダイブに弱い敵なら、落ちない
+			CheckGrroundDistance_AdjustPos();
+		}
+
 	    CObjectX::Update();
+
+		if (GetLanding() == true && m_bStartLanding == false)
+		{
+			m_bStartLanding = true;
+		}
 
 		CollisionProcess();//当たり判定処理
 
 		DefeatStaging();//倒されたときの演出を行う（派生クラスごとに変わる）
+
 
 		if (GetPosInfo().GetPos().y < -100.0f)
 		{
@@ -827,12 +839,112 @@ void CEnemy::CollisionDetectionProcess()
 					{
 						GetMoveInfo().SetMove(D3DXVECTOR3(GetMoveInfo().GetMove().x -AimVec.x * (fTotalLength - fLength) * 1.0f,GetMoveInfo().GetMove().y, GetMoveInfo().GetMove().z - AimVec.z * (fTotalLength - fLength) * 1.0f));//攻撃時の動きよりも優先的にこの移動量を割り当てる
 					}
+
+					
 				}
 			}
 
 			pObj = pNext;
 		}
 	}
+}
+
+//====================================================================================
+//衝突判定処理
+//====================================================================================
+void CEnemy::CheckGrroundDistance_AdjustPos()
+{
+	CObject* pObjBgModel = GetTopObject(static_cast<int>(CObject::TYPE::BGMODEL));//背景モデルのリストの先頭を取得
+	CObject* pObjBlock = GetTopObject(static_cast<int>(CObject::TYPE::BLOCK));    //ブロックのリストの先頭を取得
+	CObjectX::PosInfo& PosInfo = GetPosInfo();//位置情報
+	CObjectX::SizeInfo& SizeInfo = GetSizeInfo();//サイズ情報
+	CObjectX::MoveInfo& MoveInfo = GetMoveInfo();//移動情報
+	const D3DXVECTOR3& Pos = PosInfo.GetPos();//位置
+	const D3DXVECTOR3& PosOld = PosInfo.GetPosOld();//1f前の位置
+	const D3DXVECTOR3& VtxMin = SizeInfo.GetVtxMin();//最小頂点
+	const D3DXVECTOR3& VtxMax = SizeInfo.GetVtxMax();//最大頂点
+	const D3DXVECTOR3& Move = MoveInfo.GetMove();//移動量
+	D3DXVECTOR3 Dir = D3DXVECTOR3(0.0f, -1.0f, 0.0f);//下方向ベクトルを定義
+	D3DXVECTOR3 OriginPos = Pos + D3DXVECTOR3(0.0f, VtxMin.y, 0.0f);//判定する位置（オブジェクトの底面）
+	D3DXVECTOR3 RayCollisionPos = { 0.0f,0.0f,0.0f };//レイの判定場所計算用
+	bool bCollision = false;
+	float fTotalBestNearLength = 0.0f;//レイが当たったオブジェクトの距離の中で一番近い距離を決める
+	int nCntRayCollosionObj = 0;//レイが当たったオブジェクトの数をカウントする
+	//背景モデルリスト
+	while (pObjBgModel != nullptr)
+	{
+		CObject* pNextBgMoodel = pObjBgModel->GetNextObject();
+		CBgModel* pBgModel = static_cast<CBgModel*>(pObjBgModel);//背景モデルにキャスト
+		CObjectX::PosInfo BgModelPosInfo = pBgModel->GetPosInfo();//背景モデルの位置情報
+		CObjectX::SizeInfo BgModelSizeInfo = pBgModel->GetSizeInfo();//背景モデルのサイズ情報
+		const D3DXVECTOR3& BgModelPos = BgModelPosInfo.GetPos();//背景モデルの位置
+		const D3DXVECTOR3& BgModelPosOld = BgModelPosInfo.GetPosOld();//1f前の位置
+		const D3DXVECTOR3& BgModelVtxMax = BgModelSizeInfo.GetVtxMax();//背景モデルの最小頂点
+		const D3DXVECTOR3& BgModelVtxMin = BgModelSizeInfo.GetVtxMin();//背景モデルの最大頂
+		if (CCollision::RayIntersectsAABBCollisionPos(OriginPos, Dir, BgModelPos + BgModelVtxMin, BgModelPos + BgModelVtxMax, RayCollisionPos))
+		{
+			float fLength = sqrtf(powf(RayCollisionPos.x - OriginPos.x, 2) +
+				powf(RayCollisionPos.y - OriginPos.y, 2) +
+				powf(RayCollisionPos.z - OriginPos.z, 2));//レイが当たった場所との距離
+
+			if (nCntRayCollosionObj == 0)
+			{//最初にレイが当たったオブジェクトをカウントし、一番近い距離とする
+				nCntRayCollosionObj++;
+				fTotalBestNearLength = fLength;
+			}
+			else
+			{//2つめ以降に当たったオブジェクトの場合、一番近い距離と比較して更新する
+				if (fLength < fTotalBestNearLength)
+				{
+					fTotalBestNearLength = fLength;
+				}
+			}
+		}
+		pObjBgModel = pNextBgMoodel;
+	}
+
+	//ブロックリスト
+	while (pObjBlock != nullptr)
+	{
+		CObject* pNextBlock = pObjBlock->GetNextObject();
+		CBlock* pBlock = static_cast<CBlock*>(pObjBlock);//ブロックにキャスト
+		CObjectX::PosInfo BlockPosInfo = pBlock->GetPosInfo();//ブロックの位置情報
+		CObjectX::SizeInfo BlockSizeInfo = pBlock->GetSizeInfo();//ブロックのサイズ情報
+		const D3DXVECTOR3& BlockPos = BlockPosInfo.GetPos();//ブロックの位置
+		const D3DXVECTOR3& BlockPosOld = BlockPosInfo.GetPosOld();//1f前の位置
+		const D3DXVECTOR3& BlockVtxMax = BlockSizeInfo.GetVtxMax();//ブロックの最小頂点
+		const D3DXVECTOR3& BlockVtxMin = BlockSizeInfo.GetVtxMin();//ブロックの最大頂
+		if (CCollision::RayIntersectsAABBCollisionPos(OriginPos, Dir, BlockPos + BlockVtxMin, BlockPos + BlockVtxMax, RayCollisionPos))
+		{
+			float fLength = sqrtf(powf(RayCollisionPos.x - OriginPos.x, 2) +
+				powf(RayCollisionPos.y - OriginPos.y, 2) +
+				powf(RayCollisionPos.z - OriginPos.z, 2));//レイが当たった場所との距離
+
+			if (nCntRayCollosionObj == 0)
+			{//最初にレイが当たったオブジェクトをカウントし、一番近い距離とする
+				nCntRayCollosionObj++;
+				fTotalBestNearLength = fLength;
+			}
+			else
+			{//2つめ以降に当たったオブジェクトの場合、一番近い距離と比較して更新する
+				if (fLength < fTotalBestNearLength)
+				{
+					fTotalBestNearLength = fLength;
+				}
+			}
+		}
+
+		pObjBlock = pNextBlock;
+	}
+
+
+	if (fTotalBestNearLength > 50.0f)
+	{//一番近い距離が50.0fより大きい場合、宙に浮いているとみなし、オブジェクトの上に位置を戻す処理を行う
+		PosInfo.SetPos(PosOld);
+		PosInfo.SetPosOld(Pos - Move);
+		CManager::GetDebugText()->PrintDebugText("落ちるので戻る\n");
+	}
+
 }
 
 //====================================================================================
@@ -1445,7 +1557,7 @@ const string CDiveWeakEnemy::s_aDIVEWEAKENEMY_FILENAME[static_cast<int>(CDiveWea
 	"data\\MODEL\\Enemy\\DiveWeak\\angrySlime.x"
 };
 const int CDiveWeakEnemy::s_nATTACK_FREQUENCY = 105;//攻撃頻度
-const float CDiveWeakEnemy::s_fSENSINGRANGE = 600.0f;
+const float CDiveWeakEnemy::s_fSENSINGRANGE = 2000.0f;
 const float CDiveWeakEnemy::s_fNORMAL_SPEED = 3.0f;
 //====================================================================================
 //コンストラクタ

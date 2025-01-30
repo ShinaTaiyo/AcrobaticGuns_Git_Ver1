@@ -65,6 +65,8 @@ void CEdit::Uninit()
 	//============================================
 	if (m_pStageManager != nullptr)
 	{
+		int nIdx = m_pStageManager->GetMapIndex();
+		m_pStageManager->SaveMapTxt(nIdx);
 		m_pStageManager->SetUseDeath(true);
 		m_pStageManager->SetDeath();
 		m_pStageManager = nullptr;
