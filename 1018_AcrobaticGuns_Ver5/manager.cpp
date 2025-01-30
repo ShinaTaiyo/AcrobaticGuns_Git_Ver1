@@ -155,10 +155,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 //終了処理
 //=======================
 void CManager::Uninit()
-{
-	//m_pStageManager->SaveMapTxt();//マップ情報をセーブする（それをしてから破棄する処理を開始）
-	CObject::ReleaseAll();    //オブジェクトの開放
-	
+{	
 	//================================
 	//シーン
 	//================================
@@ -290,6 +287,7 @@ void CManager::Uninit()
 	}
 	//===============================================
 
+	CObject::ReleaseAll();    //オブジェクトの開放
 
 	//最後に残ったオブジェクトをここで全部破棄
 	CObject::ReleaseProcess();//リストの破棄をする処理

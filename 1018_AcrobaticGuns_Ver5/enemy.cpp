@@ -19,6 +19,7 @@
 #include "particle.h"
 #include "phasemanager.h"
 #include "input.h"
+#include "effect.h"
 #include "camera.h"
 #include "attack.h"
 //============================================================================================================================================
@@ -880,7 +881,8 @@ void CEnemy::EditNormalSpeed()
 void CEnemy::EditSensingRange()
 {
 	CInputKeyboard* pInput = CManager::GetInputKeyboard();
-
+	CObjectX::PosInfo& PosInfo = GetPosInfo();
+	const D3DXVECTOR3& Pos = PosInfo.GetPos();
 	if (pInput->GetPress(DIK_LCONTROL) == true)
 	{//Lコントロールキーを押しながら
 		if (pInput->GetPress(DIK_LSHIFT) == true)
@@ -909,6 +911,17 @@ void CEnemy::EditSensingRange()
 			m_fSensingRange += 10.0f;
 		}
 	}
+	float fRadXZ = static_cast<float>(rand() % 628 - 314) * 0.01f;//XZ方向の角度(Yaw)を求める
+	float fRadY = static_cast<float>(rand() % 628 - 314) * 0.01f; //Y方向の角度(Pitch)を求める
+	D3DXVECTOR3 RandPos = { 0.0f,0.0f,0.0f };
+
+	RandPos.x = m_fSensingRange * sinf(fRadXZ) * cosf(fRadY);//X方向の長さに対して、球の側面に出すために、Y方向の高さの比をかける
+	RandPos.z = m_fSensingRange * cosf(fRadXZ) * cosf(fRadY);//Z方向の長さに対して、球の側面に出すために、Y方向の高さの比をかける
+	RandPos.y = m_fSensingRange * sinf(fRadY);//Y方向の高さを求める
+
+	//索敵範囲を表すためにパーティクルを索敵距離の位置にランダムで出す
+	CParticle::Create(CParticle::TYPE00_NORMAL, 200, 30.0f, 30.0f,Pos + RandPos,
+		D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f), true);
 
 	CManager::GetDebugText()->PrintDebugText("索敵範囲変更（６）：%f\n", m_fSensingRange);
 }

@@ -27,7 +27,8 @@ const string CEffect::s_EffectFileName[static_cast<int>(CEffect::EFFECTTYPE::MAX
 //==========================================
 //コンストラクタ
 //==========================================
-CEffect::CEffect(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CBillboard(nPri,bUseintPri,type,ObjType), m_Type(EFFECTTYPE::NORMAL),m_fReductionHeight(0.0f),m_fReductionWidth(0.0f)
+CEffect::CEffect(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CBillboard(nPri,bUseintPri,type,ObjType), m_Type(EFFECTTYPE::NORMAL),m_fReductionHeight(0.0f),m_fReductionWidth(0.0f),
+m_bBallMove(false), m_BallMoveRot({ 0.0f,0.0f }), m_BallMoveAddRot({ 0.0f,0.0f }), m_fBallMoveSpeed(0.0f)
 {
 
 }
@@ -93,6 +94,17 @@ void CEffect::Update()
 	//========================================
 	CBillboard::Update();
 	//===========================================================================================
+
+	if (m_bBallMove == true)
+	{
+		D3DXVECTOR3 BallMove = { 0.0f,0.0f,0.0f };//球状移動計算用
+		m_BallMoveRot += m_BallMoveAddRot;//移動向きを加算する
+		
+		//円状に移動させ続ける
+		SetMove(D3DXVECTOR3(sinf(m_BallMoveRot.y) * cosf(m_BallMoveRot.x) * m_fBallMoveSpeed,
+			sinf(m_BallMoveRot.x) * m_fBallMoveSpeed,
+			cosf(m_BallMoveRot.y) * cosf(m_BallMoveRot.x) * m_fBallMoveSpeed));
+	}
 
 	//=======================================
 	//使用状態がオフになったら・・・
@@ -177,7 +189,7 @@ void CEffect::SetDeath()
 //==========================================
 //エフェクトの生成処理
 //==========================================
-void CEffect::Create(EFFECTTYPE type, int nLife, float fWidth, float fHeight, D3DXVECTOR3 pos, D3DXCOLOR col)
+CEffect* CEffect::Create(EFFECTTYPE type, int nLife, float fWidth, float fHeight, D3DXVECTOR3 pos, D3DXCOLOR col)
 {
 	CEffect* pEffect = DBG_NEW CEffect;   //エフェクトを生成
 	CTexture* pTexture = CManager::GetTexture();
@@ -199,5 +211,7 @@ void CEffect::Create(EFFECTTYPE type, int nLife, float fWidth, float fHeight, D3
 		pEffect->SetColor(col);                                                       //色合いを設定
 		pEffect->SetAnimInfo(1, 1, col, false);                                       //アニメーション情報を設定
 	}
+
+	return pEffect;
 }
 //=======================================================================================================================================

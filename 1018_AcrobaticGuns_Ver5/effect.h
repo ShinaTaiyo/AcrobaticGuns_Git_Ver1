@@ -36,7 +36,14 @@ public:
 	void Update() override; //更新処理
 	void Draw() override;   //描画処理
 	void SetDeath() override;//死亡フラグを設定
-	static void Create(EFFECTTYPE type,int nLife, float fWidth, float fHeight,D3DXVECTOR3 pos,D3DXCOLOR col);//エフェクトを生成
+	static CEffect * Create(EFFECTTYPE type,int nLife, float fWidth, float fHeight,D3DXVECTOR3 pos,D3DXCOLOR col);//エフェクトを生成
+	
+	//===========================================
+	//移動方法
+	//===========================================
+	void SetBallMove(bool bUse, D3DXVECTOR2 InitialRot, D3DXVECTOR2 AddRot, float fSpeed)
+	{ m_bBallMove = bUse; m_BallMoveRot = InitialRot; m_BallMoveAddRot = AddRot; m_fBallMoveSpeed = fSpeed; }//円状移動の設定
+	//=================================================================================================
 private:
 	//===========================================
 	//静的メンバ
@@ -50,6 +57,12 @@ private:
 	EFFECTTYPE m_Type;        //エフェクトの種類
 	float m_fReductionWidth;  //横幅縮小スピード
 	float m_fReductionHeight; //高さ縮小スピード
+
+	bool m_bBallMove;         //円状に移動する
+	float m_fBallMoveSpeed;   //円状に移動する速度
+	D3DXVECTOR2 m_BallMoveRot;//円状に移動する向き
+	D3DXVECTOR2 m_BallMoveAddRot;//円状に移動するときの加算する向き
+
 	//=================================================================================================
 };
 //====================================================================================================================================
