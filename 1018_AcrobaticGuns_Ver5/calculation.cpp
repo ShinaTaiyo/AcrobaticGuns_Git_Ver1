@@ -95,21 +95,11 @@ float CCalculation::CalculationRandVecXY()
 //=========================================================
 //2D方向の向きの補正を行う
 //=========================================================
-void CCalculation::CalculationCollectionRot2D(float& fMyRot, float fRotAim, float fDecayRot)
+float CCalculation::CalculationCollectionRot2D(float fMyRot, float fRotAim, float fDecayRot, bool bCameraOffSet)
 {
 	float fRotDiff = 0.0f;//向きの差分
 	float fCameraRot = CManager::GetCamera()->GetRot().y;
 	fRotDiff = fRotAim - fMyRot;
-
-	//向きの差分を求める（3.14と-3.14の境界線をまたぎそうになったら補正する)
-	//if (fMyRot > D3DX_PI * 0.5f + fCameraRot && fRotAim < -D3DX_PI * 0.5f + fCameraRot)//1.57以上 -1.57未満
-	//{
-	//	fRotDiff += D3DX_PI * 2 + fCameraRot;
-	//}
-	//if (fMyRot < -D3DX_PI * 0.5f + fCameraRot && fRotAim > D3DX_PI * 0.5f + fCameraRot)
-	//{
-	//	fRotDiff -= D3DX_PI * 2 + fCameraRot;
-	//}
 
 	//向きの差分の調整
 	if (fRotDiff > D3DX_PI)
@@ -124,15 +114,31 @@ void CCalculation::CalculationCollectionRot2D(float& fMyRot, float fRotAim, floa
 	//徐々に目的の向きへ合わせていく
 	fMyRot += fRotDiff * fDecayRot;
 
-	//向きの調整（カメラを基準に値を3.14～-3.14の中に固定したいので・・・）
-	if (fMyRot >= D3DX_PI + fCameraRot)
-	{//3.14→-3.14にする
-		fMyRot -= D3DX_PI * 2;
+	if (bCameraOffSet == true)
+	{
+		//向きの調整（カメラを基準に値を3.14～-3.14の中に固定したいので・・・）
+		if (fMyRot >= D3DX_PI + fCameraRot)
+		{//3.14→-3.14にする
+			fMyRot -= D3DX_PI * 2;
+		}
+		else if (fMyRot <= -D3DX_PI + fCameraRot)
+		{//-3.14→3.14にする
+			fMyRot += D3DX_PI * 2;
+		}
 	}
-	else if (fMyRot <= -D3DX_PI + fCameraRot)
-	{//-3.14→3.14にする
-		fMyRot += D3DX_PI * 2;
+	else
+	{
+		//向きの調整
+		if (fMyRot >= D3DX_PI)
+		{//3.14→-3.14にする
+			fMyRot -= D3DX_PI * 2;
+		}
+		else if (fMyRot <= -D3DX_PI)
+		{//-3.14→3.14にする
+			fMyRot += D3DX_PI * 2;
+		}
 	}
+	return fMyRot;
 }
 //===========================================================================================================
 
@@ -282,6 +288,20 @@ D3DXVECTOR3 CCalculation::Calculation3DVec(D3DXVECTOR3 MyPos, D3DXVECTOR3 AimPos
 	ResultMove.z = VecAim.z / fVLaim * fSpeed;
 
 	return ResultMove;
+}
+//===========================================================================================================
+
+//=========================================================
+//目的地へのベクトルをYawとPitchに変換する
+//=========================================================
+D3DXVECTOR2 CCalculation::VectorToYawPitch(const D3DXVECTOR3& MyPos, const D3DXVECTOR3& AimPos)
+{
+	D3DXVECTOR2 YawPitch = { 0.0f,0.0f };//YawとPitchを計算する
+
+	YawPitch.y = atan2f(AimPos.x - MyPos.x, AimPos.z - MyPos.z);//XZ方向の発射角度を距離の比からYawを求める
+	YawPitch.x = atan2f(AimPos.y - MyPos.y, sqrtf(powf(AimPos.x - MyPos.x, 2) + powf(AimPos.z - MyPos.z, 2)));//XZ方向の距離を軸にPitchを求める
+
+	return YawPitch;
 }
 //===========================================================================================================
 

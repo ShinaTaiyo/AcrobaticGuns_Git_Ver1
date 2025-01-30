@@ -79,7 +79,7 @@ public:
 	//==========================================================
 	//ˆÚ“®AI
 	//==========================================================
-	void SetVecMoveAiInfo(vector<CAIModel*>& vec);
+	void SetVecMoveAiInfo(vector<CAIModel*> vec);
 	vector<CAIModel*>& GetVecAiModelInfo() { return m_VecMoveAi; }
 	virtual void AIMoveProcess();//AIˆÚ“®ˆ—
 	virtual void BattleMoveProcess();//ƒoƒgƒ‹ˆÚ“®ˆ—

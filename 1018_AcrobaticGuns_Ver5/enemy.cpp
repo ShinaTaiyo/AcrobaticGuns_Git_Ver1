@@ -92,7 +92,6 @@ void CEnemy::Update()
 		const D3DXVECTOR3& Pos = GetPosInfo().GetPos();
 		const D3DXVECTOR3& PlayerPos = CGame::GetPlayer()->GetPosInfo().GetPos();
 		//float fElevaRot = atan2f(PlayerPos.y - Pos.y, sqrtf(powf(PlayerPos.x - Pos.x, 2) + powf(PlayerPos.z - Pos.z, 2)));
-		//SetRot(D3DXVECTOR3(fElevaRot, atan2f(PlayerPos.x - Pos.x, PlayerPos.z - Pos.z) + D3DX_PI,0.0f));
 
 		float fLength = CCalculation::CalculationLength(Pos, PlayerPos);
 
@@ -417,7 +416,7 @@ void CEnemy::ManagerChooseControlInfo()
 //====================================================================================
 //移動AIの情報を設定する
 //====================================================================================
-void CEnemy::SetVecMoveAiInfo(vector<CAIModel*>& vec)
+void CEnemy::SetVecMoveAiInfo(vector<CAIModel*> vec)
 {
 	m_VecMoveAi = vec;
 }
@@ -592,7 +591,14 @@ void CEnemy::AIMoveProcess()
 {
 	if (CScene::GetMode() == CScene::MODE_GAME)
 	{
-		float fLengthPlayer = CCalculation::CalculationLength(CGame::GetPlayer()->GetPosInfo().GetPos(), GetPosInfo().GetPos());
+		//================
+	    //使用する変数
+		//================
+		CObjectX::RotInfo& RotInfo = GetRotInfo();//向き情報を取得
+		const D3DXVECTOR3& Rot = RotInfo.GetRot();//向きを取得
+		float fAddRotY = 0.0f;//Y方向の加算向き
+		float fLengthPlayer = CCalculation::CalculationLength(CGame::GetPlayer()->GetPosInfo().GetPos(), GetPosInfo().GetPos());//プレイヤーとの距離
+		//=========================================================================================================================================
 		if (fLengthPlayer < m_fSensingRange)
 		{
 			ChengeMove(DBG_NEW CEnemyMove_Battle());
@@ -606,6 +612,9 @@ void CEnemy::AIMoveProcess()
 
 			float fLength = CCalculation::CalculationLength(GetPosInfo().GetPos(), (*it)->GetPosInfo().GetPos());//距離を測る
 			float fRot = atan2f((*it)->GetPosInfo().GetPos().x - GetPosInfo().GetPos().x, (*it)->GetPosInfo().GetPos().z - GetPosInfo().GetPos().z);
+
+			RotInfo.SetRot(D3DXVECTOR3(Rot.x,CCalculation::CalculationCollectionRot2D(Rot.y, fRot, 0.1f, false),Rot.z));//向きを徐々に目的地へ合わせていく
+
 			GetMoveInfo().SetMove(D3DXVECTOR3(sinf(fRot) * m_fNormalSpeed, GetMoveInfo().GetMove().y, cosf(fRot) * m_fNormalSpeed));
 
 			if (fLength < m_fNormalSpeed + 50.0f)
@@ -1326,7 +1335,7 @@ void CShotWeakEnemy::AttackProcess()
 	const int& nPatternTime = GetPatternTime();
 	const int& nPattern = GetPattern();
 	if (fLength < s_fATTACKSTART_LENGTH && bAction == false && GetAttackCoolTime() > s_nATTACK_COOLTIME)
-	{//攻撃が開始されていなければ
+	{//攻撃が開始されていなければ（クールタイムごとに攻撃を行う。ターン性バトルみたいな動きになる）
 		ChengeMove(DBG_NEW CEnemyMove_None());//AI移動と攻撃処理を入れ替える
 		SetAction(true);
 	}
@@ -1868,14 +1877,81 @@ void CDiveWeakEnemy::BattleMoveProcess()
 //====================================================================================
 void CDiveWeakEnemy::AttackProcess()
 {
-	if (GetCntTime() % s_nATTACK_FREQUENCY == 0)
+	float fLength = CCalculation::CalculationLength(GetPosInfo().GetPos(), CGame::GetPlayer()->GetPosInfo().GetPos());
+	const bool& bAction = GetAction();
+	if (fLength < GetSensingRange() && bAction == false)
+	{//索敵範囲にいる場合、攻撃を開始する
+		ChengeMove(DBG_NEW CEnemyMove_None());//攻撃処理中は、移動も入るので、通常移動処理はさせない。
+		SetAction(true);//攻撃を開始
+	}
+	if (bAction == true)
 	{
-		D3DXVECTOR3 Aim = CCalculation::Calculation3DVec(GetPosInfo().GetPos() + D3DXVECTOR3(0.0f, GetSizeInfo().GetVtxMax().y + GetSizeInfo().GetVtxMax().y / 2, 0.0f), CGame::GetPlayer()->GetPosInfo().GetSenterPos(), 20.0f);
+		//==============
+		//使用変数
+		//==============
+		CObjectX::RotInfo& RotInfo = GetRotInfo();        //向き情報を取得
+		CObjectX::PosInfo& PosInfo = GetPosInfo();        //位置情報を取得
+		CObjectX::SizeInfo& SizeInfo = GetSizeInfo();     //サイズ情報を取得
+		CObjectX::MoveInfo& MoveInfo = GetMoveInfo();     //移動情報を取得
+		CPlayer* pPlayer = CGame::GetPlayer();            //プレイヤーのポインタを取得
+		CObjectX::PosInfo& PlayerPosInfo = pPlayer->GetPosInfo();//プレイヤーの位置情報を取得
+		const D3DXVECTOR3& Pos = PosInfo.GetPos();        //位置を取得
+		const D3DXVECTOR3& Move = MoveInfo.GetMove();     //移動量を取得
+		const D3DXVECTOR3& PlayerPos = PlayerPosInfo.Pos;//プレイヤーの位置を取得
+		D3DXVECTOR3 Rot = RotInfo.GetRot();               //向き
+		const float & fNormalSpeed = GetNormalSpeed();    //通常移動速度
+		float fRotAim = atan2f(PlayerPos.x - Pos.x, PlayerPos.z - Pos.z);//Z方向を基準にプレイヤーへの角度（目的の角度）を計算する
+		//========================================================================================================
 
-		CAttackEnemy * pAttackEnemy = CAttackEnemy::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::PLAYER, CAttack::COLLISIONTYPE::SQUARE, true, true, 1, 60, 200, GetPosInfo().GetPos() + D3DXVECTOR3(0.0f, GetSizeInfo().GetVtxMax().y, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), Aim, GetSizeInfo().GetScale() * 0.5f);
-		pAttackEnemy->GetBoundInfo().SetActive(true,D3DXVECTOR3(0.0f,10.0f,0.0f),true,0.5f);//バウンドさせる
-		pAttackEnemy->SetExtrusionCollisioin(true);//押し出し判定を行い、
-		pAttackEnemy->SetHitOtherThanLibing(false);//敵やプレイヤー以外との当たり判定は行わない
+		RotInfo.SetRot(D3DXVECTOR3(Rot.x, CCalculation::CalculationCollectionRot2D(Rot.y, fRotAim, 0.015f, false), Rot.z));//向きをプレイヤーへ超少しずつ合わせていく
+		MoveInfo.SetMove(D3DXVECTOR3(sinf(fRotAim) * fNormalSpeed, Move.y, cosf(fRotAim) * fNormalSpeed));//プレイヤーに向かって移動させる
+
+		if (GetCntTime() % s_nATTACK_FREQUENCY == 0)
+		{//攻撃を発射
+
+		    //==============
+		    //使用変数
+		    //==============
+			const D3DXVECTOR3& VtxMax = SizeInfo.GetVtxMax(); //最大頂点を取得
+			D3DXVECTOR3 Aim = { 0.0f,0.0f,0.0f };             //狙う方向
+			D3DXVECTOR3 ShotPos = Pos + D3DXVECTOR3(0.0f, VtxMax.y, 0.0f);//発射位置
+			D3DXVECTOR3 AddRot = { 0.0f,0.0f,0.0f };//加算する向き
+			D3DXVECTOR2 YawPitch = CCalculation::VectorToYawPitch(ShotPos, PlayerPos);//目的地への角度(YawとPitch)を取得
+			//========================================================================================================
+
+			//Yawの補正
+			if (YawPitch.y > Rot.y + 0.7f)
+			{
+				YawPitch.y = Rot.y + 0.7f;
+			}
+			else if (YawPitch.y < Rot.y - 0.7f)
+			{
+				YawPitch.y = Rot.y - 0.7f;
+			}
+
+		    //発射方向計算
+		    Aim.x = sinf(YawPitch.y) * 20.0f;//Z方向を軸にしているので、sinはXとする
+		    Aim.z = cosf(YawPitch.y) * 20.0f;//Z方向を軸にしているので。cosはZとする
+		    
+		    //Pitchの補正
+		    if (YawPitch.x > 0.3f)
+		    {
+		    	YawPitch.x = 0.3f;
+		    }
+		    else if (YawPitch.x < -0.3f)
+		    {
+		    	YawPitch.x = -0.3f;
+		    }
+		    
+		    Aim.y = sinf(YawPitch.x) * 20.0f;//軸が平面なので、sinはYとする
+		    
+		    CAttackEnemy* pAttackEnemy = CAttackEnemy::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::PLAYER, CAttack::COLLISIONTYPE::SQUARE, true, true,
+		    	1, 60, 200, ShotPos, D3DXVECTOR3(0.0f, 0.0f, 0.0f), Aim, GetSizeInfo().GetScale() * 0.5f);
+		    
+		    pAttackEnemy->GetBoundInfo().SetActive(true, D3DXVECTOR3(0.0f, 10.0f, 0.0f), true, 0.5f);//バウンドさせる
+		    pAttackEnemy->SetExtrusionCollisioin(true);//押し出し判定を行い、
+		    pAttackEnemy->SetHitOtherThanLibing(false);//敵やプレイヤー以外との当たり判定は行わない
+		}
 	}
 }
 //============================================================================================================================================
