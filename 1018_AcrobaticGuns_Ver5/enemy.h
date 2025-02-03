@@ -69,7 +69,6 @@ public:
     //関数
 	void SaveInfoTxt(fstream& WritingFile) override;  //テキストファイルに情報を保存するための関数
 	static void LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveManager, string& Buff);  //テキストファイルから情報を読み込むための関数   
-	//CObject* ManagerChengeObject(bool bAim) override; //ステージマネージャーに変更したオブジェクトを渡す
 	CObject* ManagerSaveObject() override;             //ステージマネージャーに今のオブジェクトを保存する
 	void ManagerChooseControlInfo() override;          //ステージマネージャーから操作する
 	void SetPhaseNum(int nNum) { m_nPhaseNum = nNum; } //フェーズ番号を設定する
@@ -84,7 +83,6 @@ public:
 	virtual void AIMoveProcess();//AI移動処理
 	virtual void BattleMoveProcess();//バトル移動処理
 	void ChengeMove(CEnemyMove* pEnemyMove);//移動状態を変える
-	void RayCollision();                               //レイがオブジェクトに当たっているかどうか
 	//=================================================================================================================
 
 	//==========================================================
@@ -118,6 +116,10 @@ public:
 	void SetState(STATE State) { m_State = State; }//状態異常を設定する
 	const STATE& GetState() { return m_State; }    //状態異常を取得する
 
+	//ジャンプまでのクールタイム
+	void ResetJumpCoolTime() { m_nJumpCoolTime = 0; }
+	int GetJumpCoolTime() { return m_nJumpCoolTime; }
+
 	void SetPossibleAttack(bool bPossible) { m_bPossibleAttack = bPossible; }
 protected:
 
@@ -150,6 +152,11 @@ protected:
 	void SetUseCollisionDetection(bool bUse) { m_bCollisoinDetection = bUse; }
 
 	const bool& GetCollisionDetection() const { return m_bActivateCollisionDetection; }
+
+	void RayCollision();                               //レイがオブジェクトに当たっているかどうか
+
+	//移動処理
+	void ChasePlayer();//プレイヤーを追いかける処理
 	//===============================================================================================
 
 	virtual void DefeatStaging();//倒されたときの演出
@@ -184,6 +191,8 @@ private:
 
 	bool m_bCollisionWall;
 	int m_nAttackCoolTime;
+
+	int m_nJumpCoolTime;   //ジャンプまでのクールタイム
 
 	bool m_bPossibleAttack;//攻撃可能かどうか
 	bool m_bStartLanding;  //最初に地面についたかどうか
@@ -264,6 +273,9 @@ private:
 	void AttackProcess() override;
 	void SwordCollision();//剣の当たり判定を行う
 	void DefeatStaging() override;//倒されたときの演出
+
+	//移動状態管理用のレイ
+	void RayCollisionJumpOverOnHit();//レイが当たったら飛び越える処理に移行させる関数
 	//===============================================================================================
 };
 
@@ -329,7 +341,7 @@ private:
 	//================================================
 	
 	//*攻撃移動
-	void BattleMoveProcess() override;//バトル移動処理
+	void BattleMoveProcess() override;//バトル移動処理]
 
 	//攻撃処理
 	void AttackProcess() override;
@@ -449,7 +461,7 @@ class CEnemyMove_DodgeWall : public CEnemyMove
 {
 public:
 	CEnemyMove_DodgeWall(CEnemy * pEnemy,D3DXVECTOR3 DodgeMove);//コンストラクタ
-	~CEnemyMove_DodgeWall();//デストラクタ
+	~CEnemyMove_DodgeWall() override;//デストラクタ
 	void Process(CEnemy* pEnemy)override;
 private:
 	D3DXVECTOR3 m_DodgeMove;//回避移動量
@@ -460,12 +472,24 @@ class CEnemyMove_Frightened : public CEnemyMove
 {
 public:
 	CEnemyMove_Frightened(CEnemy * pEnemy,D3DXVECTOR3 StopPos,int nStateTime);//コンストラクタ
-	~CEnemyMove_Frightened();//デストラクタ
+	~CEnemyMove_Frightened() override;//デストラクタ
 	void Process(CEnemy* pEnemy) override;//処理
 private:
 	D3DXVECTOR3 m_StopPos;//止める位置
 	CUi* m_pLockOn;       //ロックオンする
 	int m_nStateTime;     //怯え状態になる時間を設定
+};
+
+//移動タイプ：壁超えジャンプ
+class CEnemyMove_OverJumpObj : public CEnemyMove
+{
+public:
+	CEnemyMove_OverJumpObj(CEnemy* pEnemy,float fGoalheight);//コンストラクタ
+	~CEnemyMove_OverJumpObj() override;//デストラクタ
+	void Process(CEnemy* pEnemy) override;//処理
+private:
+	float m_fGoalHeight = 0.0f;//壁を超える時の目標の高さ
+	int m_nCntTime = 0;//この状態になってからの時間をカウントする
 };
 
 //移動タイプ：なし

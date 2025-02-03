@@ -659,7 +659,7 @@ bool CCalculation::IsObjectInFieldOfView(const D3DXVECTOR3& PlayerPos, const D3D
 D3DXVECTOR3 CCalculation::RadToVec(const D3DXVECTOR3& Rot)
 {
 	D3DXVECTOR3 RotToVec = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-
+	//上を０とするため、Y軸はcosを基準にする。XZ平面と比を合わせるため、XZの位置を求めるときは、sinをかける
 	RotToVec.x = sinf(Rot.x) * sinf(Rot.y);
 	RotToVec.y = cosf(Rot.x);
 	RotToVec.z = sinf(Rot.x) * cosf(Rot.y);
@@ -695,6 +695,16 @@ float CCalculation::DetermineSide3D(const D3DXVECTOR3& origin, const D3DXVECTOR3
 	//else {
 	//	return "平面上";
 	//}
+}
+//===========================================================================================================
+
+//=====================================================================
+//目的の高さへ到達するための初速度を求める（v0 = √2gh)
+//=====================================================================
+float CCalculation::GetInitialVelocityHeight(float fHeight, float fGravity)
+{
+	float fAim = sqrtf(2 * fGravity * fHeight);
+	return fAim;
 }
 //===========================================================================================================
 

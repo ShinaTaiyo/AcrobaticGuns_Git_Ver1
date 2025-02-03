@@ -284,7 +284,7 @@ public:
 		//重力
 		void SetUseGravity(bool bUse, float fCopyGravityPower) { bUseGravity = bUse; fGravityPower = fCopyGravityPower; }//重力を設定する
 		const bool& GetUseGravity() const { return bUseGravity; }//重力を使用するかどうかを設定
-
+		const float& GetGravity() const { return fGravityPower; }//重力を取得する
 		//乗算加速
 		void SetUseMultiSpeed(bool bUse, D3DXVECTOR3 CopyMultiSpeed) { MultiSpeed = CopyMultiSpeed; bUseMultiSpeed = bUse; }//乗算加速を使用するかどうか
 

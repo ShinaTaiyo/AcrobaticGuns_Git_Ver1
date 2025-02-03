@@ -40,7 +40,7 @@ int CEnemy::m_nNumEnemy = 0;
 CEnemy::CEnemy(int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectX(nPri, bUseintPri, type, ObjType),
 m_Type(ENEMYTYPE::SHOTWEAK), m_VecMoveAi(), m_MoveAiSavePos(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),m_nCntTime(0),m_nIdxMoveAi(0), m_nPhaseNum(0),m_pEnemyMove(DBG_NEW CEnemyMove_AI()),
 m_fRotMove(0.0f),m_fSensingRange(0.0f),m_fNormalSpeed(0.0f),m_Pattern(),m_bCollisoinDetection(true),m_bActivateCollisionDetection(false),m_bCollisionWall(false),
-m_DefeatAttackType(CAttack::ATTACKTYPE::EXPLOSION),m_nAttackCoolTime(0),m_bPossibleAttack(true),m_State(CEnemy::STATE::NORMAL),m_bStartLanding(false)
+m_DefeatAttackType(CAttack::ATTACKTYPE::EXPLOSION),m_nAttackCoolTime(0),m_bPossibleAttack(true),m_State(CEnemy::STATE::NORMAL),m_bStartLanding(false),m_nJumpCoolTime(0)
 {
 	m_nNumEnemy++;//敵総数カウントアップ
 }
@@ -98,6 +98,7 @@ void CEnemy::Update()
 		float fLength = CCalculation::CalculationLength(Pos, PlayerPos);
 
 		m_nCntTime++;//時間をカウントする
+		m_nJumpCoolTime++;  //ジャンプまでのクールタイムをカウントする
 		m_nAttackCoolTime++;//クールタイムをカウントする
 
 		if (GetLanding() == true)
@@ -436,6 +437,24 @@ void CEnemy::SetVecMoveAiInfo(vector<CAIModel*> vec)
 //============================================================================================================================================
 
 //====================================================================================
+//プレイヤーを追いかける処理
+//====================================================================================
+void CEnemy::ChasePlayer()
+{
+	float fLengthPlayer = CCalculation::CalculationLength(CGame::GetPlayer()->GetPosInfo().GetPos(), GetPosInfo().GetPos());
+	const D3DXVECTOR3& PlayerPos = CGame::GetPlayer()->GetPosInfo().GetPos();
+	const D3DXVECTOR3& Pos = GetPosInfo().GetPos();
+	D3DXVECTOR3 Aim = PlayerPos - Pos;
+	D3DXVec3Normalize(&Aim, &Aim);
+	float fRot = atan2f(Aim.x, Aim.z);
+
+	D3DXVECTOR3 Move = CCalculation::HormingVecRotXZ(m_fRotMove, GetPosInfo().GetPos(), CGame::GetPlayer()->GetPosInfo().GetSenterPos(), 0.1f, m_fNormalSpeed);
+	GetRotInfo().SetRot(D3DXVECTOR3(GetRotInfo().GetRot().x, m_fRotMove, GetRotInfo().GetRot().z));
+	GetMoveInfo().SetMove(D3DXVECTOR3(Move.x, GetMoveInfo().GetMove().y, Move.z));
+}
+//============================================================================================================================================
+
+//====================================================================================
 //敵が倒されたときの演出
 //====================================================================================
 void CEnemy::DefeatStaging()
@@ -656,20 +675,11 @@ void CEnemy::AIMoveProcess()
 void CEnemy::BattleMoveProcess()
 {
 	float fLengthPlayer = CCalculation::CalculationLength(CGame::GetPlayer()->GetPosInfo().GetPos(), GetPosInfo().GetPos());
-	const D3DXVECTOR3 & PlayerPos = CGame::GetPlayer()->GetPosInfo().GetPos();
-	const D3DXVECTOR3& Pos = GetPosInfo().GetPos();
-	D3DXVECTOR3 Aim = PlayerPos - Pos;
-	D3DXVec3Normalize(&Aim, &Aim);
-	float fRot = atan2f(Aim.x,Aim.z);
 
-	D3DXVECTOR3 Move = CCalculation::HormingVecRotXZ(m_fRotMove, GetPosInfo().GetPos(), CGame::GetPlayer()->GetPosInfo().GetSenterPos(), 0.1f, m_fNormalSpeed);
-	GetRotInfo().SetRot(D3DXVECTOR3(GetRotInfo().GetRot().x, m_fRotMove, GetRotInfo().GetRot().z));
-	GetMoveInfo().SetMove(D3DXVECTOR3(Move.x, GetMoveInfo().GetMove().y,Move.z));
-	CParticle::SummonParticle(CParticle::TYPE00_NORMAL, 1, 30, 20.0f, 20.0f, 100, 10, false, Pos, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
-	RayCollision();
+	ChasePlayer();//プレイヤーを追いかける処理
 
 	if (fLengthPlayer > m_fSensingRange + 300.0f)
-	{//距離が索敵範囲の+300.0fより遠くなったら
+	{//距離が索敵範囲の+300.0fより遠くなったらAIモードに戻して徘徊させる
 		ChengeMove(DBG_NEW CEnemyMove_AI());
 	}
 }
@@ -702,7 +712,6 @@ void CEnemy::RayCollision()
 	{
 		CObjectX* pObjX = nullptr;
 		D3DXVECTOR3 Ray = CCalculation::RadToVec(D3DXVECTOR3(GetRotInfo().GetRot().x, GetRotInfo().GetRot().y,0.0f) - D3DXVECTOR3(D3DX_PI * 0.5f,0.0f,0.0f));//手前側にレイを飛ばす
-		D3DXVec3Normalize(&Ray, &Ray);
 
 		for (int nCntPri = 0; nCntPri < m_nMAXPRIORITY; nCntPri++)
 		{
@@ -733,7 +742,7 @@ void CEnemy::RayCollision()
 		}
 
 		if (pObjX != nullptr)
-		{
+		{//当たったオブジェクトがあった場合、プレイヤーとのベクトルの内積をとり、オブジェクトをよけるまで右側に動いたり左側に動いたりする
 			D3DXVECTOR3 ObjectAim = pObjX->GetPosInfo().GetPos() - GetPosInfo().GetPos();
 			D3DXVec3Normalize(&ObjectAim, &ObjectAim);
 
@@ -1027,8 +1036,8 @@ void CEnemy::EditSensingRange()
 	float fRadY = static_cast<float>(rand() % 628 - 314) * 0.01f; //Y方向の角度(Pitch)を求める
 	D3DXVECTOR3 RandPos = { 0.0f,0.0f,0.0f };
 
-	RandPos.x = m_fSensingRange * sinf(fRadXZ) * cosf(fRadY);//X方向の長さに対して、球の側面に出すために、Y方向の高さの比をかける
-	RandPos.z = m_fSensingRange * cosf(fRadXZ) * cosf(fRadY);//Z方向の長さに対して、球の側面に出すために、Y方向の高さの比をかける
+	RandPos.x = m_fSensingRange * sinf(fRadXZ) * cosf(fRadY);//X方向の長さに対して、球の側面に出すために、Y方向の高さの比（高さを底面の比としてかける）
+	RandPos.z = m_fSensingRange * cosf(fRadXZ) * cosf(fRadY);//Z方向の長さに対して、球の側面に出すために、Y方向の高さの比（高さを底面の比としてかける）
 	RandPos.y = m_fSensingRange * sinf(fRadY);//Y方向の高さを求める
 
 	//索敵範囲を表すためにパーティクルを索敵距離の位置にランダムで出す
@@ -1446,7 +1455,9 @@ CObject* CShotWeakEnemy::ManagerSaveObject()
 //====================================================================================
 void CShotWeakEnemy::BattleMoveProcess()
 {
-	CEnemy::BattleMoveProcess();
+	CEnemy::ChasePlayer();//プレイヤーを追いかける処理
+
+	RayCollisionJumpOverOnHit();//レイが当たった時にジャンプさせるための処理
 }
 //============================================================================================================================================
 
@@ -1455,54 +1466,55 @@ void CShotWeakEnemy::BattleMoveProcess()
 //====================================================================================
 void CShotWeakEnemy::AttackProcess()
 {
-	float fLength = CCalculation::CalculationLength(GetPosInfo().GetPos(), CGame::GetPlayer()->GetPosInfo().GetPos());
-	const bool& bAction = GetAction();
-	const int& nPatternTime = GetPatternTime();
-	const int& nPattern = GetPattern();
-	if (fLength < s_fATTACKSTART_LENGTH && bAction == false && GetAttackCoolTime() > s_nATTACK_COOLTIME)
-	{//攻撃が開始されていなければ（クールタイムごとに攻撃を行う。ターン性バトルみたいな動きになる）
-		ChengeMove(DBG_NEW CEnemyMove_None());//AI移動と攻撃処理を入れ替える
-		SetAction(true);
-	}
+	//float fLength = CCalculation::CalculationLength(GetPosInfo().GetPos(), CGame::GetPlayer()->GetPosInfo().GetPos());
+	//float fLengthY = CGame::GetPlayer()->GetPosInfo().GetPos().y - GetPosInfo().GetPos().y;
+	//const bool& bAction = GetAction();
+	//const int& nPatternTime = GetPatternTime();
+	//const int& nPattern = GetPattern();
+	//if (fLength < s_fATTACKSTART_LENGTH && bAction == false && fLengthY < 400.0f && GetAttackCoolTime() > s_nATTACK_COOLTIME)
+	//{//攻撃が開始されていなければ（クールタイムごとに攻撃を行う。ターン性バトルみたいな動きになる）
+	//	ChengeMove(DBG_NEW CEnemyMove_None());//AI移動と攻撃処理を入れ替える
+	//	SetAction(true);
+	//}
 
-	if (bAction == true)
-	{
-		switch (nPattern)
-		{
-		case 0:
-			GetMoveInfo().SetMove(D3DXVECTOR3(0.0f, GetMoveInfo().GetMove().y, 0.0f));
-			if (nPatternTime == 15)
-			{
-				SetPattern(nPattern + 1);
-				SetPatternTime(0);
-				m_SaveAimPos = CGame::GetPlayer()->GetPosInfo().GetPos();
-			}
-			break;
-		case 1:
-			CParticle::SummonChargeParticle(CParticle::TYPE::TYPE00_NORMAL, 1, 45, 5.0f, 20.0f, 20.0f, GetSizeInfo().GetSize().x, 100, 10, false,
-				GetPosInfo().GetSenterPos(), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
+	//if (bAction == true)
+	//{
+	//	switch (nPattern)
+	//	{
+	//	case 0:
+	//		GetMoveInfo().SetMove(D3DXVECTOR3(0.0f, GetMoveInfo().GetMove().y, 0.0f));
+	//		if (nPatternTime == 15)
+	//		{
+	//			SetPattern(nPattern + 1);
+	//			SetPatternTime(0);
+	//			m_SaveAimPos = CGame::GetPlayer()->GetPosInfo().GetPos();
+	//		}
+	//		break;
+	//	case 1:
+	//		CParticle::SummonChargeParticle(CParticle::TYPE::TYPE00_NORMAL, 1, 45, 5.0f, 20.0f, 20.0f, GetSizeInfo().GetSize().x, 100, 10, false,
+	//			GetPosInfo().GetSenterPos(), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
 
-			if (nPatternTime == 45)
-			{
-				GetMoveInfo().SetUseInteria(true, 0.05f);
+	//		if (nPatternTime == 45)
+	//		{
+	//			GetMoveInfo().SetUseInteria(true, 0.05f);
 
-				GetMoveInfo().SetMove(CCalculation::Calculation3DVec(GetPosInfo().GetPos(),m_SaveAimPos, 30.0f));
-				SetPattern(nPattern + 1);
-				SetPatternTime(0);
-			}
-			break;
-		case 2:
-			if (nPatternTime == 60)
-			{
-				EndAttackPattern();//攻撃パターンを終了する
-				ChengeMove(DBG_NEW CEnemyMove_AI());//AI移動処理に変える
-			}
-			break;
-		default:
-			break;
-		}
-		SetPatternTime(nPatternTime + 1);
-	}
+	//			GetMoveInfo().SetMove(CCalculation::Calculation3DVec(GetPosInfo().GetPos(),m_SaveAimPos, 30.0f));
+	//			SetPattern(nPattern + 1);
+	//			SetPatternTime(0);
+	//		}
+	//		break;
+	//	case 2:
+	//		if (nPatternTime == 60)
+	//		{
+	//			EndAttackPattern();//攻撃パターンを終了する
+	//			ChengeMove(DBG_NEW CEnemyMove_AI());//AI移動処理に変える
+	//		}
+	//		break;
+	//	default:
+	//		break;
+	//	}
+	//	SetPatternTime(nPatternTime + 1);
+	//}
 }
 //============================================================================================================================================
 
@@ -1540,6 +1552,85 @@ void CShotWeakEnemy::DefeatStaging()
 			CParticle* pParticle = CParticle::Create(CParticle::TYPE::TYPE00_NORMAL, 120, 80.0f, 80.0f, GetPosInfo().GetPos(), CCalculation::Rand3DVec(200, 10),
 				D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f), true);
 			pParticle->SetUseAddSpeed(true, true, 0.9f);
+		}
+	}
+}
+//============================================================================================================================================
+
+//====================================================================================
+//レイがオブジェクトに当たった時にジャンプさせるための処理
+//====================================================================================
+void CShotWeakEnemy::RayCollisionJumpOverOnHit()
+{
+	//=======================
+    //敵の変数
+    //=======================
+	CObjectX::PosInfo& PosInfo = GetPosInfo();//位置情報を取得
+	CObjectX::SizeInfo& SizeInfo = GetSizeInfo();//サイズ情報を取得
+	CObjectX::MoveInfo& MoveInfo = GetMoveInfo();//移動情報を取得
+	CObjectX::RotInfo& RotInfo = GetRotInfo();//向き情報を取得
+
+	const D3DXVECTOR3& Pos = PosInfo.GetPos();//位置
+	const D3DXVECTOR3& SenterPos = PosInfo.GetSenterPos();//中心位置
+	const D3DXVECTOR3& Rot = RotInfo.GetRot();//向き
+	const D3DXVECTOR3& VtxMax = SizeInfo.GetVtxMax();//最大頂点
+	const D3DXVECTOR3& VtxMin = SizeInfo.GetVtxMin();//最小頂点
+	const D3DXVECTOR3& Size = SizeInfo.GetSize();//サイズ
+	D3DXVECTOR3 RayOrigin = SenterPos + D3DXVECTOR3(sinf(Rot.y) * (Size.x / 2), 0.0f, cosf(Rot.y) * (Size.x / 2));//レイの視点を決める
+
+	//レイの始点にパーティクルを出す
+	CParticle::SummonParticle(CParticle::TYPE::TYPE00_NORMAL, 1, 60, 40.0f, 40.0f, 100, 10, false, RayOrigin, D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f), true);
+
+	D3DXVECTOR3 RayDir = RayOrigin - SenterPos;
+	D3DXVec3Normalize(&RayDir, &RayDir);
+	D3DXVECTOR3 RayCollisionPos = { 0.0f,0.0f,0.0f };//レイが当たったところ格納用
+	float fLength = 0.0f;//距離格納用
+	//=====================================================================================
+
+	for (int nCntPri = 0; nCntPri < CObject::m_nMAXPRIORITY; nCntPri++)
+	{
+		if (nCntPri == static_cast<int>(CObject::TYPE::BLOCK) || nCntPri == static_cast<int>(CObject::TYPE::BGMODEL))
+		{
+			CObject* pObj = CObject::GetTopObject(nCntPri);//先頭アドレスを取得
+			while (pObj != nullptr)
+			{
+				CObject* pNext = pObj->GetNextObject();
+
+				CObjectX* pObjX = static_cast<CObjectX*>(pObj);
+
+				//=======================
+				//比較対象の変数
+				//=======================
+				CObjectX::PosInfo& ComPosInfo = pObjX->GetPosInfo();//位置情報を取得
+				CObjectX::RotInfo& ComRotInfo = pObjX->GetRotInfo();//向き情報を取得
+				CObjectX::SizeInfo& ComSizeInfo = pObjX->GetSizeInfo();//サイズ情報を取得
+
+				const D3DXVECTOR3& ComPos = ComPosInfo.GetPos();//位置
+				const D3DXVECTOR3& ComRot = ComRotInfo.GetRot();//向き
+				const D3DXVECTOR3& ComVtxMax = ComSizeInfo.GetVtxMax();//最大頂点
+				const D3DXVECTOR3& ComVtxMin = ComSizeInfo.GetVtxMin();//最小頂点
+				const D3DXVECTOR3& ComSize = ComSizeInfo.GetSize();//サイズ
+				//=====================================================================================
+
+				if (CCollision::RayIntersectsAABBCollisionPos(RayOrigin, RayDir, ComPos + ComVtxMin, ComPos + ComVtxMax, RayCollisionPos))
+				{
+					fLength = CCalculation::CalculationLength(RayOrigin, RayCollisionPos);//レイの支店とレイが当たった位置を出す
+					CParticle::SummonParticle(CParticle::TYPE::TYPE00_NORMAL, 1, 60, 40.0f, 40.0f, 100, 10, true, RayCollisionPos, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), true);
+					if (fLength < 100.0f)
+					{
+						float fLengthY = (ComPos.y + ComVtxMax.y) - Pos.y;//Y軸の距離を取り、目標のジャンプ距離を求める
+
+						if (GetJumpCoolTime() > 200)
+						{
+							ChengeMove(DBG_NEW CEnemyMove_OverJumpObj(this,fLengthY));//移動状態を「壁を超える」にする
+						}
+						//他のオブジェクトの比較はもういらないのでreturnする
+						return;
+					}
+				}
+
+				pObj = pNext;
+			}
 		}
 	}
 }
@@ -1994,6 +2085,7 @@ void CDiveWeakEnemy::ManagerChooseControlInfo()
 void CDiveWeakEnemy::BattleMoveProcess()
 {
 	CEnemy::BattleMoveProcess();
+
 }
 //============================================================================================================================================
 
@@ -2772,6 +2864,53 @@ void CIdleEnemy::DefeatStaging()
 				D3DXCOLOR(0.678f, 1.0f, 0.184f, 1.0f), true);
 			pParticle->SetUseAddSpeed(true, true, 0.9f);
 		}
+	}
+}
+//============================================================================================================================================
+
+//************************************************************************************
+//撃破演出
+//************************************************************************************
+
+//====================================================================================
+//コンストラクタ
+//===================================================================================
+CEnemyMove_OverJumpObj::CEnemyMove_OverJumpObj(CEnemy* pEnemy, float fGoalheight)
+{
+	m_fGoalHeight = fGoalheight;//目標のジャンプ高さ
+}
+//============================================================================================================================================
+
+//====================================================================================
+//デストラクタ
+//===================================================================================
+CEnemyMove_OverJumpObj::~CEnemyMove_OverJumpObj()
+{
+
+}
+//============================================================================================================================================
+
+//====================================================================================
+//処理
+//===================================================================================
+void CEnemyMove_OverJumpObj::Process(CEnemy* pEnemy)
+{
+	CObjectX::PosInfo& PosInfo = pEnemy->GetPosInfo();
+	const D3DXVECTOR3& Pos = PosInfo.GetPos();
+	const D3DXVECTOR3& SenterPos = PosInfo.GetSenterPos();
+	m_nCntTime++;
+
+	CParticle::SummonChargeParticle(CParticle::TYPE::TYPE00_NORMAL, 1, 60, 5.0f, 40.0f, 40.0f, 200.0f, 100, 10, true, SenterPos, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), true);
+
+	if (m_nCntTime == 100)
+	{
+		CObjectX::MoveInfo& MoveInfo = pEnemy->GetMoveInfo();
+
+		const D3DXVECTOR3& Move = MoveInfo.GetMove();
+
+		MoveInfo.SetMove(D3DXVECTOR3(Move.x,CCalculation::GetInitialVelocityHeight(m_fGoalHeight,pEnemy->GetMoveInfo().GetGravity()) + 5.0f,Move.z));
+		pEnemy->ResetJumpCoolTime();//次にジャンプ攻撃を発動するまでのクールタイムをリセットする
+		pEnemy->ChengeMove(DBG_NEW CEnemyMove_Battle());
 	}
 }
 //============================================================================================================================================
