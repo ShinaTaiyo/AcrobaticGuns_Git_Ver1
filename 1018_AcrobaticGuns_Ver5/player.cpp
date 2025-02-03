@@ -180,7 +180,6 @@ void CPlayer::Update()
 
     if (m_bDamage == true)
     {
-        //CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL::SE_DAMAGE_000);
         SetNextMotion(3);
         m_bDamage = false;
     }
@@ -601,7 +600,7 @@ void CPlayer::SetDamage(int nDamage, int nHitStopTime)
 
         pSound->PlaySoundB(CSound::SOUND_LABEL::SE_DAMAGE_000);
 
-        SetInitialActionMode(ACTIONMODE::SHOT);//射撃モードに強制的に戻す
+        //SetInitialActionMode(ACTIONMODE::SHOT);//射撃モードに強制的に戻す
 
         m_bDamage = true;//ダメージを受けた状態を明示的に示す
         SetNextMotion(2);

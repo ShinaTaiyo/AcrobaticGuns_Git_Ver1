@@ -244,6 +244,12 @@ void CPlayerMove_Dive::MoveProcess(CPlayer* pPlayer)
 		bInput = true;
 	}
 	pPlayer->GetMoveInfo().SetMove(CCalculation::Calculation3DVec(pPlayer->GetPosInfo().GetPos(),pWireHead->GetPosInfo().GetPos(), 40.0f));//目的地に達するまで狙い続ける
+
+	if (pPlayer->IsDamaged())
+	{//ダイブ移動中にダメージを受けたら射撃モードの初期状態に戻す（ダイブ攻撃は強力な攻撃なので、ノーリスクで突撃させたくないから）
+		pPlayer->SetInitialActionMode(CPlayer::ACTIONMODE::SHOT);
+	}
+
 	CCamera* pCamera = CManager::GetCamera();
 	if (CCalculation::CalculationLength(pPlayer->GetPosInfo().GetPos(), pWireHead->GetPosInfo().GetPos()) < s_fCOLLISIONDIVEMOVELENGTH)
 	{//ダイブ時に判定したら移動モードと攻撃モードを通常に戻す

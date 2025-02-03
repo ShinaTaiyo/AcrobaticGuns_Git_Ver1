@@ -2028,7 +2028,7 @@ void CDiveWeakEnemy::AttackProcess()
 		float fRotAim = atan2f(PlayerPos.x - Pos.x, PlayerPos.z - Pos.z);//Z方向を基準にプレイヤーへの角度（目的の角度）を計算する
 		//========================================================================================================
 
-		RotInfo.SetRot(D3DXVECTOR3(Rot.x, CCalculation::CalculationCollectionRot2D(Rot.y, fRotAim, 0.015f, false), Rot.z));//向きをプレイヤーへ超少しずつ合わせていく
+		RotInfo.SetRot(D3DXVECTOR3(Rot.x, CCalculation::CalculationCollectionRot2D(Rot.y, fRotAim, 0.007f, false), Rot.z));//向きをプレイヤーへ超少しずつ合わせていく
 		MoveInfo.SetMove(D3DXVECTOR3(sinf(fRotAim) * fNormalSpeed, Move.y, cosf(fRotAim) * fNormalSpeed));//プレイヤーに向かって移動させる
 
 		if (GetCntTime() % s_nATTACK_FREQUENCY == 0)
@@ -2045,13 +2045,13 @@ void CDiveWeakEnemy::AttackProcess()
 			//========================================================================================================
 
 			//Yawの補正
-			if (YawPitch.y > Rot.y + 0.7f)
+			if (YawPitch.y > Rot.y + 0.5f)
 			{
-				YawPitch.y = Rot.y + 0.7f;
+				YawPitch.y = Rot.y + 0.5f;
 			}
-			else if (YawPitch.y < Rot.y - 0.7f)
+			else if (YawPitch.y < Rot.y - 0.5f)
 			{
-				YawPitch.y = Rot.y - 0.7f;
+				YawPitch.y = Rot.y - 0.5f;
 			}
 
 		    //発射方向計算
