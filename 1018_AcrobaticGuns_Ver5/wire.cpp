@@ -126,7 +126,7 @@ void CWire::Update()
 		//円を展開する平面を求める基準ベクトルを計算する
 		D3DXVec3Cross(&V1, &Dir, &Up);//X方向
 		D3DXVec3Normalize(&V1, &V1);//ベクトル１を正規化
-		D3DXVec3Cross(&V2, &Dir, &V1);//Y方向
+		D3DXVec3Cross(&V2,&Dir,&V1);//Y方向
 		D3DXVec3Normalize(&V2, &V2);//ベクトル２を正規化
 
 		//頂点の位置の設定を開始

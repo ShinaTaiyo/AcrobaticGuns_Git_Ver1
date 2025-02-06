@@ -198,7 +198,7 @@ void CPhaseManager::AdvancePhase()
 
 	}
 
-	if (s_nNowStage != static_cast<int>(CStageManager::WORLDTYPE::MAX))
+	if (s_nNowStage < static_cast<int>(CStageManager::WORLDTYPE::MAX))
 	{
 		if (CEnemy::GetNumEnemy() <= 0 && s_nNowPhase == s_MaxPhase + 1 && s_bStartFade == false)
 		{

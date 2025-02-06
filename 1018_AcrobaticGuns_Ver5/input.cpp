@@ -308,7 +308,6 @@ void CInputJoypad::Update()
 		m_joykeyStateTrigger.Gamepad.wButtons = ~OldButton & Button;//1f前の入力状態を反転。現在押されているボタンと&演算（どちらも１なら１）するので、1f前おしていない場合、アクティブになり、トリガー処理が実現する
 
 		BYTE RTTrigger = joykeyState.Gamepad.bRightTrigger;
-		CManager::GetDebugText()->PrintDebugText("現在のジョイパッドの右トリガー情報の値：%d\n", RTTrigger);
 		BYTE OldRTrigger = m_joykeyStatePress.Gamepad.bRightTrigger;	
 		m_joykeyStateTrigger.Gamepad.bRightTrigger = ~OldRTrigger & RTTrigger;//1f前の入力状態を反転。現在押されているボタンと&演算（どちらも１なら１）するので、1f前おしていない場合、アクティブになり、トリガー処理が実現する
 
@@ -439,9 +438,6 @@ bool CInputJoypad::GetLStickPress(const int nDivisionRot,float fDirectionRot)
 	float normalizedLX = LX / magnitude;
 	float normalizedLY = LY / magnitude;
 
-	CManager::GetDebugText()->PrintDebugText("左スティックのX値：%f\n", normalizedLX);
-	CManager::GetDebugText()->PrintDebugText("左スティックのY値：%f\n", normalizedLY);
-
 	//今回のゲームは、Z軸の正方向が前なので、Z軸(右引数）を基準にX軸（左引数）の角度を求める
 	float fAimRot = atan2f(normalizedLX, normalizedLY);
 	//======================================
@@ -497,7 +493,6 @@ bool CInputJoypad::GetLStickPress(const int nDivisionRot,float fDirectionRot)
 		normalizedMagnitude = 0.0;
 		bActive = false;
 	}
-	CManager::GetDebugText()->PrintDebugText("正規化した角度：%f\n", m_fLSitckAimRot);
 	return bActive;
 }
 //===============================================================

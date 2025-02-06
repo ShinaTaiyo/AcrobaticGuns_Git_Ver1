@@ -106,17 +106,18 @@ void CEnemy::Update()
 			GetMoveInfo().SetMove(D3DXVECTOR3(GetMoveInfo().GetMove().x,0.0f, GetMoveInfo().GetMove().z));
 		}
 
-		m_pEnemyMove->Process(this);
+		m_pEnemyMove->Process(this);//移動処理全般ステート
 
 		if (m_bPossibleAttack == true)
 		{
 			AttackProcess();//攻撃処理
 		}
 
+		//敵の位置の調整
 		CollisionDetectionProcess();
 
 		if (m_Type == ENEMYTYPE::DIVEWEAK && m_bStartLanding == true)
-		{//ダイブに弱い敵なら、落ちない
+		{//ダイブに弱い敵なら、最初に乗った地面から落ちない
 			CheckGrroundDistance_AdjustPos();
 		}
 
@@ -631,10 +632,6 @@ void CEnemy::AIMoveProcess()
 		float fAddRotY = 0.0f;//Y方向の加算向き
 		float fLengthPlayer = CCalculation::CalculationLength(CGame::GetPlayer()->GetPosInfo().GetPos(), GetPosInfo().GetPos());//プレイヤーとの距離
 		//=========================================================================================================================================
-		if (fLengthPlayer < m_fSensingRange)
-		{
-			ChengeMove(DBG_NEW CEnemyMove_Battle());
-		}
 
 		if (m_VecMoveAi.size() > 0)
 		{
@@ -663,6 +660,11 @@ void CEnemy::AIMoveProcess()
 			{
 				m_nIdxMoveAi = nSize - 1;
 			}
+
+		    if (fLengthPlayer < m_fSensingRange)
+		    {
+		    	ChengeMove(DBG_NEW CEnemyMove_Battle());
+		    }
 		}
 	}
 }
@@ -778,7 +780,7 @@ void CEnemy::EndAttackPattern()
 	m_Pattern.nSubPattern = 0;
 	m_nAttackCoolTime = 0;
 	GetMoveInfo().SetUseGravity(true, GetNormalGravity());
-	GetMoveInfo().SetUseInteria(true, GetNormalInertia());
+	GetMoveInfo().SetUseInteria(false, GetNormalInertia());
 }
 //============================================================================================================================================
 
@@ -1456,6 +1458,8 @@ CObject* CShotWeakEnemy::ManagerSaveObject()
 void CShotWeakEnemy::BattleMoveProcess()
 {
 	CEnemy::ChasePlayer();//プレイヤーを追いかける処理
+	const D3DXVECTOR3& Move = GetMoveInfo().GetMove();//移動量を取得
+	CManager::GetDebugText()->PrintDebugText("射撃に弱い敵の移動量：%f %f %f\n", Move.x, Move.y, Move.z);
 
 	RayCollisionJumpOverOnHit();//レイが当たった時にジャンプさせるための処理
 }
@@ -1466,55 +1470,57 @@ void CShotWeakEnemy::BattleMoveProcess()
 //====================================================================================
 void CShotWeakEnemy::AttackProcess()
 {
-	//float fLength = CCalculation::CalculationLength(GetPosInfo().GetPos(), CGame::GetPlayer()->GetPosInfo().GetPos());
-	//float fLengthY = CGame::GetPlayer()->GetPosInfo().GetPos().y - GetPosInfo().GetPos().y;
-	//const bool& bAction = GetAction();
-	//const int& nPatternTime = GetPatternTime();
-	//const int& nPattern = GetPattern();
-	//if (fLength < s_fATTACKSTART_LENGTH && bAction == false && fLengthY < 400.0f && GetAttackCoolTime() > s_nATTACK_COOLTIME)
-	//{//攻撃が開始されていなければ（クールタイムごとに攻撃を行う。ターン性バトルみたいな動きになる）
-	//	ChengeMove(DBG_NEW CEnemyMove_None());//AI移動と攻撃処理を入れ替える
-	//	SetAction(true);
-	//}
+	float fLength = CCalculation::CalculationLength(GetPosInfo().GetPos(), CGame::GetPlayer()->GetPosInfo().GetPos());
+	float fLengthY = CGame::GetPlayer()->GetPosInfo().GetPos().y - GetPosInfo().GetPos().y;
+	const bool& bAction = GetAction();
+	const int& nPatternTime = GetPatternTime();
+	const int& nPattern = GetPattern();
 
-	//if (bAction == true)
-	//{
-	//	switch (nPattern)
-	//	{
-	//	case 0:
-	//		GetMoveInfo().SetMove(D3DXVECTOR3(0.0f, GetMoveInfo().GetMove().y, 0.0f));
-	//		if (nPatternTime == 15)
-	//		{
-	//			SetPattern(nPattern + 1);
-	//			SetPatternTime(0);
-	//			m_SaveAimPos = CGame::GetPlayer()->GetPosInfo().GetPos();
-	//		}
-	//		break;
-	//	case 1:
-	//		CParticle::SummonChargeParticle(CParticle::TYPE::TYPE00_NORMAL, 1, 45, 5.0f, 20.0f, 20.0f, GetSizeInfo().GetSize().x, 100, 10, false,
-	//			GetPosInfo().GetSenterPos(), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
+	if (fLength < s_fATTACKSTART_LENGTH && bAction == false && fLengthY < 400.0f && GetAttackCoolTime() > s_nATTACK_COOLTIME)
+	{//攻撃が開始されていなければ（クールタイムごとに攻撃を行う。ターン性バトルみたいな動きになる）
+		ChengeMove(DBG_NEW CEnemyMove_None());//AI移動と攻撃処理を入れ替える
+		SetAction(true);
+	}
 
-	//		if (nPatternTime == 45)
-	//		{
-	//			GetMoveInfo().SetUseInteria(true, 0.05f);
+	if (bAction == true)
+	{
+		switch (nPattern)
+		{
+		case 0://止まって突進方向を決める
+			GetMoveInfo().SetMove(D3DXVECTOR3(0.0f, GetMoveInfo().GetMove().y, 0.0f));
+			if (nPatternTime == 15)
+			{
+				SetPattern(nPattern + 1);
+				SetPatternTime(0);
+				m_SaveAimPos = CGame::GetPlayer()->GetPosInfo().GetPos();
+			}
+			break;
+		case 1://チャージする
+			CParticle::SummonChargeParticle(CParticle::TYPE::TYPE00_NORMAL, 1, 45, 5.0f, 20.0f, 20.0f, GetSizeInfo().GetSize().x, 100, 10, false,
+				GetPosInfo().GetSenterPos(), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
 
-	//			GetMoveInfo().SetMove(CCalculation::Calculation3DVec(GetPosInfo().GetPos(),m_SaveAimPos, 30.0f));
-	//			SetPattern(nPattern + 1);
-	//			SetPatternTime(0);
-	//		}
-	//		break;
-	//	case 2:
-	//		if (nPatternTime == 60)
-	//		{
-	//			EndAttackPattern();//攻撃パターンを終了する
-	//			ChengeMove(DBG_NEW CEnemyMove_AI());//AI移動処理に変える
-	//		}
-	//		break;
-	//	default:
-	//		break;
-	//	}
-	//	SetPatternTime(nPatternTime + 1);
-	//}
+			if (nPatternTime == 45)
+			{//狙った方向に突進する
+				GetMoveInfo().SetUseInteria(true, 0.05f);
+
+				GetMoveInfo().SetMove(CCalculation::Calculation3DVec(GetPosInfo().GetPos(),m_SaveAimPos, 30.0f));
+				SetPattern(nPattern + 1);
+				SetPatternTime(0);
+			}
+			break;
+		case 2:
+			if (nPatternTime == 60)
+			{//攻撃パターンを終了する
+				GetMoveInfo().SetUseInteria(false, GetNormalInertia());//慣性をオフに戻す
+			    EndAttackPattern();//攻撃パターンを終了する
+				ChengeMove(DBG_NEW CEnemyMove_AI());//AI移動処理に変える
+			}
+			break;
+		default:
+			break;
+		}
+		SetPatternTime(nPatternTime + 1);
+	}
 }
 //============================================================================================================================================
 
@@ -1578,9 +1584,6 @@ void CShotWeakEnemy::RayCollisionJumpOverOnHit()
 	const D3DXVECTOR3& Size = SizeInfo.GetSize();//サイズ
 	D3DXVECTOR3 RayOrigin = SenterPos + D3DXVECTOR3(sinf(Rot.y) * (Size.x / 2), 0.0f, cosf(Rot.y) * (Size.x / 2));//レイの視点を決める
 
-	//レイの始点にパーティクルを出す
-	CParticle::SummonParticle(CParticle::TYPE::TYPE00_NORMAL, 1, 60, 40.0f, 40.0f, 100, 10, false, RayOrigin, D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f), true);
-
 	D3DXVECTOR3 RayDir = RayOrigin - SenterPos;
 	D3DXVec3Normalize(&RayDir, &RayDir);
 	D3DXVECTOR3 RayCollisionPos = { 0.0f,0.0f,0.0f };//レイが当たったところ格納用
@@ -1615,7 +1618,6 @@ void CShotWeakEnemy::RayCollisionJumpOverOnHit()
 				if (CCollision::RayIntersectsAABBCollisionPos(RayOrigin, RayDir, ComPos + ComVtxMin, ComPos + ComVtxMax, RayCollisionPos))
 				{
 					fLength = CCalculation::CalculationLength(RayOrigin, RayCollisionPos);//レイの支店とレイが当たった位置を出す
-					CParticle::SummonParticle(CParticle::TYPE::TYPE00_NORMAL, 1, 60, 40.0f, 40.0f, 100, 10, true, RayCollisionPos, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), true);
 					if (fLength < 100.0f)
 					{
 						float fLengthY = (ComPos.y + ComVtxMax.y) - Pos.y;//Y軸の距離を取り、目標のジャンプ距離を求める
@@ -2546,7 +2548,7 @@ CIdleEnemy* CIdleEnemy::Create(IDLEENEMYTYPE Type, int nLife, int nPhaseNum, D3D
 	pIdleEnemy->GetSizeInfo().SetScale(Scale);        //拡大率
 	pIdleEnemy->GetSizeInfo().SetFormarScale(Scale);  //元の拡大率を設定
 	pIdleEnemy->SetSensingRange(550.0f);              //感知射程
-	pIdleEnemy->SetNormalSpeed(10.0f);                //通常移動速度
+	pIdleEnemy->SetNormalSpeed(3.0f);                //通常移動速度
 	pIdleEnemy->GetMoveInfo().SetUseInteria(false, GetNormalInertia());//慣性を設定（通常値）
 	pIdleEnemy->SetCntTime(rand() % 100 + 1);         //攻撃タイミングをずらす
 	pIdleEnemy->GetLifeInfo().SetAutoDeath(true);     //体力が０になったときに死亡フラグを発動
@@ -2740,14 +2742,14 @@ void CIdleEnemy::LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveManag
 		pIdleEnemy->GetDrawInfo().SetUseDraw(true);        //描画する
 		pIdleEnemy->GetDrawInfo().SetUseShadow(true);      //影を描画する
 		pIdleEnemy->SetVecMoveAiInfo(VecMoveAi);           //移動AI情報を設定
-		pIdleEnemy->SetNormalSpeed(fNormalSpeed);          //通常速度を設定
+		pIdleEnemy->SetNormalSpeed(3.0f);          //通常速度を設定
 		pIdleEnemy->SetSensingRange(fSensingRange);        //索敵範囲を設定
 		pIdleEnemy->GetMoveInfo().SetUseUpdatePos(true);   //位置の更新を行う
 		listSaveManager.push_back(pIdleEnemy);             //vectorに情報を保存する
 	}
 	else if (CScene::GetMode() == CScene::MODE_GAME)
 	{//ゲームモードなら（フェーズ制でゲームが動くので、フェーズ情報に敵の情報を格納）
-		CGame::GetPhaseManager()->PushPhaseInfo(Pos, Rot, Scale, nLife, static_cast<int>(EnemyType),nIdleEnemyType, nPhaseNum, fNormalSpeed, fSensingRange, 3, VecMoveAiInfo);
+		CGame::GetPhaseManager()->PushPhaseInfo(Pos, Rot, Scale, nLife, static_cast<int>(EnemyType),nIdleEnemyType, nPhaseNum,3.0f, fSensingRange, 3, VecMoveAiInfo);
 	}
 }
 //============================================================================================================================================
