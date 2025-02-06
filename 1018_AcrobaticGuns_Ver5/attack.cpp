@@ -17,6 +17,7 @@
 #include "objectXInfo.h"
 #include "block.h"
 #include "bgModel.h"
+#include "particle.h"
 #include "game.h"
 #include "collision.h"
 //======================================================================================================================
@@ -38,7 +39,7 @@ const string CAttack::ATTACK_FILENAME[static_cast<int>(CAttack::ATTACKTYPE::MAX)
 CAttack::CAttack(int nPower, int nSetHitStopTime, int nPri, bool bUseintPri, CObject::TYPE type, CObject::OBJECTTYPE ObjType) : CObjectX(nPri, bUseintPri, type, ObjType),
 m_Type(ATTACKTYPE::BULLET), m_nPower(nPower), m_HitStop({0,nSetHitStopTime}),m_bCollisionRelease(true),m_CollisionType(CAttack::COLLISIONTYPE::NONE),
 m_TargetType(CAttack::TARGETTYPE::NONE),m_bHitOtherThanLiving(false),m_bAutoCollision(true),m_bCollisionSuccess(false),m_bExtrusionCollision(false),
-m_BoundInfo(), m_bCollision(false)
+m_BoundInfo(),m_CollisionObjType(CObject::TYPE::NONE)
 {
 
 }
@@ -79,20 +80,21 @@ void CAttack::Update()
 {
 	CObjectX::Update();
 
+	m_bCollisionSuccess = false;
+
 	if (m_bAutoCollision == true)
-	{
+	{//生きているものとの当たり判定を行う（プレイヤー、敵、ボスなど）
 		Collision();
 	}
-	m_bCollision = false;
 
 	if (m_bHitOtherThanLiving == true)
-	{
+	{//生きているもの以外（背景やブロック）とも当たり判定を行う
 		HitOtherCollisionProcess();
 	}
 	else
-	{
+	{//生きているものとだけ当たり判定を行う（当たったら消える）
 		if (m_bExtrusionCollision == true)
-		{//押し出し判定を行う
+		{//押し出し判定を行う（建物に当たっても消えるわけじゃない）
 			ExtrusionCollisionProcess();
 
 			if (m_BoundInfo.GetActive() == true)
@@ -100,10 +102,6 @@ void CAttack::Update()
 				m_BoundInfo.BoundProcess(this);
 			}
 		}
-	}
-	if (m_bCollision == true && GetCollisionRelease() == true)
-	{
-		SetDeath();
 	}
 }
 //======================================================================================================================
@@ -131,7 +129,6 @@ void CAttack::SetDeath()
 //==================================================================
 void CAttack::Collision()
 {
-	bool bCollision = false;
 	for (int nCntPri = 0; nCntPri < m_nMAXPRIORITY; nCntPri++)
 	{
 		CObject* pObj = GetTopObject(nCntPri);
@@ -143,25 +140,33 @@ void CAttack::Collision()
 			if (pObj->GetType() == CObject::TYPE::ENEMY && m_TargetType == TARGETTYPE::ENEMY)
 			{
 				CEnemy* pEnemy = static_cast<CEnemy*>(pObj);
-				CollisionProcess(bCollision, bNowCollision, pEnemy);
-				if (pEnemy->GetLifeInfo().GetLife() < 1)
+				CollisionProcess(m_bCollisionSuccess, bNowCollision, pEnemy);
+				if (m_bCollisionSuccess == true)
 				{
-					pEnemy->SetDefeatAttack(m_Type);
+					m_CollisionObjType = CObject::TYPE::ENEMY;//当たったオブジェクトのタイプを格納する
+					if (pEnemy->GetLifeInfo().GetLife() < 1)
+					{
+						pEnemy->SetDefeatAttack(m_Type);
+					}
 				}
 			}
 			else if (pObj->GetType() == CObject::TYPE::PLAYER && m_TargetType == TARGETTYPE::PLAYER)
 			{
 				CObjectX* pObjX = static_cast<CObjectX*>(pObj);
-				CollisionProcess(bCollision, bNowCollision, pObjX);
+				CollisionProcess(m_bCollisionSuccess, bNowCollision, pObjX);
+
+				if (m_bCollisionSuccess == true)
+				{
+					m_CollisionObjType = CObject::TYPE::PLAYER;//当たったオブジェクトのタイプを格納する
+				}
 			}
 
 			pObj = pNext;
 		}
 	}
 
-	if (bCollision == true && GetCollisionRelease() == true)
+	if (m_bCollisionSuccess == true && GetCollisionRelease() == true)
 	{
-		m_bCollisionSuccess = true;
 		SetDeath();
 	}
 
@@ -187,12 +192,18 @@ void CAttack::HitOtherCollisionProcess()
 
 				if (CCollision::CollisionSquare(GetPosInfo().GetPos(), GetSizeInfo().GetVtxMax(), GetSizeInfo().GetVtxMin(), pObjX->GetPosInfo().GetPos(), pObjX->GetSizeInfo().GetVtxMax(), pObjX->GetSizeInfo().GetVtxMin()))
 				{
-					m_bCollision = true;
+					m_bCollisionSuccess = true;
+					m_CollisionObjType = pObj->GetType();//当たったオブジェクトのタイプを格納する
 				}
 			}
 
 			pObj = pNext;
 		}
+	}
+
+	if (m_bCollisionSuccess == true && m_bCollisionRelease == true)
+	{
+		SetDeath();
 	}
 
 }
@@ -336,27 +347,9 @@ void CAttackPlayer::Uninit()
 //==================================================================
 void CAttackPlayer::Update()
 {
-	CAttack::Update();
+	CAttack::Update();//スーパークラスの更新
 
-	if (GetCollisionSuccess() == true && GetAttackType() == ATTACKTYPE::BULLET)
-	{
-		if (CScene::GetMode() == CScene::MODE::MODE_GAME)
-		{
-			CUiState_Gauge* pUiState_Gauge = dynamic_cast<CUiState_Gauge*>(CGame::GetPlayer()->GetDiveGaugeFrame()->GetUiState(CUiState::UISTATE::GAUGE));//UIのゲージ情報を取得
-			if (pUiState_Gauge != nullptr)
-			{
-				CGauge* pDiveGauge = pUiState_Gauge->GetGauge();//ダイブゲージを取得する
-				CUiState_Numeric* pUiState_Numeric = dynamic_cast<CUiState_Numeric*>(CGame::GetPlayer()->GetDivePossibleNum()->GetUiState(CUiState::UISTATE::NUMERIC));//ダイブ可能階数のUIの数値（ダイブ可能回数)を取得
-				if (pUiState_Numeric != nullptr)
-				{
-					if (pUiState_Numeric->GetValue() < CPlayer::GetMaxDiveNum())
-					{//最大ダイブ可能回数に達していない場合はダイブ可能回数を＋１する
-						pDiveGauge->SetParam(pDiveGauge->GetParam() + 1);
-					}
-				}
-			}
-		}
-	}
+	BulletCollisionProcess();//弾が当たった時の処理
 }
 //======================================================================================================================
 
@@ -416,6 +409,45 @@ CAttackPlayer* CAttackPlayer::Create(ATTACKTYPE AttackType, TARGETTYPE TargetTyp
 
 	pAttackPlayer->SetSize();//サイズを設定する
 	return pAttackPlayer;
+}
+//======================================================================================================================
+
+//==================================================================
+//弾が当たった時の処理
+//==================================================================
+void CAttackPlayer::BulletCollisionProcess()
+{
+	if (CScene::GetMode() == CScene::MODE::MODE_GAME)
+	{
+		if (GetCollisionSuccess() == true && GetAttackType() == ATTACKTYPE::BULLET)
+		{
+			CObjectX::PosInfo& PosInfo = GetPosInfo();//位置情報を取得
+			const D3DXVECTOR3& Pos = PosInfo.GetPos();//位置
+			CUiState_Gauge* pUiState_Gauge = dynamic_cast<CUiState_Gauge*>(CGame::GetPlayer()->GetDiveGaugeFrame()->GetUiState(CUiState::UISTATE::GAUGE));//UIのゲージ情報を取得
+			if (pUiState_Gauge != nullptr)
+			{
+				CGauge* pDiveGauge = pUiState_Gauge->GetGauge();//ダイブゲージを取得する
+				CUiState_Numeric* pUiState_Numeric = dynamic_cast<CUiState_Numeric*>(CGame::GetPlayer()->GetDivePossibleNum()->GetUiState(CUiState::UISTATE::NUMERIC));//ダイブ可能階数のUIの数値（ダイブ可能回数)を取得
+				if (pUiState_Numeric != nullptr)
+				{
+					if (pUiState_Numeric->GetValue() < CPlayer::GetMaxDiveNum())
+					{//最大ダイブ可能回数に達していない場合はダイブ可能回数を＋１する
+						pDiveGauge->SetParam(pDiveGauge->GetParam() + 1);
+					}
+				}
+			}
+
+			//パーティクルを衝突位置に召喚する
+			if (GetCollisionObjType() == CObject::TYPE::ENEMY)
+			{//敵に当たっていたら
+				CParticle::SummonParticle(CParticle::TYPE::TYPE00_NORMAL, 20, 30, 30.0f, 30.0f, 100, 10, true, Pos, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
+			}
+			else
+			{//それ以外なら
+				CParticle::SummonParticle(CParticle::TYPE::TYPE00_NORMAL, 20, 30, 30.0f, 30.0f, 100, 10, false, Pos, D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f), true);
+			}
+		}
+	}
 }
 //======================================================================================================================
 

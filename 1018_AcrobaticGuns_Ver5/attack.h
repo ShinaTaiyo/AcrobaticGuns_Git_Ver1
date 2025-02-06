@@ -102,6 +102,8 @@ public:
 	void SetExtrusionCollisioin(bool bUse) { m_bExtrusionCollision = bUse; }
 	const bool& GetExtrusionCollisioin() { return m_bExtrusionCollision; }
 
+	const CObject::TYPE& GetCollisionObjType() { return m_CollisionObjType; }//当たったオブジェクトのタイプを取得する
+
 	//構造体
 	BoundInfo& GetBoundInfo() { return m_BoundInfo; }//バウンド情報を取得
 
@@ -125,11 +127,10 @@ private:
 	bool m_bExtrusionCollision;        //押し出し判定を使うかどうか
 	bool m_bCollisionSuccess; //判定が成功したかどうか
 
-	bool m_bCollision;//当たったかどうか
-
 	HitStop m_HitStop;//ヒットストップ
 	ATTACKTYPE m_Type;//タイプ
 	COLLISIONTYPE m_CollisionType;//判定タイプ
+	CObject::TYPE m_CollisionObjType;//当たったオブジェクトの種類
 	TARGETTYPE m_TargetType;//狙うオブジェクトの種類
 	BoundInfo m_BoundInfo;  //バウンド情報
 	//==========================================================================================
@@ -160,6 +161,7 @@ public:
 	void SetDeath() override;         //死亡フラグを設定
 	static CAttackPlayer* Create(ATTACKTYPE AttackType,TARGETTYPE TargetType,COLLISIONTYPE CollisionType,bool bHitOtherThanLiving,bool bAutoCollision,int nPower,int nSetHitStopTime,int nLife, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale);//生成処理
 private:
+	void BulletCollisionProcess();//弾が当たった時の処理
 };
 //==================================================================================================================================================
 

@@ -661,10 +661,10 @@ void CEnemy::AIMoveProcess()
 				m_nIdxMoveAi = nSize - 1;
 			}
 
-		    if (fLengthPlayer < m_fSensingRange)
-		    {
-		    	ChengeMove(DBG_NEW CEnemyMove_Battle());
-		    }
+		}
+		if (fLengthPlayer < m_fSensingRange)
+		{//プレイヤーが索敵範囲に入ったらバトルモードに変更
+			ChengeMove(DBG_NEW CEnemyMove_Battle());
 		}
 	}
 }
@@ -2087,7 +2087,6 @@ void CDiveWeakEnemy::ManagerChooseControlInfo()
 void CDiveWeakEnemy::BattleMoveProcess()
 {
 	CEnemy::BattleMoveProcess();
-
 }
 //============================================================================================================================================
 

@@ -414,6 +414,7 @@ void CPlayerAttack_Shot::AttackProcess(CPlayer* pPlayer)
 		pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::BULLET,CAttack::TARGETTYPE::ENEMY,CAttack::COLLISIONTYPE::SQUARE,true,true,3,0,45,ShotPos, pPlayer->GetRotInfo().GetRot(), Move, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 		pAttackPlayer->GetMoveInfo().SetUseInteria(false, CObjectX::GetNormalInertia());
 		pAttackPlayer->GetLifeInfo().SetAutoSubLife(true);
+		pAttackPlayer->SetHitOtherThanLibing(true);
 
 		CManager::GetSound()->PlaySoundB(CSound::SOUND_LABEL::SE_SHOT_001);//ŽËŒ‚Œø‰Ê‰¹‚ðo‚·
 		CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::SHOT);		
