@@ -430,124 +430,126 @@ void CCameraState_Normal::Process(CCamera* pCamera)
 	//========================================
     //カメラの向きを変える
     //========================================
-	if (CManager::GetInputKeyboard()->GetPress(DIK_Q))
+	if (CScene::GetMode() != CScene::MODE_TITLE || CScene::GetMode() != CScene::MODE_RESULT)
 	{
-		pCamera->SetRot(pCamera->GetRot() + D3DXVECTOR3(0.0f, -s_fNORMAL_AROUNDROTSPEED, 0.0f));
-	}
-	if (CManager::GetInputKeyboard()->GetPress(DIK_E))
-	{
-		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT))
+		if (CManager::GetInputKeyboard()->GetPress(DIK_Q))
 		{
-			pCamera->SetRot(D3DXVECTOR3(pCamera->GetRot().x,0.0f,pCamera->GetRot().z));
+			pCamera->SetRot(pCamera->GetRot() + D3DXVECTOR3(0.0f, -s_fNORMAL_AROUNDROTSPEED, 0.0f));
 		}
-		else
+		if (CManager::GetInputKeyboard()->GetPress(DIK_E))
+		{
+			if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT))
+			{
+				pCamera->SetRot(D3DXVECTOR3(pCamera->GetRot().x, 0.0f, pCamera->GetRot().z));
+			}
+			else
+			{
+				pCamera->SetRot(pCamera->GetRot() + D3DXVECTOR3(0.0f, s_fNORMAL_AROUNDROTSPEED, 0.0f));
+			}
+		}
+
+		if (CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::LB))
+		{
+			pCamera->SetRot(pCamera->GetRot() + D3DXVECTOR3(0.0f, -s_fNORMAL_AROUNDROTSPEED, 0.0f));
+		}
+		if (CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::RB))
 		{
 			pCamera->SetRot(pCamera->GetRot() + D3DXVECTOR3(0.0f, s_fNORMAL_AROUNDROTSPEED, 0.0f));
 		}
-	}
 
-	if (CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::LB))
-	{
-		pCamera->SetRot(pCamera->GetRot() + D3DXVECTOR3(0.0f, -s_fNORMAL_AROUNDROTSPEED, 0.0f));
-	}
-	if (CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::RB))
-	{
-		pCamera->SetRot(pCamera->GetRot() + D3DXVECTOR3(0.0f, s_fNORMAL_AROUNDROTSPEED, 0.0f));
-	}
-
-	//===========================
-	//Xボタンを押していたら
-	//===========================
-	if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
-	{//シフトキーを押しながら・・・
-		if (CManager::GetInputKeyboard()->GetPress(DIK_X) == true)
+		//===========================
+		//Xボタンを押していたら
+		//===========================
+		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
+		{//シフトキーを押しながら・・・
+			if (CManager::GetInputKeyboard()->GetPress(DIK_X) == true)
+			{
+				pCamera->SetAddPosR(pCamera->GetAddPosR() + D3DXVECTOR3(0.0f, -5.0f, 0.0f));
+			}
+		}
+		else if (CManager::GetInputKeyboard()->GetPress(DIK_X) == true)
 		{
-			pCamera->SetAddPosR(pCamera->GetAddPosR() + D3DXVECTOR3(0.0f, -5.0f, 0.0f));
+			pCamera->SetAddPosR(pCamera->GetAddPosR() + D3DXVECTOR3(0.0f, 5.0f, 0.0f));
 		}
-	}
-	else if (CManager::GetInputKeyboard()->GetPress(DIK_X) == true)
-	{
-		pCamera->SetAddPosR(pCamera->GetAddPosR() + D3DXVECTOR3(0.0f, 5.0f, 0.0f));
-	}
 
-	//=================================================
-	//ゲームパッド、又はマウスでカメラの向きを変える
-	//=================================================
-	if (CManager::GetInputJoypad()->GetRStickPress(16) == true)
-	{
-		if (CScene::GetMode() == CScene::MODE::MODE_GAME)
+		//=================================================
+		//ゲームパッド、又はマウスでカメラの向きを変える
+		//=================================================
+		if (CManager::GetInputJoypad()->GetRStickPress(16) == true)
 		{
-			CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::CAMERACONTROLL);
-		}
+			if (CScene::GetMode() == CScene::MODE::MODE_GAME)
+			{
+				CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::CAMERACONTROLL);
+			}
 
-		CManager::GetCamera()->SetRot(pCamera->GetRot() + D3DXVECTOR3(cosf(CManager::GetInputJoypad()->GetRStickAimRot() + D3DX_PI) * 0.04f,
-			sinf(CManager::GetInputJoypad()->GetRStickAimRot()) * 0.04f, 0.0f));
-	}
-	float fAngle = 0.0f;
-	if (CManager::GetInputMouse()->GetMouseMoveAngle(fAngle))
-	{
-		if (CScene::GetMode() == CScene::MODE::MODE_GAME)
+			CManager::GetCamera()->SetRot(pCamera->GetRot() + D3DXVECTOR3(cosf(CManager::GetInputJoypad()->GetRStickAimRot() + D3DX_PI) * 0.04f,
+				sinf(CManager::GetInputJoypad()->GetRStickAimRot()) * 0.04f, 0.0f));
+		}
+		float fAngle = 0.0f;
+		if (CManager::GetInputMouse()->GetMouseMoveAngle(fAngle))
 		{
-			CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::CAMERACONTROLL);
+			if (CScene::GetMode() == CScene::MODE::MODE_GAME)
+			{
+				CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::CAMERACONTROLL);
+			}
+			if (CScene::GetMode() != CScene::MODE_TITLE)
+			{//タイトルではEnterしか押さないので、タイトルではマウスでカメラを動かさない
+				CManager::GetCamera()->SetRot(pCamera->GetRot() + D3DXVECTOR3(cosf(fAngle) * 0.05f,
+				   sinf(fAngle) * 0.05f, 0.0f));
+			}
 		}
-		if (CScene::GetMode() != CScene::MODE_TITLE)
-		{//タイトルではEnterしか押さないので、タイトルではマウスでカメラを動かさない
-			CManager::GetCamera()->SetRot(pCamera->GetRot() + D3DXVECTOR3(cosf(fAngle) * 0.06f,
-				sinf(fAngle) * 0.06f, 0.0f));
-		}
-	}
 
-	//===========================
-	//Cボタンを押していたら
-	//===========================
-	if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
-	{//シフトキーを押しながら・・・
-		if (CManager::GetInputKeyboard()->GetPress(DIK_C) == true)
+		//===========================
+		//Cボタンを押していたら
+		//===========================
+		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
+		{//シフトキーを押しながら・・・
+			if (CManager::GetInputKeyboard()->GetPress(DIK_C) == true)
+			{
+				pCamera->SetAddPosV(pCamera->GetAddPosV() + D3DXVECTOR3(0.0f, -5.0f, 0.0f));
+			}
+		}
+		else if (CManager::GetInputKeyboard()->GetPress(DIK_C) == true)
 		{
-			pCamera->SetAddPosV(pCamera->GetAddPosV() + D3DXVECTOR3(0.0f, -5.0f, 0.0f));
+			pCamera->SetAddPosV(pCamera->GetAddPosV() + D3DXVECTOR3(0.0f, 5.0f, 0.0f));
 		}
-	}
-	else if (CManager::GetInputKeyboard()->GetPress(DIK_C) == true)
-	{
-		pCamera->SetAddPosV(pCamera->GetAddPosV() + D3DXVECTOR3(0.0f, 5.0f, 0.0f));
-	}
 
-	//===========================
-	//Vボタンを押していたら
-	//===========================
-	if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
-	{//シフトキーを押しながら・・・
-		if (CManager::GetInputKeyboard()->GetPress(DIK_V) == true)
+		//===========================
+		//Vボタンを押していたら
+		//===========================
+		if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
+		{//シフトキーを押しながら・・・
+			if (CManager::GetInputKeyboard()->GetPress(DIK_V) == true)
+			{
+				pCamera->SetLength(pCamera->GetLength() - 5.0f);
+			}
+		}
+		else if (CManager::GetInputKeyboard()->GetPress(DIK_V) == true)
 		{
-			pCamera->SetLength(pCamera->GetLength() - 5.0f);
+			pCamera->SetLength(pCamera->GetLength() + 5.0f);
 		}
-	}
-	else if (CManager::GetInputKeyboard()->GetPress(DIK_V) == true)
-	{
-		pCamera->SetLength(pCamera->GetLength() + 5.0f);
-	}
 
 
-	//========================================
-	//カメラを揺らす
-	//========================================
-	if (CManager::GetInputKeyboard()->GetTrigger(DIK_F1) == true)
-	{
-		pCamera->SetShake(50, 0.2f);
-	}
-
-	//========================================
-	//後ろを向く
-	//========================================
-	if (CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::Y))
-	{
-		if (CScene::GetMode() == CScene::MODE::MODE_GAME)
+		//========================================
+		//カメラを揺らす
+		//========================================
+		if (CManager::GetInputKeyboard()->GetTrigger(DIK_F1) == true)
 		{
-			CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::TURNAROUND);
+			pCamera->SetShake(50, 0.2f);
 		}
-		pCamera->ChengeState(DBG_NEW CCameraState_TurnAround(pCamera->GetRot() + D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), 0.15f));
-	}
 
+		//========================================
+		//後ろを向く
+		//========================================
+		if (CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::Y))
+		{
+			if (CScene::GetMode() == CScene::MODE::MODE_GAME)
+			{
+				CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::TURNAROUND);
+			}
+			pCamera->ChengeState(DBG_NEW CCameraState_TurnAround(pCamera->GetRot() + D3DXVECTOR3(0.0f, D3DX_PI, 0.0f), 0.15f));
+		}
+	}
 }
 //===================================================================================================================================================
 

@@ -62,6 +62,7 @@ HRESULT CTitle::Init()
 	CScene::Init();//シーン初期化処理
 
 	//タイトル背景を生成
+	CManager::GetCamera()->SetRot(D3DXVECTOR3(-D3DX_PI * 0.5f, 0.0f, 0.0f));
 
 	CUi* pUi = CUi::Create(CUi::UITYPE::PRESSENTER_000, CObject2D::POLYGONTYPE::SENTERROLLING, 200.0f, 200.0f, 100, false, D3DXVECTOR3(SCREEN_WIDTH - 200.0f,
 		SCREEN_HEIGHT - 100.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));

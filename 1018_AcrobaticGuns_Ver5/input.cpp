@@ -659,7 +659,6 @@ D3DXVECTOR2 CInputMouse::GetMousePos()
 			{//カーソルを中心に移動
 				CursorPos.x = SCREEN_WIDTH / 2;
 				CursorPos.y = SCREEN_HEIGHT / 2;
-				ScreenToClient(hwnd, &MousePoint);//現在のカーソルの位置をウインドウの位置に変換
 				SetCursorPos(static_cast<int>(CursorPos.x), static_cast<int>(CursorPos.y));
 				m_bCursorSenterWarp = true;
 			}
@@ -667,7 +666,6 @@ D3DXVECTOR2 CInputMouse::GetMousePos()
 			{//カーソルを中心に移動
 				CursorPos.x = SCREEN_WIDTH / 2;
 				CursorPos.y = SCREEN_HEIGHT / 2;
-				ScreenToClient(hwnd, &MousePoint);//現在のカーソルの位置をウインドウの位置に変換
 				SetCursorPos(static_cast<int>(CursorPos.x), static_cast<int>(CursorPos.y));
 				m_bCursorSenterWarp = true;
 			}
@@ -699,7 +697,7 @@ bool CInputMouse::GetMouseMoveAngle(float& fAngle)
 	}
 	else
 	{//このフレームではカーソルの位置が瞬時に中心に移動しているので、ベクトルの方向を一致させるために逆にする
-		fAngle = -atan2f(CursorPos.x - m_CursorPosOld.x, CursorPos.y - m_CursorPosOld.y);
+		fAngle = atan2f(m_CursorPosOld.x - CursorPos.x,m_CursorPosOld.y - CursorPos.y);
 	}
 	//1f前の位置を更新
 	m_CursorPosOld = CursorPos;

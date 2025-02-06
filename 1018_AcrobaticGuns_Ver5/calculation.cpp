@@ -150,10 +150,13 @@ bool CCalculation::CaluclationMove(bool bUseStick, D3DXVECTOR3& Move, float fSpe
 	float fCameraRot = CManager::GetCamera()->GetRot().y;
 	float fMoveX = 0.0f;                                            //X方向の移動量
 	float fMoveZ = 0.0f;                                            //Z方向の移動量
-	bool bMove = true;                                             //移動しているかどうか 
+	bool bMove = false;                                             //移動しているかどうか 
+	bool bUseController = true;                                    //コントローラーを使用するかどうか
+	bMove = CManager::GetInputJoypad()->GetLStickPress(8, 0.0f);//コントローラーの入力
 
-	if (bUseStick == false)
-	{
+	if (bMove == false)
+	{//この時点でコントローラーの入力がされていない場合、キー入力の受付を開始
+		bUseController = false;//コントローラーは使用しない
 		if (CManager::GetInputKeyboard()->GetPress(DIK_W) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::UP) == true)
 		{
 			fMoveZ = 1.0f;
@@ -180,14 +183,10 @@ bool CCalculation::CaluclationMove(bool bUseStick, D3DXVECTOR3& Move, float fSpe
 			bMove = false;//待機状態
 		}
 	}
-	else
-	{
-		bMove = CManager::GetInputJoypad()->GetLStickPress(8,0.0f);
-	}
 	if (bMove == true)
 	{//移動状態なら
 		//カメラを基準に向きを決める
-		if (bUseStick == true)
+		if (bUseController == true)
 		{
 			fRot = CManager::GetInputJoypad()->GetLStickAimRot();
 			CManager::GetDebugText()->PrintDebugText("スティックの向き：%f\n",fRot);
@@ -218,44 +217,6 @@ bool CCalculation::CaluclationMove(bool bUseStick, D3DXVECTOR3& Move, float fSpe
 			break;
 		}
 	}
-	//float fCameraRot = CManager::GetCamera()->GetRot().y;
-	//float fMoveX = 0.0f;                                            //X方向の移動量
-	//float fMoveZ = 0.0f;                                            //Z方向の移動量
-	//bool bMove = true;                                             //移動しているかどうか 
-
-	//if (CManager::GetInputKeyboard()->GetPress(DIK_W) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::UP) == true)
-	//{
-	//	fMoveZ = 1.0f;
-	//}
-	//else if (CManager::GetInputKeyboard()->GetPress(DIK_S) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::DOWN) == true)
-	//{
-	//	fMoveZ = -1.0f;
-	//}
-	//if (CManager::GetInputKeyboard()->GetPress(DIK_D) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::RIGHT) == true)
-	//{
-	//	fMoveX = 1.0f;
-	//}
-	//else if (CManager::GetInputKeyboard()->GetPress(DIK_A) == true || CManager::GetInputJoypad()->GetPress(CInputJoypad::JOYKEY::LEFT) == true)
-	//{
-	//	fMoveX = -1.0f;
-	//}
-
-	//if (fMoveX != 0.0f || fMoveZ != 0.0f)
-	//{
-	//	bMove = true;//移動状態
-	//}
-	//else
-	//{
-	//	bMove = false;//待機状態
-	//}
-	//if (bMove == true)
-	//{//移動状態なら
-	//	//カメラを基準に向きを決める
-	//	fRot = atan2f(fMoveZ, fMoveX) + fCameraRot;
-	//	Move.x = cosf(fRot) * fSpeed;
-	//	Move.z = sinf(fRot) * fSpeed;
-	//}
-
 	return bMove;
 }
 //===========================================================================================================

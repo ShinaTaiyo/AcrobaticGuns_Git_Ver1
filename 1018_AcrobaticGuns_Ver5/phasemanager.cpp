@@ -202,13 +202,13 @@ void CPhaseManager::AdvancePhase()
 	{
 		if (CEnemy::GetNumEnemy() <= 0 && s_nNowPhase == s_MaxPhase + 1 && s_bStartFade == false)
 		{
-			s_PhaseList.clear();//ステージをクリアしたのでリセット
-			s_nNowPhase = 0;    //ステージをクリアしたのでリセット
+			s_PhaseList.clear();//次のステージに行くのでフェーズ情報を初期化
+			s_nNowPhase = 0;    //次のステージに行くのでフェーズを最初から
 
 			s_nNowStage++;      //ステージ番号を次に進める
 
 			if (s_nNowStage == static_cast<int>(CStageManager::WORLDTYPE::MAX))
-			{
+			{//配列的にインクリメント後にステージ数になったら終わりなので、リザルトに移行
 				CManager::GetSceneFade()->SetSceneFade(CFade::FADEMODE_IN, CScene::MODE_RESULT);
 			}
 			else
