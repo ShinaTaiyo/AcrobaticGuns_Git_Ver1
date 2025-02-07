@@ -152,17 +152,10 @@ void CGame::Uninit()
 //=============================================================
 void CGame::Update()
 {
-#ifdef _DEBUG
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_RETURN) == true || CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::START) == true)
 	{
 		CManager::GetSceneFade()->SetSceneFade(CFade::FADEMODE_IN, CScene::MODE_RESULT);
 	}
 	CManager::GetDebugText()->PrintDebugText("Œ»Ý‚Ì“G‚Ì”G%d\n", CEnemy::GetNumEnemy());
-#else
-	if (CManager::GetInputKeyboard()->GetTrigger(DIK_RETURN) == true || CManager::GetInputJoypad()->GetTrigger(CInputJoypad::JOYKEY::START) == true)
-	{
-		CManager::GetSceneFade()->SetSceneFade(CFade::FADEMODE_IN, CScene::MODE_RESULT);
-	}
-#endif // !_DEBUG
 }
 //=========================================================================================================================
