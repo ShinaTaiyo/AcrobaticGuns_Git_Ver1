@@ -276,9 +276,9 @@ void CPlayerMove_Dive::MoveProcess(CPlayer* pPlayer)
 //******************************************************************************************************************************************************
 
 //=====================================================================================================
-//コンストラクタ
+//コンストラクタ（ワイヤー発射開始フラグは、デフォルトで発射可能なのでtrueで初期化)
 //=====================================================================================================
-CPlayerMove_Stuck::CPlayerMove_Stuck(CPlayer* pPlayer) : m_NowPos(pPlayer->GetPosInfo().GetPos())
+CPlayerMove_Stuck::CPlayerMove_Stuck(CPlayer* pPlayer) : m_NowPos(pPlayer->GetPosInfo().GetPos()),m_bStartWireShot(true)
 {
 	CCamera* pCamera = CManager::GetCamera();
 	CWireHead* pWireHead = pPlayer->GetWire()->GetWireHead();
@@ -330,12 +330,23 @@ void CPlayerMove_Stuck::MoveProcess(CPlayer* pPlayer)
 	D3DXVECTOR3 WireHeadRot = pWireHead->GetRotInfo().GetRot(); // ワイヤーヘッドの向き（オイラー角）
 	CWire* pWire = pPlayer->GetWire();
 	CLockon* pLockon = pPlayer->GetLockOn();//ロックオンへのポインタ
-
+	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();//ジョイパッド入力情報を取得
+	CInputMouse* pInputMouse = CManager::GetInputMouse();//マウス入力情報を取得
 	pWireHead->GetPosInfo().SetPos(pPlayer->GetPosInfo().GetPos());//ダイブ準備中なのでワイヤーヘッドをプレイヤーの位置に固定
-	//pPlayer->SetRot(D3DXVECTOR3(pCamera->GetRot().x + D3DX_PI,-pCamera->GetRot().y,0.0f));//向きをカメラに合わせる
-	if ((CManager::GetInputJoypad()->GetRT_Trigger() || CManager::GetInputMouse()->GetMouseLeftClickTrigger()) && pLockon->GetSuccessRayCollision() == true)
+
+	if (pInputJoypad->GetTrigger(CInputJoypad::JOYKEY::B))
+	{//引っ付きながら射撃する
+		m_bStartWireShot = m_bStartWireShot ? false : true;//フラグのONOFFを変える
+		if (m_bStartWireShot == false)
+		{
+			pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_StackShot(pPlayer));
+		}
+	}
+
+	if ((pInputJoypad->GetRT_Trigger() || pInputMouse->GetMouseLeftClickTrigger()) && pLockon->GetSuccessRayCollision() && m_bStartWireShot)
 	{//ワイヤー発射移動モードにチェンジ
-		CPlayerWireShot::StartWireShotProcess(pPlayer);
+		pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_Dont());//強制的に攻撃不可にする（ダイブ発動までの準備をするため）
+		CPlayerWireShot::StartWireShotProcess(pPlayer);//ワイヤーの発射を開始する
 	}
 
 }
@@ -785,6 +796,70 @@ CPlayerWireShot_Dont::~CPlayerWireShot_Dont()
 //=====================================================================================================
 void CPlayerWireShot_Dont::WireShotProcess(CPlayer* pPlayer)
 {
+
+}
+//======================================================================================================================================================
+
+//******************************************************************************************************************************************************
+//攻撃状態：引っ付き射撃
+//******************************************************************************************************************************************************
+
+//=====================================================================================================
+//コンストラクタ
+//=====================================================================================================
+CPlayerAttack_StackShot::CPlayerAttack_StackShot(CPlayer* pPlayer) : m_bDelayModeChengeFrame(true)
+{
+	CLockon* pLockon = pPlayer->GetLockOn();//ロックオンターゲットを取得
+	pLockon->ChengeTexture(CLockon::TYPE::STUCKSHOT);//引っ付き射撃用のターゲットテクスチャに変える
+}
+//======================================================================================================================================================
+
+//=====================================================================================================
+//デストラクタ
+//=====================================================================================================
+CPlayerAttack_StackShot::~CPlayerAttack_StackShot()
+{
+
+}
+//======================================================================================================================================================
+
+//=====================================================================================================
+//攻撃処理
+//=====================================================================================================
+void CPlayerAttack_StackShot::AttackProcess(CPlayer* pPlayer)
+{
+	CLockon* pLockon = pPlayer->GetLockOn();
+	D3DXVECTOR3 ShotPos = pPlayer->GetPosInfo().GetPos() + D3DXVECTOR3(0.0f, pPlayer->GetSizeInfo().GetVtxMax().y, 0.0f);
+	D3DXVECTOR3 Move = CCalculation::Calculation3DVec(ShotPos, pLockon->GetNearRayColObjPos(),s_fNORMAL_SHOTSPEED);
+	CAttackPlayer* pAttackPlayer = nullptr;//プレイヤー攻撃へのポインタ
+	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();//ジョイパッド入力情報へのポインタ
+	CInputMouse* pInputMouse = CManager::GetInputMouse();   //マウス入力情報へのポインタ
+	if (pInputJoypad->GetRT_Repeat(s_nSHOT_FREQUENCY) == true ||
+		pInputMouse->GetMouseLeftClickRepeat(s_nSHOT_FREQUENCY) == true)
+	{
+		pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::BULLET, CAttack::TARGETTYPE::ENEMY, CAttack::COLLISIONTYPE::SQUARE, true, true, 3, 0, 45, ShotPos, pPlayer->GetRotInfo().GetRot(), Move, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+		pAttackPlayer->GetMoveInfo().SetUseInteria(false, CObjectX::GetNormalInertia());
+		pAttackPlayer->GetLifeInfo().SetAutoSubLife(true);
+		pAttackPlayer->SetHitOtherThanLibing(true);
+
+		CManager::GetSound()->PlaySoundB(CSound::SOUND_LABEL::SE_SHOT_001);//射撃効果音を出す
+		CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::SHOT);
+	}
+	if (pInputJoypad->GetRT_Press())
+	{
+		pPlayer->SetNextMotion(2);//攻撃ボタンを押している限り、次のモーションは攻撃モーションになる
+	}
+
+	if (pInputJoypad->GetTrigger(CInputJoypad::JOYKEY::B) && m_bDelayModeChengeFrame == false)
+	{//スタック移動モードでこの攻撃モードにJOYKEY_Bボタンで変えているので、この処理に最初に移行したときにJOYKEY_Bボタンが発動してしまうので、1フレーム遅らせる
+		pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_Dont());//攻撃しないモードに再び変える
+		pLockon->ChengeTexture(CLockon::TYPE::DIVE);//ダイブ用のターゲットテクスチャに戻す
+	}
+
+	if (m_bDelayModeChengeFrame == true)
+	{//1フレーム上のモードチェンジの入力を遅らせたので役目は終了。falseに戻す
+		m_bDelayModeChengeFrame = false;
+	}
 
 }
 //======================================================================================================================================================

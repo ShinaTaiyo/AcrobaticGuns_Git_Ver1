@@ -87,6 +87,7 @@ public:
 	void MoveProcess(CPlayer* pPlayer) override; //移動処理
 private:
 	D3DXVECTOR3 m_NowPos;//カメラの位置のモーションに使う
+	bool m_bStartWireShot;//ワイヤーの発射を開始するかどうか
 };
 
 //移動できないクラス
@@ -126,12 +127,25 @@ private:
 	static const float s_fNORMAL_SHOTSPEED;//通常の射撃速度
 };
 
+//引っ付き射撃クラス
+class CPlayerAttack_StackShot : public CPlayerAttack
+{
+public:
+	CPlayerAttack_StackShot(CPlayer * pPlayer);//コンストラクタ
+	~CPlayerAttack_StackShot() override;//デストラクタ
+	void AttackProcess(CPlayer* pPlayer) override;//攻撃処理
+private:
+	static constexpr float s_fNORMAL_SHOTSPEED = 70.0f;//引っ付きながらなので射撃性能UP
+	static constexpr int s_nSHOT_FREQUENCY = 3;//攻撃頻度
+	bool m_bDelayModeChengeFrame;              //攻撃モードのチェンジを遅らせるフラグ
+};
+
 //ダイブクラス
 class CPlayerAttack_Dive : public CPlayerAttack
 {
 public:
 	CPlayerAttack_Dive();//コンストラクタ
-	~CPlayerAttack_Dive();//デストラクタ
+	~CPlayerAttack_Dive() override;//デストラクタ
 	void AttackProcess(CPlayer* pPlayer) override;//攻撃処理
 };
 
