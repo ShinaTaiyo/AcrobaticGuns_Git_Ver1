@@ -334,11 +334,11 @@ void CPlayerMove_Stuck::MoveProcess(CPlayer* pPlayer)
 	CInputMouse* pInputMouse = CManager::GetInputMouse();//マウス入力情報を取得
 	pWireHead->GetPosInfo().SetPos(pPlayer->GetPosInfo().GetPos());//ダイブ準備中なのでワイヤーヘッドをプレイヤーの位置に固定
 
-	if (pInputJoypad->GetTrigger(CInputJoypad::JOYKEY::B))
+	if (pInputJoypad->GetTrigger(CInputJoypad::JOYKEY::B) || pInputMouse->GetMouseMiddleClickTrigger())
 	{//引っ付きながら射撃する
 		m_bStartWireShot = m_bStartWireShot ? false : true;//フラグのONOFFを変える
 		if (m_bStartWireShot == false)
-		{
+		{//m_bStartWireShotをtrueにしたときにステートが変わらないようにするため、falseの時だけステートを変える
 			pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_StackShot(pPlayer));
 		}
 	}
@@ -496,7 +496,6 @@ CPlayerAttack_Dive::~CPlayerAttack_Dive()
 //=====================================================================================================
 void CPlayerAttack_Dive::AttackProcess(CPlayer* pPlayer)
 {
-
 	CUiState_Gauge* pUiState_Gauge = dynamic_cast<CUiState_Gauge*>(CGame::GetPlayer()->GetDiveGaugeFrame()->GetUiState(CUiState::UISTATE::GAUGE));//UIのゲージ情報を取得
 	if (pUiState_Gauge != nullptr)
 	{
@@ -845,12 +844,12 @@ void CPlayerAttack_StackShot::AttackProcess(CPlayer* pPlayer)
 		CManager::GetSound()->PlaySoundB(CSound::SOUND_LABEL::SE_SHOT_001);//射撃効果音を出す
 		CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::SHOT);
 	}
-	if (pInputJoypad->GetRT_Press())
+	if (pInputJoypad->GetRT_Press() || pInputMouse->GetMouseLeftClickPress())
 	{
 		pPlayer->SetNextMotion(2);//攻撃ボタンを押している限り、次のモーションは攻撃モーションになる
 	}
 
-	if (pInputJoypad->GetTrigger(CInputJoypad::JOYKEY::B) && m_bDelayModeChengeFrame == false)
+	if ((pInputJoypad->GetTrigger(CInputJoypad::JOYKEY::B) || pInputMouse->GetMouseMiddleClickTrigger()) && m_bDelayModeChengeFrame == false)
 	{//スタック移動モードでこの攻撃モードにJOYKEY_Bボタンで変えているので、この処理に最初に移行したときにJOYKEY_Bボタンが発動してしまうので、1フレーム遅らせる
 		pPlayer->ChengeAttackMode(DBG_NEW CPlayerAttack_Dont());//攻撃しないモードに再び変える
 		pLockon->ChengeTexture(CLockon::TYPE::DIVE);//ダイブ用のターゲットテクスチャに戻す
