@@ -115,6 +115,10 @@ void CPlayer::Uninit()
 //====================================================
 void CPlayer::Update()
 {
+    CObjectX::PosInfo& PosInfo = GetPosInfo();//位置情報
+    CObjectX::SizeInfo& SizeInfo = GetSizeInfo();//サイズ情報
+    const D3DXVECTOR3& Pos = PosInfo.GetPos();//位置
+    const D3DXVECTOR3& VtxMax = SizeInfo.GetVtxMax();//最大頂点
     if (CScene::GetMode() == CScene::MODE_GAME)
     {
         if (GetLanding())
@@ -126,7 +130,6 @@ void CPlayer::Update()
         {
             m_pMove->MoveProcess(this);//現在のアクションモードの移動処理を実行
         }
-
         if (m_pAbnormalState != nullptr)
         {
             m_pAbnormalState->Process(this);//状態異常の処理を実行
@@ -439,7 +442,7 @@ void CPlayer::ChengeWireShotMode(CPlayerWireShot* pPlayerWireShot)
 //==========================================================================================================
 
 //========================================================
-//アクションモードの初期状態に設定する
+//それぞれのアクションモードの初期状態に設定する
 //========================================================
 void CPlayer::SetInitialActionMode(ACTIONMODE ActionMode)
 {

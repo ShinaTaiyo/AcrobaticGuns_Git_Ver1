@@ -14,7 +14,6 @@
 #include "main.h"
 #include "character.h"
 #include "lockon.h"
-#include "meshorbit.h"
 #include "ui.h"
 #include "player_actionmode.h"
 #include "wire.h"
