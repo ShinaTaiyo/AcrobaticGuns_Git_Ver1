@@ -453,8 +453,8 @@ bool CCalculation::CalcMatchRay(D3DXVECTOR3 AimPos, float fSx, float fSy, int nS
 	D3DXVECTOR3 ray1;
 
 	D3DXVECTOR3 Pos1 = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-	CalcScreenToWorld(&nearpos1,fSx,fSy, 0.0f, nScreen_w, nScreen_h, View, Prj);//（椎名）多分カメラの位置
-	CalcScreenToWorld(&farpos1, fSx,fSy, 1.0f, nScreen_w, nScreen_h, View, Prj); //（椎名）多分描画範囲の一番奥の位置
+	CalcScreenToWorld(&nearpos1,fSx,fSy, 0.0f, nScreen_w, nScreen_h, View, Prj);//（椎名）カメラの位置
+	CalcScreenToWorld(&farpos1, fSx,fSy, 1.0f, nScreen_w, nScreen_h, View, Prj); //（椎名）描画範囲の一番奥の位置
 	ray1 = farpos1 - nearpos1;
 
 	D3DXVec3Normalize(&ray1, &ray1);
