@@ -19,6 +19,7 @@
 #include "main.h"
 #include "phasemanager.h"
 #include "eventmanager.h"
+#include "score.h"
 #include "tutorial.h"
 //===============================================================================
 
@@ -39,12 +40,14 @@ public:
 	static CPhaseManager* GetPhaseManager() { return m_pPhaseManager; }    //フェーズマネージャーを取得する
 	static CStageManager* GetStageManager() { return m_pStageManager; }    //ステージマネージャーを取得する
 	static CTutorial* GetTutorial() { return m_pTutorial; }                //チュートリアル
+	static CScore* GetScore() { return s_pSCORE; }                         //スコアへのポインタを取得する
 private:
 	static constexpr bool s_bUSETUTORIAL = true;                           //チュートリアルを使用するかどうか
 	static CPlayer* m_pPlayer;                                             //プレイヤー
 	static CStageManager* m_pStageManager;                                 //ステージマネージャー
 	static CPhaseManager* m_pPhaseManager;                                 //フェーズマネージャー
 	static CTutorial* m_pTutorial;                                         //チュートリアル
+	static CScore * s_pSCORE;                                              //スコア
 	static int s_nPhaseNum;                                                //フェーズ番号
 	static bool s_bGameClear;                                              //ゲームをクリアしたかどうか
 

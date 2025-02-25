@@ -55,6 +55,7 @@ public:
 		PHASEMANAGER,    //フェーズマネージャー
 		EVENTMANAGER,    //イベントマネージャー
 		TUTORIAL,        //チュートリアル
+		SCORE,           //スコア
 		FADE,            //フェード
 		MAX
 	};
