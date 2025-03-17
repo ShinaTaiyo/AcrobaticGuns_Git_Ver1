@@ -198,6 +198,7 @@
     <ClCompile Include="tutorial.cpp" />
     <ClCompile Include="ui.cpp" />
     <ClCompile Include="ui3d.cpp" />
+    <ClCompile Include="ui_composite.cpp" />
     <ClCompile Include="wire.cpp" />
     <ClCompile Include="wire_head.cpp" />
   </ItemGroup>
@@ -255,6 +256,7 @@
     <ClInclude Include="tutorial.h" />
     <ClInclude Include="ui.h" />
     <ClInclude Include="ui3d.h" />
+    <ClInclude Include="ui_composite.h" />
     <ClInclude Include="wire.h" />
     <ClInclude Include="wire_head.h" />
   </ItemGroup>
