@@ -570,7 +570,7 @@ void CPlayer::SetDamage(int nDamage, int nHitStopTime)
     {//ヒットストップ状態じゃなければ処理を実行する
         CCharacter::SetDamage(nDamage, nHitStopTime);                    //キャラクターのダメージ処理
         CSound* pSound = CManager::GetSound();                           //サウンド情報
-                                                                         
+        CCombo* pCombo = CGame::GetCombo();                              //コンボへのポインタ
         m_pHpGauge->SetParam(GetLifeInfo().GetLife());                   //体力ゲージのパラメータを設定（キャラクターのダメージ処理で体力が変動)
         m_pHpGauge->SetShake(5.0f * nDamage, 30);                        //体力ゲージを振動させる
 
@@ -585,6 +585,7 @@ void CPlayer::SetDamage(int nDamage, int nHitStopTime)
         pGauge->SetScale(D3DXVECTOR2(1.0f, 1.0f));                       //拡大率を設定する
 
         pSound->PlaySoundB(CSound::SOUND_LABEL::SE_DAMAGE_000);          //ダメージサウンドを呼ぶ
+        pCombo->ResetCombo();                                            //コンボ数をリセットする
 
         m_bDamage = true;                                                //ダメージを受けた状態を明示的に示す
         SetNextMotion(2);                                                //ダメージモーションにする

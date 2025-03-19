@@ -51,11 +51,20 @@ public:
 	void Draw() override;                                          //描画処理
 	void SetDeath() override;                                      //死亡フラグ設定処理
 	static CCombo* Create(D3DXVECTOR3 Pos);                        //生成処理
+
+	//個別
+	void AddCombo(int nCombo);                                     //コンボ加算
+	void ResetCombo();                                             //コンボリセット
+	int GetComboValue() { return m_nCombo; }                       //コンボ数取得
 private:
 	//=================
 	//静的メンバ
 	//=================
-
+	static constexpr float s_fCOMBODISP_WIDTH = 180.0f;      //コンボ表示の横幅
+	static constexpr float s_fCOMBODISP_HEIGHT = 180.0f;     //コンボ表示の高さ
+	static constexpr float s_fCOMBODISP_VALUEWIDTH = 45.0f;  //コンボ表示の数値の横幅
+	static constexpr float s_fCOMBODISP_VALUEHEIGHT = 45.0f; //コンボ表示の数値の高さ
+	static const D3DXVECTOR3 s_COMBODISP_POS;                //コンボ表示の位置
 	//===========================================================
 
 	//=================

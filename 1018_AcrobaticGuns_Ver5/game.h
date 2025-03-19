@@ -42,6 +42,7 @@ public:
 	static CStageManager* GetStageManager() { return m_pStageManager; }    //ステージマネージャーを取得する
 	static CTutorial* GetTutorial() { return m_pTutorial; }                //チュートリアル
 	static CScore* GetScore() { return s_pSCORE; }                         //スコアへのポインタを取得する
+	static CCombo* GetCombo() { return s_pCOMBO; }                         //コンボへのポインタを取得する
 private:
 	static constexpr bool s_bUSETUTORIAL = true;                           //チュートリアルを使用するかどうか
 	static CPlayer* m_pPlayer;                                             //プレイヤー

@@ -315,7 +315,6 @@ void CPlayerAttack_Shot::AttackProcess(CPlayer* pPlayer)
 	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();      //ジョイパッド入力情報へのポインタ
 	CInputMouse* pInputMouse = CManager::GetInputMouse();         //マウス入力情報へのポインタ
 	CSound* pSound = CManager::GetSound();                        //サウンド情報へのポインタ
-	CScore* pScore = CGame::GetScore();                           //スコア情報へのポインタ
 	if (pInputKeyboard->GetTrigger(DIK_J) == true || pInputJoypad->GetRT_Repeat(4) == true ||
 		pInputMouse->GetMouseLeftClickRepeat(4) == true)
 	{//Jキー又はジョイパッド右トリガーボタン又はマウスの左クリックボタンを押していたら
@@ -327,8 +326,6 @@ void CPlayerAttack_Shot::AttackProcess(CPlayer* pPlayer)
 
 		pSound->PlaySoundB(CSound::SOUND_LABEL::SE_SHOT_001);                           //射撃効果音を出す
 		CGame::GetTutorial()->SetSuccessCheck(CTutorial::CHECK::SHOT);		            //射撃チュートリアル完了
-
-		pScore->AddScore(10);                                                           //射撃するたびにスコアを１０増やす
 	}
 
 	if (pInputJoypad->GetRT_Press())

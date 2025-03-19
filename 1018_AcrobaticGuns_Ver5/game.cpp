@@ -90,8 +90,8 @@ HRESULT CGame::Init()
 	s_pSCORE = CScore::Create(D3DXVECTOR3(SCREEN_WIDTH - CScore::GetNumberWidth(),CScore::GetNumberHeight(), 0.0f)); //スコアの生成
 	s_pSCORE->SetUseDeath(false);                                                      //死亡フラグを使用しない
 
-	//s_pCOMBO = CCombo::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));//コンボを生成
-	//s_pCOMBO->SetUseDeath(false);//死亡フラグを使用しない
+	s_pCOMBO = CCombo::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));//コンボを生成
+	s_pCOMBO->SetUseDeath(false);//死亡フラグを使用しない
 
 	if (s_bUSETUTORIAL == false)
 	{//チュートリアルを使用しないなら
@@ -172,16 +172,16 @@ void CGame::Uninit()
 	}
 	//=====================================================================
 	
-	////============================================
-	////コンボの破棄
-	////============================================
-	//if (s_pCOMBO != nullptr)
-	//{
-	//	s_pCOMBO->SetUseDeath(true); //死亡フラグを使用する
-	//	s_pCOMBO->SetDeath();        //死亡フラグを設定する
-	//	s_pCOMBO = nullptr;          //スコアへのポインタを初期化
-	//}
-	////=====================================================================
+	//============================================
+	//コンボの破棄
+	//============================================
+	if (s_pCOMBO != nullptr)
+	{
+		s_pCOMBO->SetUseDeath(true); //死亡フラグを使用する
+		s_pCOMBO->SetDeath();        //死亡フラグを設定する
+		s_pCOMBO = nullptr;          //スコアへのポインタを初期化
+	}
+	//=====================================================================
 
 	CManager::GetSound()->Stop();//全てのサウンドを停止
 
