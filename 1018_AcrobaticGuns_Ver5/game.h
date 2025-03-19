@@ -20,6 +20,7 @@
 #include "phasemanager.h"
 #include "eventmanager.h"
 #include "score.h"
+#include "combo.h"
 #include "tutorial.h"
 //===============================================================================
 
@@ -48,6 +49,7 @@ private:
 	static CPhaseManager* m_pPhaseManager;                                 //フェーズマネージャー
 	static CTutorial* m_pTutorial;                                         //チュートリアル
 	static CScore * s_pSCORE;                                              //スコア
+	static CCombo* s_pCOMBO;                                               //コンボ
 	static int s_nPhaseNum;                                                //フェーズ番号
 	static bool s_bGameClear;                                              //ゲームをクリアしたかどうか
 

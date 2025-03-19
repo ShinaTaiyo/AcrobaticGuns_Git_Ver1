@@ -34,6 +34,7 @@ CPhaseManager* CGame::m_pPhaseManager = nullptr; //ƒtƒF[ƒYƒ}ƒl[ƒWƒƒ[‚Ö‚Ìƒ|ƒCƒ
 CTutorial* CGame::m_pTutorial = nullptr;         //ƒ`ƒ…[ƒgƒŠƒAƒ‹‚Ö‚Ìƒ|ƒCƒ“ƒ^
 int CGame::s_nPhaseNum = 0;                      //ƒtƒF[ƒY”Ô†
 CScore* CGame::s_pSCORE = nullptr;               //ƒXƒRƒA‚Ö‚Ìƒ|ƒCƒ“ƒ^
+CCombo* CGame::s_pCOMBO = nullptr;               //ƒRƒ“ƒ{‚Ö‚Ìƒ|ƒCƒ“ƒ^
 bool CGame::s_bGameClear = false;                //ƒQ[ƒ€‚ðƒNƒŠƒA‚µ‚½‚©‚Ç‚¤‚©
 //=========================================================================================================================
 
@@ -47,6 +48,7 @@ CGame::CGame(bool bUseGamePad)
 	m_pPhaseManager = nullptr;  //ƒtƒF[ƒYƒ}ƒl[ƒWƒƒ[‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ð‰Šú‰»
 	m_pTutorial = nullptr;      //ƒ`ƒ…[ƒgƒŠƒAƒ‹‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ð‰Šú‰»
 	s_pSCORE = nullptr;         //ƒXƒRƒA‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ð‰Šú‰»
+	s_pCOMBO = nullptr;         //ƒRƒ“ƒ{‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ð‰Šú‰»
 	s_nPhaseNum = 0;            //ƒtƒF[ƒY”Ô†‚ð‰Šú‰»
 	s_bGameClear = false;       //ƒQ[ƒ€‚ðƒNƒŠƒA‚µ‚½‚©‚Ç‚¤‚©i‰ŠúÝ’è‚ÍƒNƒŠƒA‚µ‚Ä‚¢‚È‚¢ó‘Ôj
 }
@@ -87,6 +89,9 @@ HRESULT CGame::Init()
 
 	s_pSCORE = CScore::Create(D3DXVECTOR3(SCREEN_WIDTH - CScore::GetNumberWidth(),CScore::GetNumberHeight(), 0.0f)); //ƒXƒRƒA‚Ì¶¬
 	s_pSCORE->SetUseDeath(false);                                                      //Ž€–Sƒtƒ‰ƒO‚ðŽg—p‚µ‚È‚¢
+
+	//s_pCOMBO = CCombo::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));//ƒRƒ“ƒ{‚ð¶¬
+	//s_pCOMBO->SetUseDeath(false);//Ž€–Sƒtƒ‰ƒO‚ðŽg—p‚µ‚È‚¢
 
 	if (s_bUSETUTORIAL == false)
 	{//ƒ`ƒ…[ƒgƒŠƒAƒ‹‚ðŽg—p‚µ‚È‚¢‚È‚ç
@@ -166,6 +171,17 @@ void CGame::Uninit()
 		s_pSCORE = nullptr;          //ƒXƒRƒA‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ð‰Šú‰»
 	}
 	//=====================================================================
+	
+	////============================================
+	////ƒRƒ“ƒ{‚Ì”jŠü
+	////============================================
+	//if (s_pCOMBO != nullptr)
+	//{
+	//	s_pCOMBO->SetUseDeath(true); //Ž€–Sƒtƒ‰ƒO‚ðŽg—p‚·‚é
+	//	s_pCOMBO->SetDeath();        //Ž€–Sƒtƒ‰ƒO‚ðÝ’è‚·‚é
+	//	s_pCOMBO = nullptr;          //ƒXƒRƒA‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ð‰Šú‰»
+	//}
+	////=====================================================================
 
 	CManager::GetSound()->Stop();//‘S‚Ä‚ÌƒTƒEƒ“ƒh‚ð’âŽ~
 

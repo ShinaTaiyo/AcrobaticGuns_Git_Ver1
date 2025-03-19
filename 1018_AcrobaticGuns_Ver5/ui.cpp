@@ -35,7 +35,8 @@ const string CUi::UI_FILENAME[static_cast<int>(CUi::UITYPE::MAX)] =
 	"data\\TEXTURE\\UI\\PressEnterOrStart_Logo.png",
 	"data\\TEXTURE\\UI\\DiveGaugeFrame_000.png",
 	"data\\TEXTURE\\UI\\GameClear_000.png",
-	"data\\TEXTURE\\UI\\Lose_000.png"
+	"data\\TEXTURE\\UI\\Lose_000.png",
+	"data\\TEXTURE\\UI\\Combo_000.png"
 };//テクスチャファイル名
 
 //====================================================

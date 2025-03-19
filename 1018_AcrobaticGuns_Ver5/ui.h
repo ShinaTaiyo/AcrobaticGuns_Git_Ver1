@@ -41,6 +41,7 @@ public:
 		DIVEGAUGEFRAME_000,     //ダイブゲージのフレーム
 		GAMECLEAR_000,          //ゲームクリアの文字のテクスチャ
 		LOSE_000,               //負けの文字のテクスチャ
+		COMBOTEXT_000,          //コンボの文字のテクスチャ
 		MAX
 	};
 

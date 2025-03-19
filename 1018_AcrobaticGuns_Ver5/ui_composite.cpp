@@ -13,10 +13,6 @@
 #include "calculation.h"
 //=================================================================================================================
 
-//*****************************************************************************************************************
-//コンポーネント
-//*****************************************************************************************************************
-
 //=================================================================================================================
 //コンストラクタ
 //=================================================================================================================
@@ -58,6 +54,11 @@ void CUIComposite_Component::Draw(CUi* pUi)
 //*****************************************************************************************************************
 
 //=================================================================================================================
+//静的メンバ宣言
+//=================================================================================================================
+const int CUIComposite_Numeric::s_nMAX_VALUE = static_cast<int>(std::pow(10, CUIComposite_Numeric::s_nMAX_DIGIT)) - 1;//最大数値
+
+//=================================================================================================================
 //コンストラクタ
 //=================================================================================================================
 CUIComposite_Numeric::CUIComposite_Numeric(CUi* pUi, int nValue, float fWidth, float fHeight) : CUIComposite_Component(pUi)
@@ -65,18 +66,23 @@ CUIComposite_Numeric::CUIComposite_Numeric(CUi* pUi, int nValue, float fWidth, f
 	m_nValue = nValue;                                                         //数字を割り当てる
 	m_fWidth = fWidth;                                                         //横幅の基準値
 	m_fHeight = fHeight;                                                       //高さの基準値
-	int nDigit = CCalculation::CalculationDigit(m_nValue);                     //桁数を取得
-	if (m_nValue == 0)
-	{//桁数を０にするわけにはいかないので、桁数を１とする
-		nDigit = 1;
+
+	if (m_nValue > s_nMAX_VALUE)//最大数値を超えていたら・・・
+	{//数値を最大数値に収める
+		m_nValue = s_nMAX_VALUE;
 	}
 
-	for (int nCnt = 0; nCnt < nDigit; nCnt++)
+	m_nDigit = CCalculation::CalculationDigit(m_nValue);                     //桁数を取得
+	for (int nCnt = 0; nCnt < s_nMAX_DIGIT; nCnt++)
 	{
 		CNumber* pNumber = CNumber::Create(pUi->GetPos(), fWidth, fHeight);    //数字を生成
 		int nNum = CCalculation::getDigit(m_nValue, nCnt);                     //桁数を取得
 		pNumber->SetAnim(nNum);                                                //指定した桁の数値を取得する
 		pNumber->SetUseDeath(false);                                           //死亡フラグを発動させない
+		if (nCnt >= m_nDigit)
+		{//取得桁数以上は描画しない
+			pNumber->SetUseDraw(false);//取得した桁数以下の行は描画しない
+		}
 		m_VecNum.push_back(pNumber);                                           //数字の動的配列に保存
 	}
 
@@ -92,14 +98,11 @@ CUIComposite_Numeric::~CUIComposite_Numeric()
 {
 	for (auto it : m_VecNum)
 	{
-		if (it != nullptr)
-		{
-			it->SetUseDeath(true);//死亡フラグを使用する
-			it->SetDeath();       //死亡フラグを設定
-		}
+		it->SetUseDeath(true);//死亡フラグを使用する
+		it->SetDeath();       //死亡フラグを設定
 	}
 
-	m_VecNum.clear();             //クリアする
+	m_VecNum.clear();//クリア
 }
 //=============================================================================================================================================
 
@@ -109,10 +112,11 @@ CUIComposite_Numeric::~CUIComposite_Numeric()
 void CUIComposite_Numeric::Update(CUi* pUi)
 {
 	int nSize = m_VecNum.size();//桁数を取得
-	int nCnt = 0;
-	for (auto it = m_VecNum.begin(); it != m_VecNum.end(); it++, nCnt++)
-	{//数字を横に並べ続ける
-		(*it)->SetPos(pUi->GetPos() + D3DXVECTOR3(pUi->GetWidth() / 2 + (*it)->GetWidth() / 2 + (*it)->GetWidth() * (nSize - 1) - ((*it)->GetWidth() * nCnt), 0.0f, 0.0f));
+
+	for (int nCnt = 0; nCnt < nSize; nCnt++)
+	{//数字を横に並べ続ける（UIの端にずらし、更に数字表示の半分ずらすことでUIの端にちょうど数字がくっつくように計算。あとは現在の桁数分右にずらしてから１桁目から順番に描画）
+		m_VecNum[nCnt]->SetPos(pUi->GetPos() + D3DXVECTOR3(pUi->GetWidth() / 2 + m_VecNum[nCnt]->GetWidth() / 2 +
+			m_VecNum[nCnt]->GetWidth() * (m_nDigit - 1) - m_VecNum[nCnt]->GetWidth() * nCnt, 0.0f, 0.0f));
 	}
 }
 //=============================================================================================================================================
@@ -131,35 +135,27 @@ void CUIComposite_Numeric::Draw(CUi* pUI)
 //=================================================================================================================
 void CUIComposite_Numeric::SetValue(int nValue, CUi* pUi)
 {
-	//数値の動的配列の中身を全て破棄
-	for (auto it = m_VecNum.begin(); it != m_VecNum.end(); ++it)
-	{//数字を全部破棄
-		if ((*it) != nullptr)
-		{
-			(*it)->SetUseDeath(true);
-			(*it)->SetDeath();
-			(*it) = nullptr;
-		}
+	m_nValue = nValue;//数値を代入
+	if (m_nValue > s_nMAX_VALUE)//最大数値を超えていたら・・・
+	{//数値を最大数値に収める
+		m_nValue = s_nMAX_VALUE;
 	}
 
-	m_VecNum.clear();//メモリの中身を初期化
-
-	m_nValue = nValue;//数値を格納
-	int nDigit = CCalculation::CalculationDigit(m_nValue);//桁数を計算
-
-	if (m_nValue == 0)
-	{//桁数を０にするわけにはいかないので、桁数を１とする
-		nDigit = 1;
-	}
-
+	m_nDigit = CCalculation::CalculationDigit(m_nValue);                     //桁数を取得
+	int nCnt = 0;//桁数カウント用
 	//再び桁数分数値の表示を生成し動的配列に格納する
-	for (int nCnt = 0; nCnt < nDigit; nCnt++)
+	for (auto it = m_VecNum.begin(); it != m_VecNum.end(); ++it, nCnt++)
 	{
-		CNumber* pNumber = CNumber::Create(pUi->GetPos(), m_fWidth, m_fHeight);
-		int nNum = CCalculation::getDigit(m_nValue, nCnt);//指定した桁の数値を取得する
-		pNumber->SetAnim(nNum);//アニメーションパターン
-		pNumber->SetUseDeath(false);//死亡フラグを発動させない
-		m_VecNum.push_back(pNumber);//動的配列に保存
+		if (nCnt < m_nDigit)
+		{//取得した桁数以内なら描画する
+			int nNum = CCalculation::getDigit(m_nValue, nCnt);                     //桁数を取得
+			(*it)->SetAnim(nNum);                                                  //指定桁数のアニメーションを設定
+			(*it)->SetUseDraw(true);
+		}
+		else
+		{//取得した桁数以下は描画しない
+			(*it)->SetUseDraw(false);
+		}
 	}
 }
 //============================================================================================================================================

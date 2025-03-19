@@ -69,8 +69,11 @@ public:
 	void SetValue(int nValue, CUi* pUi);  //数値を設定する
 	int GetValue() { return m_nValue; };  //数値を取得する
 private:
+	static constexpr int s_nMAX_DIGIT = 8; //最大桁数
+	static const int s_nMAX_VALUE;        //最大数値
 	vector<CNumber*> m_VecNum;            //数字の動的配列
 	int m_nValue = 0;                     //数値
+	int m_nDigit = 0;                     //桁数
 	float m_fWidth = 0.0f;                //横幅基準値
 	float m_fHeight = 0.0f;               //高さ基準値
 };

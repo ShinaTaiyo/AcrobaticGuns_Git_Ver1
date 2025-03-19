@@ -54,6 +54,7 @@ public:
 		STAGEMANAGER,    //ステージマネージャー
 		PHASEMANAGER,    //フェーズマネージャー
 		EVENTMANAGER,    //イベントマネージャー
+		COMBO,           //コンボ
 		TUTORIAL,        //チュートリアル
 		SCORE,           //スコア
 		FADE,            //フェード
