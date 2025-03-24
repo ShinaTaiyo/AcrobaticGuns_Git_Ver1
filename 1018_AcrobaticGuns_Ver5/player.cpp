@@ -293,7 +293,6 @@ void CPlayer::SetDeath()
 CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3DXVECTOR3 Scale)
 {
     CPlayer* pPlayer = DBG_NEW CPlayer(DBG_NEW CPlayerMove_Normal(),DBG_NEW CPlayerAttack_Shot());//プレイヤーを生成
-    int nIdx = 0;//テクスチャのインデックス
     CObjectX::PosInfo& PosInfo = pPlayer->GetPosInfo();                                                      //位置情報
     CObjectX::RotInfo& RotInfo = pPlayer->GetRotInfo();                                                      //向き情報
     CObjectX::SizeInfo& SizeInfo = pPlayer->GetSizeInfo();                                                   //サイズ情報
@@ -305,6 +304,16 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
     pPlayer->SetTypeNum(0);                                                                                  //オブジェクトXごとのタイプ番号を設定
     pPlayer->RegistMotion("data\\MODEL\\Enemy\\MotionEnemy\\DiveWeakEnemy\\DiveWeakEnemyMotion.txt",pPlayer);//モーションファイルを割り当てる
     pPlayer->GetDrawInfo().SetUseDraw(false);                                                                //描画しない
+
+    int nIdx = CManager::GetObjectXInfo()->Regist("data\\MODEL\\Enemy\\MotionEnemy\\DiveWeakEnemy\\DiveWeakEnemy00_CollisionModel.x"); //モデル情報を登録し番号を取得
+    pPlayer->BindObjectXInfo(CManager::GetObjectXInfo()->GetMesh(nIdx),                                      //モデル情報を設定する（当たり判定用のモデル)
+        CManager::GetObjectXInfo()->GetBuffMat(nIdx),
+        CManager::GetObjectXInfo()->GetdwNumMat(nIdx),
+        CManager::GetObjectXInfo()->GetTexture(nIdx),
+        CManager::GetObjectXInfo()->GetColorValue(nIdx));
+
+    pPlayer->SetSize();                                                                                      //サイズを設定
+
     PosInfo.SetPos(pos);                                                                                     //位置の設定
     PosInfo.SetPosOld(pos);                                                                                  //1f前の位置を設定
     PosInfo.SetPosFuture(pos);                                                                               //1f後の位置を設定

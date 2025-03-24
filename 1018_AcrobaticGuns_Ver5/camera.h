@@ -98,7 +98,7 @@ private:
 	static const float m_BESIDECAMERALENGTH;                                              //ビサイドモードのカメラの距離
 	static const float s_fINITIAL_LENGTH;                                                 //最初の距離
 	static bool s_bCAMERACONTROLLMOUSE;                                                   //カメラをマウスで操作するかどうか（Debugでは使わないかもしれないが、Releaseでは必ず使う)
-	static constexpr bool s_bDEBUGCAMERACONTROLLMOUSE = true;                            //デバッグ時にもカメラをマウスで操作するかどうか（カメラを使用するとカーソルが固定されてしまうので、使用するかを決める)
+	static constexpr bool s_bDEBUGCAMERACONTROLLMOUSE = false;                            //デバッグ時にもカメラをマウスで操作するかどうか（カメラを使用するとカーソルが固定されてしまうので、使用するかを決める)
 	//==========================================================================================================================================
 
 	//======================================

@@ -40,6 +40,7 @@ m_nTypeNum(0), m_PosInfo({}), m_DrawInfo({}), m_RotInfo({}), m_SizeInfo({}), m_M
 m_bExtrusionCollisionSquareX(false),m_bExtrusionCollisionSquareY(false),m_bExtrusionCollisionSquareZ(false),m_bIsLanding(false)
 {
 	SetObjectType(CObject::OBJECTTYPE::OBJECTTYPE_X);//オブジェクトタイプ設定
+	D3DXMatrixIdentity(&m_DrawInfo.mtxWorld);        //ワールドマトリックスを初期化
 }
 //================================================================================================================================================
 

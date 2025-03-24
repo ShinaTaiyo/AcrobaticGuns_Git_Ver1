@@ -83,7 +83,7 @@ public:
 		bool bBlinkingColor = false;                 //色を点滅させるかどうか
 
 		//ワールド変換行列
-		D3DXMATRIX mtxWorld = {};                     //マトリックスワールド!
+		D3DXMATRIX mtxWorld;                     //マトリックスワールド!
 	    D3DXMATRIX * pMtxParent = nullptr;            //親マトリックス 
 		D3DXCOLOR Color = { 1.0f,1.0f,1.0f,1.0f };    //現在の統一の色合い
 
