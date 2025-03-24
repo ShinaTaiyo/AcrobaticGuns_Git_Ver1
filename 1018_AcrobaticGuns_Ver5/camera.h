@@ -98,7 +98,7 @@ private:
 	static const float m_BESIDECAMERALENGTH;                                              //ビサイドモードのカメラの距離
 	static const float s_fINITIAL_LENGTH;                                                 //最初の距離
 	static bool s_bCAMERACONTROLLMOUSE;                                                   //カメラをマウスで操作するかどうか（Debugでは使わないかもしれないが、Releaseでは必ず使う)
-	static constexpr bool s_bDEBUGCAMERACONTROLLMOUSE = false;                            //デバッグ時にもカメラをマウスで操作するかどうか（カメラを使用するとカーソルが固定されてしまうので、使用するかを決める)
+	static constexpr bool s_bDEBUGCAMERACONTROLLMOUSE = true;                            //デバッグ時にもカメラをマウスで操作するかどうか（カメラを使用するとカーソルが固定されてしまうので、使用するかを決める)
 	//==========================================================================================================================================
 
 	//======================================
@@ -110,7 +110,7 @@ private:
 	D3DXVECTOR3 m_AddPosV;                        //加算視点
 	D3DXVECTOR3 m_VecU;                           //上方向ベクトル!
 	D3DXVECTOR3 m_Rot;                            //向き!
-	D3DXMATRIX m_mtxProjection;                   //プロジェクション行列!
+	D3DXMATRIX m_mtxProjection;                   //プロジェクション行列!!
 	D3DXMATRIX m_mtxView;                         //ビューマトリックス!
 	CAMERATYPE m_CameraType;                      //カメラモードの種類!
 	D3DXVECTOR3 m_DifferenceLength;               //差分!

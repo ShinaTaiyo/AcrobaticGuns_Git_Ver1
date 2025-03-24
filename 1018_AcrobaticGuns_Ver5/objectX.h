@@ -439,18 +439,18 @@ public:
 	//==========================================================
 
 	//オブジェクトXの種類
-	void SetObjXType(OBJECTXTYPE ObjXType) { m_nObjXType = ObjXType; }                      //オブジェクトXの分類を設定
-	OBJECTXTYPE GetObjXType() { return m_nObjXType; }                                       //オブジェクトXのタイプを取得する
-
-	//タイプ番号
-	void SetTypeNum(int nTypeNum) { m_nTypeNum = nTypeNum; }                                //オブジェクトごとのタイプ番号を設定
-	int GetTypeNum() { return m_nTypeNum;}                                                  //オブジェクトごとのタイプ番号を設定
-
-	//情報表示処理＆操作
-	void ManagerChooseControlInfo() override;                                               //ステージマネージャーが情報を操作する
-
-	void SaveInfoTxt(fstream& WritingFile) override;                                        //テキストファイルに情報を保存するための関数
-
+	void SetObjXType(OBJECTXTYPE ObjXType) { m_nObjXType = ObjXType; }                                           //オブジェクトXの分類を設定
+	OBJECTXTYPE GetObjXType() { return m_nObjXType; }                                                            //オブジェクトXのタイプを取得する
+																							                     
+	//タイプ番号																			                        
+	void SetTypeNum(int nTypeNum) { m_nTypeNum = nTypeNum; }                                                     //オブジェクトごとのタイプ番号を設定
+	int GetTypeNum() { return m_nTypeNum;}                                                                       //オブジェクトごとのタイプ番号を設定
+																							                     
+	//情報表示処理＆操作																	                        
+	void ManagerChooseControlInfo() override;                                                                    //ステージマネージャーが情報を操作する
+																							                     
+	void SaveInfoTxt(fstream& WritingFile) override;                                                             //テキストファイルに情報を保存するための関数
+	void LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveManager, string& Buff, CObject* pObj) override; //テキストファイルから情報を読み込むための関数
 	//================================================================================================================================================
 
 	//==========================================================

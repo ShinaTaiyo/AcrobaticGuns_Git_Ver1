@@ -148,6 +148,7 @@ public:
 	//エディタ関係
 	//=================================================
 	virtual void SaveInfoTxt(fstream& WritingFile);   //テキストファイルに情報を保存するための関数
+	virtual void LoadInfoTxt(fstream& LoadingFile, list<CObject*>& listSaveManager, string& Buff,CObject * pObj);//テキストファイルから情報を読み込むための関数
 	virtual void ManagerChooseControlInfo();          //情報操作
 	virtual CObject * ManagerChengeObject(bool bAim); //ステージマネージャーに変更したオブジェクトを渡す
 	virtual CObject * ManagerSaveObject();            //ステージマネージャーに今のオブジェクトを保存する
