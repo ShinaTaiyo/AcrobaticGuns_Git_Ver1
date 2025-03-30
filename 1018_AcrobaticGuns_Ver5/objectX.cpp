@@ -180,13 +180,24 @@ void CObjectX::Draw()
 	D3DXVECTOR3 PosZero = { 0.0f,0.0f,0.0f };
 	D3DXVec3TransformCoord(&m_PosInfo.WorldPos, &PosZero, &m_DrawInfo.mtxWorld);
 
+
 	//=======================================
 	//描画の調整
 	//=======================================
+	if (m_DrawInfo.Color.a < 1.0f)
+	{
+    	pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);//TRUEだと透明度と背景のブレンドが行われる、FALSEだと完全に不透明な描画になる
+		pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);     //描画するオブジェクトの色の影響度を決める,D3DBLEND_SRCALPHA：(R,G,B) * a(オブジェクトの透明度に応じた色)
+		pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA); //すでに描画されている背景色の影響度を決める,D3DBLEND_INVSRCALPHA:(R,G,B)×(1 - a)<背景の色を残す割合>
+		pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);             //奥行情報を書き込まない
+	}
+	else
+	{//不透明オブジェクトを通常通り描画する
 	//アルファテストを有効(アルファ値が０より大きい場合に描画する）
-	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-	pDevice->SetRenderState(D3DRS_ALPHAREF,0);
-	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
+		pDevice->SetRenderState(D3DRS_ALPHAREF, 0);                     //透明度が0以上の時に描画
+		pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);       //透明度が０より大きいピクセルのみ描画
+		pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);              //Zバッファに書き込む
+	}
 
 	//法線の長さを１にする。（スケールなどを使った時は、必ず使う。)
 	pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);
