@@ -177,6 +177,7 @@ bool CCalculation::CaluclationMove(bool bUseStick, D3DXVECTOR3& Pos, D3DXVECTOR3
 		if (fMoveX != 0.0f || fMoveZ != 0.0f)
 		{//ã‹L‚Ìˆ—‚Åƒ{ƒ^ƒ“‚ð“ü—Í‚µ‚Ä‚¢‚½‚ç“®‚¢‚Ä‚¢‚é‚Æ‚Ý‚È‚·
 			bMove = true;//ˆÚ“®ó‘Ô
+
 		}
 		else
 		{

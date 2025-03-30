@@ -488,7 +488,7 @@ void CCharacter::LoadModelParts(string MotionFileName, CCharacter* pCharacter)
         {//モデルパーツを読み込む
             ReadingFile >> Reading_Buff;//イコール
             ReadingFile >> Reading_Buff;//モデルパーツのパス
-            pCharacter->m_VecModelParts.push_back(CModelParts::Create(Reading_Buff));//モデルパーツ数を追加
+            pCharacter->m_VecModelParts.push_back(CModelParts::Create(Reading_Buff,pCharacter->GetType()));//モデルパーツ数を追加
         }
         else if (Reading_Buff == "CHARACTERSET")
         {//各モデルパーツの情報を設定する

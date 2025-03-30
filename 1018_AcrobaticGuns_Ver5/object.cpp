@@ -21,10 +21,8 @@ int CObject::m_nNumAll = 0;//オブジェクト総数
 CObject* CObject::m_apObject[CObject::m_nMAXPRIORITY][CObject::m_nMAXOBJECT] = {};
 CObject* CObject::m_pTop[CObject::m_nMAXPRIORITY] = {};
 CObject* CObject::m_pCur[CObject::m_nMAXPRIORITY] = {};
-
 bool CObject::m_bActivationReleaseAll = false;            //ReleaseAllを発動するかどうか
 //====================================================
-
 
 //=====================================================
 //コンストラクタ（描画順設定用）
@@ -184,19 +182,17 @@ void CObject::UpdateAll()
 void CObject::DrawAll()
 {
 	CObject* pObj = nullptr;//オブジェクト格納用
-
-	for (int nCntPriority = 0; nCntPriority < m_nMAXPRIORITY; nCntPriority++)
+	for (int nCnt = 0; nCnt < static_cast<int>(TYPE::MAX); nCnt++)
 	{
-		pObj = m_pTop[nCntPriority];//トップオブジェクトを取得
+	    pObj = m_pTop[s_nDrawPriority[nCnt]]; // トップオブジェクトを取得
 		while (pObj != nullptr)
 		{
-			//次のオブジェクトを格納
-			CObject* pNext = pObj->m_pNext;
-
-			pObj->Draw();
+			CObject* pNext = pObj->m_pNext; // 次のオブジェクトを格納
+			pObj->Draw(); // 描画
 			pObj = pNext;
 		}
 	}
+
 }
 //======================================================================================================================
 

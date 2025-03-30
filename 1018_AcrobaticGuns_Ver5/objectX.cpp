@@ -191,12 +191,6 @@ void CObjectX::Draw()
 	//法線の長さを１にする。（スケールなどを使った時は、必ず使う。)
 	pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);
 
-	if (m_DrawInfo.Color.a < 1.0f && CScene::GetMode() == CScene::MODE_GAME)
-	{
-		//Zバッファに書き込まない
-		pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
-	}
-
 	if (m_DrawInfo.bUseCulling == true)
 	{
 		//両面を描画する
@@ -668,7 +662,7 @@ void CObjectX::ChengeEditPos()
 	}
 	else
 	{//XZ平面移動
-		CCalculation::CaluclationMove(false, Move,m_PosInfo.Pos,5.0f, CCalculation::MOVEAIM_XZ, m_RotInfo.Rot.y);
+		CCalculation::CaluclationMove(false,m_PosInfo.Pos,Move,5.0f, CCalculation::MOVEAIM_XZ, m_RotInfo.Rot.y);
 	}
 
 	//支点も一緒に移動
@@ -677,6 +671,7 @@ void CObjectX::ChengeEditPos()
 
 	//デバッグ表示
 	CManager::GetDebugText()->PrintDebugText("支点位置(矢印キー) %f %f %f\n", m_PosInfo.SupportPos.x,m_PosInfo.SupportPos.y, m_PosInfo.SupportPos.z);
+	CManager::GetDebugText()->PrintDebugText("移動量 ： %f %f %f\n", Move.x, Move.y, Move.z);
 	CManager::GetDebugText()->PrintDebugText("向きZ(FGキー) %f\n", m_RotInfo.Rot.z);
 	CManager::GetCamera()->SetPosR(m_PosInfo.Pos);//注視点を現在操作しているモデルに固定
 	//================================================================================================================================================

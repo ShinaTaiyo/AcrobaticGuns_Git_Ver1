@@ -32,12 +32,10 @@ public:
 		BLOCK,           //ブロック
 		BGMODEL,         //背景モデル
 		AIMODEL,         //AIモデル
-		WIREHEAD,        //ワイヤー頭
-		PLAYER,          //プレイヤー
-		ENEMY,           //敵
-		BULLET,          //弾
 		ATTACK,          //攻撃
-		MODELPARTS,      //モデルパーツ
+		ENEMY,           //敵
+		PLAYER,          //プレイヤー
+		WIREHEAD,        //ワイヤー頭
 		WIRE,            //ワイヤー
 		MESHORBIT,       //軌跡メッシュ
 		EFFECT,          //エフェクト
@@ -157,7 +155,41 @@ protected:
 private:
 	static CObject* m_apObject[m_nMAXPRIORITY][m_nMAXOBJECT];//オブジェクト管理
 	static bool m_bActivationReleaseAll;                     //ReleaseAllを発動するかどうか
-
+	static constexpr int s_nDrawPriority[static_cast<int>(TYPE::MAX)] = 
+	{
+		static_cast<int>(TYPE::BG3D),         //0
+  		static_cast<int>(TYPE::FIELD),        //1
+		static_cast<int>(TYPE::BGMODEL),      //2
+		static_cast<int>(TYPE::BLOCK),        //3
+		static_cast<int>(TYPE::AIMODEL),      //4
+		static_cast<int>(TYPE::PLAYER),       //5
+		static_cast<int>(TYPE::WIREHEAD),     //6
+		static_cast<int>(TYPE::WIRE),         //7
+		static_cast<int>(TYPE::ATTACK),       //8
+		static_cast<int>(TYPE::ENEMY),        //9
+		static_cast<int>(TYPE::UI3D),         //10
+		static_cast<int>(TYPE::NUMBER3D),     //11
+		static_cast<int>(TYPE::BG),           //12
+		static_cast<int>(TYPE::PARTICLE),     //13
+		static_cast<int>(TYPE::MESHORBIT),    //14
+		static_cast<int>(TYPE::EFFECT),       //15
+		static_cast<int>(TYPE::PARTICLE2D),   //16
+		static_cast<int>(TYPE::LOCKON),       //17
+		static_cast<int>(TYPE::UI),           //18
+		static_cast<int>(TYPE::NUMBER),       //19
+		static_cast<int>(TYPE::GAUGE),        //20
+		static_cast<int>(TYPE::PHASEINFO),    //21
+		static_cast<int>(TYPE::STAGEMANAGER), //22
+		static_cast<int>(TYPE::PHASEMANAGER), //23
+		static_cast<int>(TYPE::EVENTMANAGER), //24
+		static_cast<int>(TYPE::COMBO),        //25
+		static_cast<int>(TYPE::TUTORIAL),     //26
+		static_cast<int>(TYPE::SCORE),        //27
+		static_cast<int>(TYPE::FADE),         //28
+		static_cast<int>(TYPE::NONE),         //29
+	}; //描画順配列
+	//static map<TYPE, int> s_DrawPriority;                    //描画順を決める用のマップ型（タイプ列挙型が更新順で、この静的メンバ変数は描画順)
+	//static vector<pair<TYPE, int>> s_VecDrawPriority;        //描画順を決める
 	//===============================================
 	//リスト管理
 	//===============================================

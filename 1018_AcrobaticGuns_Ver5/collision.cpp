@@ -422,7 +422,6 @@ void CCollision::ResolveExtrusionCollisionSquare(CObjectX* pObjX, CObjectX* pCom
 {
 	if (pObjX->GetCollisionInfo().GetState().GetLandingOld())
 	{
-		CParticle::SummonParticle(CParticle::TYPE::TYPE00_NORMAL, 1, 30, 30.0f, 30.0f, 100, 10, false, pObjX->GetPosInfo().GetPos(), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), true);
 		CCollision::NewExtrusionCollisionSquareY(pObjX, pComObjX);
 		if (pObjX->GetCollisionInfo().GetSquareInfo().GetPushOutFlag(AXIS::X) == true)
 		{
@@ -437,7 +436,6 @@ void CCollision::ResolveExtrusionCollisionSquare(CObjectX* pObjX, CObjectX* pCom
 	}
 	else if (pObjX->GetCollisionInfo().GetState().GetWallingOld())
 	{
-		CParticle::SummonParticle(CParticle::TYPE::TYPE00_NORMAL, 1, 30, 30.0f, 30.0f, 100, 10, false, pObjX->GetPosInfo().GetPos(), D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f), true);
 		if (pObjX->GetCollisionInfo().GetSquareInfo().GetPushOutFlag(AXIS::X) == true)
 		{
 			CCollision::NewExtrusionCollisionSquareX(pObjX, pComObjX);
@@ -452,7 +450,6 @@ void CCollision::ResolveExtrusionCollisionSquare(CObjectX* pObjX, CObjectX* pCom
 	}
 	else
 	{
-		CParticle::SummonParticle(CParticle::TYPE::TYPE00_NORMAL, 1, 30, 30.0f, 30.0f, 100, 10, false, pObjX->GetPosInfo().GetPos(), D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f), true);
 		CCollision::NewExtrusionCollisionSquareX(pObjX, pComObjX);
 		CCollision::NewExtrusionCollisionSquareY(pObjX, pComObjX);
 		CCollision::NewExtrusionCollisionSquareZ(pObjX, pComObjX);
