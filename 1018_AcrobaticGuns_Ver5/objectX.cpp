@@ -40,7 +40,7 @@ m_nTypeNum(0), m_PosInfo({}), m_DrawInfo({}), m_RotInfo({}), m_SizeInfo({}), m_M
 m_bExtrusionCollisionSquareX(false),m_bExtrusionCollisionSquareY(false),m_bExtrusionCollisionSquareZ(false),m_bIsLanding(false)
 {
 	SetObjectType(CObject::OBJECTTYPE::OBJECTTYPE_X);//オブジェクトタイプ設定
-	D3DXMatrixIdentity(&m_DrawInfo.mtxWorld);        //ワールドマトリックスを初期化
+	D3DXMatrixIdentity(&m_DrawInfo.GetMatrixWorld());        //ワールドマトリックスを初期化
 }
 //================================================================================================================================================
 
@@ -113,7 +113,7 @@ void CObjectX::Update()
 	m_SizeInfo.DecideVtxMaxMinProcess();         //頂点の最大最小を決める処理
 										         
 	m_DrawInfo.ChengeColorProcess(this);         //色を変える処理
-	if (m_RotInfo.bUseAddRot == true)
+	if (m_RotInfo.GetUseAddRot() == true)
 	{//向きの加算処理
 		m_RotInfo.Rot += m_RotInfo.AddRot;
 	}
@@ -668,7 +668,7 @@ void CObjectX::ChengeEditPos()
 	}
 	else
 	{//XZ平面移動
-		CCalculation::CaluclationMove(false, Move, 5.0f, CCalculation::MOVEAIM_XZ, m_RotInfo.Rot.y);
+		CCalculation::CaluclationMove(false, Move,m_PosInfo.Pos,5.0f, CCalculation::MOVEAIM_XZ, m_RotInfo.Rot.y);
 	}
 
 	//支点も一緒に移動

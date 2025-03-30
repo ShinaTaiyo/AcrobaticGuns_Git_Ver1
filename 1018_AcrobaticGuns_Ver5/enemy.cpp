@@ -98,9 +98,11 @@ void CEnemy::Update()
 		m_nCntTime++;                                                             //時間をカウントする
 		m_nJumpCoolTime++;                                                        //ジャンプまでのクールタイムをカウントする
 		m_nAttackCoolTime++;                                                      //クールタイムをカウントする
+		CObjectX::CollisionInfo& CollisionInfo = GetCollisionInfo();              //当たり判定情報を取得する
+		CObjectX::CollisionInfo::State& CollisionState = CollisionInfo.GetState();//当たり判定状態を取得する
 
-		if (GetLanding() == true)
-		{//地面に乗る
+		if (CollisionState.GetLanding())
+		{
 			GetMoveInfo().SetMove(D3DXVECTOR3(GetMoveInfo().GetMove().x,0.0f, GetMoveInfo().GetMove().z));
 		}
 
@@ -121,7 +123,7 @@ void CEnemy::Update()
 
 	    CObjectX::Update();//オブジェクトX更新処理
 
-		if (GetLanding() == true && m_bStartLanding == false)
+		if (CollisionState.GetLanding() && m_bStartLanding == false)
 		{//地面に乗っているかつ、まだ地面に乗っていなかったら
 			m_bStartLanding = true;//地面に初めて乗ったフラグをtrueにする
 		}
@@ -569,8 +571,10 @@ void CEnemy::DefeatStaging()
 //====================================================================================
 void CEnemy::CollisionProcess()
 {
-	GetCollisionInfo().GetSquareInfo().ResetPushOutFirstFlag();   //それぞれの軸の押し出し判定の優先フラグをリセット
-	SetIsLanding(false);                                          //地面に乗っているかどうかをリセット 
+	CObjectX::CollisionInfo& CollisionInfo = GetCollisionInfo();               //当たり判定情報を取得する
+	CObjectX::CollisionInfo::State& CollisionState = CollisionInfo.GetState(); //当たり判定状態を取得する
+	CollisionInfo.GetSquareInfo().ResetPushOutFirstFlag();                     //それぞれの軸の押し出し判定の優先フラグをリセット
+	CollisionState.SetLanding(false);                                          //地面に乗っているかどうかをリセット 
 	for (int nCntPri = 0; nCntPri < CObject::m_nMAXPRIORITY; nCntPri++)
 	{//オブジェクトリストを検索する
 		CObject* pObj = CObject::GetTopObject(nCntPri);//リストの先頭オブジェクトを取得する
@@ -2295,7 +2299,7 @@ void CDiveWeakEnemy::AttackProcess()
 		CObjectX::PosInfo& PlayerPosInfo = pPlayer->GetPosInfo();           //プレイヤーの位置情報を取得
 		const D3DXVECTOR3& Pos = PosInfo.GetPos();                          //位置を取得
 		const D3DXVECTOR3& Move = MoveInfo.GetMove();                       //移動量を取得
-		const D3DXVECTOR3& PlayerPos = PlayerPosInfo.Pos;                   //プレイヤーの位置を取得
+		const D3DXVECTOR3& PlayerPos = PlayerPosInfo.GetPos();              //プレイヤーの位置を取得
 		D3DXVECTOR3 Rot = RotInfo.GetRot();                                 //向き
 		const float & fNormalSpeed = GetNormalSpeed();                      //通常移動速度
 		float fRotAim = atan2f(PlayerPos.x - Pos.x, PlayerPos.z - Pos.z);   //Z方向を基準にプレイヤーへの角度（目的の角度）を計算する

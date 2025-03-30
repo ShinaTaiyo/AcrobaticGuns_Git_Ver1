@@ -116,6 +116,18 @@ void CCamera::Update()
 {
 	m_pCameraState->Process(this);      //カメラの角度に関する処理
 	m_pCameraLengthState->Process(this);//カメラの距離に関する処理
+	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();//キー入力情報
+	CDebugText* pDebugText = CManager::GetDebugText();//デバッグ情報
+
+	pDebugText->PrintDebugText("カメラをマウスで操作するかどうか（Lシフトを押しながらM): %d\n", s_bCAMERACONTROLLMOUSE);
+
+	if (pInputKeyboard->GetPress(DIK_LSHIFT))
+	{
+		if (pInputKeyboard->GetTrigger(DIK_M))
+		{
+			s_bCAMERACONTROLLMOUSE = s_bCAMERACONTROLLMOUSE ? false : true;//カメラをマウスで操作するかのフラグのONOFFを変える
+		}
+	}
 
 	//Pitchは前側に範囲を制限
 	if (m_Rot.x < -D3DX_PI + 0.01f)
@@ -126,6 +138,8 @@ void CCamera::Update()
 	{
 		m_Rot.x = -0.01f;
 	}
+
+	
 
 	//ジンバルロックを回避する
 	m_Rot.x = CCalculation::CorrectionRot(m_Rot.x);

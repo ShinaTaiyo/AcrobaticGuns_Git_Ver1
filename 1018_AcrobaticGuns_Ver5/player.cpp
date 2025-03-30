@@ -127,11 +127,12 @@ void CPlayer::Update()
 {
     CObjectX::PosInfo& PosInfo = GetPosInfo();            //位置情報
     CObjectX::SizeInfo& SizeInfo = GetSizeInfo();         //サイズ情報
+    CObjectX::CollisionInfo& CollisionInfo = GetCollisionInfo();//当たり判定情報を取得する
     const D3DXVECTOR3& Pos = PosInfo.GetPos();            //位置
     const D3DXVECTOR3& VtxMax = SizeInfo.GetVtxMax();     //最大頂点
     if (CScene::GetMode() == CScene::MODE_GAME)
     {//ゲームシーンなら
-        if (GetLanding())
+        if (CollisionInfo.GetState().GetLanding())
         {//地面にいるなら重力を０に
             GetMoveInfo().SetMove(D3DXVECTOR3(GetMoveInfo().GetMove().x,0.0f, GetMoveInfo().GetMove().z));
         }
@@ -501,8 +502,12 @@ void CPlayer::SetInitialActionMode(ACTIONMODE ActionMode)
 //========================================================
 void CPlayer::CollisionProcess()
 {
-    SetIsLanding(false);                                       //地面に乗っているかどうかのフラグをリセット
-    GetCollisionInfo().GetSquareInfo().ResetPushOutFirstFlag();//それぞれの軸の押し出し判定の優先フラグをリセット
+    CObjectX::CollisionInfo& CollisionInfo = GetCollisionInfo();                //当たり判定情報を取得する
+    CObjectX::CollisionInfo::State& CollisionState = CollisionInfo.GetState();  //当たり判定状態を取得する
+    CollisionInfo.GetSquareInfo().ResetPushOutFirstFlag();                      //それぞれの軸の押し出し判定の優先フラグをリセット
+    CollisionState.SetWallingOld(CollisionInfo.GetState().GetWalling());
+    CollisionState.SetLandingOld(CollisionInfo.GetState().GetLanding());
+    CollisionState.ResetState();
     m_bCollision = false;                                      //判定状態をリセット
     for (int nCntPri = 0; nCntPri < CObject::m_nMAXPRIORITY; nCntPri++)
     {//オブジェクトリストを検索
