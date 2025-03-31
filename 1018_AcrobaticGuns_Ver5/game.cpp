@@ -36,6 +36,7 @@ int CGame::s_nPhaseNum = 0;                      //フェーズ番号
 CScore* CGame::s_pSCORE = nullptr;               //スコアへのポインタ
 CCombo* CGame::s_pCOMBO = nullptr;               //コンボへのポインタ
 bool CGame::s_bGameClear = false;                //ゲームをクリアしたかどうか
+bool CGame::s_bPAUSE = false;                    //ポーズをするかどうか
 //=========================================================================================================================
 
 //=============================================================
@@ -51,6 +52,7 @@ CGame::CGame(bool bUseGamePad)
 	s_pCOMBO = nullptr;         //コンボへのポインタを初期化
 	s_nPhaseNum = 0;            //フェーズ番号を初期化
 	s_bGameClear = false;       //ゲームをクリアしたかどうか（初期設定はクリアしていない状態）
+	s_bPAUSE = false;           //ポーズをするかどうかを初期化
 }
 //=========================================================================================================================
 
@@ -183,6 +185,8 @@ void CGame::Uninit()
 	}
 	//=====================================================================
 
+	s_bPAUSE = false;//ポーズ中にゲームモードを終わらせるときもポーズ状態を解除する
+
 	CManager::GetSound()->Stop();//全てのサウンドを停止
 
 	CScene::Uninit();//シーン終了処理
@@ -199,7 +203,26 @@ void CGame::Update()
 		CManager::GetSceneFade()->SetSceneFade(CFade::FADEMODE_IN, CScene::MODE_RESULT);//リザルトシーンを呼ぶ
 	}
 
+	PauseProcess();//ポーズ処理
+
 	//デバッグ表示
 	CManager::GetDebugText()->PrintDebugText("現在の敵の数；%d\n", CEnemy::GetNumEnemy());
+}
+//=========================================================================================================================
+
+//=============================================================
+//ポーズ処理
+//=============================================================
+void CGame::PauseProcess()
+{
+	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard(); //キー入力情報を取得する
+	CDebugText* pDebugText = CManager::GetDebugText();             //デバッグ情報を取得する
+	if (pInputKeyboard->GetTrigger(DIK_P))
+	{
+		s_bPAUSE = s_bPAUSE ? false : true;//フラグを切り替える
+		CParticle::SummonParticle(CParticle::TYPE::TYPE00_NORMAL, 20, 30, 30.0f, 30.0f, 100, 10, true,m_pPlayer->GetPosInfo().GetPos(), D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f), true);
+	}
+
+	pDebugText->PrintDebugText("ポーズ中かどうか(P)：%d\n", s_bPAUSE);
 }
 //=========================================================================================================================

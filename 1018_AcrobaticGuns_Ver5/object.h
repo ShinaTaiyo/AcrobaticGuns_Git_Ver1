@@ -90,26 +90,22 @@ public:
 	//===========================================
 
 	CObject(int nPriority = 2,bool bUseintPriority = false,TYPE Type = TYPE::NONE,OBJECTTYPE ObjType = OBJECTTYPE::OBJECTTYPE_NONE);//描画優先設定(５月２８日New!：デフォルト引数（呼び出し時に引数設定しなければ３が代入されて処理される
-	virtual ~CObject();        //デストラクタ
-	virtual HRESULT Init() = 0;//初期化処理
-	virtual void Uninit() = 0; //終了処理
-	virtual void ExtraUninit();//別枠の終了処理
-	virtual void Update() = 0; //更新処理
-	virtual void Draw() = 0;   //描画処理
-	bool GetUseDeath() { return m_bUseDeath; }//死亡フラグを発動するか決めるフラグを取得
-	static void ReleaseAll();  //全オブジェクト開放
-	static void UpdateAll();   //全オブジェクト更新
-	static void DrawAll();     //全オブジェクト描画
-	virtual void SetDeath();                                              //死亡フラグを設定
-	//=====================
-	//取得系
-	//=====================
-	static int GetNumAll();                              //全オブジェクトの総数を取得する
-	bool GetCreateSuccess() { return m_bCreateSuccess; } //オブジェクトの生成に成功したかどうか
-	static CObject* GetCObject(int nIdx,int nPriority);  //オブジェクト取得
-	TYPE GetType();                                      //タイプ取得
-	//==============================================================================================
-	void SetType(TYPE type);                             //タイプ設定
+	virtual ~CObject();                                                               //デストラクタ
+	virtual HRESULT Init() = 0;                                                       //初期化処理
+	virtual void Uninit() = 0;                                                        //終了処理
+	virtual void ExtraUninit();                                                       //別枠の終了処理
+	virtual void Update() = 0;                                                        //更新処理
+	virtual void Draw() = 0;                                                          //描画処理
+	bool GetUseDeath() { return m_bUseDeath; }                                        //死亡フラグを発動するか決めるフラグを取得
+	static void ReleaseAll();                                                         //全オブジェクト開放
+	static void UpdateAll();                                                          //全オブジェクト更新
+	static void DrawAll();                                                            //全オブジェクト描画
+	virtual void SetDeath();                                                          //死亡フラグを設定
+	static int GetNumAll();                                                           //全オブジェクトの総数を取得する
+	bool GetCreateSuccess() { return m_bCreateSuccess; }                              //オブジェクトの生成に成功したかどうか
+	static CObject* GetCObject(int nIdx,int nPriority);                               //オブジェクト取得
+	TYPE GetType();                                                                   //タイプ取得
+	void SetType(TYPE type);                                                          //タイプ設定
 	static const int m_nMAXOBJECT = 1024;                                             //オブジェクト最大数
 	static const int m_nMAXPRIORITY = static_cast<int>(TYPE::MAX);                    //描画順最大数
 	static void ReleaseProcess();                                                     //リストの破棄をする処理
@@ -120,7 +116,8 @@ public:
 	OBJECTTYPE GetObjectType() { return m_ObjectType; }                               //オブジェクトの分類を取得する
 	CObject* GetNextObject() {return m_pNext; }                                       //次のオブジェクトを取得する
 	CObject* GetPrevObject() { return m_pPrev; }                                      //前のオブジェクトを取得する
-
+	void SetIsUpdatePause(bool bPause) { m_bIsUpdatePause = bPause; }                 //ポーズ中に更新を止めるかどうかを設定する
+	const bool& GetIsUpdatePause() const { return m_bIsUpdatePause; }                 //ポーズ中に更新を止めるかどうかを取得する
 	//==============================
 	//ステージマネージャー関係
 	//==============================
@@ -155,6 +152,8 @@ protected:
 private:
 	static CObject* m_apObject[m_nMAXPRIORITY][m_nMAXOBJECT];//オブジェクト管理
 	static bool m_bActivationReleaseAll;                     //ReleaseAllを発動するかどうか
+
+    //描画プライオリティ
 	static constexpr int s_nDrawPriority[static_cast<int>(TYPE::MAX)] = 
 	{
 		static_cast<int>(TYPE::BG3D),         //0
@@ -187,9 +186,8 @@ private:
 		static_cast<int>(TYPE::SCORE),        //27
 		static_cast<int>(TYPE::FADE),         //28
 		static_cast<int>(TYPE::NONE),         //29
-	}; //描画順配列
-	//static map<TYPE, int> s_DrawPriority;                    //描画順を決める用のマップ型（タイプ列挙型が更新順で、この静的メンバ変数は描画順)
-	//static vector<pair<TYPE, int>> s_VecDrawPriority;        //描画順を決める
+	};//描画プライオリティ
+
 	//===============================================
 	//リスト管理
 	//===============================================
@@ -201,6 +199,7 @@ private:
 
 	bool m_bDeath;                                           //死亡フラグ!
 	bool m_bUseDeath;                                        //死亡フラグを発動するかどうか!
+	bool m_bIsUpdatePause;                                   //ポーズ中に更新を止めるかどうか
 	//===============================================================================================
 
 	//分類用

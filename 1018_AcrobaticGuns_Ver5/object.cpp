@@ -12,6 +12,7 @@
 #include "object2d.h"
 #include "renderer.h"
 #include "manager.h"
+#include "game.h"
 //====================================================
 
 //========================
@@ -29,7 +30,7 @@ bool CObject::m_bActivationReleaseAll = false;            //ReleaseAllを発動する
 //=====================================================
 CObject::CObject(int nPriority,bool bUseintPriority, TYPE Type, OBJECTTYPE ObjType) : m_type(Type),m_ObjectType(ObjType),
 m_bDeath(false), m_bUseDeath(false),m_pPrev(nullptr),m_pNext(nullptr),
-m_nPriority(nPriority),m_bCreateSuccess(false),m_nCntFrame(0),m_ManagerObjectType(MANAGEROBJECTTYPE::NONE)
+m_nPriority(nPriority),m_bCreateSuccess(false),m_nCntFrame(0),m_ManagerObjectType(MANAGEROBJECTTYPE::NONE),m_bIsUpdatePause(true)
 {
 	m_bCreateSuccess = false;                       //生成に成功したかどうか
 	m_bDeath = false;                               //死亡フラグ
@@ -164,11 +165,25 @@ void CObject::UpdateAll()
 
 		while (pObj != nullptr)
 		{
-			//次のオブジェクトを格納
-			CObject* pNext = pObj->m_pNext;
+			if (CGame::GetPauseFlag())
+			{//ゲームモードがポーズ状態だったら
 
-			pObj->Update();
-			pObj = pNext;
+				//次のオブジェクトを格納
+				CObject* pNext = pObj->m_pNext;
+
+				if (!pObj->m_bIsUpdatePause)
+				{//ポーズ中に更新を止めないなら
+					pObj->Update();
+				}
+
+				pObj = pNext;//リストを次へ
+			}
+			else
+			{//ゲームモードがポーズ状態じゃなかったら
+				CObject* pNext = pObj->m_pNext;    //次のオブジェクトを格納
+				pObj->Update();                    //更新処理
+				pObj = pNext;                      //リストを次へ
+			}
 		}
 	}
 
