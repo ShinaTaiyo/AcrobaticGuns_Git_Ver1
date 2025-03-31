@@ -2534,7 +2534,7 @@ CEnemyMove_Frightened::CEnemyMove_Frightened(CEnemy* pEnemy, D3DXVECTOR3 StopPos
 	pEnemy->SetState(CEnemy::STATE::FRIGHTENDED);//怯え状態にする
 
 	//ロックオン表示を上記で求めたスクリーン座標に召喚する
-	m_pLockOn = CUi::Create(CUi::UITYPE::TARGET_000, CObject2D::POLYGONTYPE::SENTERROLLING, 200.0f, 200.0f, 100, true, D3DXVECTOR3(ScreenPos.x, ScreenPos.y, 0.0f),
+	m_pLockOn = CUi::Create(CUi::UITYPE::TARGET_000,false,CObject2D::POLYGONTYPE::SENTERROLLING, 200.0f, 200.0f, 100, true, D3DXVECTOR3(ScreenPos.x, ScreenPos.y, 0.0f),
 		D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f));
 
 	pEnemy->SetAction(false);        //攻撃をオフにする

@@ -30,7 +30,7 @@ bool CObject::m_bActivationReleaseAll = false;            //ReleaseAllを発動する
 //=====================================================
 CObject::CObject(int nPriority,bool bUseintPriority, TYPE Type, OBJECTTYPE ObjType) : m_type(Type),m_ObjectType(ObjType),
 m_bDeath(false), m_bUseDeath(false),m_pPrev(nullptr),m_pNext(nullptr),
-m_nPriority(nPriority),m_bCreateSuccess(false),m_nCntFrame(0),m_ManagerObjectType(MANAGEROBJECTTYPE::NONE),m_bIsUpdatePause(true)
+m_nPriority(nPriority),m_bCreateSuccess(false),m_nCntFrame(0),m_ManagerObjectType(MANAGEROBJECTTYPE::NONE),m_bIsStopUpdatePause(true)
 {
 	m_bCreateSuccess = false;                       //生成に成功したかどうか
 	m_bDeath = false;                               //死亡フラグ
@@ -171,7 +171,7 @@ void CObject::UpdateAll()
 				//次のオブジェクトを格納
 				CObject* pNext = pObj->m_pNext;
 
-				if (!pObj->m_bIsUpdatePause)
+				if (!pObj->m_bIsStopUpdatePause)
 				{//ポーズ中に更新を止めないなら
 					pObj->Update();
 				}

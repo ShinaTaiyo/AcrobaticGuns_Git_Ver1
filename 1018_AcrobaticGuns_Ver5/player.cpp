@@ -81,12 +81,12 @@ HRESULT CPlayer::Init()
         m_pLockOn->SetPolygonRotSpeed(0.01f);//ポリゴンを回転させる
 
         //モード表示の生成
-        m_pModeDisp = CUi::Create(CUi::UITYPE::ACTIONMODE_GUN, CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, 1, false, D3DXVECTOR3(50.0f, 50.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+        m_pModeDisp = CUi::Create(CUi::UITYPE::ACTIONMODE_GUN,false,CObject2D::POLYGONTYPE::SENTERROLLING, 100.0f, 100.0f, 1, false, D3DXVECTOR3(50.0f, 50.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
             D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
         m_pModeDisp->SetUseDeath(false);     //死亡フラグを使用しない
 
         //*ダイブゲージのフレームを生成
-        m_pDiveGaugeFrame = CUi::Create(CUi::UITYPE::DIVEGAUGEFRAME_000, CObject2D::POLYGONTYPE::SENTERROLLING, 450.0f, 100.0f, 1, false, D3DXVECTOR3(SCREEN_WIDTH - 250.0f, 100.0f, 0.0f),
+        m_pDiveGaugeFrame = CUi::Create(CUi::UITYPE::DIVEGAUGEFRAME_000,false,CObject2D::POLYGONTYPE::SENTERROLLING, 450.0f, 100.0f, 1, false, D3DXVECTOR3(SCREEN_WIDTH - 250.0f, 100.0f, 0.0f),
             D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
         m_pDiveGaugeFrame->SetUseDeath(false);//死亡フラグを使用しない
 
@@ -94,7 +94,7 @@ HRESULT CPlayer::Init()
         m_pDiveGaugeFrame->GetUiCompositeContainer()->Add(DBG_NEW CUIComposite_Gauge(m_pDiveGaugeFrame,D3DXVECTOR3(SCREEN_WIDTH - 390.0f, 106.5f, 0.0f), D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f), CObject2D::POLYGONTYPE::LEFT, CGauge::GAUGETYPE::DIVE, 350.0f, 19.6f, 0, 20));
 
         //*ダイブ可能回数のUIを生成
-        m_pDivePossibleNum = CUi::Create(CUi::UITYPE::POSSIBLEDIVENUMTEXT_000, CObject2D::POLYGONTYPE::SENTERROLLING, 200.0f, 100.0f, 1, false, D3DXVECTOR3(200.0f, 100.0f, 0.0f),
+        m_pDivePossibleNum = CUi::Create(CUi::UITYPE::POSSIBLEDIVENUMTEXT_000,false,CObject2D::POLYGONTYPE::SENTERROLLING, 200.0f, 100.0f, 1, false, D3DXVECTOR3(200.0f, 100.0f, 0.0f),
             D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 61.0f, 1.0f, 1.0f));
         m_pDivePossibleNum->GetUiCompositeContainer()->Add(DBG_NEW CUIComposite_Numeric(m_pDivePossibleNum, 0, 50.0f, 50.0f));//数字の機能をコンポジットパターンのコンテナに格納
         m_pDivePossibleNum->SetUseDeath(false);                                                                               //死亡フラグを使用しない

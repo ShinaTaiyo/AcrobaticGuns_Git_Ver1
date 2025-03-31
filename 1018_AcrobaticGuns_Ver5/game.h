@@ -8,7 +8,6 @@
 #ifndef _GAME_H_  
 #define _GAME_H_
 
-
 //========================================
 //インクルード
 //========================================
@@ -19,6 +18,7 @@
 #include "main.h"
 #include "phasemanager.h"
 #include "eventmanager.h"
+#include "pausemanager.h"
 #include "score.h"
 #include "combo.h"
 #include "tutorial.h"
@@ -44,11 +44,13 @@ public:
 	static CScore* GetScore() { return s_pSCORE; }                         //スコアへのポインタを取得する
 	static CCombo* GetCombo() { return s_pCOMBO; }                         //コンボへのポインタを取得する
 	static const bool& GetPauseFlag() { return s_bPAUSE; }                 //ポーズ中かどうかを取得する
+	static void SetChengePause() { s_bCHENGEPAUSE = true; }                //ポーズ状態変更フラグをONにする
 private:
 
 	//===========================================
 	//静的メンバ変数
 	//===========================================
+	//通常
 	static constexpr bool s_bUSETUTORIAL = true;                           //チュートリアルを使用するかどうか
 	static CPlayer* m_pPlayer;                                             //プレイヤー
 	static CStageManager* m_pStageManager;                                 //ステージマネージャー
@@ -59,6 +61,13 @@ private:
 	static int s_nPhaseNum;                                                //フェーズ番号
 	static bool s_bGameClear;                                              //ゲームをクリアしたかどうか
 	static bool s_bPAUSE;                                                  //ポーズするかどうか
+	static bool s_bCHENGEPAUSE;                                            //ポーズ状態変更フラグ
+	//====================================================================================================================-
+
+	//===========================================
+	//変数
+	//===========================================
+	CPauseManager* m_pPauseManager;                                        //ポーズマネージャー
 	//====================================================================================================================-
 
 	//===========================================

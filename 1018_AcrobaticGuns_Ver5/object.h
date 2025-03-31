@@ -48,6 +48,7 @@ public:
 		LOCKON,          //ロックオン
 		UI,              //UI
 		GAUGE,           //ゲージ
+		UI_PAUSE,        //ポーズ用UI
 		PHASEINFO,       //フェーズ情報
 		STAGEMANAGER,    //ステージマネージャー
 		PHASEMANAGER,    //フェーズマネージャー
@@ -116,8 +117,8 @@ public:
 	OBJECTTYPE GetObjectType() { return m_ObjectType; }                               //オブジェクトの分類を取得する
 	CObject* GetNextObject() {return m_pNext; }                                       //次のオブジェクトを取得する
 	CObject* GetPrevObject() { return m_pPrev; }                                      //前のオブジェクトを取得する
-	void SetIsUpdatePause(bool bPause) { m_bIsUpdatePause = bPause; }                 //ポーズ中に更新を止めるかどうかを設定する
-	const bool& GetIsUpdatePause() const { return m_bIsUpdatePause; }                 //ポーズ中に更新を止めるかどうかを取得する
+	void SetIsStopUpdatePause(bool bPause) { m_bIsStopUpdatePause = bPause; }         //ポーズ中に更新を止めるかどうかを設定する
+	const bool& GetIsStopUpdatePause() const { return m_bIsStopUpdatePause; }         //ポーズ中に更新を止めるかどうかを取得する
 	//==============================
 	//ステージマネージャー関係
 	//==============================
@@ -156,36 +157,37 @@ private:
     //描画プライオリティ
 	static constexpr int s_nDrawPriority[static_cast<int>(TYPE::MAX)] = 
 	{
-		static_cast<int>(TYPE::BG3D),         //0
-  		static_cast<int>(TYPE::FIELD),        //1
-		static_cast<int>(TYPE::BGMODEL),      //2
-		static_cast<int>(TYPE::BLOCK),        //3
-		static_cast<int>(TYPE::AIMODEL),      //4
-		static_cast<int>(TYPE::PLAYER),       //5
-		static_cast<int>(TYPE::WIREHEAD),     //6
-		static_cast<int>(TYPE::WIRE),         //7
-		static_cast<int>(TYPE::ATTACK),       //8
-		static_cast<int>(TYPE::ENEMY),        //9
-		static_cast<int>(TYPE::UI3D),         //10
-		static_cast<int>(TYPE::NUMBER3D),     //11
-		static_cast<int>(TYPE::BG),           //12
-		static_cast<int>(TYPE::PARTICLE),     //13
-		static_cast<int>(TYPE::MESHORBIT),    //14
-		static_cast<int>(TYPE::EFFECT),       //15
-		static_cast<int>(TYPE::PARTICLE2D),   //16
-		static_cast<int>(TYPE::LOCKON),       //17
-		static_cast<int>(TYPE::UI),           //18
-		static_cast<int>(TYPE::NUMBER),       //19
-		static_cast<int>(TYPE::GAUGE),        //20
-		static_cast<int>(TYPE::PHASEINFO),    //21
-		static_cast<int>(TYPE::STAGEMANAGER), //22
-		static_cast<int>(TYPE::PHASEMANAGER), //23
-		static_cast<int>(TYPE::EVENTMANAGER), //24
-		static_cast<int>(TYPE::COMBO),        //25
-		static_cast<int>(TYPE::TUTORIAL),     //26
-		static_cast<int>(TYPE::SCORE),        //27
-		static_cast<int>(TYPE::FADE),         //28
-		static_cast<int>(TYPE::NONE),         //29
+		static_cast<int>(TYPE::BG3D),         
+  		static_cast<int>(TYPE::FIELD),        
+		static_cast<int>(TYPE::BGMODEL),      
+		static_cast<int>(TYPE::BLOCK),        
+		static_cast<int>(TYPE::AIMODEL),      
+		static_cast<int>(TYPE::PLAYER),       
+		static_cast<int>(TYPE::WIREHEAD),     
+		static_cast<int>(TYPE::WIRE),         
+		static_cast<int>(TYPE::ATTACK),       
+		static_cast<int>(TYPE::ENEMY),        
+		static_cast<int>(TYPE::UI3D),         
+		static_cast<int>(TYPE::NUMBER3D),     
+		static_cast<int>(TYPE::BG),           
+		static_cast<int>(TYPE::PARTICLE),     
+		static_cast<int>(TYPE::MESHORBIT),    
+		static_cast<int>(TYPE::EFFECT),       
+		static_cast<int>(TYPE::PARTICLE2D),   
+		static_cast<int>(TYPE::LOCKON),       
+		static_cast<int>(TYPE::UI),           
+		static_cast<int>(TYPE::NUMBER),       
+		static_cast<int>(TYPE::GAUGE),        
+		static_cast<int>(TYPE::UI_PAUSE),        
+		static_cast<int>(TYPE::PHASEINFO),    
+		static_cast<int>(TYPE::STAGEMANAGER), 
+		static_cast<int>(TYPE::PHASEMANAGER), 
+		static_cast<int>(TYPE::EVENTMANAGER), 
+		static_cast<int>(TYPE::COMBO),        
+		static_cast<int>(TYPE::TUTORIAL),     
+		static_cast<int>(TYPE::SCORE),        
+		static_cast<int>(TYPE::FADE),         
+		static_cast<int>(TYPE::NONE),         
 	};//描画プライオリティ
 
 	//===============================================
@@ -199,7 +201,7 @@ private:
 
 	bool m_bDeath;                                           //死亡フラグ!
 	bool m_bUseDeath;                                        //死亡フラグを発動するかどうか!
-	bool m_bIsUpdatePause;                                   //ポーズ中に更新を止めるかどうか
+	bool m_bIsStopUpdatePause;                                   //ポーズ中に更新を止めるかどうか
 	//===============================================================================================
 
 	//分類用
