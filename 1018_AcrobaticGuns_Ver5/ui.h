@@ -26,25 +26,27 @@ class CUi : public CObject2D
 public:
 	enum class UITYPE
 	{//UIの種類
-		LOCKON = 0,             //ロックオン
-		ACTIONMODEWINDOW,       //アクションモードウインドウ
-	    ACTIONMODE_GUN,         //ショットモードUI
-		ACTIONMODE_DIVE,        //ダイブモードUI
-		PHASETEXT,              //フェーズ文字
-		STAGETEXT,              //ステージ文字
-	    TARGET_000,             //ターゲット
-		POSSIBLEDIVENUMTEXT_000,//ダイブ可能回数文字
-		TUTORIAL_TEX,           //チュートリアル用テクスチャ
-		CHECKMARK_000,          //チェックマーク
-		TITLELOGO_000,          //タイトルロゴ
-		PRESSENTER_000,         //エンターキーを押す
-		DIVEGAUGEFRAME_000,     //ダイブゲージのフレーム
-		GAMECLEAR_000,          //ゲームクリアの文字のテクスチャ
-		LOSE_000,               //負けの文字のテクスチャ
-		COMBOTEXT_000,          //コンボの文字のテクスチャ
-	    PAUSETEXT_000,          //ポーズの文字のテクスチャ
-	    EXITTEXT_000,           //EXITの文字のテクスチャ
-	    CONTINUETEXT_000,       //CONTINUEの文字のテクスチャ
+		LOCKON = 0,                      //ロックオン
+		ACTIONMODEWINDOW,                //アクションモードウインドウ
+	    ACTIONMODE_GUN,                  //ショットモードUI
+		ACTIONMODE_DIVE,                 //ダイブモードUI
+		PHASETEXT,                       //フェーズ文字
+		STAGETEXT,                       //ステージ文字
+	    TARGET_000,                      //ターゲット
+		POSSIBLEDIVENUMTEXT_000,         //ダイブ可能回数文字
+		TUTORIAL_TEX,                    //チュートリアル用テクスチャ
+		CHECKMARK_000,                   //チェックマーク
+		TITLELOGO_000,                   //タイトルロゴ
+		PRESSENTER_000,                  //エンターキーを押す
+		DIVEGAUGEFRAME_000,              //ダイブゲージのフレーム
+		GAMECLEAR_000,                   //ゲームクリアの文字のテクスチャ
+		LOSE_000,                        //負けの文字のテクスチャ
+		COMBOTEXT_000,                   //コンボの文字のテクスチャ
+	    PAUSETEXT_000,                   //ポーズの文字のテクスチャ
+	    EXITTEXT_000,                    //EXITの文字のテクスチャ
+	    CONTINUETEXT_000,                //CONTINUEの文字のテクスチャ
+	    CAMERASENSITIVITYTEXT_000,       //カメラ感度調整の文字のテクスチャ
+	    RETURNTEXT_000,                  //戻るの文字のテクスチャ
 		MAX
 	};
 

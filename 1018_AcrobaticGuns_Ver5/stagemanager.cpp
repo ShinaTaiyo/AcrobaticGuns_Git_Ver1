@@ -268,7 +268,7 @@ void CStageManager::SaveMapTxt(int nMapNum)
 	fstream WritingFile;                                  //ファイル
 	string Writing_Buff;                                  //文字列
 
-	WritingFile.open(m_aWORLDMAP_TXT[nMapNum], ios::out); //読み取りモードでファイルを開く	
+	WritingFile.open(m_aWORLDMAP_TXT[nMapNum], ios::out); //書き出しモードでファイルを開く	
 
 	//プレイヤーのスポーンポイントを設定する（小数点第３位まで）
 	WritingFile << "PLAYER_SPAWNPOINT = " << fixed << setprecision(3) <<m_SpawnPoint.x << " " <<

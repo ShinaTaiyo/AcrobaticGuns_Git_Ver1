@@ -233,9 +233,10 @@ void CGame::Update()
 void CGame::PauseProcess()
 {
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard(); //キー入力情報を取得する
+	CInputJoypad* pInputJoypad = CManager::GetInputJoypad();       //ジョイパッド入力情報を取得する
 	CDebugText* pDebugText = CManager::GetDebugText();             //デバッグ情報を取得する
 
-	if (pInputKeyboard->GetTrigger(DIK_P) || s_bCHENGEPAUSE)
+	if (pInputKeyboard->GetTrigger(DIK_P) || pInputJoypad->GetTrigger(CInputJoypad::JOYKEY::BACK)|| s_bCHENGEPAUSE)
 	{//Pキーを押す、又はポーズ状態変更フラグを発動する
 		s_bPAUSE = s_bPAUSE ? false : true;//フラグを切り替える
 		if (s_bPAUSE)

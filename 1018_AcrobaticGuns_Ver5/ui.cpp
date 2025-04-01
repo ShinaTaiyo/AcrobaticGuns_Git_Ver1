@@ -40,6 +40,8 @@ const string CUi::UI_FILENAME[static_cast<int>(CUi::UITYPE::MAX)] =
 	"data\\TEXTURE\\UI\\PauseText_000.png",
 	"data\\TEXTURE\\UI\\ExitText_000.png",
 	"data\\TEXTURE\\UI\\ContinueText_000.png",
+	"data\\TEXTURE\\UI\\CameraSensitivityText_000.png",
+	"data\\TEXTURE\\UI\\ReturnText_000.png",
 };//テクスチャファイル名
 
 //====================================================
