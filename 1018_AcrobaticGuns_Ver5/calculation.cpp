@@ -327,20 +327,22 @@ D3DXVECTOR3* CCalculation::CalcScreenToWorld(D3DXVECTOR3* pout, float Sx, float 
 	// 各行列の逆行列を算出（ビュー、プロジェクションマトリックスの逆行列をかけるのは、カメラの位置に2DのUIが出ていると定義できるから)
 	//逆行列とは、値に値-1をかけ、掛け合わされる前に戻すこと
 	D3DXMATRIX InvView, InvPrj, VP, InvViewport;
-	D3DXMatrixInverse(&InvView, NULL, View);//ビューマトリックスとの逆光列をかけてワールド座標を求める
+	D3DXMatrixInverse(&InvView, NULL, View);//ビューマトリックスとの逆光列をかけてワールド座標を求める（ビューマトリックスの向きや位置に応じて変換されているので）
 	D3DXMatrixInverse(&InvPrj, NULL, Prj);  //プロジェクションマトリックスとの逆行列（見え方（平行投影、視野角など）を変えているので、逆行列を掛け合わせ、もとに戻す必要がある）
 	D3DXMatrixIdentity(&VP);
 
-	//スケーリングの値を変えている。スクリーン座標の中心を画面中央にする
-	VP._11 = Screen_w / 2.0f; VP._22 = -Screen_h / 2.0f;//スクリーン座標系では、通常上方向が正になるので、座標変換する際に-にしている
-	VP._41 = Screen_w / 2.0f; VP._42 = Screen_h / 2.0f;//スクリーン座標系では、通常上方向が正になるので、座標変換する際に-にしている
-	D3DXMatrixInverse(&InvViewport, NULL, &VP);
+	// スケーリングの値を変えている。スクリーン座標の中心を画面中央にする（NDC座標を使用して変換するので、スクリーン座標は０～１２８０、なお、
+	//NDC座標はー１～１だから、変換する際に合わせる必要がある(１２８０　＝　６４０）、（０　＝　ー６４０)
+	VP._11 = Screen_w / 2.0f; VP._22 = -Screen_h / 2.0f;//スケーリング成分（Xそのまま、Yは上を正に）
+	VP._41 = Screen_w / 2.0f; VP._42 = Screen_h / 2.0f; //平行移動成分（中心を原点に合わせる)
+	D3DXMatrixInverse(&InvViewport, NULL, &VP);//NDC座標に合わせる
 
 	//自分
-	D3DXVECTOR3 MyPos = D3DXVECTOR3(Sx,Sy,fZ);
+	D3DXVECTOR3 MyPos = D3DXVECTOR3(Sx,Sy,fZ);//スクリーン座標と深度値
 
 	// 逆変換
-	D3DXMATRIX tmp = InvViewport * InvPrj * InvView;//ワールド座標を求める
+	D3DXMATRIX tmp = InvViewport * InvPrj * InvView;// ワールド座標を求める（InvViewport「スクリーン座標→NDC座標」、InvPrj「NDC座標→ビュー空間」、InvView「ビュー空間→ワールド座標」)
+	                                                //この行列に深度値とスクリーン座標を合わせることで、深度値に合わせた座標変換が可能になる)
 	D3DXVec3TransformCoord(pout, &MyPos, &tmp);     //位置を求める
 	return pout;
 }
@@ -355,12 +357,13 @@ D3DXVECTOR3 CCalculation::CalcWorldToScreenNoViewport(D3DXVECTOR3 worldPos, D3DX
 	D3DXVECTOR4 ClipSpacePos;
 	D3DXMATRIX mtxTrans;
 
-	mtxTrans = viewMatrix * projectionMatrix;
+	mtxTrans = viewMatrix * projectionMatrix;//ビューポート変換しNDC座標に変換
 	D3DXVec3Transform(&ClipSpacePos, &worldPos, &mtxTrans);
 
 	//透視除算（クリップ座標からNDC空間へ）
 	if (ClipSpacePos.w != 0.0f)
-	{
+	{//X、Y、Zは、カメラからの相対的な位置を表している（変換された位置)。
+	 //Wは、カメラからの距離（深度情報）を表している
 		ClipSpacePos.x /= ClipSpacePos.w;
 		ClipSpacePos.y /= ClipSpacePos.w;
 		ClipSpacePos.z /= ClipSpacePos.w;
@@ -368,9 +371,9 @@ D3DXVECTOR3 CCalculation::CalcWorldToScreenNoViewport(D3DXVECTOR3 worldPos, D3DX
 
 	//スクリーン座標へ変換
 	D3DXVECTOR3 ScreenPos;
-	ScreenPos.x = (ClipSpacePos.x * 0.5f + 0.5f) * screenWidth;
-	ScreenPos.y = (1.0f - (ClipSpacePos.y * 0.5f + 0.5f)) * screenHeight;
-	ScreenPos.z = ClipSpacePos.z;//深度値（０～１）の範囲
+	ScreenPos.x = (ClipSpacePos.x * 0.5f + 0.5f) * screenWidth;           //真ん中を０にするため＋０．５ｆ、ー１なら左端、＋１なら右端となる
+	ScreenPos.y = (1.0f - (ClipSpacePos.y * 0.5f + 0.5f)) * screenHeight; //真ん中を０にするため＋０．５ｆ、下が正となり、上が０となるので、１の時は０になる、ー１の時は１となる
+	ScreenPos.z = ClipSpacePos.z;                                         //深度値（０～１）の範囲
 
 	return ScreenPos;
 }
