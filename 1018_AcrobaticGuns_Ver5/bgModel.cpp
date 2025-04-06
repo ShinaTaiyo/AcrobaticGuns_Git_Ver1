@@ -114,7 +114,9 @@ CBgModel* CBgModel::Create(BGMODELTYPE bgModelType, D3DXVECTOR3 pos, D3DXVECTOR3
 	pBgModel->GetSizeInfo().SetScale(Scale);              //拡大率を設定
 	pBgModel->GetSizeInfo().SetUseSwapVtxXZ(bSwapVtxXZ);  //XZの頂点のサイズを入れ替えるかどうか
 	pBgModel->GetDrawInfo().SetUseShadow(false);          //影を使用しない
-
+	pBgModel->GetLifeInfo().SetAutoSubLife(false);        //体力を自動的に減らさない
+	pBgModel->GetLifeInfo().SetMaxLife(10);               //最大体力
+	pBgModel->GetLifeInfo().SetLife(10);                  //体力
 	pBgModel->SetManagerObjectType(CObject::MANAGEROBJECTTYPE::BGMODEL);//ステージマネージャーで呼び出す時の種類を設定
 
 	if (bSwapVtxXZ == true)

@@ -315,6 +315,7 @@ void CManager::Update()
 	{
 		m_pScene->Update();        //シーンの更新処理
 	}
+	CObject::ChengeTimeScaleFrameCntProcess();//タイムスケールを変える時間をカウントする処理
 }
 //===================================================
 

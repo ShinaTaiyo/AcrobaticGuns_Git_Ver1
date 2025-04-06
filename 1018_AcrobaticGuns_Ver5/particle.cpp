@@ -98,12 +98,12 @@ void CParticle::Update()
 	//加速がONだったら
 	if (m_bAddSpeed == true)
 	{
-		Move *= m_fAddSpeed;
+		Move *= m_fAddSpeed * GetDeltaTimeScale(this);
 	}
 
 	if (m_bGravity == true)
 	{//重力を使用するなら
-		Move.y += m_fGravity;
+		Move.y += m_fGravity * GetDeltaTimeScale(this);
 	}
 
 	fAlpha = (float)(nLife) / (float)(nMaxLife);       //色の透明度を体力の割合で決定

@@ -15,6 +15,7 @@
 #include "main.h"
 #include "manager.h"
 #include "camera.h"
+#include "object.h"
 #include "input.h"
 #include "objectXInfo.h"
 #include "calculation.h"
@@ -676,9 +677,9 @@ CPlayerAbnormalState_KnockBack::~CPlayerAbnormalState_KnockBack()
 void CPlayerAbnormalState_KnockBack::Process(CPlayer* pPlayer)
 {
     //ノックバックの移動量を減衰させる
-    m_KnockBackMove.x += (0.0f - m_KnockBackMove.x) * m_fInertia;
-    m_KnockBackMove.y += (0.0f - m_KnockBackMove.y) * m_fInertia;
-    m_KnockBackMove.z += (0.0f - m_KnockBackMove.z) * m_fInertia;
+    m_KnockBackMove.x += (0.0f - m_KnockBackMove.x) * m_fInertia * CObject::GetDeltaTimeScale(pPlayer);
+    m_KnockBackMove.y += (0.0f - m_KnockBackMove.y) * m_fInertia * CObject::GetDeltaTimeScale(pPlayer);
+    m_KnockBackMove.z += (0.0f - m_KnockBackMove.z) * m_fInertia * CObject::GetDeltaTimeScale(pPlayer);
 
     //移動量の設定
     pPlayer->GetMoveInfo().SetMove(m_KnockBackMove);

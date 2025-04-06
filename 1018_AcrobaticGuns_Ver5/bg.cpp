@@ -85,7 +85,7 @@ void CBg::Update()
 		pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f) + m_PosTex;
 
 		//テクスチャ座標を移動させる
-		m_PosTex += m_MoveTex;
+		m_PosTex += m_MoveTex * GetDeltaTimeScale(this);
 
 		//頂点バッファをアンロックする
 		pVtxBuff->Unlock();

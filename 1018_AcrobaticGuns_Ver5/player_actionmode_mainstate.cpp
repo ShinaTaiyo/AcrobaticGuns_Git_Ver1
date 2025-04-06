@@ -195,7 +195,6 @@ CPlayerActionMode_WireShot::CPlayerActionMode_WireShot(CPlayer* pPlayer)
 	//正規化したベクトルをもとにYawとPitchを求める
 	float fYaw = atan2f(MathRot.x, MathRot.z);//Zを軸にする
 	float fPitch = atan2f(MathRot.y, sqrtf(powf(MathRot.x, 2) + powf(MathRot.z, 2)));//XZ平面の長さを軸にして求める
-	//fPitch *= -1.0f;//ピッチを奥側に（右手座標、手前側に傾くので、奥側に)
 
 	WireHeadMoveInfo.SetMove(CCalculation::Calculation3DVec(WireHeadPos, LockOnRayCollisionPos, s_fWIREHEAD_SHOTSPEED));//ワイヤーの頭をロックオンのレイの衝突位置に発射する
 	pWireHead->ResetCoolTime();                                                                                         //ワイヤーの頭が当たるまでのクールタイムをリセット

@@ -417,6 +417,13 @@ void CPlayerAttack_Dive::AttackProcess(CPlayer* pPlayer)
 		CWireHead* pWireHead = pPlayer->GetWire()->GetWireHead();             //ワイヤーの頭へのポインタ
 		if (pDivePossibleUiComposite_Numeric->GetValue() > 0)
 		{//ダイブゲージがたまっていたら爆発攻撃を発動
+			
+			//ダイブ攻撃を発動した瞬間にスローにする
+			CObject::SetTimeScale(CObject::TYPE::ENEMY, 0.1f, 60);
+			CObject::SetTimeScale(CObject::TYPE::PLAYER, 0.1f, 60);
+			CObject::SetTimeScale(CObject::TYPE::ATTACK, 0.1f, 60);
+			CObject::SetTimeScale(CObject::TYPE::PARTICLE, 0.1f, 60);
+
 			//爆発攻撃を生成
 			CAttackPlayer* pAttackPlayer = CAttackPlayer::Create(CAttack::ATTACKTYPE::EXPLOSION, CAttack::TARGETTYPE::ENEMY, CAttack::COLLISIONTYPE::SQUARE, false, true, 50, 30, 100, pPlayer->GetPosInfo().GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.1f, 0.1f, 0.1f),
 				D3DXVECTOR3(1.0f, 1.0f, 1.0f));
