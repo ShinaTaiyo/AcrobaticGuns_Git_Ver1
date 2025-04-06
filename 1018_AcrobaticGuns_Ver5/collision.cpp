@@ -699,7 +699,7 @@ bool CCollision::NewExtrusionCollisionSquareZ(CObjectX* pObjX, CObjectX* pComObj
 //====================================================================================================================
 
 //================================================================
-//レイとAABBの当たり判定、判定箇所も求める
+//レイとAABBの当たり判定、判定箇所も求める（全ての軸の交差範囲を比べる。重なっている範囲があれば、その範囲で当たっている）
 //================================================================
 bool CCollision::RayIntersectsAABBCollisionPos(const D3DXVECTOR3& origin,const D3DXVECTOR3& direction, const D3DXVECTOR3& min, const D3DXVECTOR3& max,
 	D3DXVECTOR3& CollisionPos)
