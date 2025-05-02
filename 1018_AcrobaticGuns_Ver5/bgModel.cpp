@@ -321,7 +321,7 @@ void CBgModel::SetBgModelType(BGMODELTYPE Type)
 		Uninit();
 		//モデル情報設定
 		int nIdx = CManager::GetObjectXInfo()->Regist(BGMODEL_FILENAME[static_cast<int>(nType)]);
-
+		m_Type = Type;//タイプ番号を格納
 		//モデル情報を割り当てる
 		BindObjectXInfo(CManager::GetObjectXInfo()->GetMesh(nIdx),
 			CManager::GetObjectXInfo()->GetBuffMat(nIdx),

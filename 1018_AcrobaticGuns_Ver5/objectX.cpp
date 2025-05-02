@@ -349,8 +349,7 @@ void CObjectX::SetDamage(int nDamage, int nHitStopTime)
 //================================================
 void CObjectX::CalculateSenterPos()
 {
-	m_PosInfo.SenterPos = m_PosInfo.Pos;//中心点を求める
-	m_PosInfo.SenterPos.y += (m_SizeInfo.VtxMax.y + m_SizeInfo.VtxMin.y) / 2;//最大頂点と最小頂点の距離を求め、その半分を足す
+	m_PosInfo.SenterPos = m_PosInfo.Pos + (m_SizeInfo.VtxMax + m_SizeInfo.VtxMin) * 0.5f;//最大頂点と最小頂点の距離を求め、その半分を足す
 }
 //================================================================================================================================================
 

@@ -288,7 +288,7 @@ void CAttack::CollisionProcess(bool& bCollision, bool& bNowCollision, CObjectX* 
 		}
 		break;
 	case CAttack::COLLISIONTYPE::RECTANGLE_XZ://XZ•ûŒü‚ÌÎ‚ß‚Ì“–‚½‚è”»’è
-		if (CCollision::RectAngleCollisionXZ(this, pObjX) == true)
+		if (CCollision::RectAngleCollisionXZ(this, pObjX))
 		{//XZ•ûŒü‚ÌÎ‚ß‚Ì“–‚½‚è”»’è‚ğs‚¤
 			bCollision = true;//“–‚½‚Á‚½
 			bNowCollision = true;//Œ»İ“–‚½‚Á‚½

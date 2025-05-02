@@ -103,7 +103,7 @@ private:
 	static constexpr int s_nMAX_SENSITIVITYLEVEL = 20;                                    //最大感度レベル
 	static int s_nSENSITIVITYLEVEL;                                                       //カメラの感度レベル
 	static bool s_bCAMERACONTROLLMOUSE;                                                   //カメラをマウスで操作するかどうか（Debugでは使わないかもしれないが、Releaseでは必ず使う)
-	static constexpr bool s_bDEBUGCAMERACONTROLLMOUSE = false;                            //デバッグ時にもカメラをマウスで操作するかどうか（カメラを使用するとカーソルが固定されてしまうので、使用するかを決める)
+	static constexpr bool s_bDEBUGCAMERACONTROLLMOUSE = true;                            //デバッグ時にもカメラをマウスで操作するかどうか（カメラを使用するとカーソルが固定されてしまうので、使用するかを決める)
 	//==========================================================================================================================================
 
 	//======================================

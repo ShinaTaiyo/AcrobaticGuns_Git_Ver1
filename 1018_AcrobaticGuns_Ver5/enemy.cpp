@@ -1217,6 +1217,7 @@ HRESULT CShotWeakEnemy::Init()
 		false,false,1, 60, 200, GetPosInfo().GetPos(), D3DXVECTOR3(0.0f,D3DX_PI * fRatioRot, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f));//剣を生成
 	m_pMagicSword->SetUseDeath(false);//剣の死亡フラグをオフにする
 
+	SetColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f), 300000, true, true, false);//デバッグ用に透明にする
 	//剣を回す方向を決める
 	if (bAim == false)
 	{
@@ -1651,7 +1652,7 @@ void CShotWeakEnemy::SwordCollision()
 {
 	if (m_pMagicSword != nullptr && CGame::GetPlayer() != nullptr)
 	{//剣とプレイヤーが存在していたら
-		if (CCollision::RectAngleCollisionXZ(m_pMagicSword, CGame::GetPlayer()))
+		if (CCollision::RectAngleCollisionXZ(m_pMagicSword,CGame::GetPlayer()))
 		{//XZ方向の斜めの当たり判定を行う
 
 			//XZ方向のベクトルを求める
