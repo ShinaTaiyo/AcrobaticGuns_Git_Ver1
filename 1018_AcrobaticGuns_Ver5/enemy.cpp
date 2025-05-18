@@ -2352,7 +2352,7 @@ void CDiveWeakEnemy::AttackProcess()
 		    	1, 60, 200, ShotPos, D3DXVECTOR3(0.0f, 0.0f, 0.0f), Aim, GetSizeInfo().GetScale() * 0.5f);//生成処理
 		    
 		    pAttackEnemy->GetBoundInfo().SetActive(true, D3DXVECTOR3(0.0f, 10.0f, 0.0f), true, 0.5f);     //バウンドさせる
-		    pAttackEnemy->SetExtrusionCollisioin(true);                                                   //押し出し判定を行い、
+		    pAttackEnemy->SetExtrusionCollision(true);                                                    //押し出し判定を行い、
 		    pAttackEnemy->SetHitOtherThanLibing(false);                                                   //敵やプレイヤー以外との当たり判定は行わない
 		}
 	}
