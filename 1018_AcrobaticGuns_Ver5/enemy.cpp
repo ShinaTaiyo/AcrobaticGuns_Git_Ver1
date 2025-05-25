@@ -1157,8 +1157,8 @@ void CEnemy::EditSensingRange()
 	D3DXVECTOR3 RandPos = { 0.0f,0.0f,0.0f };
 
 	RandPos.x = m_fSensingRange * sinf(fRadXZ) * cosf(fRadY);//X方向の長さに対して、球の側面に出すために、Y方向の高さの比（高さを底面の比としてかける）
-	RandPos.z = m_fSensingRange * cosf(fRadXZ) * cosf(fRadY);//Z方向の長さに対して、球の側面に出すために、Y方向の高さの比（高さを底面の比としてかける）
 	RandPos.y = m_fSensingRange * sinf(fRadY);               //Y方向の高さを求める
+	RandPos.z = m_fSensingRange * cosf(fRadXZ) * cosf(fRadY);//Z方向の長さに対して、球の側面に出すために、Y方向の高さの比（高さを底面の比としてかける）
 
 	//索敵範囲を表すためにパーティクルを索敵距離の位置にランダムで出す
 	CParticle::Create(CParticle::TYPE00_NORMAL, 200, 30.0f, 30.0f,Pos + RandPos,

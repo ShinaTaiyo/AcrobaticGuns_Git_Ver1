@@ -357,10 +357,10 @@ D3DXVECTOR3 CCalculation::CalcWorldToScreenNoViewport(D3DXVECTOR3 worldPos, D3DX
 	D3DXVECTOR4 ClipSpacePos;
 	D3DXMATRIX mtxTrans;
 
-	mtxTrans = viewMatrix * projectionMatrix;//ビューポート変換しNDC座標に変換
-	D3DXVec3Transform(&ClipSpacePos, &worldPos, &mtxTrans);
+	mtxTrans = viewMatrix * projectionMatrix; // ビューポート、プロジェクション変換
+	D3DXVec3Transform(&ClipSpacePos, &worldPos, &mtxTrans); // 上記の変換した時のワールド座標の位置を求める
 
-	//透視除算（クリップ座標からNDC空間へ）
+	//透視除算（クリップ座標からNDC空間へ）（本来はGPUが勝手にやるが、データとしては出ないので自分で求める)
 	if (ClipSpacePos.w != 0.0f)
 	{//X、Y、Zは、カメラからの相対的な位置を表している（変換された位置)。
 	 //Wは、カメラからの距離（深度情報）を表している

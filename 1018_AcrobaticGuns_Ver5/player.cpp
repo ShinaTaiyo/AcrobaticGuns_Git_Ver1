@@ -314,17 +314,17 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 move, D3D
         CManager::GetObjectXInfo()->GetTexture(nIdx),
         CManager::GetObjectXInfo()->GetColorValue(nIdx));
 
-    pPlayer->SetSize();                                                                                      //サイズを設定
-
-    PosInfo.SetPos(pos);                                                                                     //位置の設定
-    PosInfo.SetPosOld(pos);                                                                                  //1f前の位置を設定
-    PosInfo.SetPosFuture(pos);                                                                               //1f後の位置を設定
-    PosInfo.SetSupportPos(pos);                                                                              //設置位置
-    RotInfo.SetRot(rot);                                                                                     //向きの設定
-    SizeInfo.SetScale(Scale);                                                                                //拡大率の設定
-    SizeInfo.SetFormarScale(Scale);                                                                          //元の拡大率を設定する
-    pPlayer->GetLifeInfo().SetAutoDeath(false);                                                              //死亡フラグを自動で発動するかどうか
-    pPlayer->GetDrawInfo().SetUseShadow(true);                                                               //影を描画する
+    pPlayer->SetSize();                         //サイズを設定
+                                                
+    PosInfo.SetPos(pos);                        //位置の設定
+    PosInfo.SetPosOld(pos);                     //1f前の位置を設定
+    PosInfo.SetPosFuture(pos);                  //1f後の位置を設定
+    PosInfo.SetSupportPos(pos);                 //設置位置
+    RotInfo.SetRot(rot);                        //向きの設定
+    SizeInfo.SetScale(Scale);                   //拡大率の設定
+    SizeInfo.SetFormarScale(Scale);             //元の拡大率を設定する
+    pPlayer->GetLifeInfo().SetAutoDeath(false); //死亡フラグを自動で発動するかどうか
+    pPlayer->GetDrawInfo().SetUseShadow(true);  //影を描画する
 
     //体力
     LifeInfo.SetLife(s_nNORMAL_MAXLIFE);                                                                     //体力

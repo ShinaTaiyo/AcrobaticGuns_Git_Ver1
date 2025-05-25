@@ -99,6 +99,7 @@ void CAttack::Update()
 	m_bCollisionSuccess = false; // 当たり判定が成功したかどうかをマイフレームリセット
 
 	// === 処理 ===
+
 	CObjectX::Update(); // オブジェクトX更新処理
 
 	// 生きているものとの当たり判定を行う（プレイヤー、敵、ボスなど）
@@ -434,11 +435,15 @@ void CAttack::CollisionBuilding()
 
 			// === 変数 ===
 
-			CObjectX::PosInfo& OtherPosInfo = pObjX->GetPosInfo();    // 位置情報
-			CObjectX::SizeInfo& OtherSizeInfo = pObjX->GetSizeInfo(); // サイズ情報
-			const D3DXVECTOR3 & OtherPos = OtherPosInfo.GetPos();     // 位置
-			const D3DXVECTOR3& OtherVtxMax = OtherSizeInfo.GetVtxMax(); // 最大頂点
-			const D3DXVECTOR3& OtherVtxMin = OtherSizeInfo.GetVtxMin(); // 最小頂点
+			CObjectX::PosInfo&
+				OtherPosInfo = pObjX->GetPosInfo();      // 位置情報
+			CObjectX::SizeInfo& 
+				OtherSizeInfo = pObjX->GetSizeInfo();   // サイズ情報
+
+			const D3DXVECTOR3&
+				OtherPos = OtherPosInfo.GetPos(),        // 位置
+				OtherVtxMax = OtherSizeInfo.GetVtxMax(), // 最大頂点
+				OtherVtxMin = OtherSizeInfo.GetVtxMin(); // 最小頂点
 
 			// === 処理 ===
 
@@ -448,7 +453,6 @@ void CAttack::CollisionBuilding()
 				m_bCollisionSuccess = true; // 当たり判定が成功したフラグをオンにする
 				m_CollisionObjType = pObj->GetType(); // 当たったオブジェクトのタイプを格納する
 			}
-			
 
 			pObj = pNext; // リストを次に進める
 		}
