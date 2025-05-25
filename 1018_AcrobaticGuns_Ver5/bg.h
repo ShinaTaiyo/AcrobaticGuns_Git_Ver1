@@ -52,7 +52,6 @@ public:
 	void Update() override;   // 更新処理
 	void Draw() override;     // 描画処理
 	void SetDeath() override; // 死亡フラグを設定
-	static void Create(TYPE type); // 背景の生成
 
 	// === メンバ関数 ===
 
@@ -73,6 +72,10 @@ public:
 
 	void SetPosTex(D3DXVECTOR2 Pos); // テクスチャ座標を設定する
 	void SetMoveTex(D3DXVECTOR2 Move); // テクスチャの移動量を設定する
+
+	// === 静的メンバ関数 ===
+
+	static void Create(TYPE type); // 背景の生成
 private:
 	// === 静的メンバ変数 ===
 
