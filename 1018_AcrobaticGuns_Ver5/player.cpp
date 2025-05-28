@@ -614,7 +614,7 @@ void CPlayer::SetDamage(int nDamage, int nHitStopTime)
 void CPlayer::AdjustRot()
 {
     const D3DXVECTOR3& CameraRot = CManager::GetCamera()->GetRot();                                           //カメラの向き
-    GetRotInfo().SetRot(D3DXVECTOR3(GetRotInfo().GetRot().x,D3DX_PI + CameraRot.y, GetRotInfo().GetRot().z)); //カメラの向きを基準にプレイヤーの向きを設定
+    GetRotInfo().SetRot(D3DXVECTOR3(GetRotInfo().GetRot().x,CameraRot.y + D3DX_PI, GetRotInfo().GetRot().z)); //カメラの向きを基準にプレイヤーの向きを設定
 }
 //==========================================================================================================
 

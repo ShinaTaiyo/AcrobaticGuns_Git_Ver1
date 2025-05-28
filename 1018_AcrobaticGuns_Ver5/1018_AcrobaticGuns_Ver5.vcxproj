@@ -152,6 +152,7 @@
     <ClCompile Include="bgModel.cpp" />
     <ClCompile Include="billboard.cpp" />
     <ClCompile Include="block.cpp" />
+    <ClCompile Include="bounding_box.cpp" />
     <ClCompile Include="calculation.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="character.cpp" />
@@ -213,6 +214,7 @@
     <ClInclude Include="bgModel.h" />
     <ClInclude Include="billboard.h" />
     <ClInclude Include="block.h" />
+    <ClInclude Include="bounding_box.h" />
     <ClInclude Include="calculation.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="character.h" />

@@ -637,6 +637,8 @@ void CObjectX::ChengeEditPos()
 	D3DXVECTOR3 Move = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	SetColor(D3DXCOLOR(1.0f,0.0f,0.0f,0.5f),3,true,true,false);           //色を半透明にする
 	CInputKeyboard* pInput = CManager::GetInputKeyboard();
+	CCamera* pCamera = CManager::GetCamera(); // カメラへのポインタ
+	const D3DXVECTOR3& Rot = pCamera->GetRot(); // カメラの向き
 	//===========================
 	//位置を支点に固定
 	//===========================
@@ -673,7 +675,7 @@ void CObjectX::ChengeEditPos()
 	}
 	else
 	{//XZ平面移動
-		CCalculation::CaluclationMove(false,m_PosInfo.Pos,Move,5.0f, CCalculation::MOVEAIM_XZ, m_RotInfo.Rot.y);
+		CCalculation::CaluclationMove(false,m_PosInfo.Pos,Move,5.0f, CCalculation::MOVEAIM_XZ, Rot.y,m_RotInfo.Rot.y);
 	}
 
 	//支点も一緒に移動
