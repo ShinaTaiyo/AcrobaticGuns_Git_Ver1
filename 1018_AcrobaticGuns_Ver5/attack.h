@@ -156,11 +156,12 @@ private:
 
 	int m_nPower; // 攻撃力
 
-	bool m_bCollisionRelease;   // 衝突時に消すかどうか
-	bool m_bHitOtherThanLiving; // 生きているオブジェクト以外にも当たるかどうか
-	bool m_bAutoCollision;      // 当たり判定を攻撃クラスに任せるかどうか
-	bool m_bExtrusionCollision; // 押し出し判定を使うかどうか
-	bool m_bCollisionSuccess;   // 判定が成功したかどうか
+	bool 
+		m_bCollisionRelease,   // 衝突時に消すかどうか
+        m_bHitOtherThanLiving, // 生きているオブジェクト以外にも当たるかどうか
+	    m_bAutoCollision,      // 当たり判定を攻撃クラスに任せるかどうか
+	    m_bExtrusionCollision, // 押し出し判定を使うかどうか
+		m_bCollisionSuccess;   // 判定が成功したかどうか
 
 	ATTACKTYPE m_Type;       // タイプ
 	TARGETTYPE m_TargetType; // 狙うオブジェクトの種類

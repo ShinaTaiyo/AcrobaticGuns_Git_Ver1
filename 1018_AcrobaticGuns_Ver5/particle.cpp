@@ -12,6 +12,7 @@
 #include "particle.h"
 #include "manager.h"
 #include "renderer.h"
+#include "debugtext.h"
 #include "texture.h"
 //================================================================
 
@@ -81,14 +82,14 @@ void CParticle::Update()
 	//=======================
 	//変数宣言
 	//=======================
-	D3DXVECTOR3& Pos = CBillboard::GetPos();//位置
-	D3DXVECTOR3& Move = GetMove();          //移動量
-	float& fWidth = GetWidth();             //横幅
-	float& fHeight = GetHeight();           //高さ
+	const D3DXVECTOR3& Pos = GetPos(); // 位置
+	D3DXVECTOR3& Move = GetMove();     // 移動量
+	D3DXVECTOR3 Size = GetSize(); // サイズ
 	D3DXCOLOR col = GetColor();             //色合い
-	int& nLife = GetLife();                 //体力
-	int& nMaxLife = GetMaxLife();           //最大体力
-	float fAlpha = 0.0f;                    //色の透明度
+	const int & 
+		nLife = GetLife(),       // 体力
+	    nMaxLife = GetMaxLife(); // 最大体力
+	float fAlpha = 0.0f; // 色の透明度
 	//===========================================================================================
 
 	//=======================================
@@ -106,11 +107,11 @@ void CParticle::Update()
 		Move.y += m_fGravity * GetDeltaTimeScale(this);
 	}
 
-	fAlpha = (float)(nLife) / (float)(nMaxLife);       //色の透明度を体力の割合で決定
-	fWidth -= m_fReductionWidth;                       //横幅を減らす
-	fHeight -= m_fReductionHeight;                     //高さを減らす
-	SetColor(D3DXCOLOR(col.r, col.g, col.b, fAlpha));  //色合いの設定
-	//===========================================================================================
+	fAlpha = (float)(nLife) / (float)(nMaxLife); // 色の透明度を体力の割合で決定
+	Size.x -= m_fReductionWidth;  // 横幅を減らす
+	Size.y -= m_fReductionHeight; // 高さを減らす
+	SetSize(Size); // サイズを設定
+	SetColor(D3DXCOLOR(col.r, col.g, col.b, fAlpha)); //色合いの設定
 
 	//========================================
 	//ビルボードの更新処理
@@ -247,7 +248,7 @@ CParticle* CParticle::Create(TYPE Type, int nLife, float fWidth, float fHeight, 
 	pParticle->bindTexture(pTexture->GetAddress(pParticle->GetTextureIndex()));  //テクスチャをセットする　
 	pParticle->SetPos(pos);                                                      //オブジェクト２Ｄの位置を設定
 	pParticle->SetSupportPos(pos);                                               //召喚位置を設定
-	pParticle->SetSize(fWidth, fHeight);                                         //サイズを設定する
+	pParticle->SetSize(D3DXVECTOR3(fWidth, fHeight, 0.0f));                                         //サイズを設定する
 	pParticle->SetColor(col);                                                    //色合いを設定
 	pParticle->CObject::SetType(CObject::TYPE::PARTICLE);                        //オブジェクトの種類を決める
 	pParticle->SetAnimInfo(1, 1, col, false);                                    //アニメーション情報を設定
