@@ -50,6 +50,9 @@ public:
 	//“_‚ªAABB‚Ì’†‚É“ü‚Á‚Ä‚¢‚é‚©‚Ç‚¤‚©
 	static bool IsPointInsideAABB(const D3DXVECTOR3 & Point,CObjectX * pComObjX);
 
+	// OBB“¯m‚ÌÕ“Ë”»’è
+	static bool OBBToOBB(CObjectX* pSelf, CObjectX* pOther);
+
 	//==============================================
 	//³•ûŒ`‚Ì‰Ÿ‚µo‚µ”»’è
 	//==============================================

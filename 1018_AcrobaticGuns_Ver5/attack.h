@@ -40,6 +40,7 @@ public:
 		NONE = 0,     // なし
 		SQUARE,       // 正方形 
 		RECTANGLE_XZ, // 回転正方形XZ
+		OBBTOOBB,     // OBB同士
 		MAX
 	};
 
@@ -139,16 +140,14 @@ public:
 	const CObject::TYPE& GetCollisionObjType(); // 当たったオブジェクトのタイプを取得
 
 	BoundInfo& GetBoundInfo(); // バウンド情報を取得
-protected:
-	// === 静的メンバ変数 ===
-
-	static const string ATTACK_FILENAME[static_cast<int>(ATTACKTYPE::MAX)]; //攻撃モデルのファイル名
-
-	// === メンバ関数 ===
 
 	// 攻撃の種類
 	void SetAttackType(ATTACKTYPE AttackType); // 設定
 	const ATTACKTYPE& GetAttackType() const;   // 取得
+protected:
+	// === 静的メンバ変数 ===
+
+	static const string ATTACK_FILENAME[static_cast<int>(ATTACKTYPE::MAX)]; //攻撃モデルのファイル名
 
 	const bool& GetCollisionSuccess() const;   //当たり判定が成功したかどうか取得
 private:

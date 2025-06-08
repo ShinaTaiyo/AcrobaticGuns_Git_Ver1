@@ -21,7 +21,7 @@
 #include "particle.h"    // パーティクル
 #include "game.h"        // ゲーム
 #include "collision.h"   // コリジョン
-
+#include "ui.h"          // UI
 //**********************************************************************************************************************
 // 静的メンバ宣言
 //**********************************************************************************************************************
@@ -603,7 +603,6 @@ void CAttack::CollisionProcess(bool& bCollision, bool& bNowCollision, CObjectX* 
 	const D3DXVECTOR3& OtherVtxMax = OtherSizeInfo.GetVtxMax(); // 相手の最大頂点
 	const D3DXVECTOR3& OtherVtxMin = OtherSizeInfo.GetVtxMin(); // 相手の最小頂点
 
-
 	// === 当たり判定の種類によってポインタとして渡されたオブジェクトとの判定方法を変更して処理 ===
 
 	// 判定種類によって変更
@@ -623,6 +622,13 @@ void CAttack::CollisionProcess(bool& bCollision, bool& bNowCollision, CObjectX* 
 		{
 			bCollision = true;    // 当たった
 			bNowCollision = true; // 現在当たった
+		}
+		break;
+	case CAttack::COLLISIONTYPE::OBBTOOBB:
+		if (CCollision::OBBToOBB(this, pObjX))
+		{
+			bCollision = true;
+			bNowCollision = true;
 		}
 		break;
 	default:

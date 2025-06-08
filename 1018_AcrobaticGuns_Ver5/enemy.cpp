@@ -16,12 +16,16 @@
 #include "debugtext.h"
 #include "collision.h"
 #include "damage.h"
+#include "bgModel.h"
 #include "particle.h"
+#include "camera.h"
+#include "score.h"
 #include "phasemanager.h"
 #include "input.h"
 #include "effect.h"
+#include "combo.h"
+#include "player.h"
 #include "block.h"
-#include "camera.h"
 #include "attack.h"
 //============================================================================================================================================
 
@@ -1652,7 +1656,7 @@ void CShotWeakEnemy::SwordCollision()
 {
 	if (m_pMagicSword != nullptr && CGame::GetPlayer() != nullptr)
 	{//剣とプレイヤーが存在していたら
-		if (CCollision::RectAngleCollisionXZ(m_pMagicSword,CGame::GetPlayer()))
+		if (CCollision::OBBToOBB(m_pMagicSword,CGame::GetPlayer()))
 		{//XZ方向の斜めの当たり判定を行う
 
 			//XZ方向のベクトルを求める

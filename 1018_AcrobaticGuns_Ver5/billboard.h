@@ -27,7 +27,7 @@ public:
 
 	// コンストラクタ
 	CBillboard(
-		int nPri = 6, // 自分で決めるint型プライオリティ
+		int nPri = 6, // 自分で決めるプライオリティ
 		bool bUseintPri = false, // 自分でプライオリティを決めるかどうか
 		CObject::TYPE type = CObject::TYPE::NONE, // タイプ
 		CObject::OBJECTTYPE ObjType = CObject::OBJECTTYPE::OBJECTTYPE_BILLBOARD // オブジェクトタイプ

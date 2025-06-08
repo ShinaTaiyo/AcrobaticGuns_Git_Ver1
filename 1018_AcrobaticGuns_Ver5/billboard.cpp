@@ -75,12 +75,8 @@ CBillboard::~CBillboard()
 //===================================================================================================================
 HRESULT CBillboard::Init(void)
 {
-	// === 変数 ===
-
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();//デバイスへのポインタと取得
 	VERTEX_3D* pVtx;
-
-	// === 処理 ===
 
 	pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * 4, // 頂点の数
 		D3DUSAGE_WRITEONLY,
