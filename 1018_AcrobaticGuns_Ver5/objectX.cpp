@@ -180,11 +180,10 @@ void CObjectX::Draw()
 	D3DXVECTOR3 PosZero = { 0.0f,0.0f,0.0f };
 	D3DXVec3TransformCoord(&m_PosInfo.WorldPos, &PosZero, &m_DrawInfo.mtxWorld);
 
-
 	//=======================================
 	//描画の調整
 	//=======================================
-	if (m_DrawInfo.Color.a < 1.0f && CScene::GetMode() == CScene::MODE_GAME)
+	if (m_DrawInfo.Color.a < 0.97f && m_DrawInfo.bColorChenge && CScene::GetMode() == CScene::MODE_GAME)
 	{
     	pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);//TRUEだと透明度と背景のブレンドが行われる、FALSEだと完全に不透明な描画になる
 		pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);     //描画するオブジェクトの色の影響度を決める,D3DBLEND_SRCALPHA：(R,G,B) * a(オブジェクトの透明度に応じた色)
@@ -336,10 +335,10 @@ void CObjectX::SetDamage(int nDamage, int nHitStopTime)
 {
 	if (m_LifeInfo.bHitStop == false && nDamage > 0)
 	{//ヒットストップ状態じゃなければ
-		m_LifeInfo.bHitStop = true;              //ヒットストップ状態にする
-		m_LifeInfo.nHitStopTime = nHitStopTime;  //ヒットストップ時間
-		CDamage::Create(nDamage, GetPosInfo().GetSenterPos(), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), 30.0f + nDamage * 1.0f, 30.0f + nDamage * 1.0f);//ダメージの生成
-		m_LifeInfo.nLife -= nDamage;//体力を減らす
+		m_LifeInfo.bHitStop = true;              // ヒットストップ状態にする
+		m_LifeInfo.nHitStopTime = nHitStopTime;  // ヒットストップ時間
+		m_LifeInfo.nLife -= nDamage;             // 体力を減らす
+
 	}
 }
 //================================================================================================================================================
@@ -1211,7 +1210,6 @@ void CObjectX::DrawInfo::ChengeColorProcess(CObjectX* pObjX)
 {
 	if (bColorChenge == true)
 	{//色合いの変更
-		nChengeColorTime--;
 
 		if (bBlinkingColor == true)
 		{
@@ -1225,13 +1223,15 @@ void CObjectX::DrawInfo::ChengeColorProcess(CObjectX* pObjX)
 				pObjX->SetOnlyFormarColor();
 			}
 		}
-	}
 
-	if (nChengeColorTime <= 0 && bColorChenge == true)
-	{//色合いを変える時間がなくなったら元の色合いに戻す
-		nChengeColorTime = 0;//色合いを変えるフレームのリセット
-		pObjX->SetFormarColor();//元の色合いに戻す
-		bColorChenge = false;//色合いを変えない
+		if (nChengeColorTime <= 0 && bColorChenge == true)
+		{//色合いを変える時間がなくなったら元の色合いに戻す
+			nChengeColorTime = 0;//色合いを変えるフレームのリセット
+			pObjX->SetFormarColor();//元の色合いに戻す
+			bColorChenge = false;//色合いを変えない
+		}
+
+		nChengeColorTime--; // 色合いを変える時間を減らす
 	}
 }
 //================================================================================================================================================

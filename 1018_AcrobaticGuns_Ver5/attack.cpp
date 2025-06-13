@@ -639,7 +639,7 @@ void CAttack::CollisionProcess(bool& bCollision, bool& bNowCollision, CObjectX* 
 	if (bNowCollision == true)
 	{
 		pObjX->SetDamage(GetPower(), m_HitStop.nSetTime); // 引数に設定されているオブジェクトにダメージを与える
-		pObjX->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), m_HitStop.nSetTime, false, false,false); // 引数に設定されているオブジェクトの色合いを赤くする
+		pObjX->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), m_HitStop.nSetTime + 1, false, false,false); // 引数に設定されているオブジェクトの色合いを赤くする
 	}
 
 }

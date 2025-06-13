@@ -815,7 +815,15 @@ void CEnemy::ChengeMove(CEnemyMove* pEnemyMove)
 	//代入する
 	m_pEnemyMove = pEnemyMove;
 }
-//============================================================================================================================================
+
+//====================================================================================
+// ダメージを設定
+//====================================================================================
+void CEnemy::SetDamage(int nDamage, int nHitStopTime)
+{
+	SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), nHitStopTime, false, false, false); // 色合いを設定
+	CObjectX::SetDamage(nDamage, nHitStopTime); // オブジェクトXのダメージ設定処理
+}
 
 //====================================================================================
 //レイが当たったかどうかを判定する
@@ -1221,7 +1229,6 @@ HRESULT CShotWeakEnemy::Init()
 		false,false,1, 60, 200, GetPosInfo().GetPos(), D3DXVECTOR3(0.0f,D3DX_PI * fRatioRot, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f));//剣を生成
 	m_pMagicSword->SetUseDeath(false);//剣の死亡フラグをオフにする
 
-	SetColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f), 300000, true, true, false);//デバッグ用に透明にする
 	//剣を回す方向を決める
 	if (bAim == false)
 	{
@@ -1258,6 +1265,8 @@ void CShotWeakEnemy::Update()
 	{//剣が存在していたら
 		m_pMagicSword->GetPosInfo().SetPos(GetPosInfo().GetPos());//剣の中心を常に敵の位置に固定
 	}
+
+	CManager::GetDebugText()->PrintDebugText("射撃に弱い敵のアルファ値：%f\n", GetDrawInfo().Color.a);
 
 	SwordCollision();//剣の当たり判定を行う
 }

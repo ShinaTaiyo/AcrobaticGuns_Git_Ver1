@@ -412,7 +412,7 @@ void CCamera::MakeTransparent()
 			{//オブジェクトがnullptrになるまで検索する
 				CObject* pNext = pObj->GetNextObject();//次のオブジェクトを取得する
 				CObject::TYPE Type = pObj->GetType();//オブジェクトの種類を取得する
-				if (Type == CObject::TYPE::BGMODEL || Type == CObject::TYPE::BLOCK)
+				if (Type == CObject::TYPE::BLOCK)
 				{
 					CObjectX* pObjX = static_cast<CObjectX*>(pObj);//オブジェクトXにキャストする
 					if (CCollision::RayIntersectsAABBCollisionPos(m_PosV, Ray, pObjX->GetPosInfo().GetPos() + pObjX->GetSizeInfo().GetVtxMin(), pObjX->GetPosInfo().GetPos() + pObjX->GetSizeInfo().GetVtxMax(), RayCollisionPos))

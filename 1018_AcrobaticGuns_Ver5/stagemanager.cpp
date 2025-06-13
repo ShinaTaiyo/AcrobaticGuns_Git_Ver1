@@ -703,7 +703,16 @@ void CStageManagerState_PlacedObject::ChooseObject(CStageManager* pStageManager)
 
 	(*it)->ManagerChooseControlInfo();//オブジェクトクラスに情報を編集するための関数が各派生クラスにoverrideされているので編集することができる
 
-	DeleteObject(it, StgObjList);     //現在選択しているオブジェクトを破棄する
+	CObjectX* pObjX = dynamic_cast<CObjectX*>((*it)); // 選択オブジェクトのイテレータをオブジェクトXにダウンキャスト
+
+	// オブジェクトXへのポインタが存在していたらカメラの位置を選択オブジェクトの位置に固定
+	if (pObjX)
+	{
+		CCamera* pCamera = CManager::GetCamera();      // カメラへのポインタを取得
+		pCamera->SetPos(pObjX->GetPosInfo().GetPos()); // 位置を設定
+	}
+
+	DeleteObject(it, StgObjList);// 現在選択しているオブジェクトを破棄する
 }
 //=======================================================================================================================
 
