@@ -18,6 +18,7 @@
 #include "input.h"
 #include "attack.h"
 #include "calculation.h"
+#include "camera.h"
 #include "particle.h"
 #include "debugtext.h"
 #include "phasemanager.h"
@@ -89,6 +90,21 @@ HRESULT CGame::Init()
 
 	// 3D背景を生成
 	CBg3D::Create(CBg3D::TYPE::SKY, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1200.0f, 1200.0f, 1200.0f));
+
+	CCamera* pCamera = CManager::GetCamera();       // カメラへのポインタ
+	pCamera->SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f)); // 向きを前に設定
+	CCameraState_Normal * pNormal = dynamic_cast<CCameraState_Normal*>(pCamera->GetCameraState()); // カメラを３０フレーム操作不可能にする
+	
+	// カメラ通常状態があれば、向き操作不可能時間を設定
+	if (pNormal)
+	{
+		// ※ カーソルを中央に固定し続け、そこから動いた量に応じてカメラを動かしているので、最初にカーソルを中央に設定します。
+		// 画面の中心座標
+		POINT center = { SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 };
+		// マウスを中央にリセット
+		SetCursorPos(static_cast<int>(center.x), static_cast<int>(center.y));
+		pNormal->SetNoControlRotFrame(30);
+	}
 
 	m_pPhaseManager = CPhaseManager::Create(); // フェーズマネージャーを生成
 	m_pPhaseManager->SetUseDeath(false); // 死亡フラグを使用しない
