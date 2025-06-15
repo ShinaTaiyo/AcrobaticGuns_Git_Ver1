@@ -68,52 +68,6 @@ bool CCollision::CollisionSquarePoint(const D3DXVECTOR3 & Point,CObjectX* pObjX)
 	}
 	return false;
 }
-//====================================================================================================================
-
-//================================================================
-//正方形の当たり判定を取る
-//================================================================
-bool CCollision::CollisionBall(D3DXVECTOR3 MySenterPos, D3DXVECTOR3 MySize,
-	D3DXVECTOR3 ComparisonSenterPos, D3DXVECTOR3 ComparisonSize)
-{
-	float fResultMySize = 0.0f;        //自分のサイズ
-	float fResultComprisonSize = 0.0f; //相手のサイズ
-
-	//====================================================================
-	//X軸のサイズとY軸のサイズを比べ、大きいほうを半径として定義する
-	//====================================================================
-	if (MySize.x > MySize.y)
-	{//サイズがXの方が大きい
-		fResultMySize = MySize.x;
-	}
-	else
-	{//サイズがYの方が大きい
-		fResultMySize = MySize.y;
-	}
-
-	if (ComparisonSize.x > ComparisonSize.y)
-	{//サイズがXの方が大きい
-		fResultComprisonSize = ComparisonSize.x;
-	}
-	else
-	{//サイズがYの方が大きい
-		fResultComprisonSize = ComparisonSize.y;
-	}
-	//===============================================================================================================================-
-
-	float fCheckLength = fResultMySize / 2 + fResultComprisonSize / 2;//お互いのモデルの中心点からの距離を足す
-
-	//お互いのモデルの中心点からの距離を求める
-	float fLength = CCalculation::CalculationLength(MySenterPos, ComparisonSenterPos);
-
-	if (fLength < fCheckLength)
-	{//二つの半径の和より距離が小さければtrueを返す
-		return true;
-	}
-
-	return false;
-}
-//====================================================================================================================
 
 //================================================================
 //斜めの当たり判定XY
@@ -370,180 +324,21 @@ bool CCollision::RectAngleCollisionXZ(CObjectX* pMyObj, CObjectX* pComObj)
 }
 
 //================================================================
-//XZ方向のOBBの当たり判定
-//================================================================
-bool CCollision::RectOBB_XZ(CObjectX* pMyObj, CObjectX* pComObj)
-{
-	CObjectX::PosInfo& MyPosInfo = pMyObj->GetPosInfo();      //自分自身の位置情報
-	CObjectX::RotInfo& MyRotInfo = pMyObj->GetRotInfo();      //自分自身の向き情報
-	CObjectX::SizeInfo& MySizeInfo = pMyObj->GetSizeInfo();   //自分自身のサイズ情報
-
-	CObjectX::PosInfo& ComPosInfo = pComObj->GetPosInfo();    //相手の位置情報
-	CObjectX::RotInfo& ComRotInfo = pComObj->GetRotInfo();    //相手の向き情報
-	CObjectX::SizeInfo& ComSizeInfo = pComObj->GetSizeInfo(); //相手のサイズ情報
-
-	const D3DXVECTOR3& MyPos = MyPosInfo.GetPos();            //自分自身の位置
-	const D3DXVECTOR3& MyRot = MyRotInfo.GetRot();            //自分自身の向き
-	const D3DXVECTOR3& MyVtxMax = MySizeInfo.GetVtxMax();     //自分自身の最大頂点
-	const D3DXVECTOR3& MyVtxMin = MySizeInfo.GetVtxMin();     //自分自身の最小頂点
-	const D3DXVECTOR3& MySize = MySizeInfo.GetSize();         //自分自身のサイズ取得
-	float fAdjustLength = MyVtxMax.z - MySize.z;              // 中心点を調整する距離   
-	const D3DXVECTOR3 MySenterPos = MyPos + D3DXVECTOR3(sinf(MyRot.y) * fAdjustLength, 0.0f,cosf(fAdjustLength) * fAdjustLength);//Y軸を考慮しない自分自身の中心点 
-	D3DXVECTOR3 MySenterPosXZ = D3DXVECTOR3(MySenterPos.x,0.0f,MySenterPos.z);     //Y軸を考慮しない自分自身の中心点
-	D3DXVECTOR3 MyPosXZ = D3DXVECTOR3(MyPos.x, 0.0f, MyPos.z);                                              // Y軸を考慮しない自分自身の位置
-	CParticle::Create(CParticle::TYPE::TYPE00_NORMAL, 100, 10.0f, 10.0f, MySenterPos, D3DXVECTOR3(0.0f, 5.0f, 0.0f), D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f), true);
-
-
-	const D3DXVECTOR3& ComPos = ComPosInfo.GetPos();             // 相手の位置
-	const D3DXVECTOR3& ComRot = ComRotInfo.GetRot();             // 相手の向き情報
-	const D3DXVECTOR3& ComVtxMax = ComSizeInfo.GetVtxMax();      // 相手の最大頂点
-	const D3DXVECTOR3& ComVtxMin = ComSizeInfo.GetVtxMin();      // 相手の最小頂点
-	const D3DXVECTOR3& ComSize = ComSizeInfo.GetSize();          // 相手のサイズ
-	const D3DXVECTOR3 ComSenterPos = ComPosInfo.GetSenterPos(); // 相手の中心点
-	D3DXVECTOR3 ComSenterPosXZ = D3DXVECTOR3(ComSenterPos.x, 0.0f, ComSenterPos.z);//Y軸を考慮しない相手の中心
-	CParticle::Create(CParticle::TYPE::TYPE00_NORMAL, 100, 10.0f, 10.0f, ComSenterPos, D3DXVECTOR3(0.0f, 5.0f, 0.0f), D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f), true);//デバッグ用パーティクル
-
-	CDebugText* pDebugText = CManager::GetDebugText();        //デバッグ表示の取得
-
-	D3DXVECTOR3 MyRightPosXZ = MySenterPosXZ + D3DXVECTOR3(sinf(MyRot.y + D3DX_PI * 0.5f) * (MySize.x / 2), 0.0f, cosf(MyRot.y + D3DX_PI * 0.5f) * (MySize.x / 2));//中心点から右端への位置を求める
-
-	//デバッグ用のパーティクル（自分の右ベクトル）
-	CParticle::Create(CParticle::TYPE::TYPE00_NORMAL, 100, 10.0f, 10.0f,D3DXVECTOR3(MyRightPosXZ.x,MyPos.y, MyRightPosXZ.z), D3DXVECTOR3(0.0f, 5.0f, 0.0f), D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f), true);
-
-	D3DXVECTOR3 ComPosXZ = D3DXVECTOR3(ComPos.x, 0.0f, ComPos.z);               //Y軸を考慮しない相手の位置
-
-	D3DXVECTOR3 DirSenterXZ = ComSenterPosXZ - MySenterPosXZ;//Y軸を考慮しない中心点同士のベクトル
-	float fLength = CCalculation::CalculationLength(MySenterPosXZ, ComSenterPosXZ);//Y軸を考慮しない中心点同士の距離
-
-
-	//上記で求めた位置とのベクトルを求める：EA1
-	D3DXVECTOR3 EA1_RightVec = MyRightPosXZ - MySenterPosXZ;       //ポリゴンA右ベクトル(EA1)
-	D3DXVECTOR3 NormalizeEA1_RightVec = { 0.0f,0.0f,0.0f };  //ポリゴンA"正規化"右ベクトル
-	D3DXVec3Normalize(&NormalizeEA1_RightVec, &EA1_RightVec);//正規化
-
-	//自分の向きを考慮した前側の位置を求める（前方向０にするので、cosをZとする)
-	D3DXVECTOR3 MyUpPosXZ = MySenterPosXZ + D3DXVECTOR3(sinf(MyRot.y) * (MySize.z / 2), 0.0f, cosf(MyRot.y) * (MySize.z / 2));
-	//デバッグ用のパーティクル（自分の上ベクトル）
-	CParticle::Create(CParticle::TYPE::TYPE00_NORMAL, 100, 10.0f, 10.0f, D3DXVECTOR3(MyUpPosXZ.x, MyPos.y, MyUpPosXZ.z), D3DXVECTOR3(0.0f, 5.0f, 0.0f), D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f), true);
-
-    //上記で求めた位置とのベクトルを求める：EA2
-	D3DXVECTOR3 EA2_UpVec = MyUpPosXZ - MySenterPosXZ;   //ポリゴンA上ベクトル(EA2)
-	D3DXVECTOR3 NormalizeEA2_UpVec = { 0.0f,0.0f,0.0f }; //ポリゴンA”正規化”上ベクトル
-	D3DXVec3Normalize(&NormalizeEA2_UpVec, &EA2_UpVec);  //正規化
-
-	//相手の向きを考慮した右側の位置を求める（前方向０にするので、cosをZとし、右側なので「+90度」)
-	D3DXVECTOR3 ComRightPosXZ = ComSenterPosXZ + D3DXVECTOR3(sinf(ComRot.y + D3DX_PI * 0.5f) * (ComSize.x / 2), 0.0f, cosf(ComRot.y + D3DX_PI * 0.5f) * (ComSize.x / 2));
-	//デバッグ用のパーティクル（相手の右ベクトル）
-    CParticle::Create(CParticle::TYPE::TYPE00_NORMAL, 100, 10.0f, 10.0f, D3DXVECTOR3(ComRightPosXZ.x, ComPos.y, ComRightPosXZ.z), D3DXVECTOR3(0.0f, 5.0f, 0.0f), D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f), true);
-
-	//上記で求めた位置とのベクトルを求める：EB1
-	D3DXVECTOR3 EB1_RightVec = ComRightPosXZ - ComSenterPosXZ;       //ポリゴンB右ベクトル(EB1)
-	D3DXVECTOR3 NormalizeEB1_RightVec = { 0.0f,0.0f,0.0f };    //ポリゴンB"正規化"右ベクトル
-	D3DXVec3Normalize(&NormalizeEB1_RightVec, &EB1_RightVec);  //正規化
-
-	//相手の向きを考慮した前側の位置を求める（前方向０にするので、cosをZとする)
-	D3DXVECTOR3 ComUpPosXZ = ComSenterPosXZ + D3DXVECTOR3(sinf(ComRot.y) * (ComSize.z / 2), 0.0f, cosf(ComRot.y) * (ComSize.z / 2));
-
-	//デバッグ用のパーティクル（相手の上ベクトル）
-	CParticle::Create(CParticle::TYPE::TYPE00_NORMAL, 100, 10.0f, 10.0f, D3DXVECTOR3(ComUpPosXZ.x, ComPos.y, ComUpPosXZ.z), D3DXVECTOR3(0.0f, 5.0f, 0.0f), D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f), true);
-	//上記で求めた位置とのベクトルを求める：EB2
-	D3DXVECTOR3 EB2_UpVec = ComUpPosXZ - ComSenterPosXZ;    //ポリゴンB上ベクトル(EB2)
-	D3DXVECTOR3 NormalizeEB2_UpVec = { 0.0f,0.0f,0.0f };    //ポリゴンB"正規化"上ベクトル
-	D3DXVec3Normalize(&NormalizeEB2_UpVec, &EB2_UpVec);     //正規化
-	//全て長さです
-	float rA[4] = {};    //分離軸に対する半径A
-	float rB[4] = {};    //分離軸に対する半径B
-	float L[4] = {};     //分離軸に対する距離
-
-	//==========================================
-	//分離軸１：ポリゴンA右ベクトル(A.e1)
-	//==========================================
-	rA[0] = CCalculation::CalculationLength(MySenterPosXZ, MyRightPosXZ);//分離軸上での中心点からの長さがrA半径になる
-	rB[0] = fabsf(D3DXVec3Dot(&EB1_RightVec, &NormalizeEA1_RightVec)) + fabsf(D3DXVec3Dot(&EB2_UpVec, &NormalizeEA1_RightVec));//分離軸EA1にポリゴンBの２軸を投影した長さ
-	L[0] = fabsf(D3DXVec3Dot(&DirSenterXZ, &NormalizeEA1_RightVec));//中心点間の距離を分離軸EA1に投影
-
-	pDebugText->PrintDebugText("rA[0] = %f\n", rA[0]);
-	pDebugText->PrintDebugText("rB[0] = %f\n", rB[0]);
-	pDebugText->PrintDebugText("L[0] = %f\n", L[0]);
-
-	if (L[0] > (rA[0] + rB[0]))
-	{//投影した中心点間の距離よりも半投影線分の合計が大きければ分離軸が存在しないので、当たっている
-		return false;
-	}
-
-	//==========================================
-	//分離軸２：ポリゴンA上ベクトル(A.e2)
-	//==========================================
-	rA[1] = CCalculation::CalculationLength(MySenterPosXZ, MyUpPosXZ);
-	rB[1] = fabsf(D3DXVec3Dot(&EB1_RightVec, &NormalizeEA2_UpVec)) + fabsf(D3DXVec3Dot(&EB2_UpVec, &NormalizeEA2_UpVec));//分離軸EA2にポリゴンBの２軸を投影した長さ
-	L[1] = fabsf(D3DXVec3Dot(&DirSenterXZ, &NormalizeEA2_UpVec));//中心点間の距離を分離軸EA2に投影
-
-	pDebugText->PrintDebugText("rA[1] = %f\n", rA[1]);
-	pDebugText->PrintDebugText("rB[1] = %f\n", rB[1]);
-	pDebugText->PrintDebugText("L[1] = %f\n", L[1]);
-
-	if (L[1] > (rA[1] + rB[1]))
-	{//投影した中心点間の距離よりも半投影線分の合計が大きければ分離軸が存在しないので、当たっている
-		return false;
-	}
-
-	//==========================================
-	//分離軸３：ポリゴンB右ベクトル(B.e1)
-	//==========================================
-	rA[2] = fabsf(D3DXVec3Dot(&EA1_RightVec, &NormalizeEB1_RightVec)) + fabsf(D3DXVec3Dot(&EA2_UpVec, &NormalizeEB1_RightVec));//分離軸EB1にポリゴンAの２軸を投影した長さ
-	rB[2] = CCalculation::CalculationLength(ComSenterPosXZ, ComRightPosXZ);
-	L[2] = fabsf(D3DXVec3Dot(&DirSenterXZ, &NormalizeEB1_RightVec));//中心点間の距離を分離軸EB1に投影
-	pDebugText->PrintDebugText("rA[2] = %f\n", rA[2]);
-	pDebugText->PrintDebugText("rB[2] = %f\n", rB[2]);
-	pDebugText->PrintDebugText("L[2] = %f\n", L[2]);
-	if (L[2] > (rA[2] + rB[2]))
-	{//投影した中心点間の距離よりも半投影線分の合計が大きければ分離軸が存在しないので当たっている
-		return false;
-	}
-	
-	//==========================================
-	//分離軸４：ポリゴンB上ベクトル(B.e2)
-	//==========================================
-	rA[3] = fabsf(D3DXVec3Dot(&EA1_RightVec, &NormalizeEB2_UpVec)) + fabsf(D3DXVec3Dot(&EA2_UpVec, &NormalizeEB2_UpVec));//分離軸EB2にポリゴンAの２軸を投影した長さ
-	rB[3] = CCalculation::CalculationLength(ComSenterPosXZ, ComUpPosXZ);
-	L[3] = fabsf(D3DXVec3Dot(&DirSenterXZ, &NormalizeEB2_UpVec));           //中心点間の距離を分離軸EB2に投影
-	pDebugText->PrintDebugText("rA[3] = %f\n", rA[3]);
-	pDebugText->PrintDebugText("rB[3] = %f\n", rB[3]);
-	pDebugText->PrintDebugText("L[3] = %f\n", L[3]);
-	if (L[3] > (rA[3] + rB[3]))
-	{//投影下中心点間の距離よりも半投影線分の合計が大きければ分離軸が存在しないので当たっていない
-		return false;
-	}
-
-	//==========================================
-	//Y軸の当たり判定を確認
-	//==========================================
-	if (MyPos.y + MyVtxMax.y > ComPos.y + MyVtxMin.y &&
-		MyPos.y + MyVtxMin.y < ComPos.y + MyVtxMax.y)
-	{
-		return true;//衝突している（２つのポリゴンの分離軸が存在しないので当たっている)6
-	}
-	else
-	{
-		return false;//衝突していない（Y軸が別)
-	}
-}
-//====================================================================================================================
-
-//================================================================
 //点がAABBの中に入っているかどうか
 //================================================================
-bool CCollision::IsPointInsideAABB(const D3DXVECTOR3& Point, CObjectX* pComObjX)
+bool CCollision::IsPointInsideAABB(const D3DXVECTOR3& SelfPos, const D3DXVECTOR3& OtherPos, const D3DXVECTOR3& OtherVtxMax, const D3DXVECTOR3& OtherVtxMin)
 {
-	if (Point.x >= pComObjX->GetPosInfo().GetPos().x + pComObjX->GetSizeInfo().GetVtxMin().x &&
-		Point.x <= pComObjX->GetPosInfo().GetPos().x + pComObjX->GetSizeInfo().GetVtxMax().x &&
-		Point.y >= pComObjX->GetPosInfo().GetPos().y + pComObjX->GetSizeInfo().GetVtxMin().y &&
-		Point.y <= pComObjX->GetPosInfo().GetPos().y + pComObjX->GetSizeInfo().GetVtxMax().y &&
-		Point.z >= pComObjX->GetPosInfo().GetPos().z + pComObjX->GetSizeInfo().GetVtxMin().z &&
-		Point.z <= pComObjX->GetPosInfo().GetPos().z + pComObjX->GetSizeInfo().GetVtxMax().z)
-	{//点がAABBの中に入っていたら
+	// 点がAABBの中に入っているかどうか
+	if (SelfPos.x >= OtherPos.x + OtherVtxMin.x &&
+		SelfPos.x <= OtherPos.x + OtherVtxMax.x &&
+		SelfPos.y >= OtherPos.y + OtherVtxMin.y &&
+		SelfPos.y <= OtherPos.y + OtherVtxMax.y &&
+		SelfPos.z >= OtherPos.z + OtherVtxMin.z &&
+		SelfPos.z <= OtherPos.z + OtherVtxMax.z)
+	{
 		return true;
 	}
+
 	return false;
 }
 

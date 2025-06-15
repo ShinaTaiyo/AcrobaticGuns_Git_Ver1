@@ -33,10 +33,6 @@ public:
 	//“_‚ªAABB‚Æ“–‚½‚Á‚½‚©‚Ç‚¤‚©‚ğ”»’è
 	static bool CollisionSquarePoint(const D3DXVECTOR3 & Point,CObjectX* pObjX);
 
-	//‰~‚Ì“–‚½‚è”»’è
-	static bool CollisionBall(D3DXVECTOR3 MySenterPos, D3DXVECTOR3 MySize,
-		D3DXVECTOR3 ComparisonSenterPos, D3DXVECTOR3 ComparisonSize);
-
 	//Î‚ß‚Ì“–‚½‚è”»’èXY
 	static bool RectAngleCollisionXY(D3DXVECTOR3 MyPos, D3DXVECTOR3 MyVtxMax, D3DXVECTOR3 MyVtxMin, D3DXVECTOR3 Rot,
 		D3DXVECTOR3 ComparisonPos, D3DXVECTOR3 ComparisonVtxMax, D3DXVECTOR3 ComparisonVtxMin);
@@ -44,11 +40,13 @@ public:
 	//Î‚ß‚Ì“–‚½‚è”»’èXZ
 	static bool RectAngleCollisionXZ(CObjectX* pMyObj, CObjectX* pComObj);
 
-	//XZ•ûŒü‚ÌOBB‚Ì“–‚½‚è”»’è
-	static bool RectOBB_XZ(CObjectX* pMyObj, CObjectX* pComObj);
-
 	//“_‚ªAABB‚Ì’†‚É“ü‚Á‚Ä‚¢‚é‚©‚Ç‚¤‚©
-	static bool IsPointInsideAABB(const D3DXVECTOR3 & Point,CObjectX * pComObjX);
+	static bool IsPointInsideAABB(
+		const D3DXVECTOR3 & SelfPos,
+		const D3DXVECTOR3 & OtherPos,
+		const D3DXVECTOR3 & OtherVtxMax,
+		const D3DXVECTOR3 & OtherVtxMin
+	);
 
 	// OBB“¯m‚ÌÕ“Ë”»’è
 	static bool OBBToOBB(CObjectX* pSelf, CObjectX* pOther);

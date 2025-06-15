@@ -633,51 +633,60 @@ void CObjectX::ChengeEditScaleZ()
 //===================================================================================================================
 void CObjectX::ChengeEditPos()
 {
-	D3DXVECTOR3 Move = D3DXVECTOR3(0.0f,0.0f,0.0f);
-	SetColor(D3DXCOLOR(1.0f,0.0f,0.0f,0.5f),3,true,true,false);           //色を半透明にする
-	CInputKeyboard* pInput = CManager::GetInputKeyboard();
-	CCamera* pCamera = CManager::GetCamera(); // カメラへのポインタ
-	const D3DXVECTOR3& Rot = pCamera->GetRot(); // カメラの向き
-	//===========================
-	//位置を支点に固定
-	//===========================
-	m_PosInfo.Pos = m_PosInfo.SupportPos;
-	//========================================================================================
+	// === 処理に使用する情報を宣言、初期化 ===
 
-	//===========================
-	//位置を変更
-	//===========================
-	if (pInput->GetPress(DIK_LSHIFT) == true)
-	{//Y軸移動
+	D3DXVECTOR3 Move = D3DXVECTOR3(0.0f,0.0f,0.0f); // 移動量
+	CInputKeyboard* pInput = CManager::GetInputKeyboard(); // キー入力情報へのポインタ
+	CCamera* pCamera = CManager::GetCamera();   // カメラへのポインタ
+	const D3DXVECTOR3& Rot = pCamera->GetRot(); // カメラの向き
+	m_PosInfo.Pos = m_PosInfo.SupportPos;       // 位置を支点に固定
+
+	// === 位置の編集を開始する ===
+
+	SetColor(D3DXCOLOR(1.0f,0.0f,0.0f,0.5f),3,true,true,false); // 選択されているので色を半透明にする
+
+	// Lシフトを押しているならY軸移動を行う
+	if (pInput->GetPress(DIK_LSHIFT))
+	{
+		// Lコントロールを押していたら値を少しずつ加算する
 		if (pInput->GetPress(DIK_LCONTROL))
 		{
-			if (pInput->GetTrigger(DIK_W) == true)
+			// Wキーを押していたら上に少し移動
+			if (pInput->GetTrigger(DIK_W))
 			{
 				m_PosInfo.Pos.y += 0.1f;
 			}
-			else if (pInput->GetTrigger(DIK_S) == true)
+			// Sキーを押していたら下に少し移動
+			else if (pInput->GetTrigger(DIK_S))
 			{
 				m_PosInfo.Pos.y -= 0.1f;
 			}
 		}
+		// Lコントロールを押していないので値を加算する
 		else
 		{
-			if (pInput->GetPress(DIK_W) == true)
+			// Wキーを押し続けて居たら上に移動
+			if (pInput->GetPress(DIK_W))
 			{
 				m_PosInfo.Pos.y += 5.0f;
 			}
-			else if (pInput->GetPress(DIK_S) == true)
+			// Sキーを押し続けていたら下に移動
+			else if (pInput->GetPress(DIK_S))
 			{
 				m_PosInfo.Pos.y -= 5.0f;
 			}
 		}
 	}
+	// Lシフトを押していないのでXZ移動を行う
 	else
-	{//XZ平面移動
-		CCalculation::CaluclationMove(false,m_PosInfo.Pos,Move,5.0f, CCalculation::MOVEAIM_XZ, Rot.y,m_RotInfo.Rot.y);
+	{
+		// 入力による移動処理
+		Calculation::Move::MovementInput(false,m_PosInfo.Pos,Move,5.0f, 
+			Calculation::Move::MOVEAIM::XZ, 
+			Rot.y,m_RotInfo.Rot.y);
 	}
 
-	//支点も一緒に移動
+	// 支点も一緒に移動する
 	m_PosInfo.Pos += Move;
 	m_PosInfo.SupportPos = m_PosInfo.Pos;
 
@@ -686,10 +695,7 @@ void CObjectX::ChengeEditPos()
 	CManager::GetDebugText()->PrintDebugText("移動量 ： %f %f %f\n", Move.x, Move.y, Move.z);
 	CManager::GetDebugText()->PrintDebugText("向きZ(FGキー) %f\n", m_RotInfo.Rot.z);
 	CManager::GetCamera()->SetPosR(m_PosInfo.Pos);//注視点を現在操作しているモデルに固定
-	//================================================================================================================================================
-
 }
-//================================================================================================================================================
 
 //===================================================================================================================
 //位置を移動させる

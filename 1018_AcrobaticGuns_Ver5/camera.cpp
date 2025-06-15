@@ -162,12 +162,16 @@ void CCamera::Uninit()
 //====================================================================
 void CCamera::Update()
 {
-	m_pCameraState->Process(this);      //カメラの角度に関する処理
-	m_pCameraLengthState->Process(this);//カメラの距離に関する処理
+	// === 処理に使用する情報を宣言、初期化 ===
+
 	CInputKeyboard* pInputKeyboard = CManager::GetInputKeyboard();//キー入力情報
 	CDebugText* pDebugText = CManager::GetDebugText();//デバッグ情報
 
-	pDebugText->PrintDebugText("カメラをマウスで操作するかどうか（Lシフトを押しながらM): %d\n", s_bCAMERACONTROLLMOUSE);
+	// === カメラ更新処理開始 ===
+
+	m_pCameraState->Process(this);      //カメラの角度に関する処理
+	m_pCameraLengthState->Process(this);//カメラの距離に関する処理
+
 
 	if (pInputKeyboard->GetPress(DIK_LSHIFT))
 	{
@@ -187,18 +191,17 @@ void CCamera::Update()
 		m_Rot.x = D3DX_PI * 0.5f - 0.01f;
 	}
 
-	// 向き調整
-	m_Rot.x = CCalculation::CorrectionRot(m_Rot.x);
-	m_Rot.y = CCalculation::CorrectionRot(m_Rot.y);
-	m_Rot.z = CCalculation::CorrectionRot(m_Rot.z);
-
-	//===============================================================================
+	// 向きを円周上に包み込む
+	m_Rot.x = Calculation::Rot::WrapAngle(m_Rot.x);
+	m_Rot.y = Calculation::Rot::WrapAngle(m_Rot.y);
+	m_Rot.z = Calculation::Rot::WrapAngle(m_Rot.z);
 
 	// デバッグ表示
 	CManager::GetDebugText()->PrintDebugText("カメラの向き：%f %f %f\n", m_Rot.x, m_Rot.y, m_Rot.z);
 	CManager::GetDebugText()->PrintDebugText("カメラの視点：%f %f %f\n", m_PosV.x, m_PosV.y, m_PosV.z);
 	CManager::GetDebugText()->PrintDebugText("カメラの注視点：%f %f %f\n", m_PosR.x, m_PosR.y, m_PosR.z);
 	CManager::GetDebugText()->PrintDebugText("カメラとの距離：%f\n",m_fAddLength);
+	pDebugText->PrintDebugText("カメラをマウスで操作するかどうか（Lシフトを押しながらM): %d\n", s_bCAMERACONTROLLMOUSE);
 
 	// カメラ操作不可能フレームがあれば減らす
 	if (m_nNoControlFrame > 0)
@@ -414,34 +417,59 @@ void CCamera::NormalCameraMove()
 //====================================================================
 void CCamera::MakeTransparent()
 {
+	// シーンが「エディット」以外なら処理を開始 
 	if (CScene::GetMode() != CScene::MODE_EDIT)
-	{//シーンが「エディット」なら
-		D3DXVECTOR3 Ray = m_PosR - m_PosV;                          //注視点と支店のベクトルを取り、レイとする
-		D3DXVec3Normalize(&Ray, &Ray);                              //上記で求めたレイを正規化する
-		D3DXVECTOR3 RayCollisionPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);//レイが当たった位置代入用
-		float fLength = 0.0f;                                       //レイが当たった場所の距離
+	{
+		// === 処理に必要な情報を宣言、初期化 ===
+
+		D3DXVECTOR3 Ray = m_PosR - m_PosV; // 視点と注視点のベクトル
+		D3DXVec3Normalize(&Ray, &Ray);     // 上記で求めたベクトルを正規化する
+		D3DXVECTOR3 RayCollisionPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f); // レイが当たった位置
+		float fLength = 0.0f; // レイが当たった場所への距離
+
+		// === カメラと重なったオブジェクトを透明にする処理を開始 ===
+
+		// リスト検索
 		for (int nCntPri = 0; nCntPri < CObject::m_nMAXPRIORITY; nCntPri++)
-		{//オブジェクトリストを検索する
-			CObject* pObj = CObject::GetTopObject(nCntPri);//各リストの先頭オブジェクトを取得する
+		{
+			CObject* pObj = CObject::GetTopObject(nCntPri); // 先頭オブジェクト取得
 
+			// リストを末尾まで検索
 			while (pObj != nullptr)
-			{//オブジェクトがnullptrになるまで検索する
-				CObject* pNext = pObj->GetNextObject();//次のオブジェクトを取得する
-				CObject::TYPE Type = pObj->GetType();//オブジェクトの種類を取得する
-				if (Type == CObject::TYPE::BLOCK)
+			{
+				CObject* pNext = pObj->GetNextObject(); // 次のオブジェクト
+				CObject::TYPE Type = pObj->GetType();   // オブジェクト種類
+
+				// タイプが「ブロック」以外なら処理を中断
+				if (Type != CObject::TYPE::BLOCK)
 				{
-					CObjectX* pObjX = static_cast<CObjectX*>(pObj);//オブジェクトXにキャストする
-					if (CCollision::RayIntersectsAABBCollisionPos(m_PosV, Ray, pObjX->GetPosInfo().GetPos() + pObjX->GetSizeInfo().GetVtxMin(), pObjX->GetPosInfo().GetPos() + pObjX->GetSizeInfo().GetVtxMax(), RayCollisionPos))
-					{//レイが当たっていたら
-
-						fLength = CCalculation::CalculationLength(m_PosV, RayCollisionPos);//レイが当たった位置と距離を求める
-
-						if (m_fLength > fLength)
-						{//カメラの距離よりもオブジェクトとレイが当たった位置が近い場合は透明にする
-							pObjX->SetColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.5f), 3, true, true,false);
-						}
-					}
+					pObj = pNext;
+					continue;
 				}
+
+				CObjectX* pObjX = static_cast<CObjectX*>(pObj); // オブジェクトXにキャストする
+
+				// レイがブロックと当たらなかった場合、処理を中断
+				if (!CCollision::RayIntersectsAABBCollisionPos(
+					m_PosV, Ray, pObjX->GetPosInfo().GetPos() + pObjX->GetSizeInfo().GetVtxMin(),
+					pObjX->GetPosInfo().GetPos() + pObjX->GetSizeInfo().GetVtxMax(), RayCollisionPos))
+				{
+					pObj = pNext;
+					continue;
+				}
+
+				// レイが当たった位置と距離を求める
+				fLength = Calculation::Length::ToGoalPos(m_PosV, RayCollisionPos);
+
+				// カメラの距離よりもオブジェクトとレイが当たった距離が長い場合は処理を中断
+				if (m_fLength < fLength)
+				{
+					pObj = pNext;
+					continue;
+				}
+
+				// カメラの注視点と視点間の距離よりもレイが衝突した位置が短かったので色合いを薄くする
+				pObjX->SetColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.5f), 3, true, true,false);
 
 				pObj = pNext;//リストを進める
 			}
@@ -485,9 +513,9 @@ void CCameraState_TurnAround::Process(CCamera* pCamera)
 	float fRotDiffX = m_AimRot.x - NowRot.x;
 	float fRotDiffY = m_AimRot.y - NowRot.y;
 
-	//向きの差分を補正（ジンバルロックを回避)
-	fRotDiffX = CCalculation::CorrectionRot(fRotDiffX);
-	fRotDiffY = CCalculation::CorrectionRot(fRotDiffY);
+	//向きの差分を円周上に包み込む
+	fRotDiffX = Calculation::Rot::WrapAngle(fRotDiffX);
+	fRotDiffY = Calculation::Rot::WrapAngle(fRotDiffY);
 
 	CManager::GetDebugText()->PrintDebugText("カメラの向きの差分:%f\n");//デバッグ表示
 
@@ -495,9 +523,9 @@ void CCameraState_TurnAround::Process(CCamera* pCamera)
 	float fAddRotX = fRotDiffX * m_fAdjustTurnSpeed;
 	float fAddRotY = fRotDiffY * m_fAdjustTurnSpeed;
 
-	//ジンバルロックを回避
-	fAddRotX = CCalculation::CorrectionRot(fAddRotX);
-	fAddRotY = CCalculation::CorrectionRot(fAddRotY);
+	//加算向きを円周上に包み込む
+	fAddRotX = Calculation::Rot::WrapAngle(fAddRotX);
+	fAddRotY = Calculation::Rot::WrapAngle(fAddRotY);
 
 	//向きを設定する
 	pCamera->SetRot(D3DXVECTOR3(pCamera->GetRot().x + fAddRotX, pCamera->GetRot().y + fAddRotY, pCamera->GetRot().z));

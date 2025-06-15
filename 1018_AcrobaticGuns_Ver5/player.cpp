@@ -28,6 +28,8 @@
 #include "ui.h"
 #include "particle2d.h"
 #include "debugtext.h"
+#include "wire.h"
+#include "wire_head.h"
 #include "combo.h"
 #include "sound.h"
 #include "tutorial.h"
